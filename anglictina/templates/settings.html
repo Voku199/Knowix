@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nastavení – Knowix</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="/">
+        <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+      </a>
+    </div>
+    <nav>
+      <ul class="nav-right">
+        <li><a href="/test">Angličtina</a></li>
+        <li>
+          {% if session['user_name'] %}
+            <div class="user-profile">
+              <div class="profile-container">
+                <img src="{{ url_for('static', filename='profile_pics/' + session.get('profile_pic', 'default.jpg')) }}"
+                     alt="Profilovka"
+                     class="profile-pic"
+                     id="profileMenuTrigger">
+                <div class="profile-menu" id="profileMenu">
+                  <a href="{{ url_for('settings') }}">⚙️ Nastavení</a>
+                  <a href="{{ url_for('logout') }}">🚪 Odhlásit se</a>
+                </div>
+              </div>
+              <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+          {% else %}
+            <div class="auth-links">
+              <a href="{{ url_for('login') }}">🔑 Přihlásit se</a>
+              <a href="{{ url_for('register') }}">📝 Registrovat se</a>
+            </div>
+          {% endif %}
+        </li>
+        <li><button id="theme-toggle">🌙</button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="settings-container">
+    <h1>Nastavení účtu</h1>
+
+    <div class="profile-pic-section">
+      <h2>Profilová fotka</h2>
+      <div class="profile-pic-wrapper">
+        <img src="{{ url_for('static', filename='profile_pics/' + session.get('profile_pic', 'default.jpg')) }}"
+             alt="Aktuální profilovka"
+             class="current-profile-pic">
+      </div>
+
+      <form method="POST" action="/upload_profile_pic" enctype="multipart/form-data" class="upload-form">
+        <label for="file-upload">
+          📸 Vybrat soubor
+          <input type="file" name="file" id="file-upload" accept="image/*" required>
+        </label>
+        <button type="submit">🚀 Nahrát novou fotku</button>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p class="footer-signature">Made with ❤️ by Voku and lot of ☕</p>
+  </footer>
+
+  <script>
+    // Přepínání dark/light režimu
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowix - ALPHA VERZE</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    .alpha-badge {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: red;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 10px;
+      display: inline-block;
+      padding: 5px 15px;
+      border-radius: 20px;
+      background: rgba(255,0,0,0.1);
+    }
+
+    .footer-signature {
+      font-size: 1em;
+      font-weight: bold;
+      color: #666;
+      margin-top: 10px;
+    }
+
+    .logo-name {
+      font-size: 4rem;
+      color: #2c3e50;
+      text-transform: lowercase;
+      margin-bottom: 15px;
+      letter-spacing: -2px;
+    }
+
+    /* New styles for profile menu */
+    .profile-container {
+      position: relative;
+    }
+
+    .profile-pic {
+      border-radius: 50%;
+    }
+
+    .profile-menu {
+      position: absolute;
+      top: 70px;
+      right: 0;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: all 0.3s ease-in-out;
+    }
+
+    .profile-container:hover .profile-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="/">
+        <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+      </a>
+    </div>
+    <nav>
+      <ul class="nav-right">
+        <li><a href="/test">Angličtina</a></li>
+        <li>
+          {% if session['user_name'] %}
+            <div class="user-profile">
+              <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                  <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}" alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                  <img src="{{ url_for('static', filename='pics/default.jpg') }}" alt="Defaultní profilovka" class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                  <a href="{{ url_for('settings') }}">⚙️ Nastavení</a>
+                  <a href="{{ url_for('logout') }}">🚪 Odhlásit se</a>
+                </div>
+              </div>
+              <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+          {% else %}
+            <div class="auth-links">
+              <a href="{{ url_for('login') }}">🔑 Přihlásit se</a>
+              <a href="{{ url_for('register') }}">📝 Registrovat se</a>
+            </div>
+          {% endif %}
+        </li>
+        <li><button id="theme-toggle">🌙</button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h1 class="logo-name">knowix</h1>
+      <span class="alpha-badge">ALPHA VERZE</span>
+      <h2 class="motto">Každý pád je krok vpřed</h2>
+    </section>
+
+    <section class="info">
+      <div class="bubble">
+        <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+        <div class="bubble-text">
+          <h3>Kdo vytvořil Knowix?</h3>
+          <p>Vytvořil žák Vojtěch Kurinec</p>
+        </div>
+      </div>
+      <div class="bubble">
+        <img src="{{ url_for('static', filename='pic/introicon-hra.png') }}" alt="Knowix Logo">
+        <div class="bubble-text">
+          <h3>Proč jsem to udělal?</h3>
+          <p>Inspiroval jsem se od táty.</p>
+          <p>Táta jednou udělal PocitejSam, kde byly příklady a trénoval jsi počítání.</p>
+          <p>Takže jsem šel a udělal jsem Angličtinu.</p>
+        </div>
+      </div>
+      <div class="bubble">
+        <img src="{{ url_for('static', filename='pic/proc.png') }}" alt="Knowix Logo">
+        <div class="bubble-text">
+          <h3>Efektivita</h3>
+          <p>Jsou zde nepravidelná slovesa, která se učí ve škole.</p>
+          <p>Zároveň se zde budou přidávat další sekce, jak pro Angličtinu, tak i pro něco nového.</p>
+        </div>
+      </div>
+      <div class="bubble">
+        <img src="{{ url_for('static', filename='pic/introicon-skola.png') }}" alt="Knowix Logo">
+        <div class="bubble-text">
+          <h3>Zdarma</h3>
+          <p>Všechno by bylo zdarma... Zbytečnost kupovat licence...</p>
+        </div>
+      </div>
+      <div class="bubble support-bubble" onclick="window.open('https://ko-fi.com/voku199', '_blank')">
+        <img src="{{ url_for('static', filename='pic/support.png') }}" alt="Podpora">
+        <div class="bubble-text">
+          <h3>Podpora</h3>
+          <p>Chceš mě finančně podpořit? Klikni na to 😊</p>
+          <p>Dobrovolný příspěvek!</p>
+       </div>
+      </div>
+
+    </section>
+  </main>
+
+<footer>
+  <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+  <p class="footer-signature">
+    Made with ❤️ by
+    <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+    and lot of ☕
+  </p>
+</footer>
+
+  <script>
+    // Přepínání dark/light režimu
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+
+    // Detekce kliknutí mimo menu
+    document.addEventListener('click', (e) => {
+      const profileMenu = document.getElementById('profileMenu');
+      const trigger = document.getElementById('profileMenuTrigger');
+
+      if (!trigger.contains(e.target) && !profileMenu.contains(e.target)) {
+        profileMenu.style.opacity = '0';
+        profileMenu.style.visibility = 'hidden';
+        profileMenu.style.transform = 'translateY(10px)';
+      }
+    });
+  </script>
+</body>
+</html>

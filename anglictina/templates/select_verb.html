@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowix - ALPHA VERZE</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    .alpha-badge {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: red;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 10px;
+      display: inline-block;
+      padding: 5px 15px;
+      border-radius: 20px;
+      background: rgba(255,0,0,0.1);
+    }
+
+    .footer-signature {
+      font-size: 1em;
+      font-weight: bold;
+      color: #666;
+      margin-top: 10px;
+    }
+
+    .logo-name {
+      font-size: 4rem;
+      color: #2c3e50;
+      text-transform: lowercase;
+      margin-bottom: 15px;
+      letter-spacing: -2px;
+    }
+
+    /* Styly pro výběr sloves */
+    .verb-section {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: rgba(255,255,255,0.9);
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .verb-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .verb-form input {
+      padding: 12px 20px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+    }
+
+    .verb-form input:focus {
+      border-color: #2c3e50;
+      outline: none;
+    }
+
+    .verb-form button {
+      background: #2c3e50;
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: transform 0.2s ease;
+    }
+
+    .verb-form button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Dropdown s možností scrollování */
+    datalist {
+      position: absolute;
+      width: calc(100% - 20px);
+      max-height: 180px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      background-color: white;
+      border-radius: 0 0 5px 5px;
+      z-index: 1000;
+    }
+
+    .dropdown-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .dropdown-list li {
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .dropdown-list li:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="/">
+        <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+      </a>
+    </div>
+    <nav>
+      <ul class="nav-right">
+        <li><a href="/test">Angličtina</a></li>
+        <li>
+          {% if session['user_name'] %}
+            <div class="profile-container">
+              {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}" alt="Profilová fotka" width="64" class="profile-pic">
+              {% else %}
+                <img src="{{ url_for('static', filename='pics/default.jpg') }}" alt="Defaultní profilovka" class="profile-pic">
+              {% endif %}
+              <div class="profile-menu">
+                <a href="{{ url_for('settings') }}">⚙️ Nastavení</a>
+                <a href="{{ url_for('logout') }}">🚪 Odhlásit se</a>
+              </div>
+            </div>
+            <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
+          {% else %}
+            <div class="auth-links">
+              <a href="{{ url_for('login') }}">🔑 Přihlásit se</a>
+              <a href="{{ url_for('register') }}">📝 Registrovat se</a>
+            </div>
+          {% endif %}
+        </li>
+        <li><button id="theme-toggle">🌙</button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h1 class="logo-name">knowix</h1>
+      <span class="alpha-badge">ALPHA VERZE</span>
+    </section>
+
+    <section class="verb-section">
+      <h2 class="motto">Trénuj nepravidelná slovesa</h2>
+
+      {% if error %}
+        <div class="error-message">{{ error }}</div>
+      {% endif %}
+
+      <form method="POST" action="/test" class="verb-form">
+        <input
+          type="text"
+          id="verb"
+          name="verb"
+          list="verbs"
+          placeholder="Začněte psát sloveso..."
+          autocomplete="off"
+          required
+        >
+        <datalist id="verbs">
+          {% for verb in verbs %}
+            <option value="{{ verb }}">
+          {% endfor %}
+        </datalist>
+        <button type="submit">Spustit test ➔</button>
+      </form>
+    </section>
+  </main>
+
+<footer>
+  <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+  <p class="footer-signature">
+    Made with ❤️ by
+    <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+    and lot of ☕
+  </p>
+</footer>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const verbInput = document.getElementById('verb');
+    const verbDatalist = document.getElementById('verbs');
+
+    // Funkce pro zobrazení dropdownu s omezeným počtem položek
+    verbInput.addEventListener('input', function() {
+      const query = verbInput.value.toLowerCase();
+      const filteredVerbs = {{ verbs | tojson }}.filter(verb => verb.toLowerCase().includes(query));
+
+      verbDatalist.innerHTML = ''; // Vyčistí existující položky
+      filteredVerbs.slice(0, 6).forEach(function(verb) {
+        const option = document.createElement('option');
+        option.value = verb;
+        verbDatalist.appendChild(option);
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

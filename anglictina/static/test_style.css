@@ -1,0 +1,168 @@
+/* Reset základních stylů */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'League Spartan', sans-serif;
+  background-color: #fff;
+  color: #333;
+  transition: background 0.3s, color 0.3s;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.logo-name {
+  font-family: 'League Spartan', sans-serif;
+  font-weight: 700; /* Tlustší text */
+  text-transform: lowercase; /* Nastavení na malá písmena */
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+/* Dark mode */
+body.dark-mode {
+  background-color: #121212;
+  color: #f5f5f5;
+}
+
+/* Hlavička */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 2px solid #ddd;
+}
+
+.logo img {
+  width: 80px;
+  height: auto;
+  border-radius: 12px; /* Modernější vzhled loga */
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.nav-right {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+}
+
+.nav-right li {
+  display: inline;
+}
+
+.nav-right a, #theme-toggle {
+  text-decoration: none;
+  color: inherit;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s, background 0.3s;
+}
+
+.nav-right a:hover {
+  background: #ccc;
+  color: #000;
+}
+
+.dark-mode .motto {
+  color: white;
+}
+
+/* Dark mode button */
+#theme-toggle {
+  font-size: 1.2rem;
+}
+
+/* Hlavní část */
+main {
+  max-width: 900px;
+  margin: 50px auto;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.motto {
+  font-size: 1.8rem;
+  color: #555;
+  margin: 15px 0;
+  background: linear-gradient(to right, #e0dcd5, #ccc);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* Bubliny */
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.bubble {
+  display: flex;
+  align-items: center;
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.bubble img {
+  width: 80px;
+  height: auto;
+  margin-right: 15px;
+}
+
+.bubble-text {
+  text-align: left;
+}
+
+.bubble h3 {
+  font-size: 1.5rem;
+}
+
+.bubble p {
+  color: #555;
+}
+
+/* Dark mode pro bubliny */
+body.dark-mode .bubble {
+  background: #222;
+  color: #fff;
+}
+
+body.dark-mode .motto {
+  background: linear-gradient(to right, #444, #666);
+}
+
+/* Patička */
+footer {
+  text-align: center;
+  padding: 10px;
+  background: #f5f5f5;
+  margin-top: auto;
+  font-size: 0.9rem;
+}
+
+body.dark-mode footer {
+  background: #222;
+  color: #ccc;
+}
+
+/* Responsivní design */
+@media (max-width: 768px) {
+  .bubble {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .bubble img {
+    margin-bottom: 10px;
+  }
+}

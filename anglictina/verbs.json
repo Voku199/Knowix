@@ -1,0 +1,748 @@
+[
+  {
+    "verb1": "go",
+    "verb2": "went",
+    "verb3": "gone",
+    "examples": [
+      "Yesterday, I {verb2} to the park.",
+      "She has {verb3} to Italy three times.",
+      "They always {verb1} to the beach in summer.",
+      "He {verb2} too fast and crashed his car.",
+      "We have never {verb3} in a helicopter before.",
+      "Last night, he {verb2} too much soda."
+    ]
+  },
+  {
+    "verb1": "run",
+    "verb2": "ran",
+    "verb3": "run",
+    "examples": [
+      "I always {verb1} in the mornings to stay fit.",
+      "He {verb2} a marathon last year.",
+      "She has {verb3} across the field.",
+      "They {verb2} to the bus stop when they were late.",
+      "We {verb3} into an old friend yesterday.",
+      "She {verb1} away from home when she was a child."
+    ]
+  },
+  {
+    "verb1": "come",
+    "verb2": "came",
+    "verb3": "come",
+    "examples": [
+      "They {verb1} to the party late.",
+      "I have {verb3} to understand the problem.",
+      "He always {verb1} home early after work.",
+      "She {verb2} to the meeting prepared.",
+      "We {verb3} up with a great idea yesterday.",
+      "I {verb2} across an interesting book at the library."
+    ]
+  },
+  {
+    "verb1": "fly",
+    "verb2": "flew",
+    "verb3": "flown",
+    "examples": [
+      "I have {verb3} to Paris twice.",
+      "He {verb2} the plane to London.",
+      "They {verb1} over the mountains last summer.",
+      "We {verb2} to the beach for the weekend.",
+      "She has {verb3} a drone before.",
+      "I {verb2} to a conference last month."
+    ]
+  },
+  {
+    "verb1": "eat",
+    "verb2": "ate",
+    "verb3": "eaten",
+    "examples": [
+      "I always {verb1} breakfast before school.",
+      "She {verb2} lunch at a new cafe.",
+      "They have {verb3} sushi for dinner.",
+      "We {verb2} pizza last weekend.",
+      "He has never {verb3} Chinese food.",
+      "I {verb1} too much chocolate yesterday."
+    ]
+  },
+  {
+    "verb1": "drink",
+    "verb2": "drank",
+    "verb3": "drunk",
+    "examples": [
+      "He {verb1} water after the run.",
+      "I {verb2} coffee this morning.",
+      "She has {verb3} tea at the meeting.",
+      "They {verb2} wine at the party last night.",
+      "We have {verb3} all the juice in the fridge.",
+      "He {verb1} a glass of milk before bed."
+    ]
+  },
+  {
+    "verb1": "take",
+    "verb2": "took",
+    "verb3": "taken",
+    "examples": [
+      "She {verb2} the book from the shelf.",
+      "He has {verb3} the wrong train this morning.",
+      "I always {verb1} my dog for a walk in the evening.",
+      "They {verb2} a lot of photos during their vacation.",
+      "She {verb1} her keys by mistake.",
+      "We have {verb3} the car to the mechanic."
+    ]
+  },
+  {
+    "verb1": "drive",
+    "verb2": "drove",
+    "verb3": "driven",
+    "examples": [
+      "He {verb2} the car to work today.",
+      "I have {verb3} this route many times.",
+      "They always {verb1} carefully.",
+      "She {verb2} across the country last summer.",
+      "We {verb3} to the beach last weekend.",
+      "I {verb1} to the store this morning."
+    ]
+  },
+  {
+    "verb1": "fall",
+    "verb2": "fell",
+    "verb3": "fallen",
+    "examples": [
+      "She {verb2} off the ladder yesterday.",
+      "I have {verb3} in love with this place.",
+      "The leaves {verb1} in autumn.",
+      "They {verb2} into the trap set by the hunters.",
+      "He {verb1} asleep during the meeting.",
+      "We {verb2} on the way to the concert."
+    ]
+  },
+  {
+    "verb1": "buy",
+    "verb2": "bought",
+    "verb3": "bought",
+    "examples": [
+      "I {verb2} a new phone yesterday.",
+      "She has {verb3} some gifts for her friends.",
+      "We {verb1} a new car last month.",
+      "They {verb2} everything on sale.",
+      "He {verb3} a present for his birthday.",
+      "I {verb1} groceries on my way home."
+    ]
+  },
+
+  {
+    "verb1": "speak",
+    "verb2": "spoke",
+    "verb3": "spoken",
+    "examples": [
+      "I {verb2} to him on the phone yesterday.",
+      "She has {verb3} to the teacher about the issue.",
+      "They always {verb1} English in class.",
+      "We {verb2} for hours last night.",
+      "He has {verb3} about his experiences abroad.",
+      "I {verb1} with my friends at the party."
+    ]
+  },
+
+  {
+    "verb1": "fly",
+    "verb2": "flew",
+    "verb3": "flown",
+    "examples": [
+      "She {verb2} to Paris last year.",
+      "We have {verb3} over 500 miles today.",
+      "I {verb1} on a plane for the first time last month.",
+      "They {verb2} through a thunderstorm during their trip.",
+      "He has {verb3} across the world for business.",
+      "I {verb1} to visit my family every summer."
+    ]
+  },
+
+
+  {
+    "verb1": "build",
+    "verb2": "built",
+    "verb3": "built",
+    "examples": [
+      "He {verb2} a new house last summer.",
+      "We have {verb3} a shed in the backyard.",
+      "She {verb1} a treehouse when she was young.",
+      "They {verb2} a playground in the park.",
+      "I have never {verb3} a website before.",
+      "They {verb1} a bridge across the river."
+    ]
+  },
+  {
+    "verb1": "catch",
+    "verb2": "caught",
+    "verb3": "caught",
+    "examples": [
+      "I {verb2} a cold last week.",
+      "They have {verb3} many fish today.",
+      "She {verb1} the ball during the game.",
+      "We {verb2} a glimpse of the singer backstage.",
+      "He has {verb3} the train just in time.",
+      "I {verb1} the thief red-handed."
+    ]
+  },
+
+  {
+    "verb1": "choose",
+    "verb2": "chose",
+    "verb3": "chosen",
+    "examples": [
+      "She {verb2} the blue dress for the party.",
+      "I have {verb3} the right answer.",
+      "We {verb1} a new restaurant to visit last week.",
+      "They {verb2} the wrong path during the hike.",
+      "He has {verb3} the best team for the project.",
+      "I always {verb1} the easiest option."
+    ]
+  },
+
+  {
+    "verb1": "cost",
+    "verb2": "cost",
+    "verb3": "cost",
+    "examples": [
+      "The book {verb2} $10 last year.",
+      "They have {verb3} a fortune on their wedding.",
+      "This coat {verb1} more than I expected.",
+      "I {verb2} a lot of money on groceries today.",
+      "We have never {verb3} so much on a trip.",
+      "The repair will {verb1} quite a bit."
+    ]
+  },
+  {
+    "verb1": "cut",
+    "verb2": "cut",
+    "verb3": "cut",
+    "examples": [
+      "She {verb2} the paper with scissors.",
+      "I have {verb3} my finger while chopping vegetables.",
+      "They {verb1} the ribbon during the ceremony.",
+      "He {verb2} the cake into pieces.",
+      "We have {verb3} the project short due to time constraints.",
+      "She always {verb1} her hair short in the summer."
+    ]
+  },
+  {
+    "verb1": "dig",
+    "verb2": "dug",
+    "verb3": "dug",
+    "examples": [
+      "They {verb2} a hole in the backyard to plant a tree.",
+      "I have never {verb3} this deep before.",
+      "We {verb1} for hours to find the treasure.",
+      "He {verb2} up a new garden this spring.",
+      "They have {verb3} through the rubble to rescue people.",
+      "I {verb1} a hole for the fence post."
+    ]
+  },
+  {
+    "verb1": "do",
+    "verb2": "did",
+    "verb3": "done",
+    "examples": [
+      "I {verb2} my homework last night.",
+      "We have {verb3} everything we can to help.",
+      "She {verb1} all the cooking for the party.",
+      "He {verb2} the cleaning after the event.",
+      "They have {verb3} their best to solve the issue.",
+      "I always {verb1} my best at work."
+    ]
+  },
+
+  {
+    "verb1": "wake",
+    "verb2": "woke",
+    "verb3": "woken",
+    "examples": [
+      "He {verb2} up early for his jog.",
+      "I have {verb3} up several times during the night.",
+      "They {verb1} to the sound of birds chirping.",
+      "We {verb2} up to the smell of fresh coffee.",
+      "She has {verb3} from a long nap.",
+      "I {verb1} every day at 7 AM."
+    ]
+  },
+  {
+    "verb1": "wear",
+    "verb2": "wore",
+    "verb3": "worn",
+    "examples": [
+      "I {verb2} my new jacket yesterday.",
+      "She has {verb3} the same dress for two days.",
+      "He {verb1} a black suit to the wedding.",
+      "We {verb2} our uniforms for the match.",
+      "They have {verb3} a lot of colorful clothes recently.",
+      "I {verb1} a hat in the sun to protect myself."
+    ]
+  },
+  {
+    "verb1": "win",
+    "verb2": "won",
+    "verb3": "won",
+    "examples": [
+      "He {verb2} the first place in the competition.",
+      "I have {verb3} several awards over the years.",
+      "We {verb1} the game after a tough battle.",
+      "They {verb2} a trip to Paris as a prize.",
+      "She has {verb3} many times in her career.",
+      "I {verb1} a medal last year."
+    ]
+  },
+  {
+    "verb1": "sleep",
+    "verb2": "slept",
+    "verb3": "slept",
+    "examples": [
+      "I {verb2} for eight hours last night.",
+      "She has {verb3} through the whole storm.",
+      "He {verb1} deeply after the long journey.",
+      "They {verb2} late on the weekend.",
+      "We have {verb3} in a tent during our vacation.",
+      "I {verb1} during the whole movie."
+    ]
+  },
+  {
+    "verb1": "ride",
+    "verb2": "rode",
+    "verb3": "ridden",
+    "examples": [
+      "He {verb2} his bike to work yesterday.",
+      "She has {verb3} horses since she was young.",
+      "They {verb1} through the park in the morning.",
+      "I {verb2} a horse at the ranch last weekend.",
+      "He has {verb3} a motorcycle before.",
+      "I {verb1} to the store every day."
+    ]
+  },
+  {
+    "verb1": "teach",
+    "verb2": "taught",
+    "verb3": "taught",
+    "examples": [
+      "She {verb2} me how to play the piano.",
+      "I have {verb3} English for several years.",
+      "They {verb1} the class about the history of Rome.",
+      "We {verb2} the students how to solve the problems.",
+      "He has {verb3} a lesson on painting.",
+      "I {verb1} programming at school."
+    ]
+  },
+
+  {
+    "verb1": "stand",
+    "verb2": "stood",
+    "verb3": "stood",
+    "examples": [
+      "She {verb2} at the window and looked outside.",
+      "He has {verb3} all day during the event.",
+      "They {verb1} in line for tickets.",
+      "I {verb2} in front of the door waiting for him.",
+      "We have {verb3} together at the meeting.",
+      "She {verb1} tall in her new heels."
+    ]
+  },
+  {
+    "verb1": "swim",
+    "verb2": "swam",
+    "verb3": "swum",
+    "examples": [
+      "I {verb2} in the lake yesterday.",
+      "They have {verb3} in the ocean during their vacation.",
+      "We {verb1} for an hour this morning.",
+      "He {verb2} with his dog in the pool.",
+      "She has {verb3} in competitive races before.",
+      "They {verb1} in the pool every weekend."
+    ]
+  },
+  {
+    "verb1": "sweep",
+    "verb2": "swept",
+    "verb3": "swept",
+    "examples": [
+      "She {verb2} the floor with a broom this morning.",
+      "We have {verb3} the house clean all week.",
+      "They {verb1} the dust off the porch.",
+      "I {verb2} the kitchen before breakfast.",
+      "He has {verb3} away all the leaves from the yard.",
+      "She {verb1} the floor every Saturday."
+    ]
+  },
+  {
+    "verb1": "sell",
+    "verb2": "sold",
+    "verb3": "sold",
+    "examples": [
+      "I {verb2} my old bike yesterday.",
+      "She has {verb3} all her used books online.",
+      "We {verb1} handmade crafts at the market.",
+      "He {verb2} his car last week.",
+      "They have {verb3} a lot of tickets for the concert.",
+      "I {verb1} my phone on the internet."
+    ]
+  },
+
+  {
+    "verb1": "break",
+    "verb2": "broke",
+    "verb3": "broken",
+    "examples": [
+      "I {verb2} my phone when I dropped it.",
+      "She has {verb3} her leg twice while skiing.",
+      "He {verb2} the glass by accident.",
+      "They have {verb3} the rules again.",
+      "We {verb1} the bread into pieces.",
+      "He {verb2} the record for fastest lap."
+    ]
+  },
+
+  {
+    "verb1": "hit",
+    "verb2": "hit",
+    "verb3": "hit",
+    "examples": [
+      "He {verb2} the ball with a bat.",
+      "She has {verb3} the target every time.",
+      "They {verb1} the gym after work.",
+      "I {verb2} the car with a hammer to fix it.",
+      "We have {verb3} a milestone in the project.",
+      "He {verb1} the roadblock during his journey."
+    ]
+  },
+  {
+    "verb1": "steal",
+    "verb2": "stole",
+    "verb3": "stolen",
+    "examples": [
+      "He {verb2} my wallet last night.",
+      "She has {verb3} a cookie from the jar.",
+      "They {verb1} the show from the band.",
+      "I {verb2} a pen from the office.",
+      "We have never {verb3} anything from anyone.",
+      "He {verb1} a glance at the answer key."
+    ]
+  },
+  {
+    "verb1": "lose",
+    "verb2": "lost",
+    "verb3": "lost",
+    "examples": [
+      "I {verb2} my keys yesterday.",
+      "She has {verb3} her phone somewhere in the house.",
+      "They {verb1} their way to the hotel.",
+      "He {verb2} his wallet on the bus.",
+      "We have never {verb3} a match in this tournament.",
+      "She {verb1} her job last month."
+    ]
+  },
+  {
+    "verb1": "hide",
+    "verb2": "hid",
+    "verb3": "hidden",
+    "examples": [
+      "I {verb2} the gift under the bed.",
+      "She has {verb3} the letter from her parents.",
+      "They {verb1} their phones before the test.",
+      "He {verb2} the money in the drawer.",
+      "We have {verb3} the treasure for years.",
+      "She {verb1} her feelings from everyone."
+    ]
+  },
+  {
+    "verb1": "tear",
+    "verb2": "tore",
+    "verb3": "torn",
+    "examples": [
+      "I {verb2} my shirt while climbing.",
+      "She has {verb3} the letter into pieces.",
+      "They {verb1} the paper into small pieces.",
+      "He {verb2} the book by accident.",
+      "We have {verb3} the fabric during the project.",
+      "He {verb1} the photo in frustration."
+    ]
+  },
+  {
+    "verb1": "fight",
+    "verb2": "fought",
+    "verb3": "fought",
+    "examples": [
+      "They {verb2} for the championship title.",
+      "She has {verb3} in the tournament last year.",
+      "He {verb1} his brother over the TV remote.",
+      "We {verb2} with the neighbors about the noise.",
+      "I have never {verb3} with anyone.",
+      "She {verb1} the bully at school."
+    ]
+  },
+  {
+    "verb1": "throw",
+    "verb2": "threw",
+    "verb3": "thrown",
+    "examples": [
+      "I {verb2} the ball to my friend.",
+      "She has {verb3} the old books away.",
+      "He {verb1} the bottle into the trash.",
+      "We {verb2} a surprise party for her birthday.",
+      "They have {verb3} their plans out the window.",
+      "He {verb1} a coin into the fountain."
+    ]
+  },
+  {
+    "verb1": "make",
+    "verb2": "made",
+    "verb3": "made",
+    "examples": [
+      "She {verb2} a beautiful cake for my birthday.",
+      "He has {verb3} a gift for me every year.",
+      "They always {verb1} their friends gifts at Christmas.",
+      "I {verb2} the letter yesterday.",
+      "We have {verb3} the package to your address.",
+      "He {verb1} his promise and stayed honest."
+    ]
+  },
+  {
+    "verb1": "give",
+    "verb2": "gave",
+    "verb3": "given",
+    "examples": [
+      "She {verb2} me a gift for my birthday.",
+      "He has {verb3} the charity a large donation.",
+      "They {verb1} their time to help the community.",
+      "I {verb2} her the book yesterday.",
+      "We have {verb3} a speech at the event.",
+      "He {verb1} a talk on leadership."
+    ]
+  },
+  {
+    "verb1": "bring",
+    "verb2": "brought",
+    "verb3": "brought",
+    "examples": [
+      "She {verb2} the cake to the party.",
+      "He has {verb3} his laptop to the meeting.",
+      "They {verb1} their friends to the event.",
+      "I {verb2} my jacket because it was cold.",
+      "We have {verb3} some snacks to the picnic.",
+      "She {verb1} the report to the manager."
+    ]
+  },
+  {
+    "verb1": "send",
+    "verb2": "sent",
+    "verb3": "sent",
+    "examples": [
+      "I {verb2} an email to my boss.",
+      "She has {verb3} the invitation to all her friends.",
+      "They {verb1} a postcard from their trip.",
+      "He {verb2} me a message this morning.",
+      "We have {verb3} the package yesterday.",
+      "She {verb1} a letter to her family."
+    ]
+  },
+  {
+    "verb1": "put",
+    "verb2": "put",
+    "verb3": "put",
+    "examples": [
+      "I {verb2} the keys on the table.",
+      "She has {verb3} her phone in her bag.",
+      "He {verb1} his shoes near the door.",
+      "They {verb2} the plans on hold for now.",
+      "We have {verb3} the project off until next week.",
+      "He {verb1} the dishes into the sink."
+    ]
+  },
+  {
+    "verb1": "hold",
+    "verb2": "held",
+    "verb3": "held",
+    "examples": [
+      "He {verb2} the door open for me.",
+      "She has {verb3} the position for three years.",
+      "They {verb1} their breath during the test.",
+      "I {verb2} the keys tightly in my hand.",
+      "We have {verb3} several meetings this week.",
+      "He {verb1} a grudge against them for years."
+    ]
+  },
+  {
+    "verb1": "keep",
+    "verb2": "kept",
+    "verb3": "kept",
+    "examples": [
+      "She {verb2} her promise to help me.",
+      "He has {verb3} the secret for years.",
+      "They {verb1} their house clean and tidy.",
+      "I {verb2} the receipts in my wallet.",
+      "We have {verb3} the tradition alive for decades.",
+      "He {verb1} a diary to document his thoughts."
+    ]
+  },
+  {
+    "verb1": "pay",
+    "verb2": "paid",
+    "verb3": "paid",
+    "examples": [
+      "I {verb2} the bill at the restaurant.",
+      "She has {verb3} for the tickets already.",
+      "They {verb1} their workers a fair wage.",
+      "He {verb2} the price without hesitation.",
+      "We have {verb3} for the entire trip in advance.",
+      "She {verb1} for the damages caused."
+    ]
+  },
+  {
+    "verb1": "mean",
+    "verb2": "meant",
+    "verb3": "meant",
+    "examples": [
+      "I {verb2} to call you earlier.",
+      "She has {verb3} to tell you something important.",
+      "They {verb1} everything they said in the meeting.",
+      "He {verb2} the world to me.",
+      "We have {verb3} to organize a surprise party.",
+      "He {verb1} that he doesn't like the movie."
+    ]
+  },
+  {
+    "verb1": "spend",
+    "verb2": "spent",
+    "verb3": "spent",
+    "examples": [
+      "I {verb2} all my savings on a new car.",
+      "She has {verb3} the afternoon at the beach.",
+      "They {verb1} a lot of time working on the project.",
+      "He {verb2} all his money on gadgets.",
+      "We have {verb3} a lot of time with our families.",
+      "He {verb1} his life traveling the world."
+    ]
+  },
+  {
+    "verb1": "see",
+    "verb2": "saw",
+    "verb3": "seen",
+    "examples": [
+      "I {verb2} a movie last night.",
+      "She has {verb3} that movie before.",
+      "They {verb1} the news about the event.",
+      "He {verb2} her at the party.",
+      "We have {verb3} many beautiful places in our travels.",
+      "She {verb1} the message on her phone."
+    ]
+  },
+  {
+    "verb1": "read",
+    "verb2": "read",
+    "verb3": "read",
+    "examples": [
+      "I {verb2} the book you recommended.",
+      "She has {verb3} the article several times.",
+      "They {verb1} the instructions before starting.",
+      "He {verb2} the newspaper every morning.",
+      "We have {verb3} a lot of great novels.",
+      "She {verb1} aloud to her children before bed."
+    ]
+  },
+  {
+    "verb1": "write",
+    "verb2": "wrote",
+    "verb3": "written",
+    "examples": [
+      "I {verb2} the letter this morning.",
+      "She has {verb3} many essays for school.",
+      "They {verb1} a thank-you note after the party.",
+      "He {verb2} the report yesterday.",
+      "We have {verb3} our goals for the year.",
+      "She {verb1} a poem for the contest."
+    ]
+  },
+  {
+    "verb1": "tell",
+    "verb2": "told",
+    "verb3": "told",
+    "examples": [
+      "He {verb2} me a funny joke.",
+      "She has {verb3} the story many times.",
+      "They {verb1} us about their trip.",
+      "I {verb2} him not to worry.",
+      "We have {verb3} everyone the good news.",
+      "She {verb1} the truth from the beginning."
+    ]
+  },
+  {
+    "verb1": "think",
+    "verb2": "thought",
+    "verb3": "thought",
+    "examples": [
+      "I {verb2} it was a good idea.",
+      "She has {verb3} about the situation for days.",
+      "They {verb1} the movie was fantastic.",
+      "He {verb2} about calling you earlier.",
+      "We have {verb3} long and hard about the decision.",
+      "She {verb1} of a great solution to the problem."
+    ]
+  },
+  {
+    "verb1": "know",
+    "verb2": "knew",
+    "verb3": "known",
+    "examples": [
+      "I {verb2} the answer to that question.",
+      "She has {verb3} him for many years.",
+      "They {verb1} the truth all along.",
+      "He {verb2} about the meeting before I told him.",
+      "We have {verb3} each other since childhood.",
+      "She {verb1} exactly what to do in this situation."
+    ]
+  },
+  {
+    "verb1": "understand",
+    "verb2": "understood",
+    "verb3": "understood",
+    "examples": [
+      "I {verb2} what you're saying.",
+      "She has {verb3} the problem clearly.",
+      "They {verb1} the concept after the explanation.",
+      "He {verb2} the instructions immediately.",
+      "We have {verb3} each other’s perspectives.",
+      "He {verb1} the language quite well."
+    ]
+  },
+  {
+    "verb1": "learn",
+    "verb2": "learnt",
+    "verb3": "learnt",
+    "examples": [
+      "I {verb2} how to cook yesterday.",
+      "She has {verb3} a lot in the past year.",
+      "They {verb1} new things every day.",
+      "He {verb2} to play the guitar last month.",
+      "We have {verb3} a lot about history in school.",
+      "She {verb1} quickly when she practices."
+    ]
+  },
+  {
+    "verb1": "hear",
+    "verb2": "heard",
+    "verb3": "heard",
+    "examples": [
+      "I {verb2} a strange noise last night.",
+      "She has {verb3} the news already.",
+      "They {verb1} about the event on the radio.",
+      "He {verb2} the doorbell ring.",
+      "We have {verb3} his new song.",
+      "She {verb1} something interesting in the lecture."
+    ]
+  }
+]
+
+
+
+
+
+
+
+

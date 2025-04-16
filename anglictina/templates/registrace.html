@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrace | Knowix</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style_reg_log.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/min.css">
+</head>
+<body>
+  <nav class="auth-header">
+    <a href="/" class="home-link">
+      <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+      <span>← Zpět na hlavní stránku</span>
+    </a>
+  </nav>
+
+  <div class="auth-container">
+    <div class="auth-title">
+      <div class="header-icon">
+        <i class="fas fa-user-plus fa-3x text-primary"></i>
+      </div>
+      <h2>Vytvořte si účet</h2>
+      <p>Začněte svou vzdělávací cestu</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">
+            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endwith %}
+
+    <form method="POST" class="auth-form">
+      <div class="input-group">
+        <input type="text" name="first_name" placeholder=" " required>
+        <label><i class="fas fa-user"></i> Jméno</label>
+      </div>
+
+      <div class="input-group">
+        <input type="text" name="last_name" placeholder=" " required>
+        <label><i class="fas fa-user-tag"></i> Příjmení</label>
+      </div>
+
+      <div class="input-group">
+        <input type="email" name="email" placeholder=" " required>
+        <label><i class="fas fa-envelope"></i> E-mail</label>
+      </div>
+
+      <div class="input-group">
+        <input type="password" name="password" placeholder=" " required>
+        <label><i class="fas fa-lock"></i> Heslo</label>
+      </div>
+
+      <div class="input-group">
+        <input type="date" name="birthdate">
+        <label><i class="fas fa-birthday-cake"></i> Datum narození (volitelné)</label>
+      </div>
+
+      <button type="submit">Zaregistrovat se</button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Máte již účet? <a href="{{ url_for('login') }}">Přihlaste se</a></p>
+    </div>
+  </div>
+</body>
+</html>
