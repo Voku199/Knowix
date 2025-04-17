@@ -131,14 +131,14 @@
 <body>
     <header>
         <div class="logo">
-            <a href="/">
+            <a href="{{ url_for('main.index') }}">
                 <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
             </a>
         </div>
         <nav>
             <ul class="nav-right">
-                <li><a href="/">🏠 Domů</a></li>
-                <li><a href="/test">🔄 Nové sloveso</a></li>
+                <li><a href="{{ url_for('main.index') }}">🏠 Domů</a></li>
+                <li><a href="{{ url_for('verbs.test') }}">🔄 Nové sloveso</a></li>
                 <li>
                     {% if session['user_name'] %}
                         <div class="profile-container">
@@ -153,15 +153,15 @@
                                      class="profile-pic">
                             {% endif %}
                             <div class="profile-menu">
-                                <a href="{{ url_for('settings') }}">⚙️ Nastavení</a>
-                                <a href="{{ url_for('logout') }}">🚪 Odhlásit se</a>
+                                <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                                <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
                             </div>
                         </div>
                         <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
                     {% else %}
                         <div class="auth-links">
-                            <a href="{{ url_for('login') }}">🔑 Přihlásit se</a>
-                            <a href="{{ url_for('register') }}">📝 Registrovat se</a>
+                            <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
+                            <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
                         </div>
                     {% endif %}
                 </li>
@@ -175,24 +175,22 @@
         <h2>Sloveso: {{ verb }}</h2>
 
         {% if verbs_done is defined and total_verbs is defined %}
-        <div class="progress-container">
-            <div class="progress-bar" style="width: {{ (verbs_done / total_verbs * 100) }}%;"></div>
-            <div class="progress-text">{{ verbs_done }}/{{ total_verbs }} sloves dokončeno</div>
-        </div>
+            <div class="progress-container">
+                <p>Progres: {{ progress_for_verb }}/6 správných odpovědí</p>
+            </div>
         {% endif %}
-
         {% if feedback %}
             <p class="{% if is_correct %}correct{% else %}incorrect{% endif %}">
                 {{ feedback }}
             </p>
         {% endif %}
 
-        {% if lesson_complete and is_correct %}
+        {% if lesson_complete %}
             <div class="completion-message fade-in">
                 <p>Lekce dokončena! 🎉</p>
                 <div class="completion-options">
-                    <form method="POST" action="/test">
-                        <button type="submit" name="new_lesson" value="1" class="completion-btn new-lesson">Nová lekce</button>
+                    <form method="POST" action="{{ url_for('verbs.test') }}">
+                         <button type="submit" name="new_lesson" value="1" class="nav-btn">🔄 Nové sloveso</button>
                         <input type="hidden" name="verb" value="{{ verb }}">
                         <button type="submit" name="continue" value="1" class="completion-btn continue">Pokračovat</button>
                     </form>
@@ -202,7 +200,7 @@
         {% elif sentence %}
             <p class="sentence">{{ sentence }}</p>
 
-            <form method="POST" action="/test" class="answer-form">
+            <form method="POST" action="{{ url_for('verbs.test') }}" class="answer-form">
                 <div class="answer-buttons">
                     {% for answer in possible_answers %}
                         <button type="submit"
@@ -216,7 +214,7 @@
             </form>
 
         {% else %}
-            <form method="POST" action="/test" class="next-sentence-form">
+            <form method="POST" action="{{ url_for('verbs.test') }}" class="next-sentence-form">
                 <input type="hidden" name="verb" value="{{ verb }}">
                 <button type="submit" name="continue" value="1" class="continue-btn">Pokračovat</button>
             </form>

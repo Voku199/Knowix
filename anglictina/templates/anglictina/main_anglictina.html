@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowix - Angličtina</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="/">
+        <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+      </a>
+    </div>
+    <nav>
+      <ul class="nav-right">
+        <li><a href="/anglictina">Angličtina</a></li>
+        <li>
+          {% if session['user_name'] %}
+            <div class="user-profile">
+              <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                  <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}" alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                  <img src="{{ url_for('static', filename='pics/default.jpg') }}" alt="Defaultní profilovka" class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                  <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                  <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+              </div>
+              <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+          {% else %}
+            <div class="auth-links">
+              <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
+              <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
+            </div>
+          {% endif %}
+        </li>
+        <li><button id="theme-toggle">🌙</button></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <section class="intro">
+      <h1 class="logo-name" style="font-size: 3.5rem;">Angličtina</h1>
+      <h2 class="motto">Vyber si aktivitu</h2>
+    </section>
+
+    <section class="info">
+      <!-- Nepravidelná slovesa -->
+      <a href="/anglictina/test" class="bubble activity-bubble">
+        <img src="{{ url_for('static', filename='pic/verbs_icon.png') }}" alt="Slovesa">
+        <div class="bubble-text">
+          <h3>Nepravidelná slovesa</h3>
+          <p>Procvič si všechny tři formy nepravidelných sloves!</p>
+        </div>
+      </a>
+
+      <!-- Slovní zásoba -->
+      <a href="/cteni" class="bubble activity-bubble">
+        <img src="{{ url_for('static', filename='pic/vocab_icon.png') }}" alt="Slovní zásoba">
+        <div class="bubble-text">
+          <h3>Čtení</h3>
+          <p>Vyzkoušej si, jak rozumíš čtení!</p>
+          </div>
+      </a>
+
+      <!-- Gramatika -->
+      <a href="/gramatika" class="bubble activity-bubble">
+        <img src="{{ url_for('static', filename='pic/grammar_icon.png') }}" alt="Gramatika">
+        <div class="bubble-text">
+          <h3>Gramatika</h3>
+          <p>Procvič si časy, podmínkové věty a další gramatiku</p>
+        </div>
+      </a>
+
+      <!-- Testy -->
+      <a href="/testy" class="bubble activity-bubble">
+        <img src="{{ url_for('static', filename='pic/test_icon.png') }}" alt="Testy">
+        <div class="bubble-text">
+          <h3>Testy</h3>
+          <p>Otestuj své znalosti v mixu různých témat</p>
+        </div>
+      </a>
+    </section>
+
+    <!-- Rychlý výběr -->
+    <div class="completion-message">
+      <p>Co chceš dělat dnes?</p>
+      <div class="completion-options">
+        <a href="/rychly_test" class="completion-btn new-lesson">Rychlý test</a>
+        <a href="/pokracovat" class="completion-btn continue">Pokračovat tam, kde jsi skončil</a>
+      </div>
+    </div>
+  </main>
+
+<footer>
+  <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+  <p class="footer-signature">
+    Made with ❤️ by
+    <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+    and lot of ☕
+  </p>
+</footer>
+
+  <script>
+    // Stejný script jako v index.html
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+  </script>
+</body>
+</html>

@@ -111,13 +111,13 @@
 <body>
   <header>
     <div class="logo">
-      <a href="/">
+      <a href="{{ url_for('main.index') }}">
         <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
       </a>
     </div>
     <nav>
       <ul class="nav-right">
-        <li><a href="/test">Angličtina</a></li>
+        <li><a href="/anglictina">Angličtina</a></li>
         <li>
           {% if session['user_name'] %}
             <div class="profile-container">
@@ -127,15 +127,15 @@
                 <img src="{{ url_for('static', filename='pics/default.jpg') }}" alt="Defaultní profilovka" class="profile-pic">
               {% endif %}
               <div class="profile-menu">
-                <a href="{{ url_for('settings') }}">⚙️ Nastavení</a>
-                <a href="{{ url_for('logout') }}">🚪 Odhlásit se</a>
+                <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
               </div>
             </div>
             <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
           {% else %}
             <div class="auth-links">
-              <a href="{{ url_for('login') }}">🔑 Přihlásit se</a>
-              <a href="{{ url_for('register') }}">📝 Registrovat se</a>
+              <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
+              <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
             </div>
           {% endif %}
         </li>
@@ -157,7 +157,7 @@
         <div class="error-message">{{ error }}</div>
       {% endif %}
 
-      <form method="POST" action="/test" class="verb-form">
+      <form method="POST" action="{{ url_for('verbs.test') }}" class="verb-form">
         <input
           type="text"
           id="verb"
