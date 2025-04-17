@@ -10,7 +10,7 @@
 <body>
   <header>
     <div class="logo">
-      <a href="/">
+      <a href="/anglictina/app/static">
         <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
       </a>
     </div>
@@ -53,14 +53,40 @@
     <section class="info">
       <!-- Nepravidelná slovesa -->
       <a href="/anglictina/test" class="bubble activity-bubble">
-        <img src="{{ url_for('static', filename='pic/verbs_icon.png') }}" alt="Slovesa">
+        <img src="{{ url_for('static', filename='pic/verb.png') }}" alt="Slovesa">
         <div class="bubble-text">
           <h3>Nepravidelná slovesa</h3>
           <p>Procvič si všechny tři formy nepravidelných sloves!</p>
         </div>
       </a>
+      <div class="completion-message">
+        <p>Zatím jsou zde jenom Nepravidelné slovesa</p>
+        <p>Ale nebojte se, všechno se přidá!</p>
+      </div>
+    </section>
 
-      <!-- Slovní zásoba -->
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p class="footer-signature">
+      Made with ❤️ by
+      <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+      and lot of ☕
+    </p>
+  </footer>
+
+    <script>
+    // Stejný script jako v index.html
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+  </script>
+</body>
+</html>
+
+ <!--     &lt;!&ndash; Slovní zásoba &ndash;&gt;
       <a href="/cteni" class="bubble activity-bubble">
         <img src="{{ url_for('static', filename='pic/vocab_icon.png') }}" alt="Slovní zásoba">
         <div class="bubble-text">
@@ -69,7 +95,7 @@
           </div>
       </a>
 
-      <!-- Gramatika -->
+      &lt;!&ndash; Gramatika &ndash;&gt;
       <a href="/gramatika" class="bubble activity-bubble">
         <img src="{{ url_for('static', filename='pic/grammar_icon.png') }}" alt="Gramatika">
         <div class="bubble-text">
@@ -78,7 +104,7 @@
         </div>
       </a>
 
-      <!-- Testy -->
+      &lt;!&ndash; Testy &ndash;&gt;
       <a href="/testy" class="bubble activity-bubble">
         <img src="{{ url_for('static', filename='pic/test_icon.png') }}" alt="Testy">
         <div class="bubble-text">
@@ -88,31 +114,13 @@
       </a>
     </section>
 
-    <!-- Rychlý výběr -->
+    &lt;!&ndash; Rychlý výběr &ndash;&gt;
     <div class="completion-message">
       <p>Co chceš dělat dnes?</p>
       <div class="completion-options">
         <a href="/rychly_test" class="completion-btn new-lesson">Rychlý test</a>
         <a href="/pokracovat" class="completion-btn continue">Pokračovat tam, kde jsi skončil</a>
       </div>
-    </div>
-  </main>
+    </div>-->
 
-<footer>
-  <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
-  <p class="footer-signature">
-    Made with ❤️ by
-    <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
-    and lot of ☕
-  </p>
-</footer>
 
-  <script>
-    // Stejný script jako v index.html
-    const themeToggle = document.getElementById('theme-toggle');
-    themeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
-    });
-  </script>
-</body>
-</html>

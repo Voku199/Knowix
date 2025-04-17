@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nové heslo | Knowix</title>
+  <title>Přihlášení | Knowix</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style_reg_log.css') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
   <nav class="auth-header">
-    <a href="/" class="home-link">
+    <a href="/anglictina/app/static" class="home-link">
       <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
       <span>← Zpět na hlavní stránku</span>
     </a>
@@ -18,10 +18,10 @@
   <div class="auth-container">
     <div class="auth-title">
       <div class="header-icon">
-        <i class="fas fa-unlock-alt fa-3x text-primary"></i>
+        <i class="fas fa-user-circle fa-3x text-primary"></i>
       </div>
-      <h2>Obnovit heslo</h2>
-      <p>Zadejte nové heslo</p>
+      <h2>Vítejte zpět</h2>
+      <p>Pokračujte přihlášením</p>
     </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -37,15 +37,22 @@
 
     <form method="POST" class="auth-form">
       <div class="input-group">
-        <input type="password" name="new_password" placeholder=" " required>
-        <label><i class="fas fa-lock"></i> Nové heslo</label>
+        <input type="email" name="email" placeholder=" " required>
+        <label><i class="fas fa-envelope"></i> E-mail</label>
       </div>
+
       <div class="input-group">
-        <input type="password" name="confirm_password" placeholder=" " required>
-        <label><i class="fas fa-lock"></i> Potvrďte heslo</label>
+        <input type="password" name="password" placeholder=" " required>
+        <label><i class="fas fa-lock"></i> Heslo</label>
       </div>
-      <button type="submit">Změnit heslo</button>
+
+      <button type="submit">Přihlásit se</button>
     </form>
+
+    <div class="auth-footer">
+      <p>Nemáte účet? <a href="{{ url_for('auth.register') }}">Vytvořte si ho</a></p>
+      <a href="{{ url_for('auth.forgot_password') }}">Zapomněli jste heslo?</a>
+    </div>
   </div>
 </body>
 </html>
