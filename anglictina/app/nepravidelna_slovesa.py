@@ -1,5 +1,5 @@
 from flask import Blueprint, session, request, render_template, redirect, url_for, flash
-from anglictina.app.auth import get_db_connection
+from auth import get_db_connection
 import json
 import random
 
