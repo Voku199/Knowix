@@ -2,7 +2,7 @@ from flask import Flask
 from auth import auth_bp
 from nepravidelna_slovesa import verbs_bp
 from main_routes import main_bp
-from vocab import vocab_bp
+
 import os
 from dotenv import load_dotenv
 
@@ -18,7 +18,6 @@ app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 app.register_blueprint(main_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(verbs_bp)
-app.register_blueprint(vocab_bp)
 
 if __name__ == '__main__':
     app.run(debug=True)
