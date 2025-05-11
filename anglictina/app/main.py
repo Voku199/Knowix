@@ -4,6 +4,7 @@ from nepravidelna_slovesa import verbs_bp
 from main_routes import main_bp
 from A1_music import exercises_bp  # Add this import
 from feedback import feedback_bp
+from waitress import serve
 
 import os
 from dotenv import load_dotenv
@@ -26,4 +27,4 @@ app.register_blueprint(exercises_bp)  # Add this line
 app.register_blueprint(feedback_bp)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80)
+    serve(app, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
