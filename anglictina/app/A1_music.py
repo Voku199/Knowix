@@ -16,15 +16,19 @@ logger = logging.getLogger(__name__)
 
 
 class ThrottledGenius(Genius):
-    """Custom Genius class with request throttling and headers support"""
+    """Custom Genius class with throttling and headers support"""
 
-    def __init__(self, *args, **kwargs):
-        self.custom_headers = kwargs.pop('headers', {})
-        super().__init__(*args, **kwargs)
-        self.session.headers.update(self.custom_headers)
+    def __init__(self, access_token=None, timeout=5, headers=None, verbose=True):
+        super().__init__(
+            access_token=access_token,
+            timeout=timeout,
+            verbose=verbose
+        )
+        if headers:
+            self._session.headers.update(headers)
 
     def search_song(self, *args, **kwargs):
-        sleep(random.uniform(0.7, 1.5))  # Random delay between requests
+        sleep(random.uniform(0.7, 1.5))
         return super().search_song(*args, **kwargs)
 
 
@@ -45,23 +49,35 @@ def on_load(state):
             headers={
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 'Accept': 'application/json'
-            },
-            verbose=state.app.debug
+            }
         )
-        genius.retries = 3  # Add retries as property
+        genius.retries = 3  # Set retries after initialization
+        genius.verbose = state.app.debug
         state.app.genius = genius
         logger.info("Genius API initialized successfully")
     except Exception as e:
         logger.critical("Failed to initialize Genius API: %s", str(e))
         raise
 
+    # Initialize DeepL API
+    try:
+        state.app.translator = deepl.Translator(state.app.config['DEEPL_API_KEY'])
+        logger.info("DeepL API initialized successfully")
+    except deepl.DeepLException as e:
+        logger.critical("DeepL API error: %s", str(e))
+        raise
+
     # Load JSON data with error handling
     try:
         static_folder = state.app.static_folder
-        with open(os.path.join(static_folder, 'music/songs.json'), encoding='utf-8') as f:
+        songs_path = os.path.join(static_folder, 'music', 'songs.json')
+        pairs_path = os.path.join(static_folder, 'music', 'word_pairs.json')
+
+        with open(songs_path, encoding='utf-8') as f:
             state.app.songs = json.load(f)
-        with open(os.path.join(static_folder, 'music/word_pairs.json'), encoding='utf-8') as f:
+        with open(pairs_path, encoding='utf-8') as f:
             state.app.word_pairs = json.load(f)
+
         logger.info("Successfully loaded song data")
     except (FileNotFoundError, json.JSONDecodeError) as e:
         logger.error("Error loading data files: %s", str(e))
