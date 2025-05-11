@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, current_app
 from auth import auth_bp
 from nepravidelna_slovesa import verbs_bp
 from main_routes import main_bp
@@ -25,6 +25,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(verbs_bp)
 app.register_blueprint(exercises_bp)  # Add this line
 app.register_blueprint(feedback_bp)
+print(current_app.config['GENIUS_ACCESS_TOKEN'])  # Představuje tvůj token
 
 if __name__ == "__main__":
     serve(app, host="0.0.0.0", port=8080)
