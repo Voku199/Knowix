@@ -16,7 +16,12 @@ logger = logging.getLogger(__name__)
 
 
 class ThrottledGenius(Genius):
-    """Custom Genius class with request throttling"""
+    """Custom Genius class with request throttling and headers support"""
+
+    def __init__(self, *args, **kwargs):
+        self.custom_headers = kwargs.pop('headers', {})
+        super().__init__(*args, **kwargs)
+        self.session.headers.update(self.custom_headers)
 
     def search_song(self, *args, **kwargs):
         sleep(random.uniform(0.7, 1.5))  # Random delay between requests
@@ -34,27 +39,20 @@ def on_load(state):
 
     # Initialize Genius API with custom settings
     try:
-        state.app.genius = ThrottledGenius(
+        genius = ThrottledGenius(
             access_token=state.app.config['GENIUS_ACCESS_TOKEN'],
             timeout=20,
             headers={
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 'Accept': 'application/json'
             },
-            retries=3,
             verbose=state.app.debug
         )
+        genius.retries = 3  # Add retries as property
+        state.app.genius = genius
         logger.info("Genius API initialized successfully")
     except Exception as e:
         logger.critical("Failed to initialize Genius API: %s", str(e))
-        raise
-
-    # Initialize DeepL API
-    try:
-        state.app.translator = deepl.Translator(state.app.config['DEEPL_API_KEY'])
-        logger.info("DeepL API initialized successfully")
-    except deepl.DeepLException as e:
-        logger.critical("DeepL API error: %s", str(e))
         raise
 
     # Load JSON data with error handling
