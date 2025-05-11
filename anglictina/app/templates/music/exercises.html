@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowix - Cvičení</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+    <div class="logo">
+        <a href="{{ url_for('main.index') }}">
+            <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+        </a>
+    </div>
+    <nav>
+        <ul class="nav-right">
+            <li><a href="/anglictina">Angličtina</a></li>
+            <li><a href="/feedback">Feedback</a></li>
+            <li>
+                {% if session['user_name'] %}
+                <div class="user-profile">
+                    <div class="profile-container">
+                        {% if session.get('profile_pic') %}
+                        <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                             alt="Profilová fotka" width="64" class="profile-pic">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='pics/default.jpg') }}" alt="Defaultní profilovka"
+                             class="profile-pic" id="profileMenuTrigger">
+                        {% endif %}
+                        <div class="profile-menu" id="profileMenu">
+                            <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                            <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                        </div>
+                    </div>
+                    <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
+                </div>
+                {% else %}
+                <div class="auth-links">
+                    <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
+                    <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
+                </div>
+                {% endif %}
+            </li>
+            <li>
+                <button id="theme-toggle">🌙</button>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+<main class="exercises-container">
+    <form>
+        <section class="exercises-section">
+            {% for item in missing_exercises %}
+            <div class="exercise-card">
+                <h3>{{ loop.index }}. Doplň chybějící slovo:</h3>
+                <p>{{ item.with_blank }}</p>
+                <input type="text" name="missing_word_{{ loop.index0 }}" class="exercise-input" placeholder="Napiš chybějící slovo...">
+            </div>
+            {% endfor %}
+
+            {% for item in translation_exercises %}
+            <div class="exercise-card">
+                <h3>{{ loop.index + missing_exercises|length }}. Přelož větu:</h3>
+                <p class="original-sentence"><em>"{{ item.original }}"</em></p>
+                <input type="text" class="exercise-input translation-input" name="translation_{{ loop.index0 }}" placeholder="Tvůj překlad...">
+            </div>
+            {% endfor %}
+        </section>
+
+        <section class="word-matching">
+            <h3>Spoj slova k sobě:</h3>
+            <div class="word-grid">
+                {% for word in english_words %}
+                <div class="word-box en-word" data-word="{{ word }}">{{ word }}</div>
+                {% endfor %}
+                {% for word in czech_words %}
+                <div class="word-box cs-word" data-word="{{ word }}">{{ word }}</div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="audio-section">
+            <h3>Poslechni si audio:</h3>
+            <audio controls class="audio-player">
+                <source src="{{ url_for('static', filename='music/audio/' + audio_file) }}" type="audio/mp3">
+                Tvůj prohlížeč nepodporuje přehrávání audia.
+            </audio>
+            <button id="showLyrics" class="lyrics-toggle" type="button">Zobrazit text písně</button>
+            <div id="lyrics" class="lyrics-container"></div>
+        </section>
+
+        <button type="submit" id="checkButton" class="check-button">Zkontrolovat odpovědi</button>
+        <div id="result" class="result-container"></div>
+    </form>
+</main>
+
+<footer>
+  <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+  <p class="footer-signature">
+    Made with ❤️ by
+    <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+    and lot of ☕
+  </p>
+</footer>
+
+<!-- Převod LRC -->
+<script>
+    const lrcContent = {{ lrc_lyrics | tojson | safe }};
+    console.log(lrcContent);
+
+    function parseLrc(lrc) {
+        const parsed = lrc.split('\n')
+            .map(line => {
+                const match = line.match(/\[(\d+):(\d+(?:\.\d+)?)\](.*)/);
+                if (!match) return null;
+
+                const minutes = parseFloat(match[1]);
+                const seconds = parseFloat(match[2]);
+                return {
+                    time: minutes * 60 + seconds,
+                    text: match[3].trim()
+                };
+            })
+            .filter(line => line !== null)
+            .sort((a, b) => a.time - b.time);
+
+        console.log(parsed);
+        return parsed;
+    }
+
+    document.getElementById('showLyrics').addEventListener('click', function() {
+        const audio = document.querySelector('audio');
+        const lyricsContainer = document.getElementById('lyrics');
+        const parsedLyrics = parseLrc(lrcContent);
+
+        if (lyricsContainer.style.display === 'none' || !lyricsContainer.style.display) {
+            lyricsContainer.style.display = 'block';
+            this.textContent = 'Skrýt text písně';
+            audio.addEventListener('timeupdate', updateLyrics);
+        } else {
+            lyricsContainer.style.display = 'none';
+            this.textContent = 'Zobrazit text písně';
+            audio.removeEventListener('timeupdate', updateLyrics);
+        }
+
+        function updateLyrics() {
+            const currentTime = audio.currentTime;
+            let currentLine = parsedLyrics.findLast(line => line.time <= currentTime);
+
+            lyricsContainer.innerHTML = currentLine
+                ? `<p class="current-line">${currentLine.text}</p>`
+                : '<p>Začátek skladby...</p>';
+        }
+    });
+
+        // Přepínání dark/light režimu
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+    });
+
+    // Detekce kliknutí mimo menu
+    document.addEventListener('click', (e) => {
+        const profileMenu = document.getElementById('profileMenu');
+        const trigger = document.getElementById('profileMenuTrigger');
+
+        if (!trigger.contains(e.target) && !profileMenu.contains(e.target)) {
+            profileMenu.style.opacity = '0';
+            profileMenu.style.visibility = 'hidden';
+            profileMenu.style.transform = 'translateY(10px)';
+        }
+    });
+</script>
+
+<!-- Nastavení configu pro JS logiku -->
+<script>
+    const config = {
+        missing_exercises: {{ missing_exercises | tojson }},
+        translation_exercises: {{ translation_exercises | tojson }},
+        word_pairs: {{ word_pairs | tojson }}
+    };
+</script>
+
+<!-- Hlavní logika aplikace -->
+<script src="{{ url_for('static', filename='music/js/exercise.js') }}"></script>
+</body>
+</html>

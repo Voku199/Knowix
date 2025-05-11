@@ -1,0 +1,228 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'League Spartan', sans-serif;
+    background: #f8f9fa;
+    color: #2d3436;
+    transition: all 0.3s ease;
+    min-height: 100vh;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo img {
+    height: 50px;
+    border-radius: 8px;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    list-style: none;
+}
+
+.nav-right a {
+    text-decoration: none;
+    color: #2d3436;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.nav-right a:hover {
+    background: #f0f0f0;
+}
+
+/* Dark mode */
+body.dark-mode {
+    background: #121212;
+    color: #ffffff;
+}
+
+body.dark-mode header {
+    background: #1e1e1e;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .nav-right a {
+    color: #ffffff;
+}
+
+body.dark-mode .nav-right a:hover {
+    background: #333333;
+}
+
+/* Cvičení */
+.exercise {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 2rem auto;
+    max-width: 800px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .exercise {
+    background: #2d2d2d;
+}
+
+.exercise h3 {
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+body.dark-mode .exercise h3 {
+    color: #ffffff;
+}
+
+/* Vstupní pole */
+input[type="text"] {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    background: white;
+    color: #2d3436;
+}
+
+body.dark-mode input[type="text"] {
+    background: #333;
+    border-color: #444;
+    color: white;
+}
+
+/* Word grid */
+.word-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.word-box {
+    padding: 0.8rem;
+    border-radius: 8px;
+    text-align: center;
+    cursor: grab;
+    user-select: none;
+    transition: transform 0.2s;
+}
+
+.en-word {
+    background: #ffeaa7;
+}
+
+.cs-word {
+    background: #a8d8ea;
+}
+
+body.dark-mode .en-word {
+    background: #4d3d1d;
+}
+
+body.dark-mode .cs-word {
+    background: #1d3d4d;
+}
+
+/* Tlačítka */
+button {
+    background: #2c3e50;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 1rem auto;
+    display: block;
+}
+
+button:hover {
+    background: #3b5268;
+    transform: translateY(-2px);
+}
+
+body.dark-mode button {
+    background: #3498db;
+}
+
+body.dark-mode button:hover {
+    background: #4aa8f5;
+}
+
+/* Audio player */
+.audio-player {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+}
+
+body.dark-mode .audio-player {
+    background: #2d2d2d;
+}
+
+/* Lyrics */
+#lyrics {
+    text-align: center;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+#lyrics .current {
+    font-weight: bold;
+    color: #3498db;
+}
+
+/* Progress bar */
+.progress-container {
+    width: 100%;
+    height: 8px;
+    background: #eee;
+    border-radius: 4px;
+    margin: 1rem 0;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #3498db;
+    transition: width 0.3s ease;
+}
+
+/* Responsivní design */
+@media (max-width: 768px) {
+    header {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .nav-right {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .exercise {
+        margin: 1rem;
+        padding: 1rem;
+    }
+}

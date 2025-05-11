@@ -29,7 +29,7 @@
             background-color: #2c3e50;
             color: white;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .correct {
@@ -48,7 +48,7 @@
             font-size: 1.3rem;
             margin: 20px 0;
             padding: 15px;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
             max-width: 600px;
             text-align: center;
@@ -59,8 +59,14 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .progress-container {
@@ -69,7 +75,7 @@
             background-color: #eee;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
         .progress-bar {
@@ -89,7 +95,7 @@
             text-align: center;
             margin: 30px 0;
             padding: 20px;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
             max-width: 600px;
             margin-left: auto;
@@ -124,122 +130,131 @@
 
         .completion-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <a href="{{ url_for('main.index') }}">
-                <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
-            </a>
-        </div>
-        <nav>
-            <ul class="nav-right">
-                <li><a href="{{ url_for('main.index') }}">🏠 Domů</a></li>
-                <li><a href="{{ url_for('verbs.test') }}">🔄 Nové sloveso</a></li>
-                <li>
-                    {% if session['user_name'] %}
-                        <div class="profile-container">
-                            {% if session.get('profile_pic') %}
-                                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
-                                     alt="Profilová fotka"
-                                     width="64"
-                                     class="profile-pic">
-                            {% else %}
-                                <img src="{{ url_for('static', filename='pics/default.jpg') }}"
-                                     alt="Defaultní profilovka"
-                                     class="profile-pic">
-                            {% endif %}
-                            <div class="profile-menu">
-                                <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
-                                <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
-                            </div>
+<header>
+    <div class="logo">
+        <a href="{{ url_for('main.index') }}">
+            <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+        </a>
+    </div>
+    <nav>
+        <ul class="nav-right">
+            <li><a href="/anglictina">Angličtina</a></li>
+            <li><a href="/feedback">Feedback</a></li>
+            <li>
+                {% if session['user_name'] %}
+                <div class="user-profile">
+                    <div class="profile-container">
+                        {% if session.get('profile_pic') %}
+                        <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                             alt="Profilová fotka" width="64" class="profile-pic">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='pics/default.jpg') }}" alt="Defaultní profilovka"
+                             class="profile-pic" id="profileMenuTrigger">
+                        {% endif %}
+                        <div class="profile-menu" id="profileMenu">
+                            <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                            <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
                         </div>
-                        <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
-                    {% else %}
-                        <div class="auth-links">
-                            <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
-                            <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
-                        </div>
-                    {% endif %}
-                </li>
-                <li><button id="theme-toggle">🌙</button></li>
-            </ul>
-        </nav>
-    </header>
-
-    <main class="fade-in">
-        <h1>Doplňte chybějící tvar</h1>
-        <h2>Sloveso: {{ verb }}</h2>
-
-        {% if verbs_done is defined and total_verbs is defined %}
-            <div class="progress-container">
-                <p>Progres: {{ progress_for_verb }}/6 správných odpovědí</p>
-            </div>
-        {% endif %}
-        {% if feedback %}
-            <p class="{% if is_correct %}correct{% else %}incorrect{% endif %}">
-                {{ feedback }}
-            </p>
-        {% endif %}
-
-        {% if lesson_complete %}
-            <div class="completion-message fade-in">
-                <p>Lekce dokončena! 🎉</p>
-                <div class="completion-options">
-                    <form method="POST" action="{{ url_for('verbs.test') }}">
-                         <button type="submit" name="new_lesson" value="1" class="nav-btn">🔄 Nové sloveso</button>
-                        <input type="hidden" name="verb" value="{{ verb }}">
-                        <button type="submit" name="continue" value="1" class="completion-btn continue">Pokračovat</button>
-                    </form>
+                    </div>
+                    <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
                 </div>
-            </div>
-
-        {% elif sentence %}
-            <p class="sentence">{{ sentence }}</p>
-
-            <form method="POST" action="{{ url_for('verbs.test') }}" class="answer-form">
-                <div class="answer-buttons">
-                    {% for answer in possible_answers %}
-                        <button type="submit"
-                                name="user_answer"
-                                value="{{ answer }}"
-                                class="answer-btn">
-                            {{ answer }}
-                        </button>
-                    {% endfor %}
+                {% else %}
+                <div class="auth-links">
+                    <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
+                    <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
                 </div>
-            </form>
+                {% endif %}
+            </li>
+            <li>
+                <button id="theme-toggle">🌙</button>
+            </li>
+        </ul>
+    </nav>
+</header>
 
-        {% else %}
-            <form method="POST" action="{{ url_for('verbs.test') }}" class="next-sentence-form">
+<main class="fade-in">
+    <h1>Doplňte chybějící tvar</h1>
+    <h2>Sloveso: {{ verb }}</h2>
+
+    {% if verbs_done is defined and total_verbs is defined %}
+    <div class="progress-container">
+        <p>Progres: {{ progress_for_verb }}/6 správných odpovědí</p>
+    </div>
+    {% endif %}
+    {% if feedback %}
+    <p class="{% if is_correct %}correct{% else %}incorrect{% endif %}">
+        {{ feedback }}
+    </p>
+    {% endif %}
+
+    {% if lesson_complete %}
+    <div class="completion-message fade-in">
+        <p>Lekce dokončena! 🎉</p>
+        <div class="completion-options">
+            <form method="POST" action="{{ url_for('verbs.test') }}">
+                <button type="submit" name="new_lesson" value="1" class="nav-btn">🔄 Nové sloveso</button>
                 <input type="hidden" name="verb" value="{{ verb }}">
-                <button type="submit" name="continue" value="1" class="continue-btn">Pokračovat</button>
+                <button type="submit" name="continue" value="1" class="completion-btn continue">Pokračovat</button>
             </form>
-        {% endif %}
-    </main>
+        </div>
+    </div>
 
-    <footer>
-        <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
-        <p class="footer-signature">Made with ❤️ by Voku and lot of ☕</p>
-    </footer>
+    {% elif sentence %}
+    <p class="sentence">{{ sentence }}</p>
 
-    <script>
-        // Téma
-        document.getElementById('theme-toggle').addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-        });
+    <form method="POST" action="{{ url_for('verbs.test') }}" class="answer-form">
+        <div class="answer-buttons">
+            {% for answer in possible_answers %}
+            <button type="submit"
+                    name="user_answer"
+                    value="{{ answer }}"
+                    class="answer-btn">
+                {{ answer }}
+            </button>
+            {% endfor %}
+        </div>
+    </form>
 
-        // Profilové menu
-        document.addEventListener('click', (e) => {
-            const profileMenu = document.querySelector('.profile-menu');
-            if (!e.target.closest('.profile-container')) {
-                profileMenu.style.opacity = '0';
-                profileMenu.style.visibility = 'hidden';
-            }
-        });
-    </script>
+    {% else %}
+    <form method="POST" action="{{ url_for('verbs.test') }}" class="next-sentence-form">
+        <input type="hidden" name="verb" value="{{ verb }}">
+        <button type="submit" name="continue" value="1" class="continue-btn">Pokračovat</button>
+    </form>
+    {% endif %}
+</main>
+
+<footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p class="footer-signature">
+        Made with ❤️ by
+        <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+        and lot of ☕
+    </p>
+</footer>
+<script>
+    // Téma
+    // Přepínání dark/light režimu
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+    });
+
+    // Detekce kliknutí mimo menu
+    document.addEventListener('click', (e) => {
+        const profileMenu = document.getElementById('profileMenu');
+        const trigger = document.getElementById('profileMenuTrigger');
+
+        if (!trigger.contains(e.target) && !profileMenu.contains(e.target)) {
+            profileMenu.style.opacity = '0';
+            profileMenu.style.visibility = 'hidden';
+            profileMenu.style.transform = 'translateY(10px)';
+        }
+    });
+</script>
 </body>
 </html>

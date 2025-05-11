@@ -1,0 +1,98 @@
+[
+  {
+    "title": "Happy",
+    "artist": "Pharrell Williams",
+    "audio_file": "Happy.mp3",
+    "lyrics_file": "Happy.lrc",
+    "image": "Happy.jpeg",
+    "level": "A1"
+  },
+  {
+    "title": "Count on Me",
+    "artist": "Bruno Mars",
+    "audio_file": "Count_on_Me.mp3",
+    "lyrics_file": "Count_on_Me.lrc",
+    "image": "Count_on_Me.jpeg",
+    "level": "A1"
+  },
+  {
+    "title": "Stand By Me",
+    "artist": "Ben E. King",
+    "audio_file": "Stand_By_Me.mp3",
+    "lyrics_file": "Stand_By_Me.lrc",
+    "image": "Stand_By_Me.jpeg",
+    "level": "A1"
+  },
+  {
+    "title": "Good Life",
+    "artist": "Kanye West",
+    "audio_file": "Good_Life.mp3",
+    "lyrics_file": "Good_Life.lrc",
+    "image": "Good_Life.jpeg",
+    "level": "A2"
+  },
+  {
+    "title": "Lovers Rock",
+    "artist": "TV Girl",
+    "audio_file": "Lovers_Rock.mp3",
+    "lyrics_file": "Lovers_Rock.lrc",
+    "image": "Lovers_Rock.jpeg",
+    "level": "A2"
+  },
+  {
+    "title": "As It Was",
+    "artist": "Harry Styles",
+    "audio_file": "As_It_Was.mp3",
+    "lyrics_file": "As_It_Was.lrc",
+    "image": "As_It_Was.jpeg",
+    "level": "A2"
+  },
+  {
+    "title": "See You Again",
+    "artist": "Tyler, The Creator",
+    "audio_file": "See_You_Again.mp3",
+    "lyrics_file": "See_You_Again.lrc",
+    "image": "See_You_Again.jpeg",
+    "level": "B1"
+  },
+  {
+    "title": "Preacher Man",
+    "artist": "Kanye West",
+    "audio_file": "Preacher_Man.mp3",
+    "lyrics_file": "Preacher_Man.lrc",
+    "image": "Preacher_Man.jpeg",
+    "level": "B1"
+  },
+  {
+    "title": "Greedy",
+    "artist": "Tate McRae",
+    "audio_file": "Greedy.mp3",
+    "lyrics_file": "Greedy.lrc",
+    "image": "Greedy.jpeg",
+    "level": "B1"
+  },
+  {
+    "title": "Alright",
+    "artist": "Kendrick Lamar",
+    "audio_file": "Alright.mp3",
+    "lyrics_file": "Alright.lrc",
+    "image": "Alright.jpeg",
+    "level": "B2"
+  },
+  {
+    "title": "Magnolia",
+    "artist": "Playboi Carti",
+    "audio_file": "Magnolia.mp3",
+    "lyrics_file": "Magnolia.lrc",
+    "image": "Magnolia.jpeg",
+    "level": "B2"
+  },
+  {
+    "title": "Birds of a Feather",
+    "artist": "Billie Eilish",
+    "audio_file": "Birds_of_a_Feather.mp3",
+    "lyrics_file": "Birds_of_a_Feather.lrc",
+    "image": "Birds_of_a_Feather.jpeg",
+    "level": "B2"
+  }
+]

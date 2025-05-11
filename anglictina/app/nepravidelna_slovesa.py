@@ -41,6 +41,7 @@ verbs_bp = Blueprint('verbs', __name__)
 with open('verbs.json', 'r') as f:
     verbs_data = json.load(f)
 
+
 # Pomocné funkce
 def generate_test(verb):
     # Find matching verb in all forms
@@ -101,6 +102,8 @@ def get_possible_answers(verb, correct_tense):
     answers = wrong_answers + [correct_answer]
     random.shuffle(answers)
     return answers
+
+
 # Routy pro výuku
 @verbs_bp.route('/anglictina/test', methods=['GET', 'POST'])
 def test():
@@ -203,7 +206,7 @@ def test():
                 session['correct_answers_for_verb'] = 0
                 session['used_sentences'] = []
                 flash(f"Sloveso '{verb}' bylo úspěšně dokončeno! ✅", "success")
-                return redirect(url_for('test'))  # zpět na výběr nového slovesa
+                return redirect(url_for('verbs.test'))  # zpět na výběr nového slovesa
 
         # Aktualizace počtu dokončených sloves
         with get_db_connection() as conn:

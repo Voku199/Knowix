@@ -1,0 +1,69 @@
+<!-- templates/error.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Error Occurred</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .error-box {
+            background: #ffe6e6;
+            border: 2px solid #ff0000;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .details {
+            background: #fff3d3;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 3px;
+        }
+
+        pre {
+            background: #333;
+            color: white;
+            padding: 10px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+<h1>⚠️ Oops! Something went wrong</h1>
+
+<div class="error-box">
+    <h3>{{ error }}</h3>
+
+    {% if details %}
+    <div class="details">
+        <strong>Details:</strong><br>
+        {{ details }}
+    </div>
+    {% endif %}
+
+    {% if exception_type %}
+    <div class="details">
+        <strong>Error type:</strong> {{ exception_type }}
+    </div>
+    {% endif %}
+</div>
+
+<h4>What to do next?</h4>
+<ul>
+    <li>Zkontrolujte název písně a interpreta</li>
+    <li>Zkuste to znovu za chvíli</li>
+    <li>Pokud problém přetrvává, kontaktujte správce (Vojtěch Kurinec 7.B)</li>
+</ul>
+
+<a href="/" style="color: #0066cc;">← Zpět na hlavní stránku</a>
+
+{% if traceback %}
+<h4>Technical details:</h4>
+<pre>{% for line in traceback.format_exception() %}{{ line }}{% endfor %}</pre>
+{% endif %}
+</body>
+</html>

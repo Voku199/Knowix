@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zpětná vazba | Knowix</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<style>
+    .feedback-textarea {
+        resize: none; /* Zakáže roztahování */
+        width: 100%;
+        padding: 10px;
+        font-size: 1em;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        transition: border-color 0.3s;
+    }
+
+    .feedback-textarea:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+    .feedback-item {
+        display: flex;
+        align-items: flex-start;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 15px 0;
+    }
+
+    .feedback-profile-pic {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 15px;
+    }
+
+    .feedback-content {
+        flex-grow: 1;
+    }
+
+    .feedback-header {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .feedback-header h1 {
+        margin: 10px 0 5px;
+        font-size: 2em;
+    }
+
+    .feedback-header .subtitle {
+        font-size: 1.1em;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .feedback-icon {
+        font-size: 2.5em;
+        color: #e3d293;
+    }
+
+    .feedback-user-name {
+        font-weight: bold;
+    }
+
+    .feedback-time {
+        font-size: 0.9em;
+        color: #777;
+    }
+
+    .feedback-message {
+        margin: 0;
+    }
+
+
+</style>
+<body>
+<div class="feedback-page">
+    <header>
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <nav>
+            <ul class="nav-right">
+                <li><a href="/anglictina">Angličtina</a></li>
+                <li><a href="/feedback">Feedback</a></li>
+                <li>
+                    {% if session['user_name'] %}
+                    <div class="user-profile">
+                        <div class="profile-container">
+                            {% if session.get('profile_pic') %}
+                            <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                                 alt="Profilová fotka" class="profile-pic">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='pics/default.jpg') }}" alt="Defaultní profilovka"
+                                 class="profile-pic" id="profileMenuTrigger">
+                            {% endif %}
+                            <div class="profile-menu" id="profileMenu">
+                                <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                                <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                            </div>
+                        </div>
+                        <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
+                    </div>
+                    {% else %}
+                    <div class="auth-links">
+                        <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
+                        <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
+                    </div>
+                    {% endif %}
+                </li>
+                <li>
+                    <button id="theme-toggle">🌙</button>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="feedback-main">
+        <div class="feedback-card">
+            <div class="feedback-header">
+                <i class="fas fa-comment-dots feedback-icon"></i>
+                <h1>Dej nám zpětnou vazbu</h1>
+            </div>
+
+            <form id="feedbackForm">
+                <div class="rating-container">
+                    <div class="stars">
+                        <i class="far fa-star" data-rating="1"></i>
+                        <i class="far fa-star" data-rating="2"></i>
+                        <i class="far fa-star" data-rating="3"></i>
+                        <i class="far fa-star" data-rating="4"></i>
+                        <i class="far fa-star" data-rating="5"></i>
+                    </div>
+                    <input type="hidden" id="ratingValue" name="rating" value="0">
+                </div>
+
+                <div class="form-group">
+                    <textarea id="message" class="feedback-textarea"
+                              placeholder="Napiš svůj názor, nápad nebo připomínku..."
+                              rows="5" required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Odeslat zpětnou vazbu
+                </button>
+            </form>
+
+            <div id="feedbackResult" class="result-message"></div>
+        </div>
+
+        <div class="feedbacks-container">
+            <h2>Recenze uživatelů <i class="fas fa-comments"></i></h2>
+            <div id="feedbacksList" class="feedbacks-list">
+                <!-- Feedbacky se načtou zde -->
+            </div>
+        </div>
+    </main>
+</div>
+
+<footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p class="footer-signature">
+        Made with ❤️ by
+        <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+        and lot of ☕
+    </p>
+</footer>
+
+<script>
+    // Star rating functionality
+    const stars = document.querySelectorAll('.stars i');
+    const ratingInput = document.getElementById('ratingValue');
+
+    // Load previous rating from localStorage
+    const savedRating = localStorage.getItem('userRating');
+    if (savedRating) {
+        setRating(savedRating);
+    }
+
+    // Set rating function
+    function setRating(rating) {
+        ratingInput.value = rating;
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.remove('far');
+                star.classList.add('fas');
+                star.style.color = '#ffc107'; // Gold color
+            } else {
+                star.classList.remove('fas');
+                star.classList.add('far');
+                star.style.color = '#ccc'; // Gray color
+            }
+        });
+    }
+
+    // Rating click event
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            const rating = parseInt(star.getAttribute('data-rating'));
+            localStorage.setItem('userRating', rating); // Save rating in localStorage
+            setRating(rating);
+        });
+    });
+
+    // Form submission
+    // Odeslání formuláře
+    document.getElementById('feedbackForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const message = document.getElementById('message').value;
+        const rating = ratingInput.value;
+        const resultDiv = document.getElementById('feedbackResult');
+
+        try {
+            const response = await fetch('/feedback', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message, rating})
+            });
+
+            const data = await response.json();
+
+            if (data.redirect) {
+                window.location.href = data.redirect;
+                return;
+            }
+
+            if (data.status === 'success') {
+                // Přidání nového feedbacku
+                const container = document.getElementById('feedbacksList');
+                const newFeedback = document.createElement('div');
+                newFeedback.className = 'feedback-item';
+                newFeedback.innerHTML = `
+                    <img src="/static/profile_pics/${data.profile_pic}"
+                         class="feedback-profile-pic"
+                         alt="${data.user_name}">
+                    <div class="feedback-content">
+                        <div class="feedback-header">
+                            <span class="feedback-user-name">${data.user_name}</span>
+                            <div class="rating-stars">
+                                ${'<i class="fas fa-star"></i>'.repeat(rating)}
+                                ${'<i class="far fa-star"></i>'.repeat(5 - rating)}
+                            </div>
+                            <span class="feedback-time">právě teď</span>
+                        </div>
+                        <p class="feedback-message">${message}</p>
+                    </div>
+                `;
+                container.prepend(newFeedback);
+
+                document.getElementById('message').value = '';
+                ratingInput.value = 0;
+                stars.forEach(star => {
+                    star.classList.remove('fas');
+                    star.classList.add('far');
+                    star.style.color = '#ccc';
+                });
+            }
+
+            resultDiv.textContent = data.message;
+            resultDiv.style.color = data.status === 'success' ? 'green' : 'red';
+            resultDiv.classList.add('show');
+
+        } catch (error) {
+            resultDiv.textContent = "Nastala chyba při odesílání.";
+            resultDiv.style.color = 'red';
+            resultDiv.classList.add('show');
+        }
+    });
+
+    // Po načtení stránky načti všechna hodnocení z DB
+    window.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const res = await fetch('/get_feedbacks');
+            const data = await res.json();
+            const container = document.getElementById('feedbacksList');
+
+            if (data.feedbacks) {
+                data.feedbacks.forEach(fb => {
+                    const feedbackItem = document.createElement('div');
+                    feedbackItem.className = 'feedback-item';
+                    feedbackItem.innerHTML = `
+                    <img src="/static/profile_pics/${fb.profile_pic || 'default.jpg'}"
+                         class="feedback-profile-pic"
+                         alt="${fb.user_name}">
+                    <div class="feedback-content">
+                        <div class="feedback-header">
+                            <span class="feedback-user-name">${fb.user_name}</span>
+                            <div class="rating-stars">
+                                ${'<i class="fas fa-star"></i>'.repeat(fb.rating)}
+                                ${'<i class="far fa-star"></i>'.repeat(5 - fb.rating)}
+                            </div>
+                            <span class="feedback-time">${fb.timestamp}</span>
+                        </div>
+                        <p class="feedback-message">${fb.message}</p>
+                    </div>
+                `;
+                    container.appendChild(feedbackItem);
+                });
+            }
+        } catch (error) {
+            console.error("Nepodařilo se načíst zpětné vazby:", error);
+        }
+    });
+
+    function renderFeedback({user_name, profile_pic, rating, message, timestamp}) {
+        const container = document.getElementById('feedbacksList');
+        const feedbackItem = document.createElement('div');
+        feedbackItem.className = 'feedback-item';
+        feedbackItem.innerHTML = `
+        <img src="/static/profile_pics/${profile_pic || 'default.jpg'}"
+             class="feedback-profile-pic"
+             alt="${user_name}">
+        <div class="feedback-content">
+            <div class="feedback-header">
+                <span class="feedback-user-name">${user_name}</span>
+                <div class="rating-stars">
+                    ${'<i class="fas fa-star"></i>'.repeat(rating)}
+                    ${'<i class="far fa-star"></i>'.repeat(5 - rating)}
+                </div>
+                <span class="feedback-time">${timestamp}</span>
+            </div>
+            <p class="feedback-message">${message}</p>
+        </div>
+    `;
+        container.prepend(feedbackItem); // přidá navrch
+    }
+
+    // Přepínání dark/light režimu
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+    });
+
+    // Detekce kliknutí mimo menu
+    document.addEventListener('click', (e) => {
+        const profileMenu = document.getElementById('profileMenu');
+        const trigger = document.getElementById('profileMenuTrigger');
+
+        if (!trigger.contains(e.target) && !profileMenu.contains(e.target)) {
+            profileMenu.style.opacity = '0';
+            profileMenu.style.visibility = 'hidden';
+            profileMenu.style.transform = 'translateY(10px)';
+        }
+    });
+</script>
+</body>
+</html>

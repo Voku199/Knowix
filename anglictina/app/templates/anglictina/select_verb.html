@@ -109,45 +109,51 @@
   </style>
 </head>
 <body>
-  <header>
+<header>
     <div class="logo">
-      <a href="{{ url_for('main.index') }}">
-        <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
-      </a>
+        <a href="{{ url_for('main.index') }}">
+            <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+        </a>
     </div>
     <nav>
-      <ul class="nav-right">
-        <li><a href="/anglictina">Angličtina</a></li>
-        <li>
-          {% if session['user_name'] %}
-            <div class="profile-container">
-              {% if session.get('profile_pic') %}
-                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}" alt="Profilová fotka" width="64" class="profile-pic">
-              {% else %}
-                <img src="{{ url_for('static', filename='pics/default.jpg') }}" alt="Defaultní profilovka" class="profile-pic">
-              {% endif %}
-              <div class="profile-menu">
-                <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
-                <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
-              </div>
-            </div>
-            <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
-          {% else %}
-            <div class="auth-links">
-              <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
-              <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
-            </div>
-          {% endif %}
-        </li>
-        <li><button id="theme-toggle">🌙</button></li>
-      </ul>
+        <ul class="nav-right">
+            <li><a href="/anglictina">Angličtina</a></li>
+            <li><a href="/feedback">Feedback</a></li>
+            <li>
+                {% if session['user_name'] %}
+                <div class="user-profile">
+                    <div class="profile-container">
+                        {% if session.get('profile_pic') %}
+                        <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                             alt="Profilová fotka" width="64" class="profile-pic">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='pics/default.jpg') }}" alt="Defaultní profilovka"
+                             class="profile-pic" id="profileMenuTrigger">
+                        {% endif %}
+                        <div class="profile-menu" id="profileMenu">
+                            <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                            <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                        </div>
+                    </div>
+                    <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
+                </div>
+                {% else %}
+                <div class="auth-links">
+                    <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
+                    <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
+                </div>
+                {% endif %}
+            </li>
+            <li>
+                <button id="theme-toggle">🌙</button>
+            </li>
+        </ul>
     </nav>
-  </header>
+</header>
 
   <main>
     <section class="intro">
-      <h1 class="logo-name">knowix</h1>
-      <span class="alpha-badge">ALPHA VERZE</span>
+      <h1 class="logo-name">Knowix</h1>
     </section>
 
     <section class="verb-section">
@@ -205,6 +211,24 @@
       });
     });
   });
+
+      // Přepínání dark/light režimu
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+    });
+
+    // Detekce kliknutí mimo menu
+    document.addEventListener('click', (e) => {
+        const profileMenu = document.getElementById('profileMenu');
+        const trigger = document.getElementById('profileMenuTrigger');
+
+        if (!trigger.contains(e.target) && !profileMenu.contains(e.target)) {
+            profileMenu.style.opacity = '0';
+            profileMenu.style.visibility = 'hidden';
+            profileMenu.style.transform = 'translateY(10px)';
+        }
+    });
 </script>
 
 </body>
