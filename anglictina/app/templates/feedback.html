@@ -6,81 +6,155 @@
     <title>Zpětná vazba | Knowix</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .feedback-textarea {
+            resize: none;
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            transition: border-color 0.3s;
+        }
+
+        .feedback-textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .feedback-item {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 15px 0;
+        }
+
+        .feedback-profile-pic {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        .feedback-content {
+            flex-grow: 1;
+        }
+
+        .feedback-header {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feedback-user-name {
+            font-weight: bold;
+        }
+
+        .feedback-time {
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        .feedback-message {
+            margin: 5px 0;
+            white-space: pre-wrap;
+        }
+
+        .feedback-actions {
+            margin-top: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feedback-item:hover .feedback-actions {
+            opacity: 1;
+        }
+
+        .edit-btn, .delete-btn {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .edit-btn {
+            background: #ffc107;
+            color: black;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .edit-textarea {
+            width: 100%;
+            height: 100px;
+            margin: 10px 0;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .edit-stars {
+            margin: 10px 0;
+            font-size: 1.2em;
+            color: #ffd700;
+            cursor: pointer;
+        }
+
+        .edit-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .save-edit, .cancel-edit {
+            padding: 5px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .save-edit {
+            background: #28a745;
+            color: white;
+        }
+
+        .cancel-edit {
+            background: #6c757d;
+            color: white;
+        }
+
+        .rating-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .stars i {
+            cursor: pointer;
+            font-size: 1.5em;
+            margin: 0 2px;
+            transition: color 0.2s;
+        }
+
+        .result-message {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .result-message.show {
+            display: block;
+        }
+    </style>
 </head>
-<style>
-    .feedback-textarea {
-        resize: none; /* Zakáže roztahování */
-        width: 100%;
-        padding: 10px;
-        font-size: 1em;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        transition: border-color 0.3s;
-    }
-
-    .feedback-textarea:focus {
-        outline: none;
-        border-color: #007bff;
-    }
-
-    .feedback-item {
-        display: flex;
-        align-items: flex-start;
-        border-bottom: 1px solid #e0e0e0;
-        padding: 15px 0;
-    }
-
-    .feedback-profile-pic {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        object-fit: cover;
-        margin-right: 15px;
-    }
-
-    .feedback-content {
-        flex-grow: 1;
-    }
-
-    .feedback-header {
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .feedback-header h1 {
-        margin: 10px 0 5px;
-        font-size: 2em;
-    }
-
-    .feedback-header .subtitle {
-        font-size: 1.1em;
-        color: #666;
-        margin-bottom: 10px;
-    }
-
-    .feedback-icon {
-        font-size: 2.5em;
-        color: #e3d293;
-    }
-
-    .feedback-user-name {
-        font-weight: bold;
-    }
-
-    .feedback-time {
-        font-size: 0.9em;
-        color: #777;
-    }
-
-    .feedback-message {
-        margin: 0;
-    }
-
-
-</style>
 <body>
 <div class="feedback-page">
     <header>
@@ -159,9 +233,7 @@
 
         <div class="feedbacks-container">
             <h2>Recenze uživatelů <i class="fas fa-comments"></i></h2>
-            <div id="feedbacksList" class="feedbacks-list">
-                <!-- Feedbacky se načtou zde -->
-            </div>
+            <div id="feedbacksList" class="feedbacks-list"></div>
         </div>
     </main>
 </div>
@@ -180,42 +252,26 @@
     const stars = document.querySelectorAll('.stars i');
     const ratingInput = document.getElementById('ratingValue');
 
-    // Load previous rating from localStorage
-    const savedRating = localStorage.getItem('userRating');
-    if (savedRating) {
-        setRating(savedRating);
-    }
-
-    // Set rating function
     function setRating(rating) {
         ratingInput.value = rating;
         stars.forEach((star, index) => {
-            if (index < rating) {
-                star.classList.remove('far');
-                star.classList.add('fas');
-                star.style.color = '#ffc107'; // Gold color
-            } else {
-                star.classList.remove('fas');
-                star.classList.add('far');
-                star.style.color = '#ccc'; // Gray color
-            }
+            star.classList.toggle('fas', index < rating);
+            star.classList.toggle('far', index >= rating);
+            star.style.color = index < rating ? '#ffc107' : '#ccc';
         });
     }
 
-    // Rating click event
     stars.forEach(star => {
         star.addEventListener('click', () => {
-            const rating = parseInt(star.getAttribute('data-rating'));
-            localStorage.setItem('userRating', rating); // Save rating in localStorage
+            const rating = parseInt(star.dataset.rating);
             setRating(rating);
         });
     });
 
     // Form submission
-    // Odeslání formuláře
-    document.getElementById('feedbackForm').addEventListener('submit', async function (e) {
+    document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-
+        const form = e.target;
         const message = document.getElementById('message').value;
         const rating = ratingInput.value;
         const resultDiv = document.getElementById('feedbackResult');
@@ -229,128 +285,194 @@
 
             const data = await response.json();
 
-            if (data.redirect) {
-                window.location.href = data.redirect;
-                return;
-            }
-
             if (data.status === 'success') {
-                // Přidání nového feedbacku
-                const container = document.getElementById('feedbacksList');
-                const newFeedback = document.createElement('div');
-                newFeedback.className = 'feedback-item';
-                newFeedback.innerHTML = `
-                    <img src="/static/profile_pics/${data.profile_pic}"
-                         class="feedback-profile-pic"
-                         alt="${data.user_name}">
-                    <div class="feedback-content">
-                        <div class="feedback-header">
-                            <span class="feedback-user-name">${data.user_name}</span>
-                            <div class="rating-stars">
-                                ${'<i class="fas fa-star"></i>'.repeat(rating)}
-                                ${'<i class="far fa-star"></i>'.repeat(5 - rating)}
-                            </div>
-                            <span class="feedback-time">právě teď</span>
-                        </div>
-                        <p class="feedback-message">${message}</p>
-                    </div>
-                `;
-                container.prepend(newFeedback);
-
-                document.getElementById('message').value = '';
-                ratingInput.value = 0;
-                stars.forEach(star => {
-                    star.classList.remove('fas');
-                    star.classList.add('far');
-                    star.style.color = '#ccc';
+                renderFeedback({
+                    id: data.feedback_id,
+                    user_name: data.user_name,
+                    profile_pic: data.profile_pic,
+                    message: message,
+                    rating: rating,
+                    timestamp: data.timestamp,
+                    is_owner: true,
+                    is_edited: false
                 });
+
+                form.reset();
+                setRating(0);
+                resultDiv.textContent = data.message;
+                resultDiv.style.color = 'green';
+            } else {
+                resultDiv.textContent = data.message;
+                resultDiv.style.color = 'red';
             }
 
-            resultDiv.textContent = data.message;
-            resultDiv.style.color = data.status === 'success' ? 'green' : 'red';
             resultDiv.classList.add('show');
-
+            setTimeout(() => resultDiv.classList.remove('show'), 3000);
         } catch (error) {
-            resultDiv.textContent = "Nastala chyba při odesílání.";
+            resultDiv.textContent = "Chyba připojení k serveru";
             resultDiv.style.color = 'red';
             resultDiv.classList.add('show');
         }
     });
 
-    // Po načtení stránky načti všechna hodnocení z DB
-    window.addEventListener('DOMContentLoaded', async () => {
+    // Feedback rendering
+    function renderFeedback(fb) {
+        const container = document.getElementById('feedbacksList');
+        const feedbackItem = document.createElement('div');
+        feedbackItem.className = 'feedback-item';
+        feedbackItem.dataset.id = fb.id;
+        feedbackItem.innerHTML = `
+            <img src="/static/profile_pics/${fb.profile_pic || 'default.jpg'}"
+                 class="feedback-profile-pic"
+                 alt="${fb.user_name}">
+            <div class="feedback-content">
+                <div class="feedback-header">
+                    <span class="feedback-user-name">${fb.user_name}</span>
+                    <div class="rating-stars">
+                        ${'<i class="fas fa-star"></i>'.repeat(fb.rating)}
+                        ${'<i class="far fa-star"></i>'.repeat(5 - fb.rating)}
+                    </div>
+                    <span class="feedback-time">
+                        ${fb.timestamp}
+                        ${fb.is_edited ? '(upraveno)' : ''}
+                    </span>
+                </div>
+                <p class="feedback-message">${fb.message}</p>
+                ${fb.is_owner ? `
+                <div class="feedback-actions">
+                    <button class="edit-btn" data-id="${fb.id}">✏️ Upravit</button>
+                    <button class="delete-btn" data-id="${fb.id}">🗑️ Smazat</button>
+                </div>
+                ` : ''}
+            </div>
+        `;
+        container.prepend(feedbackItem);
+    }
+
+    // Load feedbacks
+    async function loadFeedbacks() {
         try {
             const res = await fetch('/get_feedbacks');
             const data = await res.json();
             const container = document.getElementById('feedbacksList');
-
-            if (data.feedbacks) {
-                data.feedbacks.forEach(fb => {
-                    const feedbackItem = document.createElement('div');
-                    feedbackItem.className = 'feedback-item';
-                    feedbackItem.innerHTML = `
-                    <img src="/static/profile_pics/${fb.profile_pic || 'default.jpg'}"
-                         class="feedback-profile-pic"
-                         alt="${fb.user_name}">
-                    <div class="feedback-content">
-                        <div class="feedback-header">
-                            <span class="feedback-user-name">${fb.user_name}</span>
-                            <div class="rating-stars">
-                                ${'<i class="fas fa-star"></i>'.repeat(fb.rating)}
-                                ${'<i class="far fa-star"></i>'.repeat(5 - fb.rating)}
-                            </div>
-                            <span class="feedback-time">${fb.timestamp}</span>
-                        </div>
-                        <p class="feedback-message">${fb.message}</p>
-                    </div>
-                `;
-                    container.appendChild(feedbackItem);
-                });
-            }
+            container.innerHTML = '';
+            data.feedbacks.forEach(fb => renderFeedback(fb));
         } catch (error) {
-            console.error("Nepodařilo se načíst zpětné vazby:", error);
+            console.error("Chyba při načítání feedbacků:", error);
+        }
+    }
+
+    // Edit and delete handlers
+    document.getElementById('feedbacksList').addEventListener('click', async (e) => {
+        const target = e.target;
+        const feedbackItem = target.closest('.feedback-item');
+        const id = feedbackItem?.dataset.id;
+
+        if (!id) return;
+
+        // Delete feedback
+        if (target.classList.contains('delete-btn')) {
+            if (confirm('Opravdu smazat tento feedback?')) {
+                try {
+                    const res = await fetch(`/feedback/${id}`, {method: 'DELETE'});
+                    const data = await res.json();
+                    if (data.status === 'success') feedbackItem.remove();
+                } catch (error) {
+                    alert('Chyba při mazání: ' + error.message);
+                }
+            }
+        }
+
+        // Edit feedback
+        if (target.classList.contains('edit-btn')) {
+            const contentDiv = feedbackItem.querySelector('.feedback-content');
+            const messagePara = contentDiv.querySelector('.feedback-message');
+            const starsDiv = contentDiv.querySelector('.rating-stars');
+            const originalMessage = messagePara.textContent;
+            const originalRating = starsDiv.querySelectorAll('.fas').length;
+
+            // Create edit form
+            const editForm = document.createElement('div');
+            editForm.innerHTML = `
+                <textarea class="edit-textarea">${originalMessage}</textarea>
+                <div class="edit-stars">
+                    ${Array.from({length: 5}, (_, i) => `
+                        <i class="${i < originalRating ? 'fas' : 'far'} fa-star"
+                           data-rating="${i + 1}"></i>
+                    `).join('')}
+                </div>
+                <div class="edit-controls">
+                    <button class="save-edit">Uložit</button>
+                    <button class="cancel-edit">Zrušit</button>
+                </div>
+            `;
+
+            // Replace content with form
+            contentDiv.replaceChild(editForm, messagePara);
+            starsDiv.style.display = 'none';
+
+            // Star rating in edit
+            editForm.querySelectorAll('.edit-stars .fa-star').forEach(star => {
+                star.addEventListener('click', () => {
+                    const rating = parseInt(star.dataset.rating);
+                    editForm.querySelectorAll('.edit-stars .fa-star').forEach((s, i) => {
+                        s.classList.toggle('fas', i < rating);
+                        s.classList.toggle('far', i >= rating);
+                    });
+                });
+            });
+
+            // Save changes
+            editForm.querySelector('.save-edit').addEventListener('click', async () => {
+                const newMessage = editForm.querySelector('textarea').value;
+                const newRating = editForm.querySelectorAll('.edit-stars .fas').length;
+
+                try {
+                    const res = await fetch(`/feedback/${id}`, {
+                        method: 'PUT',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({message: newMessage, rating: newRating})
+                    });
+
+                    const data = await res.json();
+                    if (data.status === 'success') {
+                        messagePara.textContent = newMessage;
+                        starsDiv.innerHTML = `
+                            ${'<i class="fas fa-star"></i>'.repeat(newRating)}
+                            ${'<i class="far fa-star"></i>'.repeat(5 - newRating)}
+                        `;
+                        contentDiv.replaceChild(messagePara, editForm);
+                        starsDiv.style.display = 'block';
+                        feedbackItem.querySelector('.feedback-time').textContent =
+                            `${data.last_modified} (upraveno)`;
+                    }
+                } catch (error) {
+                    alert('Chyba při ukládání: ' + error.message);
+                }
+            });
+
+            // Cancel edit
+            editForm.querySelector('.cancel-edit').addEventListener('click', () => {
+                contentDiv.replaceChild(messagePara, editForm);
+                starsDiv.style.display = 'block';
+            });
         }
     });
 
-    function renderFeedback({user_name, profile_pic, rating, message, timestamp}) {
-        const container = document.getElementById('feedbacksList');
-        const feedbackItem = document.createElement('div');
-        feedbackItem.className = 'feedback-item';
-        feedbackItem.innerHTML = `
-        <img src="/static/profile_pics/${profile_pic || 'default.jpg'}"
-             class="feedback-profile-pic"
-             alt="${user_name}">
-        <div class="feedback-content">
-            <div class="feedback-header">
-                <span class="feedback-user-name">${user_name}</span>
-                <div class="rating-stars">
-                    ${'<i class="fas fa-star"></i>'.repeat(rating)}
-                    ${'<i class="far fa-star"></i>'.repeat(5 - rating)}
-                </div>
-                <span class="feedback-time">${timestamp}</span>
-            </div>
-            <p class="feedback-message">${message}</p>
-        </div>
-    `;
-        container.prepend(feedbackItem); // přidá navrch
-    }
+    // Initial load
+    window.addEventListener('DOMContentLoaded', loadFeedbacks);
 
-    // Přepínání dark/light režimu
-    const themeToggle = document.getElementById('theme-toggle');
-    themeToggle.addEventListener('click', () => {
+    // Theme toggle
+    document.getElementById('theme-toggle').addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
     });
 
-    // Detekce kliknutí mimo menu
-    document.addEventListener('click', (e) => {
-        const profileMenu = document.getElementById('profileMenu');
-        const trigger = document.getElementById('profileMenuTrigger');
-
-        if (!trigger.contains(e.target) && !profileMenu.contains(e.target)) {
-            profileMenu.style.opacity = '0';
-            profileMenu.style.visibility = 'hidden';
-            profileMenu.style.transform = 'translateY(10px)';
-        }
+    // Profile menu
+    document.querySelector('.profile-pic').addEventListener('click', function () {
+        const menu = document.getElementById('profileMenu');
+        menu.style.opacity = menu.style.opacity === '1' ? '0' : '1';
+        menu.style.visibility = menu.style.visibility === 'visible' ? 'hidden' : 'visible';
+        menu.style.transform = menu.style.transform === 'translateY(0)' ? 'translateY(10px)' : 'translateY(0)';
     });
 </script>
 </body>

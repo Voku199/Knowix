@@ -13,6 +13,7 @@ import random
 
 auth_bp = Blueprint('auth', __name__)
 
+
 # Pomocné funkce
 def get_db_connection():
     return mysql.connector.connect(
@@ -24,11 +25,14 @@ def get_db_connection():
         connection_timeout=30
     )
 
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
 
+
 def generate_verification_code():
     return ''.join(random.choices(string.digits, k=8))
+
 
 def send_email(to_email, subject, body):
     from_email = "skolnichat.zib@gmail.com"
@@ -50,6 +54,7 @@ def send_email(to_email, subject, body):
         print(f"Error sending email: {e}")
         return False
 
+
 @auth_bp.route('/settings')
 def settings():
     if 'user_id' not in session:
@@ -60,6 +65,8 @@ def settings():
         session['profile_pic'] = 'default.jpg'
 
     return render_template('settings.html', profile_pic=session['profile_pic'])
+
+
 @auth_bp.route('/upload_profile_pic', methods=['POST'])
 def upload_profile_pic():
     if 'user_name' not in session or 'user_id' not in session:
@@ -94,6 +101,7 @@ def upload_profile_pic():
         flash("Podporované formáty jsou pouze PNG, JPG, JPEG nebo GIF.", "error")
         return redirect(url_for('auth.settings'))
 
+
 # Routy pro autentizaci
 @auth_bp.route('/continue')
 def continue_lesson():
@@ -111,6 +119,8 @@ def continue_lesson():
     session.pop('verbs_done', None)  # Reset progress counter
 
     return redirect(url_for('test'))
+
+
 # LOGIN/REGISTRACE
 # 📌 **Route pro registraci**
 @auth_bp.route('/register', methods=['GET', 'POST'])
@@ -145,7 +155,6 @@ def register():
     return render_template('registrace.html')
 
 
-
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -167,6 +176,7 @@ def login():
                 flash("Nesprávný e-mail nebo heslo!", "error")
 
     return render_template('login.html')
+
 
 # 📌 **Route pro odhlášení**
 @auth_bp.route('/logout')
@@ -224,6 +234,7 @@ def forgot_password():
 
     return render_template('forgot_password.html')
 
+
 @auth_bp.route('/verify_code', methods=['GET', 'POST'])
 def verify_code():
     if request.method == 'POST':
@@ -245,6 +256,7 @@ def verify_code():
             return redirect(url_for('auth.verify_code'))
 
     return render_template('verify_code.html')
+
 
 @auth_bp.route('/resend_code', methods=['POST'])
 def resend_code():
@@ -276,6 +288,7 @@ def resend_code():
         flash("Došlo k chybě při generování nového kódu.", "error")
 
     return redirect(url_for('auth.verify_code'))
+
 
 # 3. Route pro nastavení nového hesla
 @auth_bp.route('/reset_password', methods=['GET', 'POST'])

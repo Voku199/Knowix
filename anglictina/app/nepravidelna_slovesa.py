@@ -98,8 +98,27 @@ def get_possible_answers(verb, correct_tense):
         all_answers.remove(correct_answer)
 
     # Select 3 random wrong answers (or less if not enough available)
-    wrong_answers = random.sample(all_answers, min(3, len(all_answers)))
-    answers = wrong_answers + [correct_answer]
+    # Získání jiných forem aktuálního slovesa kromě správné
+    other_forms = [verb_entry[form] for form in ["verb1", "verb2", "verb3"]
+                   if form != correct_tense and verb_entry[form] != correct_answer]
+
+    # Vyber jednu náhodnou jinou formu ze stejného slovesa (pokud existuje)
+    same_verb_extra = random.choice(other_forms) if other_forms else None
+
+    # Odeber správnou a přidruženou odpověď ze seznamu všech
+    for val in [correct_answer, same_verb_extra]:
+        if val in all_answers:
+            all_answers.remove(val)
+
+    # Zbytek doplň náhodnými špatnými odpověďmi
+    needed_wrong = 3 - (1 if same_verb_extra else 0)
+    wrong_answers = random.sample(all_answers, min(needed_wrong, len(all_answers)))
+
+    # Finální seznam odpovědí
+    answers = [correct_answer] + wrong_answers
+    if same_verb_extra:
+        answers.append(same_verb_extra)
+
     random.shuffle(answers)
     return answers
 

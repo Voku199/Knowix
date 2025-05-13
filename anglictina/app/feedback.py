@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, session, render_template, redirect, url_for
-from datetime import datetime
+from datetime import datetime, timedelta
 from auth import get_db_connection
 
 feedback_bp = Blueprint('feedback', __name__)
@@ -11,8 +11,12 @@ def get_feedbacks():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
+        # Získání ID přihlášeného uživatele (pokud existuje)
+        user_id = session.get('user_id', 0)
+
         cursor.execute('''
-            SELECT f.message, f.rating, f.timestamp, 
+            SELECT f.id, f.user_id, f.message, f.rating, f.timestamp, 
+                   f.last_modified, f.is_edited,
                    u.first_name as user_name, u.profile_pic 
             FROM feedback f
             JOIN users u ON f.user_id = u.id
@@ -23,6 +27,9 @@ def get_feedbacks():
 
         for fb in feedbacks:
             fb['timestamp'] = fb['timestamp'].strftime('%d.%m.%Y %H:%M')
+            fb['is_owner'] = fb['user_id'] == user_id  # Označení vlastních feedbacků
+            if fb['last_modified']:
+                fb['last_modified'] = fb['last_modified'].strftime('%d.%m.%Y %H:%M')
 
         return jsonify({"feedbacks": feedbacks})
 
@@ -33,40 +40,72 @@ def get_feedbacks():
         conn.close()
 
 
-@feedback_bp.route('/feedback', methods=['GET'])
-def feedback_form():
+@feedback_bp.route('/feedback/<int:feedback_id>', methods=['PUT', 'DELETE'])
+def manage_feedback(feedback_id):
     if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
+        return jsonify({"status": "error", "message": "Nejprve se přihlaste"}), 401
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-
+        # Ověření vlastnictví feedbacku
         cursor.execute('''
-            SELECT f.message, f.rating, f.timestamp, 
-                   u.first_name as user_name, u.profile_pic 
-            FROM feedback f
-            JOIN users u ON f.user_id = u.id
-            ORDER BY f.timestamp DESC
-        ''')
+            SELECT * FROM feedback 
+            WHERE id = %s AND user_id = %s
+        ''', (feedback_id, session['user_id']))
+        feedback = cursor.fetchone()
 
-        feedbacks = cursor.fetchall()
+        if not feedback:
+            return jsonify({"status": "error", "message": "Feedback neexistuje"}), 404
 
-        for fb in feedbacks:
-            fb['timestamp'] = fb['timestamp'].strftime('%d.%m.%Y %H:%M')
+        if request.method == 'PUT':
+            data = request.get_json()
+            new_message = data.get('message', '').strip()
+            new_rating = int(data.get('rating', 0))
 
-        return render_template('feedback.html', feedbacks=feedbacks)
+            # Validace
+            if not new_message or not 1 <= new_rating <= 5:
+                return jsonify({"status": "error", "message": "Neplatná data"}), 400
+
+            # Aktualizace feedbacku
+            cursor.execute('''
+                UPDATE feedback 
+                SET message = %s, 
+                    rating = %s, 
+                    last_modified = NOW(),
+                    is_edited = TRUE
+                WHERE id = %s
+            ''', (new_message, new_rating, feedback_id))
+            conn.commit()
+
+            return jsonify({
+                "status": "success",
+                "message": "Feedback byl úspěšně aktualizován",
+                "new_message": new_message,
+                "new_rating": new_rating,
+                "last_modified": datetime.now().strftime('%d.%m.%Y %H:%M')
+            })
+
+        elif request.method == 'DELETE':
+            cursor.execute('DELETE FROM feedback WHERE id = %s', (feedback_id,))
+            conn.commit()
+            return jsonify({"status": "success", "message": "Feedback byl smazán"})
 
     except Exception as e:
-        return render_template('feedback.html', feedbacks=[], error=str(e))
+        return jsonify({"status": "error", "message": f"Chyba: {str(e)}"}), 500
     finally:
         cursor.close()
         conn.close()
 
 
+@feedback_bp.route('/feedback', methods=['GET'])
+def feedback_page():
+    return render_template("feedback.html")  # nebo redirect, nebo jiná logika
+
+
 @feedback_bp.route('/feedback', methods=['POST'])
 def handle_feedback():
-    """Zpracuje API požadavek s JSON daty"""
     if not request.is_json:
         return jsonify({"status": "error", "message": "Požadavek musí být v JSON formátu"}), 415
 
@@ -77,12 +116,10 @@ def handle_feedback():
     message = data.get("message", "").strip()
 
     try:
-        # Konverze ratingu na integer s ošetřením různých formátů
         rating = int(float(data.get("rating", 0)))
     except (ValueError, TypeError):
         return jsonify({"status": "error", "message": "Hodnocení musí být číslo"}), 400
 
-    # Rozšířená validace
     validation_errors = []
     if not message:
         validation_errors.append("Zpráva nesmí být prázdná")
@@ -100,12 +137,33 @@ def handle_feedback():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
+        # Kontrola časového limitu
         cursor.execute('''
-            INSERT INTO feedback (user_id, message, rating, timestamp)
-            VALUES (%s, %s, %s, NOW())
+            SELECT MAX(timestamp) AS last_feedback 
+            FROM feedback 
+            WHERE user_id = %s
+        ''', (session['user_id'],))
+        last_feedback = cursor.fetchone()
+
+        if last_feedback and last_feedback['last_feedback']:
+            time_diff = datetime.now() - last_feedback['last_feedback']
+            if time_diff < timedelta(hours=2):
+                remaining = timedelta(hours=2) - time_diff
+                minutes = int(remaining.seconds // 60)
+                return jsonify({
+                    "status": "error",
+                    "message": f"Můžete poslat další feedback za {minutes} minut"
+                }), 429
+
+        # Vložení nového feedbacku
+        cursor.execute('''
+            INSERT INTO feedback (user_id, message, rating, timestamp, last_modified)
+            VALUES (%s, %s, %s, NOW(), NOW())
         ''', (session['user_id'], message, rating))
+        feedback_id = cursor.lastrowid
         conn.commit()
 
+        # Získání uživatelských dat
         cursor.execute('''
             SELECT first_name, profile_pic 
             FROM users 
@@ -116,6 +174,7 @@ def handle_feedback():
         return jsonify({
             "status": "success",
             "message": "Děkujeme za zpětnou vazbu!",
+            "feedback_id": feedback_id,
             "user_name": user['first_name'],
             "profile_pic": user['profile_pic'] or 'default.jpg',
             "timestamp": datetime.now().strftime('%d.%m.%Y %H:%M'),

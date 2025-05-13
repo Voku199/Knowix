@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Knowix - Cvičení</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Hlavní logika aplikace -->
+    <script src="{{ url_for('static', filename='music/js/exercise.js') }}"></script>
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -50,6 +52,8 @@
     </nav>
 </header>
 
+<body data-song="{{ song_title }}">
+</body>
 <main class="exercises-container">
     <form>
         <section class="exercises-section">
@@ -57,7 +61,7 @@
             <div class="exercise-card">
                 <h3>{{ loop.index }}. Doplň chybějící slovo:</h3>
                 <p>{{ item.with_blank }}</p>
-                <input type="text" name="missing_word_{{ loop.index0 }}" class="exercise-input" placeholder="Napiš chybějící slovo...">
+                <input type="text" name="missing_word_{{ loop.index0 }}" class="exercise-input" placeholder="Napiš chybějící slovo..." data-correct="{{ item.missing_word }}" data-original="{{ item.original }}">
             </div>
             {% endfor %}
 
@@ -65,22 +69,24 @@
             <div class="exercise-card">
                 <h3>{{ loop.index + missing_exercises|length }}. Přelož větu:</h3>
                 <p class="original-sentence"><em>"{{ item.original }}"</em></p>
-                <input type="text" class="exercise-input translation-input" name="translation_{{ loop.index0 }}" placeholder="Tvůj překlad...">
+                <input type="text" class="exercise-input translation-input" name="translation_{{ loop.index0 }}" placeholder="Tvůj překlad..." data-correct="{{ item.translated }}" data-original="{{ item.original }}">
+
             </div>
             {% endfor %}
         </section>
 
         <section class="word-matching">
             <h3>Spoj slova k sobě:</h3>
-            <div class="word-grid">
-                {% for word in english_words %}
-                <div class="word-box en-word" data-word="{{ word }}">{{ word }}</div>
-                {% endfor %}
-                {% for word in czech_words %}
-                <div class="word-box cs-word" data-word="{{ word }}">{{ word }}</div>
-                {% endfor %}
-            </div>
+                <div class="word-grid">
+                    {% for word in english_words %}
+                    <div class="word-box en-word" data-word="{{ word }}">{{ word }}</div>
+                    {% endfor %}
+                    {% for word in czech_words %}
+                    <div class="word-box cs-word" data-word="{{ word }}">{{ word }}</div>
+                    {% endfor %}
+                </div>
         </section>
+
 
         <section class="audio-section">
             <h3>Poslechni si audio:</h3>
@@ -92,8 +98,10 @@
             <div id="lyrics" class="lyrics-container"></div>
         </section>
 
-        <button type="submit" id="checkButton" class="check-button">Zkontrolovat odpovědi</button>
-        <div id="result" class="result-container"></div>
+    <button type="button" id="checkButton" class="check-button">Zkontrolovat odpovědi</button>
+
+    <div id="result" class="result-container"></div>
+
     </form>
 </main>
 
@@ -162,29 +170,27 @@
         document.body.classList.toggle('dark-mode');
     });
 
-    // Detekce kliknutí mimo menu
-    document.addEventListener('click', (e) => {
-        const profileMenu = document.getElementById('profileMenu');
-        const trigger = document.getElementById('profileMenuTrigger');
+document.addEventListener('click', (e) => {
+    const profileMenu = document.getElementById('profileMenu');
+    const trigger = document.getElementById('profileMenuTrigger');
 
-        if (!trigger.contains(e.target) && !profileMenu.contains(e.target)) {
-            profileMenu.style.opacity = '0';
-            profileMenu.style.visibility = 'hidden';
-            profileMenu.style.transform = 'translateY(10px)';
-        }
-    });
+    // Zkontrolujeme, jestli elementy existují, než se pokusíme o další operace
+    if (profileMenu && trigger && !trigger.contains(e.target) && !profileMenu.contains(e.target)) {
+        profileMenu.style.opacity = '0';
+        profileMenu.style.visibility = 'hidden';
+        profileMenu.style.transform = 'translateY(10px)';
+    }
+});
+
+
 </script>
 
-<!-- Nastavení configu pro JS logiku -->
 <script>
-    const config = {
-        missing_exercises: {{ missing_exercises | tojson }},
-        translation_exercises: {{ translation_exercises | tojson }},
-        word_pairs: {{ word_pairs | tojson }}
-    };
+    window.exerciseConfig = {{ config | tojson | safe }};
+    console.log('Konfigurace cvičení:', exerciseConfig);
 </script>
 
-<!-- Hlavní logika aplikace -->
-<script src="{{ url_for('static', filename='music/js/exercise.js') }}"></script>
-</body>
+
+
+    </body>
 </html>

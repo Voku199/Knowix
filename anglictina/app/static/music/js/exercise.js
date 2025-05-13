@@ -1,10 +1,13 @@
-// Inicializace
+window.KnowixData = window.KnowixData || {};
+KnowixData.exerciseConfig = KnowixData.exerciseConfig || {};
+
+
 document.addEventListener('DOMContentLoaded', () => {
     initWordMatching();
     setupValidation();
+    setupLyricsToggle();
 });
 
-// Spojovačka - logika
 function initWordMatching() {
     let selectedPairs = [];
 
@@ -14,225 +17,167 @@ function initWordMatching() {
 }
 
 function handleWordClick(box, selectedPairs) {
-    if (!box.classList.contains('selected')) {
-        box.classList.add('selected');
-        selectedPairs.push(box);
-
-        if (selectedPairs.length === 2) {
-            const [first, second] = selectedPairs;
-            const isPairValid = validatePair(first, second);
-            highlightPair(first, second, isPairValid);
-
-            // Resetování výběru
-            selectedPairs.splice(0); // Lepší než selectedPairs.length = 0
-            first.classList.remove('selected');
-            second.classList.remove('selected');
-        }
-    }
-}
-
-// In validatePair function
-function validatePair(first, second) {
-    const isEnCsPair = (
-        (first.classList.contains('en-word') && second.classList.contains('cs-word')) ||
-        (first.classList.contains('cs-word') && second.classList.contains('en-word'))
-    );
-
-    if (!isEnCsPair) return false;
-
-    const enWord = first.classList.contains('en-word') ?
-        first.dataset.word : second.dataset.word;
-    const csWord = first.classList.contains('cs-word') ?
-        first.dataset.word : second.dataset.word;
-
-    return config.word_pairs[enWord] === csWord; // Corrected variable name
-}
-
-function handleWordClick(box, selectedPairs) {
-    // Zamezí klikání na již správně spojené (locked) boxy
     if (box.classList.contains('locked')) return;
 
-    if (!box.classList.contains('selected')) {
-        box.classList.add('selected');
-        selectedPairs.push(box);
+    box.classList.toggle('selected');
+    selectedPairs.includes(box)
+        ? selectedPairs.splice(selectedPairs.indexOf(box), 1)
+        : selectedPairs.push(box);
 
-        if (selectedPairs.length === 2) {
-            const [first, second] = selectedPairs;
-            const isValid = validatePair(first, second);
-            highlightPair(first, second, isValid);
+    if (selectedPairs.length === 2) {
+        const [first, second] = selectedPairs;
+        const isValid = validatePair(first, second);
 
-            // Pokud je správně, zamkne
+        highlightPair(first, second, isValid);
+
+        setTimeout(() => {
+            first.classList.remove('selected', 'wrong');
+            second.classList.remove('selected', 'wrong');
+
             if (isValid) {
-                first.classList.add('locked');
-                second.classList.add('locked');
-                first.style.pointerEvents = 'none';
-                second.style.pointerEvents = 'none';
+                [first, second].forEach(el => {
+                    el.classList.add('locked', 'correct');
+                    el.style.pointerEvents = 'none';
+                });
             }
 
-            // Resetuj výběr i vybrané styly
-            setTimeout(() => {
-                first.classList.remove('selected');
-                second.classList.remove('selected');
-
-                if (!isValid) {
-                    first.classList.remove('wrong');
-                    second.classList.remove('wrong');
-                }
-
-                selectedPairs.splice(0);
-            }, 400); // Počká 0.8 sekundy, ať máš čas vidět výsledek
-        }
+            selectedPairs.length = 0;
+        }, 1000);
     }
+}
+
+function validatePair(first, second) {
+    // Detekce jazykové kombinace
+    const languageCombination = [
+        first.classList.contains('en-word') ? 'en' : 'cs',
+        second.classList.contains('en-word') ? 'en' : 'cs'
+    ].join('-');
+
+    // Povolené kombinace
+    const validCombinations = ['en-cs', 'cs-en'];
+    if (!validCombinations.includes(languageCombination)) return false;
+
+    // Normalizace vstupních hodnot
+    const normalize = (text) => text.trim().toLowerCase();
+    const word1 = normalize(first.dataset.word);
+    const word2 = normalize(second.dataset.word);
+
+    // Validace podle konfigurace - OPRAVA ZDE
+    const wordPairs = window.exerciseConfig?.word_pairs || {};
+    return Object.entries(wordPairs).some(([key, value]) => {
+        const normalizedKey = normalize(key);
+        const normalizedValue = normalize(value);
+
+        // Kontrola obou směrů
+        return (normalizedKey === word1 && normalizedValue === word2) ||
+            (normalizedValue === word1 && normalizedKey === word2);
+    });
 }
 
 function highlightPair(first, second, isValid) {
-    first.classList.remove('correct', 'wrong');
-    second.classList.remove('correct', 'wrong');
-
     const styleClass = isValid ? 'correct' : 'wrong';
     first.classList.add(styleClass);
     second.classList.add(styleClass);
 }
 
+function collectMatchedWordPairs() {
+    const pairs = [];
+    const used = new Set();
+    const wordPairs = window.exerciseConfig?.word_pairs || {}; // OPRAVA ZDE
+
+    const enWords = document.querySelectorAll('.en-word.correct.locked');
+    const csWords = document.querySelectorAll('.cs-word.correct.locked');
+
+    enWords.forEach(enEl => {
+        const enWord = enEl.dataset.word;
+        const match = Array.from(csWords).find(csEl => {
+            const csWord = csEl.dataset.word;
+            return !used.has(csEl) && wordPairs[enWord] === csWord; // OPRAVA ZDE
+        });
+
+        if (match) {
+            pairs.push([enWord, match.dataset.word]);
+            used.add(enEl);
+            used.add(match);
+        }
+    });
+
+    return pairs;
+}
+
+// Přidejte globální normalizační funkci
+function normalizeAnswer(text) {
+    return text
+        .normalize('NFD')  // Rozložení diakritiky na základní znaky
+        .replace(/[\u0300-\u036f]/g, '')  // Odstranění diakritických znaků
+        .replace(/[^\w\s]/g, '')  // Odstranění interpunkce a speciálních znaků
+        .trim()  // Oříznutí mezer
+        .toLowerCase();  // Převod na malá písmena
+}
 
 function setupValidation() {
-    document.querySelector('#checkButton').addEventListener('click', async (event) => {
-        event.preventDefault();
-        let missingValid = true;
-        let translationValid = true;
+    document.getElementById('checkButton').addEventListener('click', async () => {
+        // Zpracování odpovědí pro doplňovačky
+        const missingAnswers = Array.from(document.querySelectorAll('.exercise-input:not(.translation-input)')).map(input => ({
+            correct: normalizeAnswer(input.getAttribute('data-correct')),
+            user: normalizeAnswer(input.value),
+            original: input.getAttribute('data-original') || ''
+        }));
 
-        const user_missing = [];
-        const correct_missing = [];
+        // Zpracování překladů
+        const translationAnswers = Array.from(document.querySelectorAll('.translation-input')).map(input => ({
+            correct: normalizeAnswer(input.getAttribute('data-correct')),
+            user: normalizeAnswer(input.value),
+            original: input.getAttribute('data-original') || ''
+        }));
 
-        config.missing_exercises.forEach((item, index) => {
-            const input = document.querySelector(`input[name="missing_word_${index}"]`);
-            const userAnswer = input.value.trim().toLowerCase();
-            const correctAnswer = item.missing_word.trim().toLowerCase();
-            user_missing.push(userAnswer);
-            correct_missing.push(correctAnswer);
+        // Zpracování slovních párů
+        const wordPairs = collectMatchedWordPairs();
 
-            if (userAnswer === correctAnswer) {
-                input.style.borderColor = "green";
-                input.classList.add("good-answer");
-                input.classList.remove("bad-answer");
-            } else {
-                input.style.borderColor = "red";
-                input.classList.add("bad-answer");
-                input.classList.remove("good-answer");
-                missingValid = false;
-            }
-        });
-
-        const user_translations = [];
-        const correct_translations = [];
-
-        config.translation_exercises.forEach((item, index) => {
-            const input = document.querySelector(`input[name="translation_${index}"]`);
-            const userAnswer = input.value.trim().toLowerCase();
-            const correctAnswer = item.translated.trim().toLowerCase();
-            user_translations.push(userAnswer);
-            correct_translations.push(correctAnswer);
-
-            if (userAnswer === correctAnswer) {
-                input.style.borderColor = "green";
-                input.classList.add("good-answer");
-                input.classList.remove("bad-answer");
-            } else {
-                input.style.borderColor = "red";
-                input.classList.add("bad-answer");
-                input.classList.remove("good-answer");
-                translationValid = false;
-            }
-        });
-
-        const selectedPairs = [];
-        let pairsValid = true;
-
-        for (const [en, cs] of Object.entries(config.word_pairs)) {
-            const enEl = document.querySelector(`.en-word[data-word="${en}"]`);
-            const csEl = document.querySelector(`.cs-word[data-word="${cs}"]`);
-
-            if (enEl?.classList.contains('correct') && csEl?.classList.contains('correct')) {
-                selectedPairs.push([en, cs]);
-            } else {
-                pairsValid = false;
-            }
-        }
-
-        if (!missingValid || !translationValid || !pairsValid) return;
-
+        // Odeslání na server
         const response = await fetch('/check-answer', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-                user_missing: user_missing[0],
-                missing_word: correct_missing[0],
-                user_translation: user_translations[0],
-                translation: correct_translations[0],
-                pairs: selectedPairs
+                missing: missingAnswers,
+                translations: translationAnswers,
+                pairs: wordPairs
             })
         });
 
+        // Zobrazení výsledků
         const result = await response.json();
-
-        if (result.correct.missing_word && result.correct.translation && result.correct.pairs) {
-            window.location.href = "/results";
-        } else {
-            alert("Něco je špatně. Zkontroluj odpovědi.");
-        }
+        renderResults(result);
     });
 }
 
+function renderResults(result) {
+    const resultContainer = document.getElementById('result');
+    let html = '<h2>Výsledky:</h2>';
 
-function validateMissingWord() {
-    const userInput = document.getElementById('missingWordInput').value;
-    return userInput.toLowerCase() === exerciseConfig.missing_word.toLowerCase();
+    html += '<h3>Doplň chybějící slovo:</h3>' +
+        result.results.missing.map((correct, i) => `<p>Úloha ${i + 1}: ${correct ? '✅ Správně' : '❌ Špatně'}</p>`).join('');
+
+    html += '<h3>Překlady:</h3>' +
+        result.results.translations.map((correct, i) => `<p>Úloha ${i + 1}: ${correct ? '✅ Správně' : '❌ Špatně'}</p>`).join('');
+
+    html += `<h3>Slovní páry:</h3><p>${result.results.pairs ? '✅ Správně' : '❌ Špatně'}</p>`;
+
+    html += result.success
+        ? '<p class="success-msg">🎉 Všechny odpovědi jsou správně!</p>'
+        : '<p class="error-msg">Některé odpovědi nejsou správně. Zkus to znovu! 🙈</p>';
+
+    resultContainer.innerHTML = html;
 }
 
-function validateTranslation() {
-    const userInput = document.getElementById('translationInput').value.trim().toLowerCase();
-    const correctTranslation = exerciseConfig.translated_line.trim().toLowerCase();
-    return userInput === correctTranslation;
-}
+function setupLyricsToggle() {
+    const toggleBtn = document.querySelector('.lyrics-toggle');
+    if (!toggleBtn) return;
 
-// In the setupValidation function's fetch call:
-body: JSON.stringify({
-    user_missing: missingWord,
-    missing_word: exerciseConfig.missing_word,
-    user_translation: translation,
-    translation: exerciseConfig.translated_line,  // Now correctly references the Czech translation
-    pairs: selectedPairs,
-})
-
-function validateAllPairs() {
-    return Object.entries(exerciseConfig.word_pairs).every(([en, cs]) => {
-        const enElement = document.querySelector(`.en-word[data-word="${en}"]`);
-        const csElement = document.querySelector(`.cs-word[data-word="${cs}"]`);
-        return enElement?.classList.contains('correct') &&
-            csElement?.classList.contains('correct');
+    toggleBtn.addEventListener('click', () => {
+        const container = document.querySelector('.lyrics-container');
+        container.classList.toggle('collapsed');
+        container.style.display = 'block';
+        toggleBtn.textContent = container.classList.contains('collapsed') ? 'Zobrazit více' : 'Skrýt';
     });
 }
-
-document.querySelector('.lyrics-toggle').addEventListener('click', function () {
-    const container = document.querySelector('.lyrics-container');
-    container.classList.toggle('collapsed'); // Přepíná mezi zkráceným a rozbaleným stavem
-    container.style.display = 'block'; // Vždy zobrazíme
-    this.textContent = container.classList.contains('collapsed') ? 'Zobrazit více' : 'Skrýt'; // Změna textu na tlačítku
-});
-
-
-// Přepínání mezi světlým a tmavým režimem
-const themeToggle = document.getElementById("theme-toggle");
-const body = document.body;
-
-themeToggle.addEventListener("click", () => {
-    body.classList.toggle("dark-mode");
-
-    // Přepínání ikonky 🌙 / ☀️
-    if (body.classList.contains("dark-mode")) {
-        themeToggle.textContent = "☀️";
-    } else {
-        themeToggle.textContent = "🌙";
-    }
-});
-

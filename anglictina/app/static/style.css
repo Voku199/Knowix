@@ -604,23 +604,28 @@ body.dark-mode .profile-menu a:hover {
     text-align: center;
 }
 
+/* SEKCE SPOJOVÁNÍ SLOV */
 .word-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin: 25px 0;
 }
 
 .word-box {
-    background-color: #e9ecef;
-    color: #495057;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    padding: 10px;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
     text-align: center;
     cursor: pointer;
     user-select: none;
-    transition: all 0.2s ease-in-out;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #f8f9fa;
+    font-weight: 600;
+    position: relative; /* Přidáno */
+    overflow: hidden; /* Přidáno */
 }
+
 
 .word-box:hover {
     background-color: #d3d9df;
@@ -778,22 +783,23 @@ body.dark-mode .profile-menu a:hover {
 }
 
 .word-box.selected {
-    outline: 2px solid #007bff;
-    background-color: #d0e8ff;
+    border-color: #2196F3 !important;
+    background: #e3f2fd !important;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.2);
 }
 
 .word-box.correct {
-    background-color: #c8f7c5;
-    border-color: #4caf50;
-    color: #2e7d32;
-    font-weight: bold;
+    border-color: #4CAF50 !important;
+    background: #C8E6C9 !important;
+    animation: popIn 0.3s ease;
 }
 
+
 .word-box.wrong {
-    background-color: #ffcdd2;
-    border-color: #f44336;
-    color: #b71c1c;
-    font-weight: bold;
+    border-color: #f44336 !important;
+    background: #ffcdd2 !important;
+    animation: shake 0.4s ease;
 }
 
 
@@ -1531,5 +1537,83 @@ body.dark-mode .profile-menu a:hover {
         font-style: italic;
     }
 
+    /* Word matching styly */
+    .word-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: 20px 0;
+    }
+
+    .word-box {
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        user-select: none;
+        background: #f8f9fa;
+    }
+
+    .word-box:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Animace */
+    @keyframes popIn {
+        0% {
+            transform: scale(0.95);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    @keyframes shake {
+        0% {
+            transform: translateX(0);
+        }
+        25% {
+            transform: translateX(-8px);
+        }
+        50% {
+            transform: translateX(8px);
+        }
+        75% {
+            transform: translateX(-8px);
+        }
+        100% {
+            transform: translateX(0);
+        }
+    }
+
+    /* Efekt propojení */
+    .word-box.connected::before {
+        content: '';
+        position: absolute;
+        background: #2196F3;
+        height: 3px;
+        width: calc(100% + 40px);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: -1;
+        border-radius: 2px;
+        animation: drawLine 0.4s ease-out;
+    }
+
+    @keyframes drawLine {
+        from {
+            width: 0;
+        }
+        to {
+            width: calc(100% + 40px);
+        }
+    }
 
 }
