@@ -16,7 +16,7 @@ def get_feedbacks():
 
         cursor.execute('''
             SELECT f.id, f.user_id, f.message, f.rating, f.timestamp, 
-                   f.last_modified, f.is_edited,
+                   f.last_feedback_time, f.is_edited,
                    u.first_name as user_name, u.profile_pic 
             FROM feedback f
             JOIN users u ON f.user_id = u.id
@@ -157,7 +157,7 @@ def handle_feedback():
 
         # Vložení nového feedbacku
         cursor.execute('''
-            INSERT INTO feedback (user_id, message, rating, timestamp, last_modified)
+            INSERT INTO feedback (user_id, message, rating, timestamp, last_feedback_time)
             VALUES (%s, %s, %s, NOW(), NOW())
         ''', (session['user_id'], message, rating))
         feedback_id = cursor.lastrowid

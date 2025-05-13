@@ -29,6 +29,7 @@ app.register_blueprint(feedback_bp)
 app.register_blueprint(theme_bp)
 
 # app.run(port=5000) PRO LOCALNÍ SERVER
+# serve(app, host="0.0.0.0", port=8080) PRO SERVER
 
 if __name__ == "__main__":
     serve(app, host="0.0.0.0", port=8080)
