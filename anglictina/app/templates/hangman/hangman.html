@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowix - ALPHA VERZE</title>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style_hangman.css">
+    <script defer src="{{ url_for('static', filename='hangman/js/hangman.js') }}"></script>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <a href="{{ url_for('main.index') }}">
+            <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+        </a>
+    </div>
+    <nav>
+        <ul class="nav-right">
+            <li><a href="/anglictina">Angličtina</a></li>
+            <li><a href="/feedback">Feedback</a></li>
+            <li>
+                {% if session['user_name'] %}
+                <div class="user-profile">
+                    <div class="profile-container">
+                        {% if session.get('profile_pic') %}
+                        <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                             alt="Profilová fotka" width="64" class="profile-pic">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='pic/default.jpg') }}" alt="Defaultní profilovka"
+                             class="profile-pic" id="profileMenuTrigger">
+                        {% endif %}
+                        <div class="profile-menu" id="profileMenu">
+                            <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                            <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+
+                        </div>
+                    </div>
+                    <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
+                </div>
+                {% else %}
+                <div class="auth-links">
+                    <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
+                    <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
+                </div>
+                {% endif %}
+            </li>
+            <li>
+                <button id="theme-toggle">🌙</button>
+            </li>
+        </ul>
+    </nav>
+</header>
+<div class="hangman-container">
+    <h2>Hangman</h2>
+
+    <div class="game-info">
+        <span id="level">Úroveň: B2</span>
+        <span id="hint">Nápověda: The end of something, usually logical.</span>
+        <button id="showHintCzBtn" class="modern-btn">Ukázat českou nápovědu 🇨🇿</button>
+        <div id="hintCz" style="margin-top: 10px; font-weight: bold;"></div>
+    </div>
+
+
+    <div id="hangmanDrawing"></div>
+
+    <div id="maskedWord">_ _ _ _ _</div>
+
+    <div id="letterButtons" class="alphabet"></div>
+
+    <div class="game-stats">
+        <p>Zbývá pokusů: <strong id="remainingAttempts">6</strong></p>
+        <p>Uhodnutá písmena: <span id="guessedLetters">-</span></p>
+    </div>
+
+    <div id="resultMessage"></div>
+    <button id="nextWordBtn" class="modern-btn">Další slovo →</button>
+</div>
+
+<footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p class="footer-signature">
+        Made with ❤️ by
+        <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+        and lot of ☕
+    </p>
+</footer>
+</body>
+</html>

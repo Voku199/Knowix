@@ -1616,4 +1616,172 @@ body.dark-mode .profile-menu a:hover {
         }
     }
 
+    /* --- HANGMAN GAME STYLES --- */
+    .hangman-container {
+        max-width: 600px;
+        margin: 60px auto;
+        text-align: center;
+        padding: 30px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        background-color: #fafafa;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .hangman-title {
+        font-size: 28px;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .masked-word {
+        font-size: 36px;
+        letter-spacing: 12px;
+        font-weight: bold;
+        margin: 20px 0;
+        font-family: monospace;
+    }
+
+    .hint-text,
+    .remaining-attempts {
+        font-size: 18px;
+        margin: 10px 0;
+        color: #555;
+    }
+
+    .letters {
+        margin-top: 25px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .letter-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+        font-weight: bold;
+        border: none;
+        background-color: #007BFF;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .letter-btn:hover:not([disabled]) {
+        background-color: #0056b3;
+    }
+
+    .letter-btn:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+        color: #666;
+    }
+
+    .restart-btn {
+        margin-top: 30px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .restart-btn:hover {
+        background-color: #218838;
+    }
+
+    .hangman-status {
+        font-size: 22px;
+        margin-top: 20px;
+        font-weight: bold;
+        color: #222;
+    }
+
+    .news-list {
+        margin: 20px;
+        padding: 0;
+    }
+
+    .news-item {
+        background-color: #f9f9f9;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .news-title {
+        font-size: 1.5em;
+        color: #007bff;
+    }
+
+    .news-content {
+        font-size: 1.1em;
+        color: #555;
+    }
+
+    .news-date {
+        display: block;
+        margin-top: 10px;
+        font-size: 0.9em;
+        color: #888;
+    }
+
+    .add-news-header {
+        font-size: 1.8em;
+        color: #333;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+
+    .news-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .input-field {
+        width: 80%;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        font-size: 1em;
+        box-sizing: border-box;
+    }
+
+    .submit-btn {
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1.2em;
+    }
+
+    .submit-btn:hover {
+        background-color: #218838;
+    }
+
+    .divider {
+        border: 0;
+        border-top: 2px solid #ccc;
+        margin: 20px 0;
+    }
+
+    .news-h1 {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 2.5rem;
+        color: #333;
+    }
+
+
 }

@@ -1,11 +1,13 @@
+from waitress import serve
 from flask import Flask, current_app
 from auth import auth_bp
 from nepravidelna_slovesa import verbs_bp
 from main_routes import main_bp
 from A1_music import exercises_bp  # Add this import
 from feedback import feedback_bp
-from waitress import serve
+from hangman import hangman_bp
 from theme import theme_bp
+from news import news_bp
 
 import os
 from dotenv import load_dotenv
@@ -27,6 +29,8 @@ app.register_blueprint(verbs_bp)
 app.register_blueprint(exercises_bp)  # Add this line
 app.register_blueprint(feedback_bp)
 app.register_blueprint(theme_bp)
+app.register_blueprint(hangman_bp)
+app.register_blueprint(news_bp)
 
 # app.run(port=5000) PRO LOCALNÍ SERVER
 # serve(app, host="0.0.0.0", port=8080) PRO SERVER

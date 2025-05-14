@@ -10,31 +10,53 @@ def get_feedbacks():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-
-        # Získání ID přihlášeného uživatele (pokud existuje)
         user_id = session.get('user_id', 0)
 
+        # Opravený SQL dotaz se správnými názvy sloupců
         cursor.execute('''
-            SELECT f.id, f.user_id, f.message, f.rating, f.timestamp, 
-                   f.last_feedback_time, f.is_edited,
-                   u.first_name as user_name, u.profile_pic 
+            SELECT 
+                f.id,
+                f.user_id,
+                f.message,
+                f.rating,
+                f.timestamp,
+                f.last_modified,  # Správný název sloupce pro poslední úpravu
+                f.is_edited,
+                u.first_name as user_name,
+                COALESCE(u.profile_pic, 'default.jpg') as profile_pic  # Fallback pro profilový obrázek
             FROM feedback f
-            JOIN users u ON f.user_id = u.id
+            LEFT JOIN users u ON f.user_id = u.id  # Zahrnout i smazané uživatele
             ORDER BY f.timestamp DESC
         ''')
 
         feedbacks = cursor.fetchall()
+        processed = []
 
         for fb in feedbacks:
-            fb['timestamp'] = fb['timestamp'].strftime('%d.%m.%Y %H:%M')
-            fb['is_owner'] = fb['user_id'] == user_id  # Označení vlastních feedbacků
-            if fb['last_modified']:
-                fb['last_modified'] = fb['last_modified'].strftime('%d.%m.%Y %H:%M')
+            # Konverze datových typů
+            fb_data = {
+                'id': fb['id'],
+                'user_id': fb['user_id'],
+                'user_name': fb['user_name'] or "Anonymní uživatel",
+                'profile_pic': fb['profile_pic'],
+                'message': fb['message'],
+                'rating': fb['rating'],
+                'timestamp': fb['timestamp'].strftime('%d.%m.%Y %H:%M'),
+                'is_owner': fb['user_id'] == user_id,
+                'is_edited': bool(fb['is_edited']),
+                'last_modified': fb['last_modified'].strftime('%d.%m.%Y %H:%M') if fb['last_modified'] else None
+            }
+            processed.append(fb_data)
 
-        return jsonify({"feedbacks": feedbacks})
+        return jsonify({"feedbacks": processed})
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"Chyba v get_feedbacks: {str(e)}")  # Logování chyby
+        return jsonify({
+            "status": "error",
+            "message": "Interní chyba serveru",
+            "feedbacks": []  # Zajištění vždy vráceného pole
+        }), 500
     finally:
         cursor.close()
         conn.close()

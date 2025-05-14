@@ -1,0 +1,184 @@
+[
+  {
+    "word": "apple",
+    "translation": "jablko",
+    "level": "A1",
+    "hint": "A common fruit, often red or green.",
+    "hint_cz": "Běžné ovoce, často červené nebo zelené."
+  },
+  {
+    "word": "window",
+    "translation": "okno",
+    "level": "A1",
+    "hint": "Glass part of a wall for light and view.",
+    "hint_cz": "Skleněná část zdi pro světlo a výhled."
+  },
+  {
+    "word": "test",
+    "translation": "test / zkouška",
+    "level": "A2",
+    "hint": "Assessment of knowledge or ability.",
+    "hint_cz": "Hodnocení znalostí nebo schopností."
+  },
+  {
+    "word": "journey",
+    "translation": "cesta (dlouhá)",
+    "level": "B1",
+    "hint": "Traveling from one place to another over time.",
+    "hint_cz": "Cestování z jednoho místa na druhé po delší dobu."
+  },
+  {
+    "word": "conclusion",
+    "translation": "závěr",
+    "level": "B2",
+    "hint": "Final decision based on reasoning.",
+    "hint_cz": "Konečné rozhodnutí založené na logické úvaze."
+  },
+  {
+    "word": "sunset",
+    "translation": "západ slunce",
+    "level": "A2",
+    "hint": "Daily disappearance of the sun.",
+    "hint_cz": "Každodenní zmizení slunce na obzoru."
+  },
+  {
+    "word": "effort",
+    "translation": "úsilí",
+    "level": "B1",
+    "hint": "Physical or mental energy to achieve a goal.",
+    "hint_cz": "Fyzická nebo mentální energie k dosažení cíle."
+  },
+  {
+    "word": "breeze",
+    "translation": "větřík",
+    "level": "B1",
+    "hint": "Gentle wind.",
+    "hint_cz": "Jemný vánek."
+  },
+  {
+    "word": "obvious",
+    "translation": "zřejmý",
+    "level": "B2",
+    "hint": "Easily perceived or understood.",
+    "hint_cz": "Snadno vnímatelné nebo pochopitelné."
+  },
+  {
+    "word": "doubt",
+    "translation": "pochybnost",
+    "level": "B2",
+    "hint": "Uncertainty about truth or fact.",
+    "hint_cz": "Nejistota ohledně pravdy nebo skutečnosti."
+  },
+  {
+    "word": "glimpse",
+    "translation": "letmý pohled",
+    "level": "B1",
+    "hint": "Quick look at something.",
+    "hint_cz": "Rychlý pohled na něco."
+  },
+  {
+    "word": "thunder",
+    "translation": "hrom",
+    "level": "A2",
+    "hint": "Loud noise during a storm.",
+    "hint_cz": "Hlasitý zvuk během bouřky."
+  },
+  {
+    "word": "harmony",
+    "translation": "harmonie",
+    "level": "B2",
+    "hint": "Pleasant arrangement of parts.",
+    "hint_cz": "Příjemné uspořádání částí."
+  },
+  {
+    "word": "to rely on",
+    "translation": "spoléhat na",
+    "level": "B1",
+    "hint": "Depend on someone/something.",
+    "hint_cz": "Být závislý na někom/něčem."
+  },
+  {
+    "word": "awkward",
+    "translation": "trapný / neobratný",
+    "level": "B2",
+    "hint": "Causing embarrassment.",
+    "hint_cz": "Způsobující trapnou situaci."
+  },
+  {
+    "word": "to glance",
+    "translation": "letmo se podívat",
+    "level": "B1",
+    "hint": "Quickly look at something.",
+    "hint_cz": "Rychle se na něco podívat."
+  },
+  {
+    "word": "fierce",
+    "translation": "prudký / divoký",
+    "level": "B2",
+    "hint": "Intense aggression or strength.",
+    "hint_cz": "Silná agrese nebo síla."
+  },
+  {
+    "word": "to vanish",
+    "translation": "zmizet",
+    "level": "B2",
+    "hint": "Disappear suddenly.",
+    "hint_cz": "Náhlé zmizení."
+  },
+  {
+    "word": "to stumble",
+    "translation": "zakopnout / zadrhávat",
+    "level": "B2",
+    "hint": "Trip while walking or speaking.",
+    "hint_cz": "Zakopnout při chůzi nebo zadrhnout se v řeči."
+  },
+  {
+    "word": "blossom",
+    "translation": "kvést / květ",
+    "level": "B1",
+    "hint": "Flowers on a tree.",
+    "hint_cz": "Květy na stromě."
+  },
+  {
+    "word": "vague",
+    "translation": "nejasný",
+    "level": "B2",
+    "hint": "Not clear or definite.",
+    "hint_cz": "Nejasný nebo nejistý."
+  },
+  {
+    "word": "to wander",
+    "translation": "toulat se",
+    "level": "B1",
+    "hint": "Walk without a fixed direction.",
+    "hint_cz": "Chůze bez určitého směru."
+  },
+  {
+    "word": "to grasp",
+    "translation": "uchopit / pochopit",
+    "level": "B2",
+    "hint": "Physically hold or mentally understand.",
+    "hint_cz": "Fyzicky uchopit nebo mentálně pochopit."
+  },
+  {
+    "word": "humble",
+    "translation": "skromný",
+    "level": "B2",
+    "hint": "Modest, not arrogant.",
+    "hint_cz": "Skromný, bez arogance."
+  },
+  {
+    "word": "to bargain",
+    "translation": "smlouvat",
+    "level": "B1",
+    "hint": "Negotiate prices or conditions.",
+    "hint_cz": "Vyjednávat ceny nebo podmínky."
+  },
+  {
+    "word": "to whisper",
+    "translation": "šeptat",
+    "level": "A2",
+    "hint": "Speak very quietly.",
+    "hint_cz": "Velmi tiché mluvení."
+  }
+]

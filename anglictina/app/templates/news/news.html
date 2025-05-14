@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novinky | Knowix</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .news-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .news-h1 {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 2.5em;
+    color: #222;
+}
+
+        .news-form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .news-item {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .news-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .news-content {
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .news-meta {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        #newsTitle, #newsContent {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        #newsContent {
+            height: 150px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo">
+        <a href="{{ url_for('main.index') }}">
+            <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+        </a>
+    </div>
+    <nav>
+        <ul class="nav-right">
+            <li><a href="/anglictina">Angličtina</a></li>
+            <li><a href="/feedback">Feedback</a></li>
+            <li><a href="/news">Novinky</a></li>
+            <li>
+                {% if session['user_name'] %}
+                <div class="user-profile">
+                    <div class="profile-container">
+                        {% if session.get('profile_pic') %}
+                        <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                             alt="Profilová fotka" width="64" class="profile-pic">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='pic/default.jpg') }}" alt="Defaultní profilovka"
+                             class="profile-pic" id="profileMenuTrigger">
+                        {% endif %}
+                        <div class="profile-menu" id="profileMenu">
+                            <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                            <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+
+                        </div>
+                    </div>
+                    <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
+                </div>
+                {% else %}
+                <div class="auth-links">
+                    <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
+                    <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
+                </div>
+                {% endif %}
+            </li>
+            <li>
+                <button id="theme-toggle">🌙</button>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+    <h1 class="news-h1">📰 Novinky</h1>
+
+    <main class="news-container">
+        {% if is_owner %}
+        <div class="news-form">
+            <h2>Přidat novinku</h2>
+            <form id="newsForm">
+                <input type="text" id="newsTitle" placeholder="Nadpis novinky" required>
+                <textarea id="newsContent" placeholder="Obsah novinky..." required></textarea>
+                <button type="submit" class="submit-btn">Publikovat</button>
+            </form>
+        </div>
+        {% endif %}
+
+        <div id="newsList">
+            <!-- Zde se načtou existující novinky -->
+        </div>
+    </main>
+
+    <script>
+        // Kontrola oprávnění
+        let isOwner = {{ 'true' if is_owner else 'false' }};
+
+        // Načtení novinek
+        async function loadNews() {
+            try {
+                const res = await fetch('/get_news');
+                const data = await res.json();
+                const container = document.getElementById('newsList');
+                container.innerHTML = '';
+
+                data.news.forEach(news => {
+                    const newsItem = document.createElement('div');
+                    newsItem.className = 'news-item';
+                    newsItem.dataset.id = news.id;
+                    newsItem.innerHTML = `
+                        <h3 class="news-title">${news.title}</h3>
+                        <div class="news-content">${news.content}</div>
+                        <div class="news-meta">
+                            Publikováno ${news.created_at}
+                            ${news.updated_at ? `(Aktualizováno ${news.updated_at})` : ''}
+                            ${isOwner ? `
+                            <div class="news-actions">
+                                <button class="edit-news" data-id="${news.id}">Upravit</button>
+                                <button class="delete-news" data-id="${news.id}">Smazat</button>
+                            </div>` : ''}
+                        </div>
+                    `;
+                    container.appendChild(newsItem);
+                });
+            } catch (error) {
+                console.error("Chyba při načítání novinek:", error);
+            }
+        }
+
+        // Odeslání nové novinky
+        document.getElementById('newsForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('newsTitle').value;
+            const content = document.getElementById('newsContent').value;
+
+            try {
+                const res = await fetch('/news', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({title, content})
+                });
+
+                const data = await res.json();
+                if (data.status === 'success') {
+                    loadNews();
+                    e.target.reset();
+                }
+            } catch (error) {
+                console.error("Chyba při odesílání:", error);
+            }
+        });
+
+        // Načtení při startu
+        window.addEventListener('DOMContentLoaded', loadNews);
+    </script>
+</body>
+</html>

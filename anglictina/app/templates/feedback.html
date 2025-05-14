@@ -153,6 +153,12 @@
         .result-message.show {
             display: block;
         }
+
+        .loading-message {
+            padding: 20px;
+            text-align: center;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -353,12 +359,28 @@
     async function loadFeedbacks() {
         try {
             const res = await fetch('/get_feedbacks');
+
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+
             const data = await res.json();
             const container = document.getElementById('feedbacksList');
             container.innerHTML = '';
-            data.feedbacks.forEach(fb => renderFeedback(fb));
+
+            // Bezpečné zpracování neexistujícího pole
+            const feedbacks = data.feedbacks || [];
+
+            feedbacks.forEach(fb => {
+                // Zajistěte výchozí hodnoty pro chybějící data
+                fb.profile_pic = fb.profile_pic || 'default.jpg';
+                fb.is_edited = fb.is_edited || false;
+                renderFeedback(fb);
+            });
+
         } catch (error) {
             console.error("Chyba při načítání feedbacků:", error);
+            // Můžete zde přidat zobrazení chyby uživateli
         }
     }
 
