@@ -173,20 +173,22 @@
             <ul class="nav-right">
                 <li><a href="/anglictina">Angličtina</a></li>
                 <li><a href="/feedback">Feedback</a></li>
+                <li><a href="/news">Novinky</a></li>
                 <li>
                     {% if session['user_name'] %}
                     <div class="user-profile">
                         <div class="profile-container">
                             {% if session.get('profile_pic') %}
                             <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
-                                 alt="Profilová fotka" class="profile-pic">
+                                 alt="Profilová fotka" width="64" class="profile-pic">
                             {% else %}
-                            <img src="{{ url_for('static', filename='pics/default.jpg') }}" alt="Defaultní profilovka"
+                            <img src="{{ url_for('static', filename='pic/default.jpg') }}" alt="Defaultní profilovka"
                                  class="profile-pic" id="profileMenuTrigger">
                             {% endif %}
                             <div class="profile-menu" id="profileMenu">
                                 <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
                                 <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+
                             </div>
                         </div>
                         <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
@@ -324,34 +326,46 @@
     // Feedback rendering
     function renderFeedback(fb) {
         const container = document.getElementById('feedbacksList');
+
+        // Validace vstupních dat
+        const safeData = {
+            id: fb.id || Date.now(),
+            user_name: fb.user_name || 'Anonymní uživatel',
+            profile_pic: fb.profile_pic || 'default.jpg',
+            message: fb.message || '',
+            rating: Math.min(Math.max(fb.rating || 0, 0), 5),
+            timestamp: fb.timestamp || new Date().toLocaleString(),
+            is_owner: !!fb.is_owner,
+            is_edited: !!fb.is_edited
+        };
+
         const feedbackItem = document.createElement('div');
         feedbackItem.className = 'feedback-item';
-        feedbackItem.dataset.id = fb.id;
         feedbackItem.innerHTML = `
-            <img src="/static/profile_pics/${fb.profile_pic || 'default.jpg'}"
-                 class="feedback-profile-pic"
-                 alt="${fb.user_name}">
-            <div class="feedback-content">
-                <div class="feedback-header">
-                    <span class="feedback-user-name">${fb.user_name}</span>
-                    <div class="rating-stars">
-                        ${'<i class="fas fa-star"></i>'.repeat(fb.rating)}
-                        ${'<i class="far fa-star"></i>'.repeat(5 - fb.rating)}
-                    </div>
-                    <span class="feedback-time">
-                        ${fb.timestamp}
-                        ${fb.is_edited ? '(upraveno)' : ''}
-                    </span>
+        <img src="/static/profile_pics/${safeData.profile_pic}"
+             class="feedback-profile-pic"
+             alt="${safeData.user_name}">
+        <div class="feedback-content">
+            <div class="feedback-header">
+                <span class="feedback-user-name">${safeData.user_name}</span>
+                <div class="rating-stars">
+                    ${'⭐'.repeat(safeData.rating)}${'☆'.repeat(5 - safeData.rating)}
                 </div>
-                <p class="feedback-message">${fb.message}</p>
-                ${fb.is_owner ? `
-                <div class="feedback-actions">
-                    <button class="edit-btn" data-id="${fb.id}">✏️ Upravit</button>
-                    <button class="delete-btn" data-id="${fb.id}">🗑️ Smazat</button>
-                </div>
-                ` : ''}
+                <span class="feedback-time">
+                    ${safeData.timestamp}
+                    ${safeData.is_edited ? '(upraveno)' : ''}
+                </span>
             </div>
-        `;
+            <p class="feedback-message">${safeData.message}</p>
+            ${safeData.is_owner ? `
+            <div class="feedback-actions">
+                <button class="edit-btn" data-id="${safeData.id}">✏️ Upravit</button>
+                <button class="delete-btn" data-id="${safeData.id}">🗑️ Smazat</button>
+            </div>
+            ` : ''}
+        </div>
+    `;
+
         container.prepend(feedbackItem);
     }
 
