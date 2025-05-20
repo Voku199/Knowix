@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/static/style.css">
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
     <div class="logo">
         <a href="{{ url_for('main.index') }}">
@@ -77,6 +77,14 @@
             <img src="{{ url_for('static', filename='pic/hangman.png') }}" alt="Slovesa">
             <div class="bubble-text">
                 <h3>Hangman</h3>
+                <p style="color: inherit;">Klasická hra ve který si můžeš procvičit slovní zásobu!</p>
+            </div>
+        </a>
+
+        <a href="/sl_chat" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+            <img src="{{ url_for('static', filename='pic/chat.png') }}" alt="Slovesa">
+            <div class="bubble-text">
+                <h3>Present Perfect</h3>
                 <p style="color: inherit;">Klasická hra ve který si můžeš procvičit slovní zásobu!</p>
             </div>
         </a>

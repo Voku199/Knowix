@@ -1,0 +1,123 @@
+[
+  {
+    "alex": "So, have you finally texted her?",
+    "cz_reply": "Jo, napsal jsem jí dnes ráno.",
+    "accepted_answers": [
+      "Yeah, I’ve texted her this morning.",
+      "I have sent her a message this morning."
+    ]
+  },
+  {
+    "alex": "Nice! What did she say?",
+    "cz_reply": "Odpověděla mi velmi slušně a zdvořile.",
+    "accepted_answers": [
+      "She has replied very politely.",
+      "She replied really politely."
+    ]
+  },
+  {
+    "alex": "Sounds formal. Are you sure you texted the right person?",
+    "cz_reply": "Podíval jsem se na jméno a bylo tam Jana Nováková.",
+    "accepted_answers": [
+      "I’ve checked the name and it was Jana Nováková.",
+      "I checked the name – it was Jana Nováková."
+    ]
+  },
+  {
+    "alex": "Wait… isn’t that our teacher’s name?",
+    "cz_reply": "Eh... jo, to je asi ona.",
+    "accepted_answers": [
+      "Uh... yeah, I guess it’s her.",
+      "Yeah... that’s probably her."
+    ]
+  },
+  {
+    "alex": "Dude! Have you been flirting with the teacher?",
+    "cz_reply": "Napsal jsem jí, že má krásné oči.",
+    "accepted_answers": [
+      "I’ve told her she has beautiful eyes.",
+      "I told her she’s got beautiful eyes."
+    ]
+  },
+  {
+    "alex": "Brooo! What did she reply?",
+    "cz_reply": "Napsala, že je ráda, že si toho někdo všiml.",
+    "accepted_answers": [
+      "She said she’s glad someone noticed.",
+      "She has written that she’s happy someone noticed."
+    ]
+  },
+  {
+    "alex": "Wait what?! She didn’t get angry?",
+    "cz_reply": "Ne, byla fakt milá. Dokonce se mě ptala, jestli jsem volný o víkendu.",
+    "accepted_answers": [
+      "No, she was really nice. She asked me if I’m free this weekend.",
+      "She has asked if I am free this weekend."
+    ]
+  },
+  {
+    "alex": "No way! Are you going out with your teacher?",
+    "cz_reply": "Řekla, že bychom si mohli dát kafe a popovídat si.",
+    "accepted_answers": [
+      "She said we could grab a coffee and talk.",
+      "She has said we can go for coffee and chat."
+    ]
+  },
+  {
+    "alex": "I can’t believe this is happening. Have you told anyone else?",
+    "cz_reply": "Ne, zatím jenom tobě.",
+    "accepted_answers": [
+      "No, just you for now.",
+      "I haven’t told anyone else."
+    ]
+  },
+  {
+    "alex": "This is wild. Have you met her outside of school before?",
+    "cz_reply": "Ne, ale napsala mi, že mě často vídá na náměstí.",
+    "accepted_answers": [
+      "No, but she wrote that she often sees me at the square.",
+      "She has told me she often sees me at the square."
+    ]
+  },
+  {
+    "alex": "That’s lowkey romantic. Has she said anything else?",
+    "cz_reply": "Řekla, že jsem jiný než ostatní studenti.",
+    "accepted_answers": [
+      "She said I’m different from other students.",
+      "She has said I’m not like other students."
+    ]
+  },
+  {
+    "alex": "Well… this took a turn. Do you like her?",
+    "cz_reply": "Jo, je chytrá, milá a vtipná.",
+    "accepted_answers": [
+      "Yeah, she’s smart, kind and funny.",
+      "Yes, she is clever, nice and funny."
+    ]
+  },
+  {
+    "alex": "Bro... this might be your first real love story.",
+    "cz_reply": "Možná… všechno začalo jednou špatnou zprávou.",
+    "accepted_answers": [
+      "Maybe… it all started with one wrong message.",
+      "It all began with a mistaken text."
+    ]
+  },
+  {
+    "alex": "That’s life, man. Have you planned the coffee date?",
+    "cz_reply": "Jo, potkáme se v sobotu v kavárně u řeky.",
+    "accepted_answers": [
+      "Yeah, we’ll meet on Saturday at the café by the river.",
+      "We are meeting on Saturday at the river café."
+    ]
+  },
+  {
+    "alex": "Good luck, Romeo. Let me know how it goes!",
+    "cz_reply": "Určitě! Dám ti vědět po schůzce.",
+    "accepted_answers": [
+      "Definitely! I’ll let you know after the date.",
+      "I will tell you after the meeting."
+    ]
+  }
+]
+

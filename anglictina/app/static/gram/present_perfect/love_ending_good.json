@@ -1,0 +1,170 @@
+[
+  {
+    "alex": "Hey, have you seen the new girl in our class?",
+    "cz_reply": "Jo, už jsem ji viděl.",
+    "accepted_answers": [
+      "Yes, I have seen her.",
+      "Yes, I’ve seen her."
+    ]
+  },
+  {
+    "alex": "She’s really cute, right?",
+    "cz_reply": "Ano, moc se mi líbí.",
+    "accepted_answers": [
+      "Yes, I really like her.",
+      "Yeah, I really like her."
+    ]
+  },
+  {
+    "alex": "Have you talked to her yet?",
+    "cz_reply": "Ano, mluvil jsem s ní o přestávce.",
+    "accepted_answers": [
+      "Yes, I have talked to her during the break.",
+      "I’ve talked to her at the break."
+    ]
+  },
+  {
+    "alex": "Nice! What have you talked about?",
+    "cz_reply": "Povídali jsme si o hudbě, kterou máme rádi.",
+    "accepted_answers": [
+      "We have talked about music we like.",
+      "We’ve talked about the music we like."
+    ]
+  },
+  {
+    "alex": "Have you found anything in common?",
+    "cz_reply": "Ano, oba máme rádi stejnou kapelu.",
+    "accepted_answers": [
+      "Yes, we have liked the same band.",
+      "Yes, we’ve liked the same band."
+    ]
+  },
+  {
+    "alex": "That’s awesome. Has she smiled at you?",
+    "cz_reply": "Jo, už se na mě několikrát usmála.",
+    "accepted_answers": [
+      "Yeah, she has smiled at me several times.",
+      "Yes, she’s smiled at me a few times."
+    ]
+  },
+  {
+    "alex": "Have you added her on social media?",
+    "cz_reply": "Ano, přidal jsem si ji na Instagramu.",
+    "accepted_answers": [
+      "Yes, I’ve added her on Instagram.",
+      "I have added her on Instagram."
+    ]
+  },
+  {
+    "alex": "And has she accepted your request?",
+    "cz_reply": "Jo, přijala to hned.",
+    "accepted_answers": [
+      "Yeah, she has accepted it immediately.",
+      "Yes, she’s accepted it right away."
+    ]
+  },
+  {
+    "alex": "Have you sent her a message?",
+    "cz_reply": "Ano, napsal jsem jí včera večer.",
+    "accepted_answers": [
+      "Yes, I have sent her a message last night.",
+      "I’ve messaged her last night."
+    ]
+  },
+  {
+    "alex": "Has she replied already?",
+    "cz_reply": "Ano, odpověděla a byla moc milá.",
+    "accepted_answers": [
+      "Yes, she has replied and was very nice.",
+      "She has already replied and was very sweet."
+    ]
+  },
+  {
+    "alex": "Bro, you’ve made some serious progress!",
+    "cz_reply": "Díky, mám z toho fakt radost.",
+    "accepted_answers": [
+      "Thanks, I’m really happy about it.",
+      "I’m really glad about it."
+    ]
+  },
+  {
+    "alex": "Have you asked her what she likes doing?",
+    "cz_reply": "Ano, ptal jsem se jí, co má ráda.",
+    "accepted_answers": [
+      "Yes, I have asked her what she likes.",
+      "I’ve asked her what she likes to do."
+    ]
+  },
+  {
+    "alex": "And what has she said?",
+    "cz_reply": "Řekla, že má ráda procházky a čtení.",
+    "accepted_answers": [
+      "She has said she likes walks and reading.",
+      "She’s told me she likes walking and reading."
+    ]
+  },
+  {
+    "alex": "Sounds perfect. Have you suggested doing something together?",
+    "cz_reply": "Ano, navrhl jsem, že bychom mohli jít ven.",
+    "accepted_answers": [
+      "Yes, I have suggested going out together.",
+      "I’ve suggested we could go out."
+    ]
+  },
+  {
+    "alex": "How has she reacted?",
+    "cz_reply": "Řekla, že by ráda šla na procházku v pátek.",
+    "accepted_answers": [
+      "She has said she’d like to go for a walk on Friday.",
+      "She’s told me she wants to go for a walk on Friday."
+    ]
+  },
+  {
+    "alex": "Dude, that’s a date already!",
+    "cz_reply": "Jo, nikdy jsem nebyl tak nervózní.",
+    "accepted_answers": [
+      "Yeah, I’ve never been this nervous.",
+      "I have never felt this nervous."
+    ]
+  },
+  {
+    "alex": "Have you picked a place to go?",
+    "cz_reply": "Ano, vybral jsem park u řeky.",
+    "accepted_answers": [
+      "Yes, I’ve picked the park near the river.",
+      "I have chosen the park by the river."
+    ]
+  },
+  {
+    "alex": "You’ve really thought this through.",
+    "cz_reply": "Chtěl jsem, aby to bylo hezké a klidné.",
+    "accepted_answers": [
+      "I’ve wanted it to be nice and quiet.",
+      "I wanted it to be peaceful and beautiful."
+    ]
+  },
+  {
+    "alex": "Have you told anyone else about it?",
+    "cz_reply": "Ne, ty jsi první, komu to říkám.",
+    "accepted_answers": [
+      "No, you’re the first person I’ve told.",
+      "No, you’re the only one I’ve told."
+    ]
+  },
+  {
+    "alex": "Bro, I’m proud of you. You’ve taken the first big step.",
+    "cz_reply": "Díky, kámo. Vážím si toho.",
+    "accepted_answers": [
+      "Thanks, bro. I really appreciate it.",
+      "Thank you, man. I appreciate that."
+    ]
+  },
+  {
+    "alex": "Good luck on Friday! You’ve got this!",
+    "cz_reply": "Díky, dám ti potom vědět, jaké to bylo.",
+    "accepted_answers": [
+      "Thanks, I’ll let you know how it went.",
+      "I’ll tell you how it went later."
+    ]
+  }
+]

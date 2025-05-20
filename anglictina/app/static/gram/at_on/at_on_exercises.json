@@ -1,0 +1,34 @@
+[
+  {
+    "sentence": "I am ___ the bus stop.",
+    "correct": "at"
+  },
+  {
+    "sentence": "She is ___ the car.",
+    "correct": "in"
+  },
+  {
+    "sentence": "The book is ___ the table.",
+    "correct": "on"
+  },
+  {
+    "sentence": "They are ___ the restaurant.",
+    "correct": "at"
+  },
+  {
+    "sentence": "The cat is ___ the box.",
+    "correct": "in"
+  },
+  {
+    "sentence": "He is ___ the train.",
+    "correct": "on"
+  },
+  {
+    "sentence": "We met ___ the airport.",
+    "correct": "at"
+  },
+  {
+    "sentence": "She was sitting ___ the sofa.",
+    "correct": "on"
+  }
+]

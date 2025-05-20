@@ -1,0 +1,138 @@
+[
+  {
+    "alex": "Hi! Did you finish the homework for today?",
+    "cz_reply": "Ještě ne, udělám ho odpoledne.",
+    "accepted_answers": [
+      "Not yet, I will do it in the afternoon.",
+      "No, I will do it in the afternoon."
+    ]
+  },
+  {
+    "alex": "Okay! It is not very hard.",
+    "cz_reply": "Jo, ale matika mi moc nejde.",
+    "accepted_answers": [
+      "Yeah, but I’m not good at math.",
+      "Yes, but math is hard for me."
+    ]
+  },
+  {
+    "alex": "Do you want help with it?",
+    "cz_reply": "To by bylo super, děkuju.",
+    "accepted_answers": [
+      "That would be great, thank you.",
+      "Yes, that would be nice, thanks."
+    ]
+  },
+  {
+    "alex": "No problem! What are you doing after school?",
+    "cz_reply": "Jdu s kamarády ven.",
+    "accepted_answers": [
+      "I’m going outside with my friends.",
+      "I’m going out with my friends."
+    ]
+  },
+  {
+    "alex": "Sounds fun! Where are you going?",
+    "cz_reply": "Asi do parku nebo na hřiště.",
+    "accepted_answers": [
+      "Maybe to the park or to the playground.",
+      "Probably to the park or playground."
+    ]
+  },
+  {
+    "alex": "Nice! Do you play football there?",
+    "cz_reply": "Jo, skoro každý den.",
+    "accepted_answers": [
+      "Yes, almost every day.",
+      "Yeah, almost every day."
+    ]
+  },
+  {
+    "alex": "Do you want to be a football player?",
+    "cz_reply": "Ne, je to jen zábava.",
+    "accepted_answers": [
+      "No, it’s just for fun.",
+      "No, it’s only for fun."
+    ]
+  },
+  {
+    "alex": "What job would you like then?",
+    "cz_reply": "Chci být učitel angličtiny.",
+    "accepted_answers": [
+      "I want to be an English teacher.",
+      "I would like to be an English teacher."
+    ]
+  },
+  {
+    "alex": "That’s a cool job! Why English?",
+    "cz_reply": "Protože mám rád jazyky.",
+    "accepted_answers": [
+      "Because I like languages.",
+      "Because I enjoy languages."
+    ]
+  },
+  {
+    "alex": "How do you learn English?",
+    "cz_reply": "Sleduju videa a hraju hry.",
+    "accepted_answers": [
+      "I watch videos and play games.",
+      "I watch videos and I play games."
+    ]
+  },
+  {
+    "alex": "Do games help with English?",
+    "cz_reply": "Jo, naučil jsem se nová slova.",
+    "accepted_answers": [
+      "Yes, I learned new words.",
+      "Yeah, I have learned new words."
+    ]
+  },
+  {
+    "alex": "That’s awesome! Do you want to study abroad?",
+    "cz_reply": "Jo, třeba v Anglii nebo v USA.",
+    "accepted_answers": [
+      "Yes, maybe in England or the USA.",
+      "Yeah, maybe in the UK or USA."
+    ]
+  },
+  {
+    "alex": "Have you ever been there?",
+    "cz_reply": "Ne, ale chci se tam podívat.",
+    "accepted_answers": [
+      "No, but I want to go there.",
+      "No, but I want to visit it."
+    ]
+  },
+  {
+    "alex": "You will! Just keep learning.",
+    "cz_reply": "Díky! Budu se snažit.",
+    "accepted_answers": [
+      "Thanks! I will try hard.",
+      "Thank you! I will do my best."
+    ]
+  },
+  {
+    "alex": "Are your parents happy with your plans?",
+    "cz_reply": "Jo, podporují mě.",
+    "accepted_answers": [
+      "Yes, they support me.",
+      "Yeah, they help me."
+    ]
+  },
+  {
+    "alex": "Great! Can I see your CV later?",
+    "cz_reply": "Jo, pošlu ti ho večer.",
+    "accepted_answers": [
+      "Yes, I will send it to you in the evening.",
+      "Yeah, I will send it later."
+    ]
+  },
+  {
+    "alex": "Perfect! Good luck with your dream!",
+    "cz_reply": "Díky, tobě taky!",
+    "accepted_answers": [
+      "Thanks, you too!",
+      "Thank you, you too!"
+    ]
+  }
+]

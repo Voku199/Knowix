@@ -1,0 +1,32 @@
+[
+  {
+    "id": "mental_health",
+    "title": "Mentální zdraví a pohoda",
+    "image": "mental_health.png",
+    "level": "B1"
+  },
+  {
+    "id": "social_media",
+    "title": "Sociální média a online svět",
+    "image": "social_media.png",
+    "level": "A2"
+  },
+  {
+    "id": "relationship_path",
+    "title": "Píšeš si s holkou/klukem",
+    "image": "love.png",
+    "level": "B1"
+  },
+  {
+    "id": "vr_gaming",
+    "title": "Virtuální realita a hry",
+    "image": "vr_gaming.png",
+    "level": "A2"
+  },
+  {
+    "id": "school_future",
+    "title": "Škola a budoucnost",
+    "image": "school_future.png",
+    "level": "A1"
+  }
+]

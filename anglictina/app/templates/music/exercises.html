@@ -9,7 +9,7 @@
     <script src="{{ url_for('static', filename='music/js/exercise.js') }}"></script>
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
     <div class="logo">
         <a href="{{ url_for('main.index') }}">
@@ -61,7 +61,7 @@
             {% for item in missing_exercises %}
             <div class="exercise-card">
                 <h3>{{ loop.index }}. Doplň chybějící slovo:</h3>
-                <p>{{ item.with_blank }}</p>
+                <p class="blank-sentence">{{ item.with_blank | safe }}</p>
                 <input type="text" name="missing_word_{{ loop.index0 }}" class="exercise-input" placeholder="Napiš chybějící slovo..." data-correct="{{ item.missing_word }}" data-original="{{ item.original }}">
             </div>
             {% endfor %}
@@ -71,7 +71,7 @@
                 <h3>{{ loop.index + missing_exercises|length }}. Přelož větu:</h3>
                 <p class="original-sentence"><em>"{{ item.original }}"</em></p>
                 <input type="text" class="exercise-input translation-input" name="translation_{{ loop.index0 }}" placeholder="Tvůj překlad..." data-correct="{{ item.translated }}" data-original="{{ item.original }}">
-
+                <div class="feedback"></div>
             </div>
             {% endfor %}
         </section>
@@ -117,6 +117,21 @@
 
 <!-- Převod LRC -->
 <script>
+
+        // theme-toggle.js
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        fetch('/set_theme', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark'
+            })
+        }).then(() => {
+            document.body.classList.toggle('dark-mode');
+            session.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+    });
+
     const lrcContent = {{ lrc_lyrics | tojson | safe }};
     console.log(lrcContent);
 
@@ -180,6 +195,76 @@ document.addEventListener('click', (e) => {
         profileMenu.style.opacity = '0';
         profileMenu.style.visibility = 'hidden';
         profileMenu.style.transform = 'translateY(10px)';
+    }
+});
+
+
+document.getElementById('checkButton').addEventListener('click', async () => {
+    const inputs = document.querySelectorAll('.exercise-input');
+    const translations = [];
+    const missings = [];
+
+    inputs.forEach((input) => {
+        if (input.classList.contains('translation-input')) {
+            translations.push({ user: input.value });
+        } else {
+            missings.push({ user: input.value });
+        }
+    });
+
+    try {
+        const res = await fetch('/check-answer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ translations, missing: missings })
+        });
+        const data = await res.json();
+
+        // Handle translation exercises feedback
+        data.results.details.translations.forEach((result, idx) => {
+            const input = document.querySelectorAll('.translation-input')[idx];
+            const feedbackBox = input.nextElementSibling;
+
+            // Reset classes and feedback
+            input.classList.remove('correct', 'incorrect', 'almost');
+            feedbackBox.textContent = '';
+            feedbackBox.classList.remove('error-feedback');
+
+            // Apply new state
+            if (data.results.translations[idx] === true) {
+                input.classList.add('correct');
+            } else if (data.results.translations[idx] === 'almost') {
+                input.classList.add('almost');
+                feedbackBox.textContent = result.feedback || 'Částečně správně, zkus to vyladit!';
+                feedbackBox.classList.add('error-feedback');
+            } else {
+                input.classList.add('incorrect');
+                feedbackBox.textContent = result.feedback || 'Zkus to znovu!';
+                feedbackBox.classList.add('error-feedback');
+            }
+        });
+
+        // Handle missing word exercises
+        data.results.details.missing.forEach((result, idx) => {
+            const input = document.querySelectorAll('.exercise-input:not(.translation-input)')[idx];
+            const feedbackBox = input.nextElementSibling;
+
+            input.classList.remove('correct', 'incorrect', 'almost');
+            feedbackBox.textContent = '';
+
+            if (data.results.missing[idx] === true) {
+                input.classList.add('correct');
+            } else if (data.results.missing[idx] === 'almost') {
+                input.classList.add('almost');
+                feedbackBox.textContent = `Téměř správně! Správné slovo: ${result.correct}`;
+            } else {
+                input.classList.add('incorrect');
+                feedbackBox.textContent = `Správná odpověď: ${result.correct}`;
+            }
+        });
+
+    } catch (error) {
+        console.error('Chyba při kontrole odpovědí:', error);
     }
 });
 

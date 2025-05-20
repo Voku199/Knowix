@@ -1,0 +1,122 @@
+[
+  {
+    "alex": "Are you bored of your old games?",
+    "cz_reply": "Jo, už mě nebaví.",
+    "accepted_answers": [
+      "Yes, I’m tired of them.",
+      "Yeah, they’re boring now."
+    ]
+  },
+  {
+    "alex": "Let’s find something new to play.",
+    "cz_reply": "Máš nějaký tip?",
+    "accepted_answers": [
+      "Do you have a tip?",
+      "Got any suggestions?"
+    ]
+  },
+  {
+    "alex": "Have you tried Beat Saber?",
+    "cz_reply": "Ne, co to je?",
+    "accepted_answers": [
+      "No, what is it?",
+      "No, what’s that?"
+    ]
+  },
+  {
+    "alex": "It’s a VR rhythm game. Super fun!",
+    "cz_reply": "Zní to zajímavě.",
+    "accepted_answers": [
+      "That sounds interesting.",
+      "Sounds cool."
+    ]
+  },
+  {
+    "alex": "You hit boxes to the beat of music.",
+    "cz_reply": "Jako tanec s meči?",
+    "accepted_answers": [
+      "Like dancing with swords?",
+      "Like sword dancing?"
+    ]
+  },
+  {
+    "alex": "Exactly! It’s good for fitness too.",
+    "cz_reply": "To bych měl zkusit.",
+    "accepted_answers": [
+      "I should try that.",
+      "I want to try it."
+    ]
+  },
+  {
+    "alex": "There’s also a zombie survival game.",
+    "cz_reply": "To zní děsivě!",
+    "accepted_answers": [
+      "That sounds scary!",
+      "Sounds creepy!"
+    ]
+  },
+  {
+    "alex": "Yeah, but exciting too!",
+    "cz_reply": "Mám rád napínavé hry.",
+    "accepted_answers": [
+      "I like exciting games.",
+      "I enjoy thrilling games."
+    ]
+  },
+  {
+    "alex": "Do you play horror games?",
+    "cz_reply": "Jen občas, bojím se.",
+    "accepted_answers": [
+      "Only sometimes, I get scared.",
+      "Sometimes, I’m scared of them."
+    ]
+  },
+  {
+    "alex": "We can try together. It’s more fun!",
+    "cz_reply": "Jasně, ve dvou je to lepší.",
+    "accepted_answers": [
+      "Sure, it’s better with two.",
+      "Yes, it's more fun with a friend."
+    ]
+  },
+  {
+    "alex": "Do you have time this weekend?",
+    "cz_reply": "Ano, jsem volný v sobotu.",
+    "accepted_answers": [
+      "Yes, I’m free on Saturday.",
+      "Yeah, Saturday works for me."
+    ]
+  },
+  {
+    "alex": "Perfect! Let’s do a game night.",
+    "cz_reply": "Super nápad!",
+    "accepted_answers": [
+      "Great idea!",
+      "Awesome plan!"
+    ]
+  },
+  {
+    "alex": "Bring snacks too!",
+    "cz_reply": "Haha, jasně. Chipsy a cola?",
+    "accepted_answers": [
+      "Haha, sure. Chips and cola?",
+      "Of course! Chips and soda?"
+    ]
+  },
+  {
+    "alex": "Exactly. Let’s make it epic.",
+    "cz_reply": "Bude to legenda!",
+    "accepted_answers": [
+      "It’ll be legendary!",
+      "It’s going to be awesome!"
+    ]
+  },
+  {
+    "alex": "I’ll text you the game list.",
+    "cz_reply": "Díky, těším se!",
+    "accepted_answers": [
+      "Thanks, I’m excited!",
+      "Can’t wait, thank you!"
+    ]
+  }
+]

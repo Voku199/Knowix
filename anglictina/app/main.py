@@ -8,6 +8,8 @@ from feedback import feedback_bp
 from hangman import hangman_bp
 from theme import theme_bp
 from news import news_bp
+from present_perfect import chat_bp
+from at_on import at_on_bp
 
 import os
 from dotenv import load_dotenv
@@ -31,6 +33,8 @@ app.register_blueprint(feedback_bp)
 app.register_blueprint(theme_bp)
 app.register_blueprint(hangman_bp)
 app.register_blueprint(news_bp)
+app.register_blueprint(chat_bp)
+app.register_blueprint(at_on_bp)
 
 # app.run(port=5000) PRO LOCALNÍ SERVER
 # serve(app, host="0.0.0.0", port=8080) PRO SERVER

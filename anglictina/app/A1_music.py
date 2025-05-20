@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, current_app, session
 from auth import get_db_connection
 from lyricsgenius import Genius
+from difflib import SequenceMatcher
 import deepl
 import os
 import random
@@ -9,6 +10,18 @@ import unicodedata
 import re
 
 exercises_bp = Blueprint('exercises', __name__, template_folder='templates')
+
+
+def normalize(text):
+    text = unicodedata.normalize('NFKD', text)
+    text = text.encode('ascii', 'ignore').decode('utf-8').lower()
+    text = re.sub(r'[^\w\s]', '', text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
+
+
+def similarity(a, b):
+    return SequenceMatcher(None, a, b).ratio()
 
 
 @exercises_bp.record_once
@@ -24,7 +37,6 @@ def on_load(state):
 
     with open(os.path.join(state.app.static_folder, 'music/word_pairs.json'), encoding='utf-8') as f:
         state.app.word_pairs = json.load(f)
-        print(state.app.word_pairs)
 
 
 @exercises_bp.route('/song-selection', methods=['GET'])
@@ -39,16 +51,49 @@ def exercise(song_id):
     except IndexError:
         return "Neplatné ID písničky", 404
 
-    # Získání textu písně
+    # Získání textu písně z Genius
     song = current_app.genius.search_song(song_info['title'], song_info['artist'])
     if not song or not song.lyrics:
         return "Text písně nebyl nalezen", 404
 
-    # Příprava cvičení
-    lines = [line for line in song.lyrics.split('\n') if line and not line.startswith('[')]
-    valid_lines = [line for line in lines if len(line.split()) >= 3]
+    # 🧽 Filtrace řádků – odstraníme balast (úvody, Contributors, Translations, atd.)
+    def is_valid_lyric_line(line):
+        line = line.strip()
+        if not line:
+            return False
+        if line.startswith('['):  # [Chorus], [Verse], atd.
+            return False
+        if re.search(r'Contributors|Translations|Lyrics|^\d+\s+Contributors', line):
+            print("Našel jsem to, ale nedám to! Jsem silný!")
+            return False
+        if re.search(r'(Deutsch|Español|Türkçe|Русский|Português|Ελληνικά|Français)', line):
+            print("Jsi myslíš doopravdy?")
+            return False
+        if re.search(r'Pharrell|made the world|anthem|#\d+', line, re.IGNORECASE):
+            print("Phe")
+            return False
+        if len(line.split()) < 3:
+            print("gg")
+            return False
+        return True
 
-    # Generování doplňovaček
+    # Zpracování textu
+    lyrics_lines = song.lyrics.split('\n')
+    print(lyrics_lines)
+
+    # Najdi první validní řádek a odřízni balast před ním
+    for idx, line in enumerate(lyrics_lines):
+        if is_valid_lyric_line(line):
+            lyrics_lines = lyrics_lines[idx:]
+            break
+
+    # Použij jen validní řádky
+    valid_lines = [line for line in lyrics_lines if is_valid_lyric_line(line)]
+
+    if len(valid_lines) < 6:
+        return "Příliš málo validních řádků v textu písně.", 400
+
+    # 🎯 Doplňovačky
     missing_exercises = []
     for line in random.sample(valid_lines, 3):
         words = line.split()
@@ -60,31 +105,31 @@ def exercise(song_id):
             'translated': current_app.translator.translate_text(line, target_lang='CS').text
         })
 
-    # Generování překladů
+    # 📘 Překlady
+    used_lines = [ex['original'] for ex in missing_exercises]
     translation_exercises = [
         {
             'original': line,
             'translated': current_app.translator.translate_text(line, target_lang='CS').text
         }
-        for line in random.sample(list(set(valid_lines) - set([ex['original'] for ex in missing_exercises])), 3)
+        for line in random.sample(list(set(valid_lines) - set(used_lines)), 3)
     ]
+    print(translation_exercises)
 
-    # Příprava slovních párů
+    # 🧠 Slovní páry
     current_word_pairs = current_app.word_pairs.get(song_info['title'], {})
     selected_pairs = random.sample(list(current_word_pairs.items()), min(6, len(current_word_pairs)))
-
-    # Přidejte reverse pairs pro obousměrnou validaci
     bidirectional_pairs = {**dict(selected_pairs), **{v: k for k, v in selected_pairs}}
 
-    # Uložení párů do session jako slovník pro validaci
+    session['missing_exercises'] = missing_exercises
+    session['translation_exercises'] = translation_exercises
     session['current_exercise_pairs'] = dict(selected_pairs)
-
     english_words = [en for en, cs in selected_pairs]
     czech_words = [cs for en, cs in selected_pairs]
     random.shuffle(english_words)
     random.shuffle(czech_words)
 
-    # Zpracování LRC textu
+    # 🎵 LRC synchronizovaný text
     lrc_content = ''
     lrc_path = os.path.join(current_app.static_folder, 'music/audio/lyrics', song_info.get('lyrics_file', ''))
     if os.path.exists(lrc_path):
@@ -97,7 +142,7 @@ def exercise(song_id):
         translation_exercises=translation_exercises,
         english_words=english_words,
         czech_words=czech_words,
-        word_pairs=dict(selected_pairs),  # Zajištění formátu slovního slovníku
+        word_pairs=dict(selected_pairs),
         audio_file=song_info['audio_file'],
         song_title=song_info["title"],
         lrc_lyrics=lrc_content,
@@ -115,53 +160,92 @@ def exercise(song_id):
 @exercises_bp.route('/check-answer', methods=['POST'])
 def check_answer():
     data = request.json
-
-    # Normalizační funkce
-    def normalize(text):
-        if not text:
-            return ''
-        text = unicodedata.normalize('NFKD', text)
-        text = text.encode('ascii', 'ignore').decode('utf-8')
-        text = re.sub(r'[^\w\s]', '', text)
-        return text.strip().lower()
-
-    # Validace odpovědí
     results = {
         'missing': [],
         'translations': [],
-        'pairs': False
+        'pairs': False,
+        'details': {
+            'missing': [],
+            'translations': []
+        }
     }
 
     # 1. Kontrola doplňovaček
+    stored_missing = session.get('missing_exercises', [])
     for idx, ex in enumerate(data.get('missing', [])):
-        correct = normalize(ex['correct']) == normalize(ex['user'])
-        results['missing'].append(correct)
+        user_answer = normalize(ex.get('user', ''))
+
+        # Získání správné odpovědi z session
+        correct_answer = stored_missing[idx]['missing_word'] if idx < len(stored_missing) else ''
+        correct_normalized = normalize(correct_answer)
+
+        ratio = similarity(user_answer, correct_normalized)
+
+        results['details']['missing'].append({
+            'user': ex.get('user'),
+            'correct': correct_answer,
+            'similarity': ratio
+        })
+
+        if ratio >= 0.9:
+            results['missing'].append(True)
+        elif ratio >= 0.7:
+            results['missing'].append('almost')
+        else:
+            results['missing'].append(False)
 
     # 2. Kontrola překladů
+    stored_translations = session.get('translation_exercises', [])
     for idx, ex in enumerate(data.get('translations', [])):
-        correct = normalize(ex['correct']) == normalize(ex['user'])
-        results['translations'].append(correct)
+        user_answer = normalize(ex.get('user', ''))
 
-    # 3. Kontrola slovních párů
+        # Získání originálu z session pro přesnější validaci
+        original_text = stored_translations[idx]['original'] if idx < len(stored_translations) else ''
+        correct_translation = stored_translations[idx]['translated'] if idx < len(stored_translations) else ''
+
+        ratio_to_translation = similarity(user_answer, normalize(correct_translation))
+        ratio_to_original = similarity(user_answer, normalize(original_text))
+        ratio = max(ratio_to_translation, ratio_to_original)
+
+        detail_result = {
+            'user': ex.get('user'),
+            'correct': correct_translation,
+            'similarity': ratio,
+            'feedback': None
+        }
+
+        if ratio >= 0.85:
+            results['translations'].append(True)
+        elif ratio >= 0.8:
+            results['translations'].append('almost')
+            detail_result[
+                'feedback'] = f"Tvoje odpověď není úplně přesná. Správná odpověď by byla: '{correct_translation}'."
+            print(detail_result)
+        else:
+            results['translations'].append(False)
+
+        results['details']['translations'].append(detail_result)
+
+    # 3. Kontrola párů (zůstává stejné)
     correct_pairs = session.get('current_exercise_pairs', {})
     user_pairs = set(tuple(pair) for pair in data.get('pairs', []))
-
-    # Validace všech možných kombinací
-    valid_pairs = set()
-    for en, cs in correct_pairs.items():
-        valid_pairs.add((en, cs))
-        valid_pairs.add((cs, en))  # Povolení obousměrných spojení
-
-    # Kontrola zda všechny uživatelské páry jsou platné
-    pairs_correct = all(pair in valid_pairs for pair in user_pairs) and \
-                    len(user_pairs) == len(correct_pairs)
-
-    results['pairs'] = pairs_correct
+    valid_pairs = set((en, cs) for en, cs in correct_pairs.items()) | set((cs, en) for en, cs in correct_pairs.items())
+    results['pairs'] = all(pair in valid_pairs for pair in user_pairs) and len(user_pairs) == len(correct_pairs)
 
     # Celkové vyhodnocení
-    all_correct = all(results['missing']) and all(results['translations']) and pairs_correct
+    all_correct = (
+            all(x in (True, 'almost') for x in results['missing']) and
+            all(x in (True, 'almost') for x in results['translations']) and
+            results['pairs']
+    )
 
     return jsonify({
         'results': results,
-        'success': all_correct
+        'success': all_correct,
+        'feedback': {
+            'thresholds': {
+                'missing': 0.9,
+                'translations': 0.85
+            }
+        }
     })

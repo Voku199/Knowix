@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, current_app, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from PIL import Image
@@ -7,11 +7,13 @@ import mysql.connector
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import json
 import string
 import time
 import random
 
 auth_bp = Blueprint('auth', __name__)
+user_settings = {}
 
 
 # Pomocné funkce
@@ -54,17 +56,47 @@ def send_email(to_email, subject, body):
         print(f"Error sending email: {e}")
         return False
 
+    # profile_pic=session['profile_pic'])
 
-@auth_bp.route('/settings')
+
+@auth_bp.route('/settings', methods=['GET'])
 def settings():
-    if 'user_id' not in session:
-        flash("Nejdřív se musíš přihlásit.", "warning")
+    user = session.get('user_id')
+    if not user:
         return redirect(url_for('auth.login'))
 
-    if 'profile_pic' not in session:
-        session['profile_pic'] = 'default.jpg'
+    db = get_db_connection()
+    cur = db.cursor()
+    cur.execute("SELECT theme_mode FROM users WHERE id = %s", (user,))
+    row = cur.fetchone()
+    theme = row[0] if row and row[0] in ['light', 'dark'] else 'light'
+    cur.close()
+    db.close()
 
-    return render_template('settings.html', profile_pic=session['profile_pic'])
+    return render_template('settings.html', theme=theme, profile_pic=session['profile_pic'])
+
+
+@auth_bp.route('/set_theme', methods=['POST'])
+def set_theme():
+    user = session.get('user_id')
+    if not user:
+        return jsonify({'error': 'Not logged in'}), 401
+
+    data = request.get_json()
+    theme = data.get('theme')
+
+    if theme not in ['light', 'dark']:
+        return jsonify({'error': 'Invalid theme'}), 400
+
+    db = get_db_connection()
+    cur = db.cursor()
+    cur.execute("UPDATE users SET theme_mode = %s WHERE id = %s", (theme, user))
+    db.commit()
+    cur.close()
+    db.close()
+
+    session['theme'] = theme  # Aktualizace session okamžitě
+    return jsonify({'success': True})
 
 
 @auth_bp.route('/upload_profile_pic', methods=['POST'])
@@ -131,9 +163,14 @@ def register():
         email = request.form['email'].strip().lower()
         password = request.form['password']
         birthdate = request.form.get('birthdate') or None
+        english_level = request.form.get('english_level')
 
         if not first_name or not last_name or not email or not password:
             flash("Vyplňte všechna povinná pole!", "error")
+            return redirect(url_for('auth.register'))
+
+        if not english_level:
+            flash("Vyberte prosím úroveň angličtiny.", "error")
             return redirect(url_for('auth.register'))
 
         hashed_password = generate_password_hash(password)
@@ -142,8 +179,12 @@ def register():
             cursor = conn.cursor()
             try:
                 cursor.execute(
-                    "INSERT INTO users (first_name, last_name, email, password, birthdate) VALUES (%s, %s, %s, %s, %s)",
-                    (first_name, last_name, email, hashed_password, birthdate)
+                    """
+                    INSERT INTO users 
+                    (first_name, last_name, email, password, birthdate, english_level)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    """,
+                    (first_name, last_name, email, hashed_password, birthdate, english_level)
                 )
                 conn.commit()
                 flash("Registrace úspěšná! Nyní se můžete přihlásit.", "success")

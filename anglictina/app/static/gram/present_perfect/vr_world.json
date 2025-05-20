@@ -1,0 +1,130 @@
+[
+  {
+    "alex": "Have you ever tried VR games?",
+    "cz_reply": "Ne, ještě nikdy.",
+    "accepted_answers": [
+      "No, never.",
+      "No, I haven’t tried them."
+    ]
+  },
+  {
+    "alex": "You should! It’s amazing.",
+    "cz_reply": "Vážně? Co je na tom tak super?",
+    "accepted_answers": [
+      "Really? What’s so cool about it?",
+      "Really? What’s good about it?"
+    ]
+  },
+  {
+    "alex": "You feel like you are inside the game.",
+    "cz_reply": "To zní fakt dobře!",
+    "accepted_answers": [
+      "That sounds really good!",
+      "Sounds great!"
+    ]
+  },
+  {
+    "alex": "I played a space game yesterday.",
+    "cz_reply": "Letěl jsi ve vesmíru?",
+    "accepted_answers": [
+      "Did you fly in space?",
+      "Were you flying in space?"
+    ]
+  },
+  {
+    "alex": "Yes! And I fought aliens too.",
+    "cz_reply": "To musela být sranda.",
+    "accepted_answers": [
+      "That must have been fun.",
+      "It was probably fun."
+    ]
+  },
+  {
+    "alex": "I screamed when they jumped at me!",
+    "cz_reply": "Haha, to bych se taky lekl.",
+    "accepted_answers": [
+      "Haha, I would be scared too.",
+      "Haha, I would scream too."
+    ]
+  },
+  {
+    "alex": "Do you have a VR headset?",
+    "cz_reply": "Ne, ale chci si ho koupit.",
+    "accepted_answers": [
+      "No, but I want to buy one.",
+      "No, but I want one."
+    ]
+  },
+  {
+    "alex": "They’re not cheap, though.",
+    "cz_reply": "Já vím, šetřím si peníze.",
+    "accepted_answers": [
+      "I know, I’m saving money.",
+      "Yes, I’m saving up."
+    ]
+  },
+  {
+    "alex": "There are cool apps too, not just games.",
+    "cz_reply": "Jako třeba co?",
+    "accepted_answers": [
+      "Like what?",
+      "For example?"
+    ]
+  },
+  {
+    "alex": "Like VR travel, painting, and concerts!",
+    "cz_reply": "To je šílený, chci to zkusit.",
+    "accepted_answers": [
+      "That’s crazy, I want to try it.",
+      "Sounds crazy, I want to try."
+    ]
+  },
+  {
+    "alex": "We can play together when you get one!",
+    "cz_reply": "Fakt? To by bylo super.",
+    "accepted_answers": [
+      "Really? That would be great.",
+      "Yes! That would be awesome."
+    ]
+  },
+  {
+    "alex": "We could explore VR cities!",
+    "cz_reply": "To zní jako výlet z gauče.",
+    "accepted_answers": [
+      "That sounds like a couch trip.",
+      "It’s like a trip from the sofa."
+    ]
+  },
+  {
+    "alex": "Exactly! Who needs a car?",
+    "cz_reply": "Haha, jen VR brýle a je to.",
+    "accepted_answers": [
+      "Haha, just VR glasses and done.",
+      "Haha, only VR headset and go!"
+    ]
+  },
+  {
+    "alex": "I hope you get yours soon!",
+    "cz_reply": "Já taky. Už se těším.",
+    "accepted_answers": [
+      "Me too. I can’t wait.",
+      "I’m excited too."
+    ]
+  },
+  {
+    "alex": "Let’s look at prices later?",
+    "cz_reply": "Jo, po škole to projdeme.",
+    "accepted_answers": [
+      "Yes, we’ll check after school.",
+      "Sure, we can look after school."
+    ]
+  },
+  {
+    "alex": "Deal! See you later!",
+    "cz_reply": "Čau, díky za tipy!",
+    "accepted_answers": [
+      "Bye, thanks for the tips!",
+      "See you, thanks for the ideas!"
+    ]
+  }
+]

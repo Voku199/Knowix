@@ -1,0 +1,138 @@
+[
+  {
+    "alex": "Hey! Have you started the school project?",
+    "cz_reply": "Ano, začal jsem včera.",
+    "accepted_answers": [
+      "Yes, I started yesterday.",
+      "Yeah, I started it yesterday."
+    ]
+  },
+  {
+    "alex": "Nice! What is your topic?",
+    "cz_reply": "Mám téma zvířata v nebezpečí.",
+    "accepted_answers": [
+      "My topic is animals in danger.",
+      "It’s about endangered animals."
+    ]
+  },
+  {
+    "alex": "Cool! Are you doing it alone?",
+    "cz_reply": "Ne, pracuju s kamarádkou.",
+    "accepted_answers": [
+      "No, I’m working with a friend.",
+      "No, I work with my friend."
+    ]
+  },
+  {
+    "alex": "That’s better! When is it due?",
+    "cz_reply": "Musíme to odevzdat v pátek.",
+    "accepted_answers": [
+      "We have to hand it in on Friday.",
+      "We must give it to the teacher on Friday."
+    ]
+  },
+  {
+    "alex": "Do you want to be a scientist one day?",
+    "cz_reply": "Ne, spíš chci být veterinář.",
+    "accepted_answers": [
+      "No, I want to be a vet.",
+      "No, I want to be a veterinarian."
+    ]
+  },
+  {
+    "alex": "Oh, why a vet?",
+    "cz_reply": "Protože miluju zvířata.",
+    "accepted_answers": [
+      "Because I love animals.",
+      "Because I like animals very much."
+    ]
+  },
+  {
+    "alex": "That’s sweet. Do you have pets?",
+    "cz_reply": "Jo, mám psa a dvě kočky.",
+    "accepted_answers": [
+      "Yes, I have a dog and two cats.",
+      "Yeah, I’ve got a dog and two cats."
+    ]
+  },
+  {
+    "alex": "Do they sleep in your room?",
+    "cz_reply": "Ano, skoro každou noc.",
+    "accepted_answers": [
+      "Yes, almost every night.",
+      "Yeah, they sleep in my room every night."
+    ]
+  },
+  {
+    "alex": "Would you like to study animals abroad?",
+    "cz_reply": "Jo, třeba v Austrálii.",
+    "accepted_answers": [
+      "Yes, maybe in Australia.",
+      "Yeah, in Australia for example."
+    ]
+  },
+  {
+    "alex": "Have you ever traveled far?",
+    "cz_reply": "Ne, jen po Česku.",
+    "accepted_answers": [
+      "No, only in the Czech Republic.",
+      "No, just around the Czech Republic."
+    ]
+  },
+  {
+    "alex": "That’s okay! There’s still time.",
+    "cz_reply": "Jo, jednou určitě pojedu.",
+    "accepted_answers": [
+      "Yes, I will go one day.",
+      "Yeah, I’ll travel one day."
+    ]
+  },
+  {
+    "alex": "What do your parents think?",
+    "cz_reply": "Jsou na mě hrdí.",
+    "accepted_answers": [
+      "They are proud of me.",
+      "They’re proud of me."
+    ]
+  },
+  {
+    "alex": "I’m proud too! You have big dreams.",
+    "cz_reply": "Díky! To mi moc pomáhá.",
+    "accepted_answers": [
+      "Thanks! That helps me a lot.",
+      "Thank you, that helps a lot."
+    ]
+  },
+  {
+    "alex": "Don’t forget to rest too.",
+    "cz_reply": "Neboj, dneska si dám pauzu.",
+    "accepted_answers": [
+      "Don’t worry, I’ll take a break today.",
+      "No worries, I will rest today."
+    ]
+  },
+  {
+    "alex": "Want to play a game later?",
+    "cz_reply": "Jo, až dodělám úkol.",
+    "accepted_answers": [
+      "Yes, when I finish my homework.",
+      "Yeah, after I do my homework."
+    ]
+  },
+  {
+    "alex": "Deal! Let me know when you’re free.",
+    "cz_reply": "Napíšu ti večer, ok?",
+    "accepted_answers": [
+      "I’ll text you in the evening, okay?",
+      "I will write you later, okay?"
+    ]
+  },
+  {
+    "alex": "Perfect! See you then!",
+    "cz_reply": "Měj se!",
+    "accepted_answers": [
+      "See you!",
+      "Take care!"
+    ]
+  }
+]

@@ -1,0 +1,122 @@
+[
+  {
+    "alex": "Are you joining the gaming tournament tonight?",
+    "cz_reply": "Jo, přihlásil jsem se včera.",
+    "accepted_answers": [
+      "Yes, I signed up yesterday.",
+      "Yeah, I joined yesterday."
+    ]
+  },
+  {
+    "alex": "Nice! What game are you playing?",
+    "cz_reply": "Rocket League. Miluju tu hru.",
+    "accepted_answers": [
+      "Rocket League. I love that game.",
+      "I'm playing Rocket League. I love it."
+    ]
+  },
+  {
+    "alex": "Same here! We should be on the same team.",
+    "cz_reply": "To by bylo super, jdem to vyhrát!",
+    "accepted_answers": [
+      "That would be awesome, let’s win it!",
+      "Let’s go win it together!"
+    ]
+  },
+  {
+    "alex": "Did you practice yesterday?",
+    "cz_reply": "Jo, asi dvě hodiny večer.",
+    "accepted_answers": [
+      "Yes, about two hours in the evening.",
+      "Yeah, I practiced for two hours last night."
+    ]
+  },
+  {
+    "alex": "That’s cool. I need to warm up too.",
+    "cz_reply": "Pojďme dát rychlou hru teď.",
+    "accepted_answers": [
+      "Let’s play a quick match now.",
+      "We can do a warm-up game now."
+    ]
+  },
+  {
+    "alex": "Alright, I’ll open the lobby.",
+    "cz_reply": "Pozvi mě, jsem online.",
+    "accepted_answers": [
+      "Invite me, I’m online.",
+      "I’m online, send me an invite."
+    ]
+  },
+  {
+    "alex": "You joined fast!",
+    "cz_reply": "Byl jsem už připravený.",
+    "accepted_answers": [
+      "I was already ready.",
+      "I was prepared."
+    ]
+  },
+  {
+    "alex": "Let’s test some tactics.",
+    "cz_reply": "Jasně, chci zkusit nové triky.",
+    "accepted_answers": [
+      "Sure, I want to try some new tricks.",
+      "Yes, let’s test some new moves."
+    ]
+  },
+  {
+    "alex": "Did you watch the pro match yesterday?",
+    "cz_reply": "Ne, zmeškal jsem to. Bylo to dobrý?",
+    "accepted_answers": [
+      "No, I missed it. Was it good?",
+      "No, I didn’t see it. Was it cool?"
+    ]
+  },
+  {
+    "alex": "It was insane! So many goals.",
+    "cz_reply": "Musím se podívat na záznam.",
+    "accepted_answers": [
+      "I have to watch the replay.",
+      "I’ll check the highlights later."
+    ]
+  },
+  {
+    "alex": "Ready to start the match?",
+    "cz_reply": "Jo, pojďme na to!",
+    "accepted_answers": [
+      "Yes, let’s go!",
+      "Yeah, I’m ready!"
+    ]
+  },
+  {
+    "alex": "Goal! That was fast!",
+    "cz_reply": "Haha, to byla moje speciálka.",
+    "accepted_answers": [
+      "Haha, that was my special move.",
+      "Haha, my secret trick."
+    ]
+  },
+  {
+    "alex": "We’re a great team.",
+    "cz_reply": "Ladíme se perfektně.",
+    "accepted_answers": [
+      "We’re syncing perfectly.",
+      "We play great together."
+    ]
+  },
+  {
+    "alex": "Let’s win the tournament tonight!",
+    "cz_reply": "Jasně! Budeme nejlepší!",
+    "accepted_answers": [
+      "Sure! We’ll be the best!",
+      "Yeah! Let’s be the champions!"
+    ]
+  },
+  {
+    "alex": "See you at 7 PM!",
+    "cz_reply": "Budu tam, čau!",
+    "accepted_answers": [
+      "I’ll be there, bye!",
+      "See you, I’ll join!"
+    ]
+  }
+]

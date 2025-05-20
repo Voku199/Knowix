@@ -1,0 +1,138 @@
+[
+  {
+    "alex": "You’ve seemed a bit nervous today. Is everything okay?",
+    "cz_reply": "Jo, byl jsem dneska trochu nervózní.",
+    "accepted_answers": [
+      "Yeah, I’ve been a bit nervous today.",
+      "Yes, I’ve been a little nervous today."
+    ]
+  },
+  {
+    "alex": "Have you had any big tests recently?",
+    "cz_reply": "Ano, měli jsme dneska velký test z matematiky.",
+    "accepted_answers": [
+      "Yes, we’ve had a big math test today.",
+      "We’ve had a big maths test today."
+    ]
+  },
+  {
+    "alex": "Have you studied much for it?",
+    "cz_reply": "Ano, učil jsem se na něj celý týden.",
+    "accepted_answers": [
+      "Yes, I’ve studied for it all week.",
+      "I’ve been studying for it all week."
+    ]
+  },
+  {
+    "alex": "Have you talked to anyone about how stressed you feel?",
+    "cz_reply": "Ne, nikomu jsem o tom neřekl.",
+    "accepted_answers": [
+      "No, I haven’t told anyone about it.",
+      "I haven’t talked to anyone about it."
+    ]
+  },
+  {
+    "alex": "Sometimes sharing can really help. Have you tried breathing exercises?",
+    "cz_reply": "Ne, nikdy jsem to nezkusil.",
+    "accepted_answers": [
+      "No, I’ve never tried that.",
+      "I haven’t tried that before."
+    ]
+  },
+  {
+    "alex": "They’ve helped me when I’ve been anxious.",
+    "cz_reply": "Pomohly ti, když jsi byl nervózní?",
+    "accepted_answers": [
+      "Have they helped you when you’ve been nervous?",
+      "Have they helped when you’ve been anxious?"
+    ]
+  },
+  {
+    "alex": "Yes! I’ve felt much better after a few deep breaths.",
+    "cz_reply": "To zní dobře, možná to zkusím.",
+    "accepted_answers": [
+      "That sounds good, maybe I’ll try it.",
+      "Sounds good, I might try it."
+    ]
+  },
+  {
+    "alex": "Have you slept well this week?",
+    "cz_reply": "Ne, moc jsem nespal.",
+    "accepted_answers": [
+      "No, I haven’t slept much.",
+      "I haven’t had much sleep."
+    ]
+  },
+  {
+    "alex": "Sleep really helps. I’ve noticed a big difference after good sleep.",
+    "cz_reply": "To je pravda, spánek hodně pomáhá.",
+    "accepted_answers": [
+      "That’s true, sleep helps a lot.",
+      "Sleep really helps, that’s true."
+    ]
+  },
+  {
+    "alex": "Have you eaten anything today?",
+    "cz_reply": "Ano, měl jsem jen rychlou snídani.",
+    "accepted_answers": [
+      "Yes, I’ve only had a quick breakfast.",
+      "I’ve had a quick breakfast."
+    ]
+  },
+  {
+    "alex": "I’ve felt worse on an empty stomach too.",
+    "cz_reply": "To se mi taky stává.",
+    "accepted_answers": [
+      "That happens to me too.",
+      "Me too, that’s happened to me."
+    ]
+  },
+  {
+    "alex": "Have you done anything fun recently?",
+    "cz_reply": "Ne, jen jsem se učil.",
+    "accepted_answers": [
+      "No, I’ve just been studying.",
+      "I haven’t done anything fun, just studied."
+    ]
+  },
+  {
+    "alex": "You’ve earned a break. Want to play a game after school?",
+    "cz_reply": "Jo, to bych rád!",
+    "accepted_answers": [
+      "Yeah, I’d like that!",
+      "I’d love to!"
+    ]
+  },
+  {
+    "alex": "I’ve brought my card game today.",
+    "cz_reply": "Fakt? To je super!",
+    "accepted_answers": [
+      "Really? That’s awesome!",
+      "That’s cool!"
+    ]
+  },
+  {
+    "alex": "Have you ever beaten me at it?",
+    "cz_reply": "Ne, ještě nikdy!",
+    "accepted_answers": [
+      "No, not yet!",
+      "I haven’t beaten you yet!"
+    ]
+  },
+  {
+    "alex": "Maybe today’s your lucky day.",
+    "cz_reply": "Uvidíme!",
+    "accepted_answers": [
+      "We’ll see!",
+      "Let’s see!"
+    ]
+  },
+  {
+    "alex": "I’m glad you’ve talked to me. You’ve done great today.",
+    "cz_reply": "Díky, hodně mi to pomohlo.",
+    "accepted_answers": [
+      "Thanks, it’s helped me a lot.",
+      "Thank you, this has really helped."
+    ]
+  }
+]

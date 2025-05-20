@@ -1,0 +1,138 @@
+[
+  {
+    "alex": "Hey, have you seen the new girl in our class?",
+    "cz_reply": "Jo, viděl jsem ji včera poprvé.",
+    "accepted_answers": [
+      "Yeah, I saw her for the first time yesterday.",
+      "Yes, I have seen her yesterday."
+    ]
+  },
+  {
+    "alex": "She seems interesting. Have you talked to her?",
+    "cz_reply": "Ne, ještě jsem s ní nemluvil.",
+    "accepted_answers": [
+      "No, I haven’t talked to her yet.",
+      "I have not spoken to her yet."
+    ]
+  },
+  {
+    "alex": "Why not? You’ve had the chance, right?",
+    "cz_reply": "Ano, měl jsem šanci, ale byl jsem moc nervózní.",
+    "accepted_answers": [
+      "Yes, I’ve had the chance but I was too nervous.",
+      "I’ve had the chance, but I was really nervous."
+    ]
+  },
+  {
+    "alex": "I get it. Have you at least smiled at her?",
+    "cz_reply": "Ne, byl jsem příliš nervózní na to, abych se usmál.",
+    "accepted_answers": [
+      "No, I was too nervous to smile.",
+      "No, I haven’t even smiled at her."
+    ]
+  },
+  {
+    "alex": "That’s tough. Have you followed her on social media?",
+    "cz_reply": "Jo, přidal jsem si ji včera.",
+    "accepted_answers": [
+      "Yeah, I’ve added her yesterday.",
+      "Yes, I have added her on social media."
+    ]
+  },
+  {
+    "alex": "Has she accepted the request?",
+    "cz_reply": "Ne, zatím ne.",
+    "accepted_answers": [
+      "No, she hasn’t accepted it yet.",
+      "She hasn’t accepted it."
+    ]
+  },
+  {
+    "alex": "Maybe she’s just busy. Have you sent her a message?",
+    "cz_reply": "Jo, napsal jsem jí krátký pozdrav.",
+    "accepted_answers": [
+      "Yeah, I’ve sent her a short greeting.",
+      "I have messaged her a quick hello."
+    ]
+  },
+  {
+    "alex": "And has she replied?",
+    "cz_reply": "Ne, ještě mi neodpověděla.",
+    "accepted_answers": [
+      "No, she hasn’t replied yet.",
+      "She has not answered yet."
+    ]
+  },
+  {
+    "alex": "It’s okay, man. Have you talked to anyone else about it?",
+    "cz_reply": "Ne, jenom tobě.",
+    "accepted_answers": [
+      "No, only to you.",
+      "No, I’ve only told you."
+    ]
+  },
+  {
+    "alex": "Maybe you’ve overthought it too much.",
+    "cz_reply": "Možná máš pravdu, moc jsem nad tím přemýšlel.",
+    "accepted_answers": [
+      "Maybe you’re right, I’ve thought about it too much.",
+      "I’ve overthought it."
+    ]
+  },
+  {
+    "alex": "Has this happened to you before?",
+    "cz_reply": "Jo, už se mi to stalo několikrát.",
+    "accepted_answers": [
+      "Yeah, it has happened to me several times.",
+      "Yes, it’s happened to me a few times."
+    ]
+  },
+  {
+    "alex": "That sucks… But at least you’ve tried.",
+    "cz_reply": "Jo, ale pořád se cítím trochu zklamaně.",
+    "accepted_answers": [
+      "Yeah, but I still feel a bit disappointed.",
+      "I still feel kind of sad."
+    ]
+  },
+  {
+    "alex": "Have you learned anything from this?",
+    "cz_reply": "Ano, měl bych být víc sebevědomý.",
+    "accepted_answers": [
+      "Yes, I should be more confident.",
+      "I’ve learned I need to be more confident."
+    ]
+  },
+  {
+    "alex": "That’s the spirit. Have you ever succeeded in situations like this?",
+    "cz_reply": "Ne, nikdy jsem v tom nebyl dobrý.",
+    "accepted_answers": [
+      "No, I’ve never been good at it.",
+      "I have never succeeded in this."
+    ]
+  },
+  {
+    "alex": "You will. You’ve already made progress just by trying.",
+    "cz_reply": "Díky, to mi trochu pomáhá.",
+    "accepted_answers": [
+      "Thanks, that helps a bit.",
+      "That’s comforting. Thanks."
+    ]
+  },
+  {
+    "alex": "Want to grab some food later? You’ve earned a break.",
+    "cz_reply": "Jasně, to zní dobře.",
+    "accepted_answers": [
+      "Sure, that sounds good.",
+      "Yeah, I’d like that."
+    ]
+  },
+  {
+    "alex": "Cool. And next time, you’ll know what to do.",
+    "cz_reply": "Jo, příště budu odvážnější.",
+    "accepted_answers": [
+      "Yeah, I’ll be braver next time.",
+      "Next time, I’ll have more courage."
+    ]
+  }
+]

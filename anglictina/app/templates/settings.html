@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/static/style.css">
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="{{ 'dark-mode' if theme == 'dark' else '' }}">
 <header>
     <div class="logo">
         <a href="{{ url_for('main.index') }}">
@@ -81,11 +81,35 @@
 </footer>
 
 <script>
-    // Přepínání dark/light režimu
     const themeToggle = document.getElementById('theme-toggle');
+
+    // Nastavení tlačítka podle aktuálního tématu
+    const isDark = document.body.classList.contains('dark-mode');
+    themeToggle.textContent = isDark ? '☀️' : '🌙';
+
     themeToggle.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
+
+        const newTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+        themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+
+        // Pošli změnu na backend
+        fetch('/set_theme', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({theme: newTheme}),
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    alert('Nepodařilo se uložit téma.');
+                }
+            })
+            .catch(() => alert('Chyba při ukládání tématu.'));
     });
 </script>
+
 </body>
 </html>

@@ -99,7 +99,7 @@ function guessLetter(letter) {
             }
 
             // Update game state
-            document.getElementById("maskedWord").innerText = data.masked_word.split("").join(" ");
+            document.getElementById("maskedWord").innerText = data.masked_word;
             document.getElementById("guessedLetters").innerText = data.guessed_letters.join(", ");
             document.getElementById("remainingAttempts").innerText = data.remaining_attempts;
             drawHangman(data.remaining_attempts);

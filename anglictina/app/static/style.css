@@ -641,6 +641,191 @@ body.dark-mode .profile-menu a:hover {
     border-color: #a5d6a7;
 }
 
+
+/* CSS pro doplňovačky */
+.missing-word-exercise {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.blank-sentence {
+    font-size: 1.1rem;
+    margin: 1rem 0;
+    color: #2c3e50;
+    font-style: italic;
+}
+
+.missing-word-input {
+    border-left: 4px solid #3498db !important;
+    padding-left: 1rem !important;
+}
+
+.missing-word-input::placeholder {
+    color: #95a5a6;
+    font-style: italic;
+}
+
+.input-container {
+    position: relative;
+    max-width: 600px;
+    margin: 1rem 0;
+}
+
+.missing-word-feedback {
+    font-size: 0.95rem;
+    padding: 0.8rem 1rem;
+    margin-top: 0.5rem;
+    border-radius: 6px;
+    display: none; /* Schováme defaultně, zobrazí se až po kontrole */
+}
+
+/* Stavy feedbacku */
+.missing-word-input.correct + .missing-word-feedback {
+    display: block;
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.missing-word-input.almost + .missing-word-feedback {
+    display: block;
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+}
+
+.missing-word-input.incorrect + .missing-word-feedback {
+    display: block;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+/* Animace pro podtržení chybějícího slova v textu */
+.blank-sentence mark {
+    animation: underline-blink 1.5s ease-in-out infinite;
+    background: transparent;
+    text-decoration: underline wavy #e74c3c;
+}
+
+@keyframes underline-blink {
+    0% {
+        opacity: 0.4;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.4;
+    }
+}
+
+/* Styly pro feedback u všech cvičení */
+.exercise-input {
+    transition: border-color 0.3s ease;
+    padding: 0.8rem;
+    margin: 0.5rem 0;
+    width: 100%;
+    max-width: 600px;
+    border-radius: 5px;
+    border: 2px solid #ddd;
+}
+
+.exercise-input:focus {
+    outline: none;
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+}
+
+/* Společné styly pro správné/nesprávné odpovědi */
+.exercise-input.correct {
+    border-color: #28a745 !important;
+}
+
+.exercise-input.incorrect {
+    border-color: #dc3545 !important;
+}
+
+.exercise-input.almost {
+    border-color: #ffc107 !important;
+}
+
+/* Feedback container pod inputy */
+.feedback {
+    color: #dc3545;
+    font-size: 0.9em;
+    margin-top: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background-color: #f8d7da;
+    border-radius: 4px;
+    border: 1px solid #f5c6cb;
+    transition: opacity 0.3s ease;
+}
+
+/* Specifické pro doplňovačky */
+.exercise-card:not(.translation-exercise) .feedback {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+}
+
+/* Pro překladová cvičení */
+.translation-input + .feedback {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+/* Animace pro feedback */
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(5px);
+    }
+    50% {
+        transform: translateX(-5px);
+    }
+    75% {
+        transform: translateX(5px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.incorrect {
+    animation: shake 0.4s ease-in-out;
+}
+
+
+.error-feedback {
+    color: #dc3545;
+    font-size: 0.9em;
+    margin-top: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background-color: #f8d7da;
+    border-radius: 4px;
+    border: 1px solid #f5c6cb;
+}
+
+.almost {
+    border: 2px solid #ffc107 !important;
+}
+
+.correct {
+    border: 2px solid #28a745 !important;
+}
+
+.incorrect {
+    border: 2px solid #dc3545 !important;
+}
+
+
 /* SEKCE AUDIO */
 .audio-section {
     width: 100%;

@@ -5,38 +5,6 @@ import random
 
 verbs_bp = Blueprint('verbs', __name__)
 
-# def init_db():
-#     with get_db_connection() as conn:
-#         cursor = conn.cursor()
-#         cursor.execute('''CREATE TABLE IF NOT EXISTS users (
-#                           id INT AUTO_INCREMENT PRIMARY KEY,
-#                           first_name VARCHAR(100) NOT NULL,
-#                           last_name VARCHAR(100) NOT NULL,
-#                           email VARCHAR(100) UNIQUE NOT NULL,
-#                           password VARCHAR(255) NOT NULL,
-#                           birthdate DATE,
-#                           profile_pic VARCHAR(255) DEFAULT 'default.jpg')''')
-#
-#         cursor.execute('''CREATE TABLE IF NOT EXISTS user_lessons (
-#                           id INT AUTO_INCREMENT PRIMARY KEY,
-#                           user_id INT NOT NULL,
-#                           lesson_id INT NOT NULL,
-#                           completed BOOLEAN DEFAULT FALSE,
-#                           completion_date TIMESTAMP NULL,
-#                           FOREIGN KEY (user_id) REFERENCES users(id))''')
-#
-#         cursor.execute('''CREATE TABLE IF NOT EXISTS lesson_progress (
-#                           id INT AUTO_INCREMENT PRIMARY KEY,
-#                           user_id INT NOT NULL,
-#                           lesson_id INT NOT NULL,
-#                           verb VARCHAR(100) NOT NULL,
-#                           completed BOOLEAN DEFAULT FALSE,
-#                           timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-#                           FOREIGN KEY (user_id) REFERENCES users(id))''')
-#         conn.commit()
-#
-# init_db()  #
-
 # Načtení dat se slovesy
 with open('verbs.json', 'r') as f:
     verbs_data = json.load(f)
@@ -126,12 +94,10 @@ def get_possible_answers(verb, correct_tense):
 # Routy pro výuku
 @verbs_bp.route('/anglictina/test', methods=['GET', 'POST'])
 def test():
-    if 'user_id' not in session:
-        flash("Pro testování se musíte přihlásit.", "warning")
-        return redirect(url_for('auth.login'))
-
     LESSON_ID = 1
     VERBS_PER_LESSON = 6
+
+    is_guest = 'user_id' not in session
 
     if request.method == 'POST':
         # 1) VÝBĚR SLOVESA
@@ -139,46 +105,48 @@ def test():
             verb = request.form.get('verb')
             if not verb:
                 flash("Neplatné sloveso", "error")
-                return redirect(url_for('test'))
+                return redirect(url_for('verbs.test'))
 
             session['current_verb'] = verb
             session['used_sentences'] = []
             session['lesson_complete'] = False
-            session['correct_answers_for_verb'] = 0  # >>>
+            session['correct_answers_for_verb'] = 0
 
             verb_entry = next((item for item in verbs_data
                                if verb in [item["verb1"], item["verb2"], item["verb3"]]), None)
             if not verb_entry:
                 flash("Sloveso nenalezeno", "error")
-                return redirect(url_for('test'))
+                return redirect(url_for('verbs.test'))
 
             sentence, correct_answer, tense = generate_test(verb)
             if not sentence:
                 flash("Žádné příklady pro toto sloveso.", "error")
-                return redirect(url_for('test'))
+                return redirect(url_for('verbs.test'))
 
             session['current_sentence'] = sentence
             session['current_tense'] = tense
 
-            with get_db_connection() as conn:
-                cursor = conn.cursor()
-                cursor.execute("""
-                    SELECT COUNT(DISTINCT verb) 
-                    FROM lesson_progress 
-                    WHERE user_id = %s AND lesson_id = %s AND completed = TRUE
-                """, (session['user_id'], LESSON_ID))
-                verbs_done = cursor.fetchone()[0] or 0
+            verbs_done = 0
+            if not is_guest:
+                with get_db_connection() as conn:
+                    cursor = conn.cursor()
+                    cursor.execute("""
+                        SELECT COUNT(DISTINCT verb) 
+                        FROM lesson_progress 
+                        WHERE user_id = %s AND lesson_id = %s AND completed = TRUE
+                    """, (session['user_id'], LESSON_ID))
+                    verbs_done = cursor.fetchone()[0] or 0
 
             session['verbs_done'] = verbs_done
 
-            return render_template('anglictina//form_odp.html',
+            return render_template('anglictina/form_odp.html',
                                    sentence=sentence,
                                    verb=verb,
                                    possible_answers=get_possible_answers(verb, tense),
                                    feedback=None,
                                    verbs_done=verbs_done,
                                    total_verbs=VERBS_PER_LESSON,
-                                   progress_for_verb=0)  # >>>
+                                   progress_for_verb=0)
 
         # 2) ZPRACOVÁNÍ ODPOVĚDI
         verb = session.get('current_verb')
@@ -186,32 +154,31 @@ def test():
 
         if not verb:
             flash("Nejprve vyber sloveso.", "error")
-            return redirect(url_for('test'))
+            return redirect(url_for('verbs.test'))
 
         if not user_answer:
             flash("Zadej odpověď před odesláním.", "warning")
-            return redirect(url_for('test'))
+            return redirect(url_for('verbs.test'))
 
         verb_entry = next((item for item in verbs_data
                            if verb in [item["verb1"], item["verb2"], item["verb3"]]), None)
         if not verb_entry:
             flash("Sloveso nebylo nalezeno", "error")
-            return redirect(url_for('test'))
+            return redirect(url_for('verbs.test'))
 
         current_tense = session.get('current_tense')
         if not current_tense:
             flash("Chyba s časem slovesa.", "error")
-            return redirect(url_for('test'))
+            return redirect(url_for('verbs.test'))
 
         correct_answer = verb_entry[current_tense]
         is_correct = user_answer.strip().lower() == correct_answer.lower()
         feedback = "✅ Správně!" if is_correct else f"❌ Špatně! Správná odpověď byla: {correct_answer}"
 
         if is_correct:
-            session['correct_answers_for_verb'] = session.get('correct_answers_for_verb', 0) + 1  # >>>
+            session['correct_answers_for_verb'] = session.get('correct_answers_for_verb', 0) + 1
 
-            # KONTROLA 6 SPRÁVNÝCH ODPOVĚDÍ
-            if session['correct_answers_for_verb'] >= 6:
+            if session['correct_answers_for_verb'] >= 6 and not is_guest:
                 with get_db_connection() as conn:
                     cursor = conn.cursor()
                     cursor.execute("""
@@ -221,25 +188,25 @@ def test():
                     """, (session['user_id'], LESSON_ID, verb))
                     conn.commit()
 
-                # Reset všeho pro další sloveso
                 session['correct_answers_for_verb'] = 0
                 session['used_sentences'] = []
                 flash(f"Sloveso '{verb}' bylo úspěšně dokončeno! ✅", "success")
-                return redirect(url_for('verbs.test'))  # zpět na výběr nového slovesa
+                return redirect(url_for('verbs.test'))
 
-        # Aktualizace počtu dokončených sloves
-        with get_db_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("""
-                SELECT COUNT(DISTINCT verb) 
-                FROM lesson_progress 
-                WHERE user_id = %s AND lesson_id = %s AND completed = TRUE
-            """, (session['user_id'], LESSON_ID))
-            verbs_done = cursor.fetchone()[0] or 0
-
+        # Update verbs_done count
+        verbs_done = 0
+        if not is_guest:
+            with get_db_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT COUNT(DISTINCT verb) 
+                    FROM lesson_progress 
+                    WHERE user_id = %s AND lesson_id = %s AND completed = TRUE
+                """, (session['user_id'], LESSON_ID))
+                verbs_done = cursor.fetchone()[0] or 0
         session['verbs_done'] = verbs_done
 
-        if verbs_done >= VERBS_PER_LESSON:
+        if verbs_done >= VERBS_PER_LESSON and not is_guest:
             with get_db_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
@@ -265,7 +232,7 @@ def test():
                                    total_verbs=VERBS_PER_LESSON,
                                    lesson_complete=True,
                                    no_more_sentences=True,
-                                   progress_for_verb=session.get('correct_answers_for_verb', 0))  # >>>
+                                   progress_for_verb=session.get('correct_answers_for_verb', 0))
 
         session['current_sentence'] = sentence
         session['current_tense'] = tense
@@ -279,7 +246,7 @@ def test():
                                verbs_done=session.get('verbs_done', 0),
                                total_verbs=VERBS_PER_LESSON,
                                lesson_complete=session.get('lesson_complete', False),
-                               progress_for_verb=session.get('correct_answers_for_verb', 0))  # >>>
+                               progress_for_verb=session.get('correct_answers_for_verb', 0))
 
     # GET – výběr slovesa
     if 'lesson_complete' in session:
@@ -288,15 +255,17 @@ def test():
 
     verbs = sorted(set(item['verb1'] for item in verbs_data))
     verbs_done = 0
-    with get_db_connection() as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT COUNT(DISTINCT verb) 
-            FROM lesson_progress 
-            WHERE user_id = %s AND lesson_id = %s AND completed = TRUE
-        """, (session['user_id'], LESSON_ID))
-        result = cursor.fetchone()
-        verbs_done = result[0] if result else 0
+
+    if not is_guest:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT COUNT(DISTINCT verb) 
+                FROM lesson_progress 
+                WHERE user_id = %s AND lesson_id = %s AND completed = TRUE
+            """, (session['user_id'], LESSON_ID))
+            result = cursor.fetchone()
+            verbs_done = result[0] if result else 0
 
     return render_template('anglictina/select_verb.html',
                            verbs=verbs,

@@ -1,0 +1,146 @@
+[
+  {
+    "alex": "Have you seen the latest viral TikTok trend?",
+    "cz_reply": "Viděl jsi ten nejnovější virální TikTok trend?",
+    "accepted_answers": [
+      "Yes, I have seen the latest viral TikTok trend.",
+      "I have watched the newest viral TikTok trend."
+    ]
+  },
+  {
+    "alex": "People have been obsessed with short videos recently.",
+    "cz_reply": "Lidi jsou poslední dobou posedlí krátkými videi.",
+    "accepted_answers": [
+      "People have been obsessed with short videos recently.",
+      "Everyone has loved short videos lately."
+    ]
+  },
+  {
+    "alex": "Have you posted any reels on Instagram this week?",
+    "cz_reply": "Přidal jsi tento týden nějaký reels na Instagram?",
+    "accepted_answers": [
+      "No, I haven't posted any reels this week.",
+      "Yes, I have posted some reels on Instagram this week."
+    ]
+  },
+  {
+    "alex": "I have noticed that reels get more views than normal posts.",
+    "cz_reply": "Všiml jsem si, že reels dostávají víc zhlédnutí než běžné příspěvky.",
+    "accepted_answers": [
+      "I have noticed that reels get more views than normal posts.",
+      "Reels have gotten more views than regular posts."
+    ]
+  },
+  {
+    "alex": "Have you ever gone viral on any platform?",
+    "cz_reply": "Už jsi někdy byl virální na nějaké platformě?",
+    "accepted_answers": [
+      "No, I haven't gone viral on any platform.",
+      "Yes, I have gone viral once."
+    ]
+  },
+  {
+    "alex": "Do you think social media have changed how we communicate?",
+    "cz_reply": "Myslíš, že sociální sítě změnily, jak komunikujeme?",
+    "accepted_answers": [
+      "Yes, social media have changed how we communicate.",
+      "No, social media haven't changed communication that much."
+    ]
+  },
+  {
+    "alex": "I have used memes to express my mood more than once.",
+    "cz_reply": "Použil jsem víc než jednou meme, abych vyjádřil náladu.",
+    "accepted_answers": [
+      "I have used memes to express my mood more than once.",
+      "Yes, I have used memes to show how I feel."
+    ]
+  },
+  {
+    "alex": "Have you downloaded any new apps recently?",
+    "cz_reply": "Stáhl jsi si nedávno nějaké nové aplikace?",
+    "accepted_answers": [
+      "Yes, I have downloaded new apps recently.",
+      "No, I haven't downloaded any new apps recently."
+    ]
+  },
+  {
+    "alex": "I have tried new filters on Snapchat every day this week.",
+    "cz_reply": "Zkoušel jsem nové filtry na Snapchatu každý den tento týden.",
+    "accepted_answers": [
+      "I have tried new filters on Snapchat every day this week.",
+      "Yes, I have used new Snapchat filters daily."
+    ]
+  },
+  {
+    "alex": "Has your phone ever crashed while streaming videos?",
+    "cz_reply": "Někdy ti telefon spadnul při sledování videí?",
+    "accepted_answers": [
+      "Yes, my phone has crashed while streaming videos.",
+      "No, my phone hasn't crashed during video streaming."
+    ]
+  },
+  {
+    "alex": "I have shared funny videos with my friends many times.",
+    "cz_reply": "Sdílel jsem srandovní videa s kamarády už několikrát.",
+    "accepted_answers": [
+      "I have shared funny videos with my friends many times.",
+      "Yes, I have sent funny videos to my friends."
+    ]
+  },
+  {
+    "alex": "Have you updated your phone’s OS recently?",
+    "cz_reply": "Aktualizoval jsi nedávno operační systém telefonu?",
+    "accepted_answers": [
+      "Yes, I have updated my phone’s OS recently.",
+      "No, I haven’t updated my phone’s OS recently."
+    ]
+  },
+  {
+    "alex": "I have noticed my battery drains faster after updates.",
+    "cz_reply": "Všiml jsem si, že baterka mi po aktualizacích rychleji ubývá.",
+    "accepted_answers": [
+      "I have noticed my battery drains faster after updates.",
+      "My battery has drained faster after updates."
+    ]
+  },
+  {
+    "alex": "Have you ever used TikTok’s Duet feature?",
+    "cz_reply": "Použil jsi někdy funkci Duet na TikToku?",
+    "accepted_answers": [
+      "Yes, I have used TikTok’s Duet feature.",
+      "No, I haven't used TikTok’s Duet feature."
+    ]
+  },
+  {
+    "alex": "I have seen many creative duets from famous creators.",
+    "cz_reply": "Viděl jsem spoustu kreativních duetů od známých tvůrců.",
+    "accepted_answers": [
+      "I have seen many creative duets from famous creators.",
+      "Yes, I have watched creative duets from famous creators."
+    ]
+  },
+  {
+    "alex": "Have you ever unfollowed someone because of their posts?",
+    "cz_reply": "Odstranil jsi někdy někoho z přátel kvůli jeho příspěvkům?",
+    "accepted_answers": [
+      "Yes, I have unfollowed someone because of their posts.",
+      "No, I haven't unfollowed anyone for their posts."
+    ]
+  },
+  {
+    "alex": "I have learned a lot about trends just by scrolling daily.",
+    "cz_reply": "Naučil jsem se hodně o trendech jen tím, že jsem denně scrolloval.",
+    "accepted_answers": [
+      "I have learned a lot about trends just by scrolling daily.",
+      "Yes, scrolling has helped me learn trends."
+    ]
+  },
+  {
+    "alex": "Do you think memes have shaped our culture in the last years?",
+    "cz_reply": "Myslíš, že meme ovlivnily naši kulturu v posledních letech?",
+    "accepted_answers": [
+      "Yes, memes have shaped our culture in recent years.",
+      "No, memes haven't influenced culture that much."
+    ]
+  }
+]

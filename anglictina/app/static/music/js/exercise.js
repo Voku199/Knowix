@@ -157,10 +157,7 @@ function renderResults(result) {
 
     html += '<h3>Doplň chybějící slovo:</h3>' +
         result.results.missing.map((correct, i) => `<p>Úloha ${i + 1}: ${correct ? '✅ Správně' : '❌ Špatně'}</p>`).join('');
-
-    html += '<h3>Překlady:</h3>' +
-        result.results.translations.map((correct, i) => `<p>Úloha ${i + 1}: ${correct ? '✅ Správně' : '❌ Špatně'}</p>`).join('');
-
+    
     html += `<h3>Slovní páry:</h3><p>${result.results.pairs ? '✅ Správně' : '❌ Špatně'}</p>`;
 
     html += result.success
@@ -181,3 +178,5 @@ function setupLyricsToggle() {
         toggleBtn.textContent = container.classList.contains('collapsed') ? 'Zobrazit více' : 'Skrýt';
     });
 }
+
+

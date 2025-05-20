@@ -1,0 +1,138 @@
+[
+  {
+    "alex": "Hi! Do you know about career day tomorrow?",
+    "cz_reply": "Jo, máme si přinést životopis, že jo?",
+    "accepted_answers": [
+      "Yes, we have to bring a CV, right?",
+      "Yes, we need to bring a CV, right?"
+    ]
+  },
+  {
+    "alex": "Yes! What job do you want in the future?",
+    "cz_reply": "Chci být programátor.",
+    "accepted_answers": [
+      "I want to be a programmer.",
+      "I want to become a programmer."
+    ]
+  },
+  {
+    "alex": "Cool! Do you use a computer a lot?",
+    "cz_reply": "Jo, používám ho každý den.",
+    "accepted_answers": [
+      "Yes, I use it every day.",
+      "Yeah, I use it every day."
+    ]
+  },
+  {
+    "alex": "Do you play games or write code?",
+    "cz_reply": "Píšu kód a hraju hry.",
+    "accepted_answers": [
+      "I write code and play games.",
+      "I code and play games."
+    ]
+  },
+  {
+    "alex": "That’s nice! What games do you play?",
+    "cz_reply": "Hraju Minecraft a Roblox.",
+    "accepted_answers": [
+      "I play Minecraft and Roblox.",
+      "I play Roblox and Minecraft."
+    ]
+  },
+  {
+    "alex": "I like Minecraft too! Do your parents help you?",
+    "cz_reply": "Jo, táta mi pomáhá s počítačem.",
+    "accepted_answers": [
+      "Yes, my dad helps me with the computer.",
+      "Yeah, my dad helps me with the computer."
+    ]
+  },
+  {
+    "alex": "That's great! Do you like school?",
+    "cz_reply": "Jo, ale někdy je nudná.",
+    "accepted_answers": [
+      "Yes, but sometimes it is boring.",
+      "Yeah, but it is boring sometimes."
+    ]
+  },
+  {
+    "alex": "What is your favorite subject?",
+    "cz_reply": "Mám rád informatiku.",
+    "accepted_answers": [
+      "I like IT.",
+      "I like computer science."
+    ]
+  },
+  {
+    "alex": "Do you have a good teacher?",
+    "cz_reply": "Jo, náš učitel je hodný.",
+    "accepted_answers": [
+      "Yes, our teacher is nice.",
+      "Yeah, our teacher is kind."
+    ]
+  },
+  {
+    "alex": "Do you want to study IT after school?",
+    "cz_reply": "Ano, chci jít na střední školu s IT.",
+    "accepted_answers": [
+      "Yes, I want to go to a high school with IT.",
+      "Yes, I want to study IT in high school."
+    ]
+  },
+  {
+    "alex": "That’s a good idea. Is it in your city?",
+    "cz_reply": "Jo, je to tady ve městě.",
+    "accepted_answers": [
+      "Yes, it is here in the city.",
+      "Yeah, it is in the city."
+    ]
+  },
+  {
+    "alex": "Do your friends want to go there too?",
+    "cz_reply": "Ne, oni chtějí jít jinam.",
+    "accepted_answers": [
+      "No, they want to go somewhere else.",
+      "No, they want to go to another school."
+    ]
+  },
+  {
+    "alex": "That’s okay. Do you feel ready?",
+    "cz_reply": "Trochu, ale jsem nervózní.",
+    "accepted_answers": [
+      "A bit, but I am nervous.",
+      "A little, but I am nervous."
+    ]
+  },
+  {
+    "alex": "Don’t worry! You will be great.",
+    "cz_reply": "Díky, to je milé.",
+    "accepted_answers": [
+      "Thanks, that is nice.",
+      "Thank you, that’s kind."
+    ]
+  },
+  {
+    "alex": "Do you need help with your CV?",
+    "cz_reply": "Jo, můžeš mi s tím pomoct?",
+    "accepted_answers": [
+      "Yes, can you help me with it?",
+      "Yeah, can you help me?"
+    ]
+  },
+  {
+    "alex": "Of course! Let's do it now.",
+    "cz_reply": "Super, děkuju moc!",
+    "accepted_answers": [
+      "Great, thank you very much!",
+      "Awesome, thanks a lot!"
+    ]
+  },
+  {
+    "alex": "You're welcome! Let’s make your future awesome.",
+    "cz_reply": "Jo! Těším se na zítřek.",
+    "accepted_answers": [
+      "Yes! I look forward to tomorrow.",
+      "Yeah! I’m excited for tomorrow."
+    ]
+  }
+]

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowix - Angličtina</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
+<header>
+    <div class="logo">
+        <a href="{{ url_for('main.index') }}">
+            <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+        </a>
+    </div>
+    <nav>
+        <ul class="nav-right">
+            <li><a href="/anglictina">Angličtina</a></li>
+            <li><a href="/feedback">Feedback</a></li>
+            <li><a href="/news">Novinky</a></li>
+            <li>
+                {% if session['user_name'] %}
+                <div class="user-profile">
+                    <div class="profile-container">
+                        {% if session.get('profile_pic') %}
+                        <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                             alt="Profilová fotka" width="64" class="profile-pic">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='pics/default.jpg') }}" alt="Defaultní profilovka"
+                             class="profile-pic" id="profileMenuTrigger">
+                        {% endif %}
+                        <div class="profile-menu" id="profileMenu">
+                            <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                            <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                        </div>
+                    </div>
+                    <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
+                </div>
+                {% else %}
+                <div class="auth-links">
+                    <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
+                    <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
+                </div>
+                {% endif %}
+            </li>
+            <li>
+                <button id="theme-toggle">🌙</button>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main>
+    <section class="intro">
+        <h1 class="logo-name" style="font-size: 3.5rem;">Angličtina</h1>
+        <h2 class="motto">Vyber si aktivitu</h2>
+    </section>
+
+    <section class="info">
+        <!-- Nepravidelná slovesa -->
+        <a href="/sl_chat" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+            <img src="{{ url_for('static', filename='pic/verb.png') }}" alt="Slovesa">
+            <div class="bubble-text">
+                <h3>Present Perfect</h3>
+                <p style="color: inherit;">Procvičování rozdílů mezi předpřítomným a minulým časem.</p>
+            </div>
+        </a>
+        <a href="/at-on" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+            <img src="{{ url_for('static', filename='pic/music.png') }}" alt="Slovesa">
+            <div class="bubble-text">
+                <h3>Předložky času a místa (in/on/at)</h3>
+                <p style="color: inherit;">Procvičování správného použití předložek jako in, on, at v čase a místě.</p>
+            </div>
+        </a>
+
+        <a href="/hangman" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+            <img src="{{ url_for('static', filename='pic/hangman.png') }}" alt="Slovesa">
+            <div class="bubble-text">
+                <h3>Slovosled v otázkách</h3>
+                <p style="color: inherit;">Procvičování správného slovosledu v anglických otázkách.</p>
+            </div>
+        </a>
+
+        <a href="/anglictina/test" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+            <img src="{{ url_for('static', filename='pic/verb.png') }}" alt="Slovesa">
+            <div class="bubble-text">
+                <h3>Present perfect vs Past Simple</h3>
+                <p style="color: inherit;">Procvičování rozdílů mezi předpřítomným a minulým časem.</p>
+            </div>
+        </a>
+
+    </section>
+</main>
+
+<footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p class="footer-signature">
+        Made with ❤️ by
+        <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+        and lot of ☕
+    </p>
+</footer>
+
+<script>
+    // theme-toggle.js
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        fetch('/set_theme', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark'
+            })
+        }).then(() => {
+            document.body.classList.toggle('dark-mode');
+            session.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+    });
+
+
+    // Detekce kliknutí mimo menu
+    document.addEventListener('click', (e) => {
+        const profileMenu = document.getElementById('profileMenu');
+        const trigger = document.getElementById('profileMenuTrigger');
+
+        if (!trigger.contains(e.target) && !profileMenu.contains(e.target)) {
+            profileMenu.style.opacity = '0';
+            profileMenu.style.visibility = 'hidden';
+            profileMenu.style.transform = 'translateY(10px)';
+        }
+    });
+</script>
+</body>
+</html>
