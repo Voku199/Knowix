@@ -1,0 +1,1003 @@
+/* Reset základních stylů */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'League Spartan', sans-serif;
+    background-color: #fff;
+    color: #333;
+    transition: all 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Dark mode */
+body.dark-mode {
+    background-color: #121212;
+    color: #f5f5f5;
+}
+
+/* Hlavička s animací */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 2px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+/* Logo s 3D efektem */
+.logo img {
+    width: 80px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform-style: preserve-3d;
+}
+
+.logo a {
+    display: inline-block;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.logo:hover img {
+    transform: translateY(-5px) rotateX(10deg) scale(1.05);
+    box-shadow: 5px 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Navigace s moderními efekty */
+.nav-right {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-right li {
+    display: inline;
+    position: relative;
+}
+
+/* Tlačítka v navigaci s gradient efektem */
+.nav-right a {
+    text-decoration: none;
+    color: #333;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 10px 15px;
+    background: linear-gradient(to bottom, #f0f0f0, #eaeaea);
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    display: inline-block; /* Zajistí, že tlačítka nebudou měnit pozici při hover */
+}
+
+
+.nav-right a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0.5s;
+}
+
+.nav-right a:hover {
+    background: linear-gradient(to bottom, #e0e0e0, #ccc);
+    color: #000;
+    transform: translateY(-3px); /* Jemné posunutí tlačítka při hover */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.nav-right a:hover::before {
+    left: 100%; /* Posune efekt pouze u aktivního tlačítka */
+}
+
+/* Dark mode pro menu */
+body.dark-mode .nav-right a {
+    background: linear-gradient(to bottom, #444, #333);
+    color: #f5f5f5;
+}
+
+body.dark-mode .nav-right a:hover {
+    background: linear-gradient(to bottom, #555, #444);
+    color: #fff;
+}
+
+/* Tlačítko pro změnu režimu s pulzujícím efektem */
+#theme-toggle {
+    background: linear-gradient(to bottom, #f0f0f0, #eaeaea);
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#theme-toggle:hover {
+    background: linear-gradient(to bottom, #e0e0e0, #ccc);
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: translateY(-3px) scale(1.1);
+    }
+    50% {
+        transform: translateY(-3px) scale(1.15);
+    }
+    100% {
+        transform: translateY(-3px) scale(1.1);
+    }
+}
+
+body.dark-mode #theme-toggle {
+    background: linear-gradient(to bottom, #444, #333);
+    color: white;
+}
+
+body.dark-mode #theme-toggle:hover {
+    background: linear-gradient(to bottom, #555, #444);
+}
+
+/* Hlavní část s fade-in efektem */
+main {
+    max-width: 900px;
+    margin: 50px auto;
+    text-align: center;
+    padding: 0 20px;
+    animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Motto s animovaným gradientem */
+.motto {
+    font-size: 1.8rem;
+    color: #555;
+    margin: 15px 0;
+    background: linear-gradient(to right, #e0dcd5, #ccc);
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.5s ease;
+    background-size: 200% auto;
+}
+
+.motto:hover {
+    background-position: right center;
+    transform: scale(1.02);
+}
+
+body.dark-mode .motto {
+    background: linear-gradient(to right, #444, #666);
+    color: white;
+}
+
+/* Bubliny s hover efekty */
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 30px
+}
+
+.bubble {
+    display: flex;
+    align-items: center;
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform: perspective(500px) rotateY(0deg);
+}
+
+.bubble:hover {
+    transform: perspective(500px) rotateY(5deg) translateY(-5px);
+    box-shadow: 5px 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.bubble img {
+    width: 80px;
+    height: auto;
+    margin-right: 15px;
+    transition: all 0.3s ease;
+    filter: drop-shadow(2px 2px 5px rgba(0, 0, 0, 0.2));
+}
+
+.bubble:hover img {
+    transform: scale(1.1) rotate(-5deg);
+}
+
+.bubble-text {
+    text-align: left;
+}
+
+.bubble h3 {
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.bubble:hover h3 {
+    color: #000;
+    transform: translateX(5px);
+}
+
+.bubble p {
+    color: #555;
+    transition: all 0.3s ease;
+}
+
+.bubble:hover p {
+    transform: translateX(5px);
+}
+
+/* Dark mode pro bubliny */
+body.dark-mode .bubble {
+    background: #222;
+    color: #fff;
+}
+
+body.dark-mode .bubble:hover {
+    background: #2a2a2a;
+}
+
+body.dark-mode .bubble h3 {
+    color: #fff;
+}
+
+body.dark-mode .bubble p {
+    color: #ddd;
+}
+
+/* Patička s hover efektem */
+footer {
+    text-align: center;
+    padding: 10px;
+    background: #f5f5f5;
+    margin-top: auto;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+footer:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode footer {
+    background: #222;
+    color: #ccc;
+}
+
+body.dark-mode footer:hover {
+    background: #2a2a2a;
+}
+
+/* Přidej toto do CSS */
+.profile-pic {
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #f0f0f0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(45deg, #f8f8f8, #fff);
+}
+
+.profile-pic:hover {
+    transform: scale(1.03);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15),
+    inset 0 0 0 4px rgba(255, 255, 255, 0.2);
+    border-color: #e0e0e0;
+}
+
+.profile-pic::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Hover efekt pro změnu profilovky */
+.profile-pic:hover::before {
+    content: 'Změnit foto';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 12px;
+    font-size: 1.1rem;
+    z-index: 2;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* Dark mode úpravy */
+body.dark-mode .profile-pic {
+    border-color: #333;
+    background: linear-gradient(45deg, #222, #2a2a2a);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .profile-pic:hover {
+    border-color: #444;
+    box-shadow: 0 15px 45px rgba(255, 255, 255, 0.1),
+    inset 0 0 0 4px rgba(255, 255, 255, 0.05);
+}
+
+/* Styly pro formulář */
+.upload-form {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.upload-form input[type="file"] {
+    display: none;
+}
+
+.upload-form label {
+    padding: 12px 25px;
+    background: linear-gradient(to right, #f0f0f0, #e8e8e8);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid #ddd;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.upload-form label:hover {
+    background: linear-gradient(to right, #e8e8e8, #e0e0e0);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.upload-form button {
+    padding: 12px 30px;
+    background: linear-gradient(to right, #4CAF50, #45a049);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    border: 2px solid #3d8b40;
+}
+
+.upload-form button:hover {
+    background: linear-gradient(to right, #45a049, #3d8b40);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+/* Dark mode pro formulář */
+body.dark-mode .upload-form label {
+    background: linear-gradient(to right, #333, #3a3a3a);
+    border-color: #444;
+    color: #fff;
+}
+
+body.dark-mode .upload-form label:hover {
+    background: linear-gradient(to right, #3a3a3a, #333);
+}
+
+body.dark-mode .upload-form button {
+    background: linear-gradient(to right, #2d7a31, #1e5a21);
+    border-color: #1e5a21;
+}
+
+/* Styly pro profilovou fotku v menu */
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto; /* Posune celý blok úplně doprava */
+}
+
+.greeting {
+    font-size: 1rem;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.profile-container {
+    position: relative;
+}
+
+.profile-pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #f0f0f0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.profile-pic:hover {
+    transform: scale(1.1);
+    border-color: #ddd;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Dropdown menu */
+.profile-menu {
+    position: absolute;
+    right: -50px;
+    top: 100%;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 10px 0;
+    min-width: 160px;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+}
+
+.profile-menu a {
+    display: block;
+    padding: 8px 15px;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.profile-menu a:hover {
+    background: #f5f5f5;
+    padding-left: 20px;
+}
+
+.profile-container:hover .profile-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Dark mode styly */
+body.dark-mode .greeting {
+    color: #f5f5f5;
+}
+
+body.dark-mode .profile-pic {
+    border-color: #444;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .profile-menu {
+    background: #2a2a2a;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .profile-menu a {
+    color: #f5f5f5;
+}
+
+body.dark-mode .profile-menu a:hover {
+    background: #333;
+}
+
+/* ---------- LISTENING INDEX ---------- */
+
+:root {
+    --primary-color: #4361ee;
+    --accent-color: #3a0ca3;
+    --accent-hover: #2a0880;
+    --card-bg: #ffffff;
+    --content-bg: #f8f9fa;
+    --card-hover: #edf2ff;
+    --option-bg: #f1f3f9;
+    --option-hover: #e6e9ff;
+    --border-color: #e2e8f0;
+    --text-color: #2d3748;
+}
+
+.dark-mode {
+    --primary-color: #8ba1ff;
+    --accent-color: #5e43f3;
+    --accent-hover: #4a32d0;
+    --card-bg: #2d3748;
+    --content-bg: #1a202c;
+    --card-hover: #4a5568;
+    --option-bg: #2d3748;
+    --option-hover: #4a5568;
+    --border-color: #4a5568;
+    --text-color: #e2e8f0;
+}
+
+.listening-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.listening-container h1 {
+    text-align: center;
+    margin-bottom: 3rem;
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    position: relative;
+}
+
+.listening-container h1::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 4px;
+    background: var(--accent-color);
+    margin: 0.5rem auto;
+    border-radius: 2px;
+}
+
+.level-section {
+    margin-bottom: 3rem;
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.level-section:hover {
+    transform: translateY(-5px);
+}
+
+.level-section h2 {
+    background: var(--accent-color);
+    color: white;
+    padding: 1rem 1.5rem;
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.lessons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+}
+
+.lesson-card {
+    background: var(--content-bg);
+    border-radius: 10px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+}
+
+.lesson-card:hover {
+    background: var(--card-hover);
+    border-color: var(--accent-color);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.lesson-card a {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.lesson-card a::before {
+    content: '🎧';
+    margin-right: 12px;
+    font-size: 1.2rem;
+}
+
+/* ---------- LESSON PAGE ---------- */
+.lesson-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.lesson-container h1 {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--accent-color);
+    color: var(--primary-color);
+}
+
+.audio-container {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    text-align: center;
+}
+
+.audio-container h2 {
+    margin-top: 0;
+    color: var(--accent-color);
+    margin-bottom: 1.5rem;
+}
+
+audio {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    display: block;
+}
+
+.quiz-container {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+}
+
+.quiz-container h2 {
+    margin-top: 0;
+    color: var(--accent-color);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.quiz-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+}
+
+.question-block {
+    background: var(--content-bg);
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+}
+
+.question-block p {
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.question-block label {
+    display: block;
+    padding: 0.8rem 1rem;
+    margin: 0.5rem 0;
+    background: var(--option-bg);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.question-block label:hover {
+    background: var(--option-hover);
+    transform: translateX(5px);
+}
+
+.question-block input[type="radio"] {
+    margin-right: 10px;
+}
+
+.submit-btn {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    align-self: flex-start;
+    margin-top: 1rem;
+}
+
+.submit-btn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+#result {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    display: none;
+}
+
+/* Dark mode adjustments */
+.dark-mode .lesson-card {
+    border-color: #444;
+}
+
+.dark-mode .question-block {
+    border-color: #444;
+}
+
+/* === Responsivita pro hlavní obsah === */
+@media (max-width: 900px) {
+    .listening-container {
+        padding: 1.2rem 0.5rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .listening-container {
+        margin: 18px 0 0 0;
+        padding: 0.7rem 0.2rem;
+    }
+
+    section {
+        padding: 1rem 0.5rem;
+    }
+}
+
+/* Navigace - hamburger menu pro úzké obrazovky */
+@media (max-width: 700px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 5vw;
+    }
+
+    .logo img {
+        width: 50px;
+    }
+
+    .nav-right {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .nav-right li {
+        width: 100%;
+    }
+
+    .nav-right a, .auth-links a {
+        width: 100%;
+        text-align: left;
+        padding: 12px 10px;
+        font-size: 1.1rem;
+    }
+
+    .user-profile {
+        flex-direction: row;
+        gap: 8px;
+        margin-left: 0;
+    }
+
+    .profile-pic {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* Hlavní obsah - listening lessons */
+@media (max-width: 900px) {
+    .listening-container {
+        padding: 1.2rem 0.5rem;
+        max-width: 100vw;
+    }
+}
+
+@media (max-width: 600px) {
+    .listening-container {
+        margin: 18px 0 0 0;
+        padding: 0.7rem 0.2rem;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    section {
+        padding: 1rem 0.5rem;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .listening-container h1 {
+        font-size: 1.5rem;
+    }
+
+    section h2 {
+        font-size: 1.1rem;
+    }
+
+    section a {
+        font-size: 1rem;
+        padding: 0.5rem 0.7rem;
+    }
+}
+
+/* Bubble info sekce a další flexboxy */
+@media (max-width: 700px) {
+    .info {
+        gap: 10px;
+    }
+
+    .bubble {
+        flex-direction: column;
+        text-align: center;
+        padding: 10px;
+    }
+
+    .bubble img {
+        margin: 0 0 10px 0;
+        width: 60px;
+    }
+}
+
+/* Footer */
+@media (max-width: 600px) {
+    footer {
+        font-size: 0.8rem;
+        padding: 8px;
+    }
+}
+
+/* Song grid a karty */
+@media (max-width: 768px) {
+    .song-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .song-card {
+        min-height: 180px;
+    }
+
+    .song-link h3 {
+        font-size: 1.1rem;
+        bottom: 35px;
+    }
+
+    .song-link p {
+        font-size: 0.95rem;
+    }
+}
+
+/* Quiz a lesson page */
+@media (max-width: 768px) {
+    .lesson-container, .audio-container, .quiz-container {
+        padding: 1rem;
+    }
+
+    .quiz-form {
+        gap: 1rem;
+    }
+
+    .question-block {
+        padding: 1rem;
+    }
+}
+
+/* Zvětšení klikacích ploch na mobilech */
+@media (max-width: 600px) {
+    .check-button, .submit-btn, .lyrics-toggle {
+        font-size: 1rem;
+        padding: 10px 12px;
+    }
+
+    .profile-menu {
+        min-width: 120px;
+        right: 0;
+    }
+}
+
+/* Zajištění scrollování na malých displejích */
+@media (max-width: 400px) {
+    .listening-container, .lesson-container {
+        padding: 0.3rem 0.1rem;
+    }
+
+    section {
+        padding: 0.5rem 0.2rem;
+    }
+}
+
+/* Skrytí nadbytečných dekorací na mobilech */
+@media (max-width: 500px) {
+    .listening-container h1::after {
+        display: none;
+    }
+}
+
+/* --- Vylepšené sekce h2 pro dark mode a mobilní zařízení --- */
+body.dark-mode section h2 {
+    color: #f5f5f5 !important;
+    text-shadow: 0 2px 8px #222, 0 1px 0 #333;
+    background: none;
+    border-radius: 0;
+    letter-spacing: 0.5px;
+    transition: color 0.3s, text-shadow 0.3s;
+}
+
+/* Pro větší čitelnost i na světlém pozadí */
+section h2 {
+    transition: color 0.3s, text-shadow 0.3s;
+}
+
+/* Responsivní úpravy pro sekce h2 */
+@media (max-width: 600px) {
+    section h2 {
+        font-size: 1rem !important;
+        padding: 0.5rem 0.2rem !important;
+        margin-bottom: 0.7rem !important;
+    }
+
+    body.dark-mode section h2 {
+        text-shadow: 0 1px 4px #111, 0 1px 0 #222;
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .listening-container, .lesson-container {
+        padding: 1.5rem;
+    }
+
+    .lessons-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .audio-container, .quiz-container {
+        padding: 1.5rem;
+    }
+
+}

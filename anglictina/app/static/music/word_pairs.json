@@ -11,7 +11,15 @@
     "time": "čas",
     "live": "žít",
     "high": "vysoko",
-    "laugh": "smát se"
+    "laugh": "smát se",
+    "memories": "vzpomínky",
+    "world": "svět",
+    "story": "příběh",
+    "lost": "ztracený",
+    "found": "nalezený",
+    "crazy": "šílený",
+    "young": "mladý",
+    "free": "volný"
   },
   "Lovers Rock": {
     "love": "láska",
@@ -25,7 +33,15 @@
     "touch": "dotek",
     "skin": "kůže",
     "move": "pohyb",
-    "hold": "držet"
+    "hold": "držet",
+    "music": "hudba",
+    "heart": "srdce",
+    "sweet": "sladký",
+    "close": "blízko",
+    "fire": "oheň",
+    "moon": "měsíc",
+    "whisper": "šeptat",
+    "dream": "sen"
   },
   "As It Was": {
     "alone": "sám",
@@ -39,7 +55,15 @@
     "past": "minulost",
     "run": "běžet",
     "cold": "chladný",
-    "truth": "pravda"
+    "truth": "pravda",
+    "door": "dveře",
+    "call": "zavolat",
+    "open": "otevřít",
+    "waiting": "čekání",
+    "broken": "zlomený",
+    "memory": "vzpomínka",
+    "old": "starý",
+    "different": "odlišný"
   },
   "See You Again": {
     "see": "vidět",
@@ -53,7 +77,15 @@
     "miss": "chybět",
     "memory": "vzpomínka",
     "laugh": "smát se",
-    "cry": "plakat"
+    "cry": "plakat",
+    "journey": "cesta",
+    "apart": "odloučený",
+    "together": "spolu",
+    "heart": "srdce",
+    "wait": "čekat",
+    "smile": "úsměv",
+    "end": "konec",
+    "beginning": "začátek"
   },
   "Preacher Man": {
     "preacher": "kazatel",
@@ -67,7 +99,15 @@
     "hope": "naděje",
     "faith": "víra",
     "holy": "svatý",
-    "believe": "věřit"
+    "believe": "věřit",
+    "church": "kostel",
+    "spirit": "duch",
+    "forgive": "odpustit",
+    "sin": "hřích",
+    "angel": "anděl",
+    "bless": "požehnat",
+    "heaven": "nebe",
+    "peace": "mír"
   },
   "Greedy": {
     "want": "chtít",
@@ -81,7 +121,15 @@
     "power": "moc",
     "chase": "honit",
     "goal": "cíl",
-    "score": "skóre"
+    "score": "skóre",
+    "lose": "prohrát",
+    "risk": "riziko",
+    "fortune": "štěstí (bohatství)",
+    "desire": "touha",
+    "temptation": "pokušení",
+    "rush": "spěch",
+    "deal": "dohoda",
+    "price": "cena"
   },
   "Alright": {
     "alright": "v pohodě",
@@ -95,7 +143,15 @@
     "rise": "vstát",
     "voice": "hlas",
     "equal": "rovný",
-    "truth": "pravda"
+    "truth": "pravda",
+    "stand": "stát",
+    "light": "světlo",
+    "fear": "strach",
+    "change": "změna",
+    "dream": "sen",
+    "future": "budoucnost",
+    "together": "spolu",
+    "power": "síla"
   },
   "Magnolia": {
     "block": "blok",
@@ -109,7 +165,15 @@
     "street": "ulice",
     "beat": "rytmus",
     "ride": "jet",
-    "night": "noc"
+    "night": "noc",
+    "flex": "vytahovat se",
+    "ice": "led",
+    "chain": "řetěz",
+    "crew": "parta",
+    "boss": "šéf",
+    "flash": "blesk",
+    "hustle": "dřít",
+    "zone": "zóna"
   },
   "Birds of a Feather": {
     "birds": "ptáci",
@@ -123,7 +187,15 @@
     "wing": "křídlo",
     "sky": "nebe",
     "song": "píseň",
-    "free": "volný"
+    "free": "volný",
+    "friend": "přítel",
+    "journey": "cesta",
+    "share": "sdílet",
+    "trust": "důvěra",
+    "warm": "teplý",
+    "safe": "bezpečný",
+    "home": "domov",
+    "belong": "patřit"
   },
   "Happy": {
     "happy": "šťastný",
@@ -137,7 +209,15 @@
     "smile": "úsměv",
     "joy": "radost",
     "dance": "tanec",
-    "light": "světlo"
+    "light": "světlo",
+    "sing": "zpívat",
+    "free": "volný",
+    "bright": "jasný",
+    "move": "pohyb",
+    "energy": "energie",
+    "fun": "zábava",
+    "shine": "zářit",
+    "cheer": "povzbudit"
   },
   "Count on Me": {
     "count": "počítat / spolehnout se",
@@ -151,7 +231,15 @@
     "call": "zavolat",
     "trust": "důvěra",
     "help": "pomoc",
-    "close": "blízko"
+    "close": "blízko",
+    "promise": "slib",
+    "find": "najít",
+    "lost": "ztracený",
+    "reach": "dosáhnout",
+    "hold": "držet",
+    "support": "podpora",
+    "care": "starat se",
+    "together": "spolu"
   },
   "Stand By Me": {
     "stand": "stát",
@@ -165,6 +253,14 @@
     "river": "řeka",
     "love": "láska",
     "need": "potřebovat",
-    "night": "noc"
+    "night": "noc",
+    "storm": "bouře",
+    "safe": "bezpečný",
+    "close": "blízko",
+    "walk": "jít",
+    "friend": "přítel",
+    "hold": "držet",
+    "cry": "plakat",
+    "promise": "slib"
   }
 }

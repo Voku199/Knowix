@@ -1,0 +1,118 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="cs">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Vytvoř větu – Knowix</title>-->
+<!--    <link rel="stylesheet" href="/static/style.css">-->
+<!--<link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"> -->
+<!--</head>-->
+<!--<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">-->
+<!--<header>-->
+<!--    <div class="logo">-->
+<!--        <a href="{{ url_for('main.index') }}">-->
+<!--            <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">-->
+<!--        </a>-->
+<!--    </div>-->
+<!--    <nav>-->
+<!--        <ul class="nav-right">-->
+<!--            <li><a href="/anglictina">Angličtina</a></li>-->
+<!--            <li><a href="/feedback">Feedback</a></li>-->
+<!--            <li><a href="/news">Novinky</a></li>-->
+<!--            <li>-->
+<!--                {% if session.get('user_name') %}-->
+<!--                <div class="user-profile">-->
+<!--                    <div class="profile-container">-->
+<!--                        {% if session.get('profile_pic') %}-->
+<!--                        <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"-->
+<!--                             alt="Profilová fotka" width="64" class="profile-pic">-->
+<!--                        {% else %}-->
+<!--                        <img src="{{ url_for('static', filename='pics/default.jpg') }}" alt="Defaultní profilovka"-->
+<!--                             class="profile-pic" id="profileMenuTrigger">-->
+<!--                        {% endif %}-->
+<!--                        <div class="profile-menu" id="profileMenu">-->
+<!--                            <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>-->
+<!--                            <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>-->
+<!--                </div>-->
+<!--                {% else %}-->
+<!--                <div class="auth-links">-->
+<!--                    <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>-->
+<!--                    <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>-->
+<!--                </div>-->
+<!--                {% endif %}-->
+<!--            </li>-->
+<!--            <li>-->
+<!--                <button id="theme-toggle">🌙</button>-->
+<!--            </li>-->
+<!--        </ul>-->
+<!--    </nav>-->
+<!--</header>-->
+
+<!--<main>-->
+<!--    <section class="intro">-->
+<!--        <h1 class="logo-name">🧠 Poskládej větu</h1>-->
+<!--        <p class="motto">Použij správnou předložku (<strong>in</strong> / <strong>on</strong> / <strong>at</strong>) a-->
+<!--            poskládej větu!</p>-->
+<!--    </section>-->
+
+<!--    <section class="exercise-box">-->
+<!--        <h2>Slovo: <strong>{{ keyword if keyword else '...' }}</strong></h2>-->
+<!--        <form method="POST">-->
+<!--            <label for="sentence">Napiš celou větu:</label><br>-->
+<!--            <input type="text" id="sentence" name="sentence" required placeholder="Např. I am at the house."-->
+<!--                   value="{{ user_sentence or '' }}">-->
+<!--            <button type="submit">Odeslat</button>-->
+<!--        </form>-->
+
+<!--        {% if result %}-->
+<!--        <div class="result-box {{ 'correct' if correct else 'wrong' }}">-->
+<!--            <p>{{ result }}</p>-->
+<!--            {% if correct %}-->
+<!--            <p>📝 Tvoje věta: <em>"{{ user_sentence }}"</em></p>-->
+<!--            <p>✅ Skvělá práce!</p>-->
+<!--            {% else %}-->
+<!--            <p>❌ Zkus napsat větu, která obsahuje předložku <strong>at</strong>, <strong>on</strong> nebo-->
+<!--                <strong>in</strong> a dává smysl.</p>-->
+<!--            {% endif %}-->
+<!--        </div>-->
+<!--        {% endif %}-->
+
+<!--        {% if sentences %}-->
+<!--        <section class="history">-->
+<!--            <h3>Tvoje předchozí věty:</h3>-->
+<!--            <ul>-->
+<!--                {% for sentence in sentences %}-->
+<!--                <li>{{ sentence }}</li>-->
+<!--                {% endfor %}-->
+<!--            </ul>-->
+<!--        </section>-->
+<!--        {% endif %}-->
+<!--    </section>-->
+
+
+<!--    <div style="text-align:center; margin-top: 20px;">-->
+<!--        <a href="{{ url_for('at_on.create_sentence') }}" class="button">Zkusit další</a>-->
+<!--        <a href="{{ url_for('at_on.select_exercise') }}" class="button">Zpět na výběr</a>-->
+<!--    </div>-->
+<!--</main>-->
+
+<!--<script>-->
+<!--    // theme-toggle.js-->
+<!--    document.getElementById('theme-toggle').addEventListener('click', () => {-->
+<!--        fetch('/set_theme', {-->
+<!--            method: 'POST',-->
+<!--            headers: {'Content-Type': 'application/json'},-->
+<!--            body: JSON.stringify({-->
+<!--                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark'-->
+<!--            })-->
+<!--        }).then(() => {-->
+<!--            document.body.classList.toggle('dark-mode');-->
+<!--            sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->
+
+<!--</body>-->
+<!--</html>-->

@@ -1,0 +1,50 @@
+{
+  "title": "A New Bicycle",
+  "level": "A2",
+  "story": [
+    "Last week, Tom wanted to buy a new bicycle.",
+    "He saved money for several months.",
+    "Yesterday, he finally bought it.",
+    "He has already ridden it three times since then.",
+    "He has never felt so happy with a bike before."
+  ],
+  "fill_in_the_blank": [
+    {
+      "sentence": "Tom ___ (save) money for several months.",
+      "answer": "has saved",
+      "tense": "present perfect"
+    },
+    {
+      "sentence": "Yesterday, he ___ (buy) a new bicycle.",
+      "answer": "bought",
+      "tense": "past simple"
+    }
+  ],
+  "questions": [
+    {
+      "question": "When did Tom buy the bicycle?",
+      "type": "open",
+      "answer": "Yesterday"
+    },
+    {
+      "question": "How many times has he ridden it?",
+      "type": "multiple_choice",
+      "options": [
+        "One",
+        "Three",
+        "Five"
+      ],
+      "answer": "Three"
+    }
+  ],
+  "tense_identification": [
+    {
+      "sentence": "He has already ridden it three times.",
+      "answer": "present perfect"
+    },
+    {
+      "sentence": "He saved money for several months.",
+      "answer": "past simple"
+    }
+  ]
+}

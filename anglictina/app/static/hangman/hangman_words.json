@@ -180,5 +180,138 @@
     "level": "A2",
     "hint": "Speak very quietly.",
     "hint_cz": "Velmi tiché mluvení."
+  },
+  {
+    "word": "river",
+    "translation": "řeka",
+    "level": "A1",
+    "hint": "A large natural stream of water.",
+    "hint_cz": "Velký přírodní proud vody."
+  },
+  {
+    "word": "mountain",
+    "translation": "hora",
+    "level": "A1",
+    "hint": "A very high hill.",
+    "hint_cz": "Velmi vysoký kopec."
+  },
+  {
+    "word": "brave",
+    "translation": "statečný",
+    "level": "A2",
+    "hint": "Not afraid to do dangerous things.",
+    "hint_cz": "Nebát se dělat nebezpečné věci."
+  },
+  {
+    "word": "to improve",
+    "translation": "zlepšit",
+    "level": "B1",
+    "hint": "To make something better.",
+    "hint_cz": "Udělat něco lepším."
+  },
+  {
+    "word": "to achieve",
+    "translation": "dosáhnout",
+    "level": "B1",
+    "hint": "To successfully reach a goal.",
+    "hint_cz": "Úspěšně dosáhnout cíle."
+  },
+  {
+    "word": "evidence",
+    "translation": "důkaz",
+    "level": "B2",
+    "hint": "Facts or information that show something is true.",
+    "hint_cz": "Fakta nebo informace, které ukazují, že něco je pravda."
+  },
+  {
+    "word": "to hesitate",
+    "translation": "váhat",
+    "level": "B2",
+    "hint": "Pause before doing something.",
+    "hint_cz": "Zastavit se před tím, než něco uděláš."
+  },
+  {
+    "word": "to encourage",
+    "translation": "povzbudit",
+    "level": "B1",
+    "hint": "Give someone support or confidence.",
+    "hint_cz": "Dát někomu podporu nebo sebedůvěru."
+  },
+  {
+    "word": "to complain",
+    "translation": "stěžovat si",
+    "level": "B1",
+    "hint": "Say that you are not satisfied.",
+    "hint_cz": "Říct, že nejsi spokojený."
+  },
+  {
+    "word": "to suggest",
+    "translation": "navrhnout",
+    "level": "B1",
+    "hint": "To offer an idea or plan.",
+    "hint_cz": "Nabídnout nápad nebo plán."
+  },
+  {
+    "word": "to refuse",
+    "translation": "odmítnout",
+    "level": "B2",
+    "hint": "Say no to something.",
+    "hint_cz": "Říct ne něčemu."
+  },
+  {
+    "word": "to persuade",
+    "translation": "přesvědčit",
+    "level": "B2",
+    "hint": "Make someone do something by giving reasons.",
+    "hint_cz": "Přimět někoho něco udělat tím, že mu dáš důvody."
+  },
+  {
+    "word": "to remind",
+    "translation": "připomenout",
+    "level": "B1",
+    "hint": "Help someone remember something.",
+    "hint_cz": "Pomoci někomu si něco zapamatovat."
+  },
+  {
+    "word": "to borrow",
+    "translation": "půjčit si",
+    "level": "A2",
+    "hint": "Take and use something that belongs to someone else.",
+    "hint_cz": "Vzit si a použít něco, co patří někomu jinému."
+  },
+  {
+    "word": "to lend",
+    "translation": "půjčit (někomu)",
+    "level": "A2",
+    "hint": "Give something to someone for a short time.",
+    "hint_cz": "Dát něco někomu na krátkou dobu."
+  },
+  {
+    "word": "to promise",
+    "translation": "slíbit",
+    "level": "A2",
+    "hint": "Say you will definitely do something.",
+    "hint_cz": "Říct, že určitě něco uděláš."
+  },
+  {
+    "word": "to invite",
+    "translation": "pozvat",
+    "level": "A2",
+    "hint": "Ask someone to come to an event.",
+    "hint_cz": "Pozvat někoho na událost."
+  },
+  {
+    "word": "to discover",
+    "translation": "objevit",
+    "level": "B1",
+    "hint": "Find something for the first time.",
+    "hint_cz": "Najít něco poprvé."
+  },
+  {
+    "word": "to destroy",
+    "translation": "zničit",
+    "level": "B1",
+    "hint": "To damage something so badly it cannot be used.",
+    "hint_cz": "Poškodit něco tak, že to už nejde použít."
   }
 ]

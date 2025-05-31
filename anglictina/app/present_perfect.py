@@ -77,7 +77,7 @@ def chat():
         elif roll <= 66:
             selected_filename = "vr_world2.json"
         else:
-            selected_filename = "vr_wolrd3.json"
+            selected_filename = "vr_world3.json"
 
     elif lesson_id == "school_future":
         # Tohle si můžeš přizpůsobit podle potřeby – tady ponechávám 50/48/2%
@@ -126,7 +126,10 @@ def chat():
         chat_lessons = []
 
     # Session
-    session.clear()
+    # Session
+    session.pop('chat_data', None)
+    session.pop('chat_index', None)
+    session.pop('current_lesson', None)
     session['chat_data'] = chat_data
     session['chat_index'] = 0
     session['current_lesson'] = selected_filename

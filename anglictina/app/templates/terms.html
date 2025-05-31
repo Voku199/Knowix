@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Podmínky používání | Knowix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        .terms-container {
+            background: #f7faff;
+            border-radius: 1.2rem;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+            padding: 2.2rem 1.5rem 2rem 1.5rem;
+            max-width: 650px;
+            margin: 2.5rem auto 2rem auto;
+        }
+
+        .terms-container h1 {
+            font-size: 2rem;
+            margin-bottom: 1.2rem;
+            color: #2563eb;
+            text-align: center;
+        }
+
+        .terms-container ul {
+            margin: 1.2rem 0 1.2rem 1.2rem;
+            padding-left: 1.2rem;
+        }
+
+        .terms-container li {
+            margin-bottom: 0.7em;
+            font-size: 1.08em;
+        }
+
+        .terms-container .highlight {
+            background: #e0e7ff;
+            padding: 0.2em 0.5em;
+            border-radius: 0.4em;
+            font-weight: 600;
+        }
+
+        .terms-container p {
+            margin-bottom: 1em;
+            font-size: 1.07em;
+        }
+
+        @media (max-width: 700px) {
+            .terms-container {
+                padding: 1.2rem 0.5rem;
+                border-radius: 0.7rem;
+            }
+
+            .terms-container h1 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
+<header>
+    <div class="logo">
+        <a href="{{ url_for('main.index') }}">
+            <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+        </a>
+    </div>
+    <nav>
+        <ul class="nav-right">
+            <li><a href="/anglictina">Angličtina</a></li>
+            <li><a href="/feedback">Feedback</a></li>
+            <li><a href="/news">Novinky</a></li>
+            <li>
+                {% if session['user_name'] %}
+                <div class="user-profile">
+                    <div class="profile-container">
+                        {% if session.get('profile_pic') %}
+                        <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                             alt="Profilová fotka" width="64" class="profile-pic">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='pic/default.jpg') }}" alt="Defaultní profilovka"
+                             class="profile-pic" id="profileMenuTrigger">
+                        {% endif %}
+                        <div class="profile-menu" id="profileMenu">
+                            <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                            <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                        </div>
+                    </div>
+                    <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
+                </div>
+                {% else %}
+                <div class="auth-links">
+                    <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
+                    <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
+                </div>
+                {% endif %}
+            </li>
+            <li>
+                <button id="theme-toggle">🌙</button>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <div class="terms-container">
+        <h1>Podmínky používání Knowix</h1>
+        <p>
+            Vítej na Knowixu! Používáním této platformy souhlasíš s následujícími podmínkami:
+        </p>
+        <ul>
+            <li><span class="highlight">Knowix</span> je vzdělávací platforma vytvořená pro trénink angličtiny zábavným
+                a přístupným způsobem.
+            </li>
+            <li>Data jako <span class="highlight">e-mail, jméno nebo úroveň angličtiny</span> jsou uložena pouze za
+                účelem poskytování služby.
+            </li>
+            <li>Registrací potvrzuješ, že jsi uvedl pravdivé údaje. <span class="highlight">Věk minimálně 13 let.</span>
+            </li>
+            <li>Potvrzení ohledně Terms Container <span class="highlight">není povinný!</span></li>
+            <li>Knowix neslouží ke <span class="highlight">komerčnímu využití</span> bez předchozího souhlasu.</li>
+            <li>Respektuj ostatní uživatele a pravidla slušnosti.</li>
+            <li>Jakékoliv porušení může vést k <span class="highlight">omezení přístupu</span>.</li>
+        </ul>
+        <p>
+            Pokud máš jakékoliv dotazy, napiš nám na <a
+                href="mailto:vojta.kurinec@gmail.com">vojta.kurinec@gmail.com</a>.
+        </p>
+        <p style="text-align:center; margin-top:1.5em; color:#2563eb; font-weight:600;">
+            Děkujeme, že používáš Knowix! ❤️
+        </p>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p class="footer-signature">
+        Made with ❤️ by
+        <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+        and lot of ☕
+    </p>
+</footer>
+</body>
+</html>

@@ -1,34 +1,202 @@
 [
   {
-    "sentence": "I am ___ the bus stop.",
-    "correct": "at"
-  },
-  {
-    "sentence": "She is ___ the car.",
-    "correct": "in"
-  },
-  {
-    "sentence": "The book is ___ the table.",
-    "correct": "on"
-  },
-  {
     "sentence": "They are ___ the restaurant.",
     "correct": "at"
   },
   {
-    "sentence": "The cat is ___ the box.",
+    "sentence": "I live ___ Prague.",
     "correct": "in"
   },
   {
-    "sentence": "He is ___ the train.",
+    "sentence": "The meeting is ___ Monday.",
     "correct": "on"
   },
   {
-    "sentence": "We met ___ the airport.",
+    "sentence": "She was born ___ 2009.",
+    "correct": "in"
+  },
+  {
+    "sentence": "He is waiting ___ the bus stop.",
     "correct": "at"
   },
   {
-    "sentence": "She was sitting ___ the sofa.",
+    "sentence": "We met ___ the party.",
+    "correct": "at"
+  },
+  {
+    "sentence": "The keys are ___ the table.",
     "correct": "on"
+  },
+  {
+    "sentence": "The children are playing ___ the garden.",
+    "correct": "in"
+  },
+  {
+    "sentence": "We have a meeting ___ the morning.",
+    "correct": "in"
+  },
+  {
+    "sentence": "I have an appointment ___ 5 PM.",
+    "correct": "at"
+  },
+  {
+    "sentence": "I usually wake up ___ 7 o'clock.",
+    "correct": "at"
+  },
+  {
+    "sentence": "He works ___ a hospital.",
+    "correct": "at"
+  },
+  {
+    "sentence": "The book is ___ the shelf.",
+    "correct": "on"
+  },
+  {
+    "sentence": "We were born ___ July.",
+    "correct": "in"
+  },
+  {
+    "sentence": "The class starts ___ 8 AM.",
+    "correct": "at"
+  },
+  {
+    "sentence": "I was born ___ May 10th.",
+    "correct": "on"
+  },
+  {
+    "sentence": "She is ___ her room.",
+    "correct": "in"
+  },
+  {
+    "sentence": "Let’s meet ___ the weekend.",
+    "correct": "on"
+  },
+  {
+    "sentence": "The picture is ___ the wall.",
+    "correct": "on"
+  },
+  {
+    "sentence": "He arrived ___ the airport.",
+    "correct": "at"
+  },
+  {
+    "sentence": "We went to the beach ___ Saturday.",
+    "correct": "on"
+  },
+  {
+    "sentence": "She’s not here ___ the moment.",
+    "correct": "at"
+  },
+  {
+    "sentence": "He’s working ___ the office.",
+    "correct": "in"
+  },
+  {
+    "sentence": "I was ___ the cinema last night.",
+    "correct": "at"
+  },
+  {
+    "sentence": "The milk is ___ the fridge.",
+    "correct": "in"
+  },
+  {
+    "sentence": "We will leave ___ the afternoon.",
+    "correct": "in"
+  },
+  {
+    "sentence": "There’s a fly ___ the ceiling.",
+    "correct": "on"
+  },
+  {
+    "sentence": "She has a meeting ___ Friday morning.",
+    "correct": "on"
+  },
+  {
+    "sentence": "I’ll see you ___ Christmas Day.",
+    "correct": "on"
+  },
+  {
+    "sentence": "He likes to jog ___ the evening.",
+    "correct": "in"
+  },
+  {
+    "sentence": "The clock is ___ the wall.",
+    "correct": "on"
+  },
+  {
+    "sentence": "We stayed ___ a hotel.",
+    "correct": "at"
+  },
+  {
+    "sentence": "He sat ___ the chair.",
+    "correct": "on"
+  },
+  {
+    "sentence": "There was a spider ___ the corner.",
+    "correct": "in"
+  },
+  {
+    "sentence": "They arrived ___ night.",
+    "correct": "at"
+  },
+  {
+    "sentence": "We arrived ___ the same time.",
+    "correct": "at"
+  },
+  {
+    "sentence": "She lives ___ the city center.",
+    "correct": "in"
+  },
+  {
+    "sentence": "He put the book ___ the bag.",
+    "correct": "in"
+  },
+  {
+    "sentence": "I was born ___ a cold winter day.",
+    "correct": "on"
+  },
+  {
+    "sentence": "We are going there ___ the holidays.",
+    "correct": "in"
+  },
+  {
+    "sentence": "He was ___ the concert yesterday.",
+    "correct": "at"
+  },
+  {
+    "sentence": "They are sitting ___ the grass.",
+    "correct": "on"
+  },
+  {
+    "sentence": "He left ___ the morning.",
+    "correct": "in"
+  },
+  {
+    "sentence": "Let’s meet ___ the school entrance.",
+    "correct": "at"
+  },
+  {
+    "sentence": "The papers are ___ the drawer.",
+    "correct": "in"
+  },
+  {
+    "sentence": "She was ___ her phone all night.",
+    "correct": "on"
+  },
+  {
+    "sentence": "He is ___ a meeting now.",
+    "correct": "in"
+  },
+  {
+    "sentence": "The movie is ___ 8 PM.",
+    "correct": "at"
+  },
+  {
+    "sentence": "We’ll have dinner ___ the terrace.",
+    "correct": "on"
+  },
+  {
+    "sentence": "The birds are ___ the sky.",
+    "correct": "in"
   }
 ]

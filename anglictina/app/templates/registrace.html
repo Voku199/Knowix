@@ -6,6 +6,7 @@
     <title>Registrace | Knowix</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style_reg_log.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/min.css">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
 <nav class="auth-header">
@@ -61,7 +62,6 @@
             <label><i class="fas fa-birthday-cake"></i> Datum narození (volitelné)</label>
         </div>
 
-
         <div class="input-group">
             <label for="english_level" class="select-label">Úroveň angličtiny</label>
             <select name="english_level" id="english_level" required>
@@ -76,7 +76,13 @@
             <div class="select-description">Vyber si svou aktuální úroveň angličtiny, aby ti lekce seděly.</div>
         </div>
 
-
+        <div class="input-group checkbox-group">
+            <input type="checkbox" id="terms_opt_in" name="terms_opt_in">
+            <label for="terms_opt_in">
+                Souhlasím s <a href="/terms" target="_blank">Podmínkami používání</a>
+                a <a href="/cookies" target="_blank">Zásadami cookies</a>
+            </label>
+        </div>
         <button type="submit">Zaregistrovat se</button>
     </form>
 

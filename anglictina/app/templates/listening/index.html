@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html lang="cs">
+<meta charset="UTF-8">
 <head>
     <meta charset="UTF-8">
-    <title>Vytvoř větu – Knowix</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowix - Poslouchání</title>
+    <link rel="stylesheet" href="/static/style_lis_in.css">
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- Google tag (gtag.js) -->
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
@@ -25,7 +30,7 @@
                         <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
                              alt="Profilová fotka" width="64" class="profile-pic">
                         {% else %}
-                        <img src="{{ url_for('static', filename='pics/default.jpg') }}" alt="Defaultní profilovka"
+                        <img src="{{ url_for('static', filename='pic/default.jpg') }}" alt="Defaultní profilovka"
                              class="profile-pic" id="profileMenuTrigger">
                         {% endif %}
                         <div class="profile-menu" id="profileMenu">
@@ -49,37 +54,34 @@
     </nav>
 </header>
 
-<main>
-    <section class="intro">
-        <h1 class="logo-name">🧠 Poskládej větu</h1>
-        <p class="motto">Použij správnou předložku (in / on / at) a poskládej větu!</p>
+<main class="listening-container">
+    <h1>Listening Lessons</h1>
+
+    {% for level, lessons_in_level in lessons.items() %}
+    <section>
+        <h2>Level {{ level }}</h2>
+        <ul>
+            {% for lesson in lessons_in_level %}
+            <li>
+                <a href="{{ url_for('listening_bp.lesson', level=level, lesson_id=lesson.id) }}">
+                    {{ lesson.title }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
     </section>
-
-    <section class="exercise-box">
-        <h2>Slovo: <strong>{{ keyword }}</strong></h2>
-        <form method="POST">
-            <label for="sentence">Napiš celou větu:</label><br>
-            <input type="text" id="sentence" name="sentence" required placeholder="Např. I am at the house.">
-            <button type="submit">Odeslat</button>
-        </form>
-
-        {% if result %}
-        <div class="result-box {{ 'correct' if correct else 'wrong' }}">
-            <p>{{ result }}</p>
-            {% if correct %}
-            <p>✅ Skvělá práce!</p>
-            {% else %}
-            <p>❌ Správně mělo být: <strong>{{ correct_sentence }}</strong></p>
-            {% endif %}
-        </div>
-        {% endif %}
-    </section>
-
-    <div style="text-align:center; margin-top: 20px;">
-        <a href="{{ url_for('at_on.create_sentence') }}" class="button">Zkusit další</a>
-        <a href="{{ url_for('at_on.select_exercise') }}" class="button">Zpět na výběr</a>
-    </div>
+    {% endfor %}
 </main>
+
+<footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p class="footer-signature">
+        Made with ❤️ by
+        <a href="https://ko-fi.com/voku199" target="_blank"
+           style="color: inherit; text-decoration: underline;">Voku</a>
+        and lot of ☕
+    </p>
+</footer>
 
 <script>
     // theme-toggle.js
@@ -96,8 +98,17 @@
         });
     });
 
+    // Detekce kliknutí mimo menu
+    document.addEventListener('click', (e) => {
+        const profileMenu = document.getElementById('profileMenu');
+        const trigger = document.getElementById('profileMenuTrigger');
 
+        if (!trigger.contains(e.target) && !profileMenu.contains(e.target)) {
+            profileMenu.style.opacity = '0';
+            profileMenu.style.visibility = 'hidden';
+            profileMenu.style.transform = 'translateY(10px)';
+        }
+    });
 </script>
-
 </body>
 </html>

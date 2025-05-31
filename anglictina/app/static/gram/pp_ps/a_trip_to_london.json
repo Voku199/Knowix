@@ -1,0 +1,82 @@
+{
+  "title": "Anna’s London Adventure",
+  "level": "B1-B2",
+  "story": [
+    "Anna has always dreamed of visiting London.",
+    "Last July, her dream finally came true when she traveled there with her parents.",
+    "They stayed in a small hotel near Hyde Park and spent five days exploring the city.",
+    "On the first day, they visited the British Museum and had lunch at a traditional pub.",
+    "The next day, they walked across Tower Bridge and took a boat ride on the River Thames.",
+    "Anna has taken over 300 photos and posted many of them online.",
+    "She has also written a detailed blog post about each day of the trip.",
+    "Since she came back home, she has told her friends stories about London every single day.",
+    "She says it was one of the most exciting experiences of her life."
+  ],
+  "fill_in_the_blank": [
+    {
+      "sentence": "Anna ___ (dream) of visiting London since she was a child.",
+      "answer": "has dreamed",
+      "tense": "present perfect"
+    },
+    {
+      "sentence": "Last July, her dream ___ (come) true.",
+      "answer": "came",
+      "tense": "past simple"
+    },
+    {
+      "sentence": "She ___ (post) many photos online.",
+      "answer": "has posted",
+      "tense": "present perfect"
+    },
+    {
+      "sentence": "They ___ (walk) across Tower Bridge the next day.",
+      "answer": "walked",
+      "tense": "past simple"
+    }
+  ],
+  "questions": [
+    {
+      "question": "Where did Anna stay during her trip?",
+      "type": "open",
+      "answer": "In a small hotel near Hyde Park"
+    },
+    {
+      "question": "How long did they stay in London?",
+      "type": "multiple_choice",
+      "options": [
+        "Three days",
+        "Five days",
+        "A week"
+      ],
+      "answer": "Five days"
+    },
+    {
+      "question": "What did they do on the second day?",
+      "type": "open",
+      "answer": "They walked across Tower Bridge and took a boat ride"
+    },
+    {
+      "question": "Why does Anna say the trip was exciting?",
+      "type": "open",
+      "answer": "Because it was one of the most exciting experiences of her life"
+    }
+  ],
+  "tense_identification": [
+    {
+      "sentence": "Anna has told her friends stories about London.",
+      "answer": "present perfect"
+    },
+    {
+      "sentence": "They stayed in a hotel near Hyde Park.",
+      "answer": "past simple"
+    },
+    {
+      "sentence": "She has written a blog post about the trip.",
+      "answer": "present perfect"
+    },
+    {
+      "sentence": "They took a boat ride on the River Thames.",
+      "answer": "past simple"
+    }
+  ]
+}

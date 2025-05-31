@@ -1,9 +1,41 @@
+<!-- app/templates/gram/at_on/fill_word.html -->
 <!DOCTYPE html>
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
     <title>Doplň předložku – Knowix</title>
     <link rel="stylesheet" href="/static/style.css">
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #4CAF50;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .exercise-box {
+            background-color: {{ '#2d2d2d' if session.get('theme') == 'dark' else '#ffffff' }};
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .completed-box {
+            text-align: center;
+            padding: 40px;
+        }
+    </style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
@@ -50,62 +82,70 @@
 </header>
 
 <main>
-    <section class="intro">
-        <h1 class="logo-name">✍️ Doplň správnou předložku</h1>
-        <p class="motto">Vyber správnou předložku (in / on / at) pro větu.</p>
-    </section>
-
-    <section class="exercise-box">
-        <form method="POST">
-            <!-- Zobrazení otázky -->
-            <p class="question">Věta: <strong>{{ question }}</strong></p>
-
-            <!-- Skryté inputy pro POST -->
-            <input type="hidden" name="question" value="{{ question }}">
-            <input type="hidden" name="correct" value="{{ correct }}">
-
-            <div class="options">
-                <label><input type="radio" name="answer" value="in" required> in</label><br>
-                <label><input type="radio" name="answer" value="on"> on</label><br>
-                <label><input type="radio" name="answer" value="at"> at</label><br>
-            </div>
-
-            <button type="submit">Odeslat</button>
-        </form>
-
-        {% if result is defined %}
-        <div class="result-box {{ 'correct' if result else 'wrong' }}">
-            {% if result %}
-            <p>✅ Skvěle!</p>
-            {% else %}
-            <p>❌ Správně mělo být: <strong>{{ correct_preposition }}</strong></p>
-            {% endif %}
+    {% if remaining_count > 0 %}
+        <div class="progress-container">
+            <div class="progress-bar" style="width: {{ (answered_count/total_questions)*100 }}%"></div>
         </div>
-        {% endif %}
-    </section>
 
-    <div style="text-align:center; margin-top: 20px;">
-        <a href="{{ url_for('at_on.fill_word') }}" class="button">Zkusit další</a>
-        <a href="{{ url_for('at_on.select_exercise') }}" class="button">Zpět na výběr</a>
-    </div>
+        <div class="exercise-box">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <p class="question">{{ question }}</p>
+                <input type="hidden" name="question_id" value="{{ question_id }}">
+
+                <div class="options">
+                    <label><input type="radio" name="answer" value="in" required> in</label>
+                    <label><input type="radio" name="answer" value="on"> on</label>
+                    <label><input type="radio" name="answer" value="at"> at</label>
+                </div>
+
+                <button type="submit">Odeslat odpověď</button>
+            </form>
+
+            <div class="progress-text">
+                Dokončeno: {{ answered_count }}/{{ total_questions }}
+            </div>
+        </div>
+    {% else %}
+        <div class="completed-box">
+            <h2>🎉 Všechny otázky dokončeny!</h2>
+            <p>Úspěšně jsi odpověděl(a) na všech {{ total_questions }} otázek!</p>
+            <div class="actions">
+                <a href="{{ url_for('at_on.reset_progress') }}" class="button">⟳ Zkusit znovu</a>
+                <a href="{{ url_for('at_on.select_exercise') }}" class="button">← Zpět na výběr</a>
+            </div>
+        </div>
+    {% endif %}
 </main>
+
+<footer>
+  <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+  <p class="footer-signature">
+    Made with ❤️ by
+    <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+    and lot of ☕
+  </p>
+</footer>
+
 <script>
-
-    // theme-toggle.js
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-        fetch('/set_theme', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark'
-            })
-        }).then(() => {
-            document.body.classList.toggle('dark-mode');
-            session.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-        });
+    // Automatické skrytí flash zpráv
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 3000);
     });
-
 </script>
-
 </body>
 </html>

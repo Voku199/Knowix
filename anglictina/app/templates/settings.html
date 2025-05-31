@@ -6,7 +6,36 @@
     <title>Nastavení – Knowix</title>
     <link rel="stylesheet" href="/static/style.css">
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
+
+<style>
+.english-level-select {
+    margin-top: 20px;
+    max-width: 400px;
+}
+
+.form-select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.btn-save {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-save:hover {
+    background-color: #45a049;
+}
+</style>
 <body class="{{ 'dark-mode' if theme == 'dark' else '' }}">
 <header>
     <div class="logo">
@@ -69,6 +98,21 @@
             <button type="submit">🚀 Nahrát novou fotku</button>
         </form>
     </div>
+
+    <div class="settings-section">
+    <h2>Úroveň angličtiny</h2>
+    <div class="english-level-select">
+        <select id="englishLevelSelect" class="form-select">
+            <option value="A1" {% if english_level == 'A1' %}selected{% endif %}>A1 - Začátečník</option>
+            <option value="A2" {% if english_level == 'A2' %}selected{% endif %}>A2 - Mírně pokročilý</option>
+            <option value="B1" {% if english_level == 'B1' %}selected{% endif %}>B1 - Středně pokročilý</option>
+            <option value="B2" {% if english_level == 'B2' %}selected{% endif %}>B2 - Vyšší středně pokročilý</option>
+            <option value="C1" {% if english_level == 'C1' %}selected{% endif %}>C1 - Pokročilý</option>
+            <option value="C2" {% if english_level == 'C2' %}selected{% endif %}>C2 - Expert</option>
+        </select>
+        <button onclick="updateEnglishLevel()" class="btn-save">Uložit změny</button>
+    </div>
+</div>
 </main>
 
 <footer>
@@ -109,6 +153,31 @@
             })
             .catch(() => alert('Chyba při ukládání tématu.'));
     });
+
+    function updateEnglishLevel() {
+        const select = document.getElementById('englishLevelSelect');
+        const level = select.value;
+
+        fetch('/set_english_level', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({level: level})
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Úroveň angličtiny byla úspěšně aktualizována!');
+                } else {
+                    alert('Chyba při ukládání: ' + (data.error || 'Neznámá chyba'));
+                }
+            })
+            .catch(error => {
+                console.error('Chyba:', error);
+                alert('Nastala chyba při komunikaci se serverem.');
+            });
+    }
 </script>
 
 </body>

@@ -67,13 +67,40 @@ def settings():
 
     db = get_db_connection()
     cur = db.cursor()
-    cur.execute("SELECT theme_mode FROM users WHERE id = %s", (user,))
+    cur.execute("SELECT theme_mode, english_level FROM users WHERE id = %s", (user,))
     row = cur.fetchone()
     theme = row[0] if row and row[0] in ['light', 'dark'] else 'light'
+    english_level = row[1] if row else 'A1'
     cur.close()
     db.close()
 
-    return render_template('settings.html', theme=theme, profile_pic=session['profile_pic'])
+    return render_template('settings.html',
+                           theme=theme,
+                           english_level=english_level,
+                           profile_pic=session['profile_pic'])
+
+
+@auth_bp.route('/set_english_level', methods=['POST'])
+def set_english_level():
+    user = session.get('user_id')
+    if not user:
+        return jsonify({'error': 'Not logged in'}), 401
+
+    data = request.get_json()
+    level = data.get('level')
+
+    valid_levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
+    if level not in valid_levels:
+        return jsonify({'error': 'Neplatná úroveň'}), 400
+
+    db = get_db_connection()
+    cur = db.cursor()
+    cur.execute("UPDATE users SET english_level = %s WHERE id = %s", (level, user))
+    db.commit()
+    cur.close()
+    db.close()
+
+    return jsonify({'success': True})
 
 
 @auth_bp.route('/set_theme', methods=['POST'])
@@ -297,6 +324,16 @@ def verify_code():
             return redirect(url_for('auth.verify_code'))
 
     return render_template('verify_code.html')
+
+
+@auth_bp.route("/terms")
+def terms():
+    return render_template("terms.html")
+
+
+@auth_bp.route("/cookies")
+def cookies():
+    return render_template("cookie.html")
 
 
 @auth_bp.route('/resend_code', methods=['POST'])

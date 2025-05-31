@@ -6,6 +6,7 @@
     <title>Knowix - Angličtina</title>
     <link rel="stylesheet" href="/static/style.css">
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
@@ -57,14 +58,16 @@
     </section>
 
     <section class="info">
-        <!-- Nepravidelná slovesa -->
-        <a href="/anglictina/test" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/verb.png') }}" alt="Slovesa">
+
+        <a href="/listening" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+            <img src="{{ url_for('static', filename='pic/talking.png') }}" alt="Slovesa">
             <div class="bubble-text">
-                <h3>Nepravidelná slovesa</h3>
-                <p style="color: inherit;">Procvič si všechny tři formy nepravidelných sloves!</p>
+                <h3>Poslouchání</h3>
+                <p style="color: inherit;">Procvič si normalní bázi poslouchaní konverzací!</p>
             </div>
         </a>
+
+
         <a href="/song-selection" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
             <img src="{{ url_for('static', filename='pic/music.png') }}" alt="Slovesa">
             <div class="bubble-text">
@@ -81,17 +84,13 @@
             </div>
         </a>
 
-        <a href="/sl_chat" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/chat.png') }}" alt="Slovesa">
+        <a href="/gramatika" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+            <img src="{{ url_for('static', filename='pic/grammary.png') }}" alt="Slovesa">
             <div class="bubble-text">
-                <h3>Present Perfect</h3>
-                <p style="color: inherit;">Klasická hra ve který si můžeš procvičit slovní zásobu!</p>
+                <h3>Gramatika</h3>
+                <p style="color: inherit;">Gramatika, kde si můžeš procvičit svojí gramatiku zábavnou formou!</p>
             </div>
         </a>
-        <div class="completion-message">
-            <p>Zatím tady skoro nic není...</p>
-            <p>Ale nebojte se, všechno se přidá časem!</p>
-        </div>
     </section>
 
 </main>

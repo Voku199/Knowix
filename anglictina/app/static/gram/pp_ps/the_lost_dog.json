@@ -1,0 +1,50 @@
+{
+  "title": "The Lost Dog",
+  "level": "A1",
+  "story": [
+    "One day, Lisa lost her dog in the park.",
+    "She looked everywhere but didn’t find him.",
+    "She has asked many people if they saw him.",
+    "Finally, she found him near the lake.",
+    "She has never been so scared before."
+  ],
+  "fill_in_the_blank": [
+    {
+      "sentence": "Lisa ___ (lose) her dog in the park.",
+      "answer": "lost",
+      "tense": "past simple"
+    },
+    {
+      "sentence": "She ___ (ask) many people since then.",
+      "answer": "has asked",
+      "tense": "present perfect"
+    }
+  ],
+  "questions": [
+    {
+      "question": "Where did Lisa lose her dog?",
+      "type": "open",
+      "answer": "In the park"
+    },
+    {
+      "question": "How did she feel?",
+      "type": "multiple_choice",
+      "options": [
+        "Happy",
+        "Angry",
+        "Scared"
+      ],
+      "answer": "Scared"
+    }
+  ],
+  "tense_identification": [
+    {
+      "sentence": "She has never been so scared before.",
+      "answer": "present perfect"
+    },
+    {
+      "sentence": "She found him near the lake.",
+      "answer": "past simple"
+    }
+  ]
+}

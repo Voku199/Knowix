@@ -6,6 +6,7 @@
     <title>Knowix - Angličtina</title>
     <link rel="stylesheet" href="/static/style.css">
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
@@ -59,33 +60,33 @@
     <section class="info">
         <!-- Nepravidelná slovesa -->
         <a href="/sl_chat" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/verb.png') }}" alt="Slovesa">
+            <img src="{{ url_for('static', filename='pic/present_perfect.png') }}" alt="Slovesa">
             <div class="bubble-text">
                 <h3>Present Perfect</h3>
                 <p style="color: inherit;">Procvičování rozdílů mezi předpřítomným a minulým časem.</p>
             </div>
         </a>
-        <a href="/at-on" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/music.png') }}" alt="Slovesa">
+        <a href="/at-on/fill-word" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+            <img src="{{ url_for('static', filename='pic/at_on_in.png') }}" alt="Slovesa">
             <div class="bubble-text">
                 <h3>Předložky času a místa (in/on/at)</h3>
                 <p style="color: inherit;">Procvičování správného použití předložek jako in, on, at v čase a místě.</p>
             </div>
         </a>
 
-        <a href="/hangman" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/hangman.png') }}" alt="Slovesa">
-            <div class="bubble-text">
-                <h3>Slovosled v otázkách</h3>
-                <p style="color: inherit;">Procvičování správného slovosledu v anglických otázkách.</p>
-            </div>
-        </a>
+        <!--        <a href="/hangman" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">-->
+        <!--            <img src="{{ url_for('static', filename='pic/hangman.png') }}" alt="Slovesa">-->
+        <!--            <div class="bubble-text">-->
+        <!--                <h3>Slovosled v otázkách</h3>-->
+        <!--                <p style="color: inherit;">Procvičování správného slovosledu v anglických otázkách.</p>-->
+        <!--            </div>-->
+        <!--        </a>-->
 
         <a href="/anglictina/test" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/verb.png') }}" alt="Slovesa">
+            <img src="{{ url_for('static', filename='pic/nep_sl.png') }}" alt="Slovesa">
             <div class="bubble-text">
-                <h3>Present perfect vs Past Simple</h3>
-                <p style="color: inherit;">Procvičování rozdílů mezi předpřítomným a minulým časem.</p>
+                <h3>Nepravidelná slovesa</h3>
+                <p style="color: inherit;">Procvič si všechny tři formy nepravidelných sloves!</p>
             </div>
         </a>
 

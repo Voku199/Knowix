@@ -1,151 +1,157 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ověření kódu | Knowix</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style_reg_log.css') }}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <style>
-    .resend-code {
-      margin-top: 20px;
-      text-align: center;
-    }
-    .resend-code button {
-      background: none;
-      border: none;
-      color: #0066cc;
-      text-decoration: underline;
-      cursor: pointer;
-      font-size: inherit;
-      padding: 0;
-    }
-    .resend-code button:hover {
-      color: #004499;
-    }
-    .timer {
-      color: #666;
-      font-size: 0.9em;
-      margin-top: 5px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ověření kódu | Knowix</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_reg_log.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        .resend-code {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .resend-code button {
+            background: none;
+            border: none;
+            color: #0066cc;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: inherit;
+            padding: 0;
+        }
+
+        .resend-code button:hover {
+            color: #004499;
+        }
+
+        .timer {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+    </style>
 </head>
 <body>
-  <nav class="auth-header">
+<nav class="auth-header">
     <a href="/anglictina/app/static" class="home-link">
-      <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
-      <span>← Zpět na hlavní stránku</span>
+        <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+        <span>← Zpět na hlavní stránku</span>
     </a>
-  </nav>
+</nav>
 
-  <div class="auth-container">
+<div class="auth-container">
     <div class="auth-title">
-      <div class="header-icon">
-        <i class="fas fa-envelope-open-text fa-3x text-primary"></i>
-      </div>
-      <h2>Zadejte ověřovací kód</h2>
-      <p>Zkontrolujte svou e-mailovou schránku</p>
+        <div class="header-icon">
+            <i class="fas fa-envelope-open-text fa-3x text-primary"></i>
+        </div>
+        <h2>Zadejte ověřovací kód</h2>
+        <p>Zkontrolujte svou e-mailovou schránku</p>
     </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
-      <div class="flash-messages">
+    <div class="flash-messages">
         {% for category, message in messages %}
-          <div class="flash-message {{ category }}">
+        <div class="flash-message {{ category }}">
             <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
             {{ message }}
-          </div>
+        </div>
         {% endfor %}
-      </div>
+    </div>
     {% endwith %}
 
     <form method="POST" class="auth-form">
-      <div class="input-group">
-        <input type="text" name="verification_code" maxlength="8"
-               pattern="\d{8}" title="Zadejte 8místný číselný kód"
-               placeholder=" " required>
-        <label><i class="fas fa-code"></i> Ověřovací kód (8 číslic)</label>
-      </div>
-      <button type="submit">Ověřit</button>
+        <div class="input-group">
+            <input type="text" name="verification_code" maxlength="8"
+                   pattern="\d{8}" title="Zadejte 8místný číselný kód"
+                   placeholder=" " required>
+            <label><i class="fas fa-code"></i> Ověřovací kód (8 číslic)</label>
+        </div>
+        <button type="submit">Ověřit</button>
 
-      <div class="resend-code">
-        <p>Nedostali jste kód? <button type="button" id="resendButton">Poslat nový kód</button></p>
-        <div id="timer" class="timer">Můžete požádat o nový kód za <span id="countdown">60</span> sekund</div>
-      </div>
+        <div class="resend-code">
+            <p>Nedostali jste kód?
+                <button type="button" id="resendButton">Poslat nový kód</button>
+            </p>
+            <div id="timer" class="timer">Můžete požádat o nový kód za <span id="countdown">60</span> sekund</div>
+        </div>
     </form>
-  </div>
+</div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const resendButton = document.getElementById('resendButton');
-      const timerElement = document.getElementById('timer');
-      const countdownElement = document.getElementById('countdown');
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const resendButton = document.getElementById('resendButton');
+        const timerElement = document.getElementById('timer');
+        const countdownElement = document.getElementById('countdown');
 
-      let countdown = 60;
-      let canResend = false;
+        let countdown = 60;
+        let canResend = false;
 
-      // Skryjeme timer, pokud není potřeba
-      timerElement.style.display = 'none';
+        // Skryjeme timer, pokud není potřeba
+        timerElement.style.display = 'none';
 
-      // Funkce pro odeslání nového kódu
-      resendButton.addEventListener('click', function() {
-        if (!canResend) return;
+        // Funkce pro odeslání nového kódu
+        resendButton.addEventListener('click', function () {
+            if (!canResend) return;
 
-        fetch('/resend_code', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          if (data.success) {
-            alert("Nový ověřovací kód byl odeslán na váš email.");
-            startCountdown();
-          } else {
-            alert("Došlo k chybě: " + (data.message || "Nepodařilo se odeslat nový kód"));
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert("Došlo k chybě při komunikaci se serverem.");
+            fetch('/resend_code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        alert("Nový ověřovací kód byl odeslán na váš email.");
+                        startCountdown();
+                    } else {
+                        alert("Došlo k chybě: " + (data.message || "Nepodařilo se odeslat nový kód"));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Došlo k chybě při komunikaci se serverem.");
+                });
         });
-      });
 
-      // Funkce pro odpočet času
-      function startCountdown() {
-        canResend = false;
-        countdown = 60;
-        timerElement.style.display = 'block';
-        resendButton.style.color = '#999';
-        resendButton.style.cursor = 'not-allowed';
+        // Funkce pro odpočet času
+        function startCountdown() {
+            canResend = false;
+            countdown = 60;
+            timerElement.style.display = 'block';
+            resendButton.style.color = '#999';
+            resendButton.style.cursor = 'not-allowed';
 
-        const timer = setInterval(function() {
-          countdown--;
-          countdownElement.textContent = countdown;
+            const timer = setInterval(function () {
+                countdown--;
+                countdownElement.textContent = countdown;
 
-          if (countdown <= 0) {
-            clearInterval(timer);
-            timerElement.style.display = 'none';
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    timerElement.style.display = 'none';
+                    resendButton.style.color = '#0066cc';
+                    resendButton.style.cursor = 'pointer';
+                    canResend = true;
+                }
+            }, 1000);
+        }
+
+        // Povolit tlačítko po načtení stránky (pro testování)
+        // V produkčním prostředí byste měli zkontrolovat čas posledního odeslání
+        setTimeout(() => {
+            canResend = true;
             resendButton.style.color = '#0066cc';
             resendButton.style.cursor = 'pointer';
-            canResend = true;
-          }
         }, 1000);
-      }
-
-      // Povolit tlačítko po načtení stránky (pro testování)
-      // V produkčním prostředí byste měli zkontrolovat čas posledního odeslání
-      setTimeout(() => {
-        canResend = true;
-        resendButton.style.color = '#0066cc';
-        resendButton.style.cursor = 'pointer';
-      }, 1000);
     });
-  </script>
+</script>
 </body>
 </html>

@@ -1,0 +1,873 @@
+{
+  "A1": [
+    {
+      "id": "a1_lesson_morning_routine",
+      "title": "My Morning Routine",
+      "audio_file": "A1_01.mp3",
+      "questions": [
+        {
+          "type": "multiple_choice",
+          "question": "What time does Jana wake up?",
+          "options": [
+            "6 o’clock",
+            "7 o’clock",
+            "8 o’clock"
+          ],
+          "answer": "7 o’clock"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What does Jana do first after waking up?",
+          "options": [
+            "Brush her teeth",
+            "Get out of bed",
+            "Eat breakfast"
+          ],
+          "answer": "Get out of bed"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What does Jana usually eat for breakfast?",
+          "options": [
+            "Bread with butter and jam",
+            "Cereal and milk",
+            "Pancakes"
+          ],
+          "answer": "Bread with butter and jam"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "How does Jana get to school?",
+          "options": [
+            "She walks",
+            "She takes the bus",
+            "Her parents drive her"
+          ],
+          "answer": "She takes the bus"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "Why does Jana like school?",
+          "options": [
+            "Because of her friends and kind teachers",
+            "Because of the sports",
+            "Because of the food"
+          ],
+          "answer": "Because of her friends and kind teachers"
+        }
+      ]
+    },
+    {
+      "id": "a1_lesson_park",
+      "title": "At the Park",
+      "audio_file": "A1_02.mp3",
+      "questions": [
+        {
+          "type": "multiple_choice",
+          "question": "What day is it today?",
+          "options": [
+            "Monday",
+            "Sunday",
+            "Friday"
+          ],
+          "answer": "Sunday"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What is the weather like?",
+          "options": [
+            "It is raining",
+            "It is sunny",
+            "It is snowing"
+          ],
+          "answer": "It is sunny"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "Where does Tom go?",
+          "options": [
+            "To the park",
+            "To the shop",
+            "To the school"
+          ],
+          "answer": "To the park"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What does Tom drink in the park?",
+          "options": [
+            "Cold water",
+            "Juice",
+            "Coffee"
+          ],
+          "answer": "Cold water"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What does Tom watch in the pond?",
+          "options": [
+            "Ducks",
+            "Fish",
+            "Swans"
+          ],
+          "answer": "Ducks"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "How does Tom feel in the park?",
+          "options": [
+            "Sad",
+            "Happy",
+            "Tired"
+          ],
+          "answer": "Happy"
+        }
+      ]
+    },
+    {
+      "id": "a1_lesson_shopping",
+      "title": "Shopping",
+      "audio_file": "A1_03.mp3",
+      "questions": [
+        {
+          "type": "multiple_choice",
+          "question": "What does Anna want to buy?",
+          "options": [
+            "Apples and bread",
+            "Milk and butter",
+            "Vegetables"
+          ],
+          "answer": "Apples and bread"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "Who does Anna talk to in the shop?",
+          "options": [
+            "The man behind the counter",
+            "Her friend",
+            "The teacher"
+          ],
+          "answer": "The man behind the counter"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "How much does the apple cost?",
+          "options": [
+            "One euro",
+            "Two euros",
+            "Fifty cents"
+          ],
+          "answer": "One euro"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What else does Anna buy?",
+          "options": [
+            "Milk and butter",
+            "Cheese and eggs",
+            "Water and juice"
+          ],
+          "answer": "Milk and butter"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "Where does Anna go after shopping?",
+          "options": [
+            "Home",
+            "To the park",
+            "To school"
+          ],
+          "answer": "Home"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "Why is Anna happy?",
+          "options": [
+            "Because she has everything for dinner",
+            "Because she met a friend",
+            "Because she likes the shop"
+          ],
+          "answer": "Because she has everything for dinner"
+        }
+      ]
+    }
+  ],
+  "A2": [
+    {
+      "id": "a2_lesson_trip_to_city",
+      "title": "A Trip to the City",
+      "audio_file": "A2_01.mp3",
+      "questions": [
+        {
+          "type": "multiple_choice",
+          "question": "How did Mark and his friends travel to the city?",
+          "options": [
+            "By car",
+            "By train",
+            "By bus"
+          ],
+          "answer": "By train"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What did Mark see at the museum?",
+          "options": [
+            "Animals",
+            "Old paintings and sculptures",
+            "Movies"
+          ],
+          "answer": "Old paintings and sculptures"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What did Mark eat at the café?",
+          "options": [
+            "Pizza",
+            "Coffee and a sandwich",
+            "Tea and cake"
+          ],
+          "answer": "Coffee and a sandwich"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "Why did Mark buy new clothes?",
+          "options": [
+            "There was a sale",
+            "He forgot his clothes",
+            "It was cold"
+          ],
+          "answer": "There was a sale"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What did they do at the end of the day?",
+          "options": [
+            "Went home",
+            "Went to a concert",
+            "Watched a movie"
+          ],
+          "answer": "Watched a movie"
+        }
+      ]
+    },
+    {
+      "id": "a2_lesson_weekend_with_friends",
+      "title": "Weekend Adventures with Friends",
+      "audio_file": "A2_02.mp3",
+      "questions": [
+        {
+          "type": "multiple_choice",
+          "question": "Where did Mia and her friends go first?",
+          "options": [
+            "To a park",
+            "To a café",
+            "To a cinema"
+          ],
+          "answer": "To a café"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What drink did Mia order?",
+          "options": [
+            "Iced tea",
+            "Rainbow latte",
+            "Coca-Cola"
+          ],
+          "answer": "Rainbow latte"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What was special about the art exhibit?",
+          "options": [
+            "It had animals",
+            "It was interactive",
+            "It was about sports"
+          ],
+          "answer": "It was interactive"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "Where did they go in the evening?",
+          "options": [
+            "To the subway",
+            "To a concert",
+            "To a rooftop park"
+          ],
+          "answer": "To a rooftop park"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What did they talk about at the end of the day?",
+          "options": [
+            "Food",
+            "School and memes",
+            "Books"
+          ],
+          "answer": "School and memes"
+        }
+      ]
+    },
+    {
+      "id": "a2_lesson_balancing_hobbies",
+      "title": "Balancing School and Hobbies",
+      "audio_file": "A2_03.mp3",
+      "questions": [
+        {
+          "type": "multiple_choice",
+          "question": "What club is Liam part of?",
+          "options": [
+            "Sports club",
+            "Art club",
+            "Coding club"
+          ],
+          "answer": "Coding club"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What kind of videos does Liam like to watch?",
+          "options": [
+            "Technology and gaming",
+            "Cooking",
+            "Travel"
+          ],
+          "answer": "Technology and gaming"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What does 'brainrot' mean in the text?",
+          "options": [
+            "Feeling very bored",
+            "Watching content too much",
+            "Playing too much sport"
+          ],
+          "answer": "Watching content too much"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What does Liam do to stay active?",
+          "options": [
+            "He plays basketball and goes for walks",
+            "He goes to the gym",
+            "He dances"
+          ],
+          "answer": "He plays basketball and goes for walks"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What does Liam try to do on weekends?",
+          "options": [
+            "Play video games all day",
+            "Study more",
+            "Balance screen time with other hobbies"
+          ],
+          "answer": "Balance screen time with other hobbies"
+        }
+      ]
+    }
+  ],
+  "B1": [
+    {
+      "id": "b1_lesson_study_abroad",
+      "title": "Studying Abroad in Spain",
+      "audio_file": "B1_01.mp3",
+      "questions": [
+        {
+          "type": "multiple_choice",
+          "question": "Where did the speaker study?",
+          "options": [
+            "Barcelona",
+            "Madrid",
+            "Valencia"
+          ],
+          "answer": "Madrid"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What was difficult at the beginning?",
+          "options": [
+            "Finding food",
+            "Making friends",
+            "Understanding the classes"
+          ],
+          "answer": "Understanding the classes"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "How did the speaker improve their Spanish?",
+          "options": [
+            "By watching TV",
+            "By practicing with classmates",
+            "By taking private lessons"
+          ],
+          "answer": "By practicing with classmates"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What did the speaker enjoy about Spanish culture?",
+          "options": [
+            "The early mornings",
+            "The quiet evenings",
+            "The social lifestyle and late dinners"
+          ],
+          "answer": "The social lifestyle and late dinners"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "How did the experience change the speaker?",
+          "options": [
+            "They want to move to Spain",
+            "They became more confident and open-minded",
+            "They decided not to study abroad again"
+          ],
+          "answer": "They became more confident and open-minded"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "How long did the study program last?",
+          "options": [
+            "Three months",
+            "One semester",
+            "One year"
+          ],
+          "answer": "One semester"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What was the biggest challenge with food?",
+          "options": [
+            "Too spicy",
+            "Different meal times",
+            "Not enough options"
+          ],
+          "answer": "Different meal times"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What advice does the speaker give?",
+          "options": [
+            "Stay in your comfort zone",
+            "Be open to new experiences",
+            "Only travel if you speak the language"
+          ],
+          "answer": "Be open to new experiences"
+        }
+      ]
+    },
+    {
+      "id": "b1_lesson_digital_detox",
+      "title": "Digital Detox Weekend",
+      "audio_file": "B1_02.mp3",
+      "questions": [
+        {
+          "type": "multiple_choice",
+          "question": "What did the speaker decide to do?",
+          "options": [
+            "Go hiking for the weekend",
+            "Turn off all digital devices",
+            "Travel to another city"
+          ],
+          "answer": "Turn off all digital devices"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What did they do during the detox?",
+          "options": [
+            "Watched TV",
+            "Went to the cinema",
+            "Read a book and went for walks"
+          ],
+          "answer": "Read a book and went for walks"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "How did the speaker feel at first?",
+          "options": [
+            "Relaxed and happy",
+            "Nervous and bored",
+            "Disconnected and anxious"
+          ],
+          "answer": "Disconnected and anxious"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What was one positive result of the detox?",
+          "options": [
+            "They got a new phone",
+            "They felt calmer and more focused",
+            "They missed their friends more"
+          ],
+          "answer": "They felt calmer and more focused"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What will the speaker do in the future?",
+          "options": [
+            "Have digital detoxes regularly",
+            "Stop using technology completely",
+            "Buy a new laptop"
+          ],
+          "answer": "Have digital detoxes regularly"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What did the speaker realize during the detox?",
+          "options": [
+            "They are addicted to chocolate",
+            "They use their phone out of habit",
+            "They prefer old movies"
+          ],
+          "answer": "They use their phone out of habit"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "How long did the detox last?",
+          "options": [
+            "24 hours",
+            "One weekend",
+            "One week"
+          ],
+          "answer": "One weekend"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "Who inspired the speaker to try the detox?",
+          "options": [
+            "A friend",
+            "A podcast",
+            "Their teacher"
+          ],
+          "answer": "A podcast"
+        }
+      ]
+    },
+    {
+      "id": "b1_lesson_first_job",
+      "title": "Starting My First Job",
+      "audio_file": "B1_03.mp3",
+      "questions": [
+        {
+          "type": "multiple_choice",
+          "question": "How old was the speaker when they got their first job?",
+          "options": [
+            "15",
+            "16",
+            "17"
+          ],
+          "answer": "17"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What kind of place did they work at?",
+          "options": [
+            "A supermarket",
+            "A clothing store",
+            "A café"
+          ],
+          "answer": "A café"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What happened on the first day?",
+          "options": [
+            "They arrived late",
+            "They forgot their apron",
+            "They spilled coffee"
+          ],
+          "answer": "They forgot their apron"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What did they learn from the job?",
+          "options": [
+            "Teamwork and responsibility",
+            "Advanced computer skills",
+            "Driving a car"
+          ],
+          "answer": "Teamwork and responsibility"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "How did the speaker feel about the experience?",
+          "options": [
+            "It wasn’t useful",
+            "It was one of the most important experiences",
+            "They wouldn’t do it again"
+          ],
+          "answer": "It was one of the most important experiences"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What did the speaker do with their first salary?",
+          "options": [
+            "Saved it",
+            "Bought a phone",
+            "Went shopping with friends"
+          ],
+          "answer": "Bought a phone"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What was the most difficult part of the job?",
+          "options": [
+            "Long hours",
+            "Dealing with angry customers",
+            "Cleaning up"
+          ],
+          "answer": "Dealing with angry customers"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "Who helped the speaker learn the job?",
+          "options": [
+            "Their friend",
+            "Their manager",
+            "Their sibling"
+          ],
+          "answer": "Their manager"
+        }
+      ]
+    }
+  ],
+  "B2": [
+    {
+      "id": "b2_lesson2",
+      "title": "The Choice That Changed Everything",
+      "audio_file": "B2_02.mp3",
+      "questions": [
+        {
+          "type": "multiple_choice",
+          "question": "What was Daniel's life like before his decision?",
+          "options": [
+            "Exciting and full of travel",
+            "Stable but uninspiring",
+            "Chaotic and unpredictable"
+          ],
+          "answer": [
+            "Stable but uninspiring"
+          ]
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What inspired Daniel to make a change?",
+          "options": [
+            "A motivational podcast",
+            "A group of people painting a mural",
+            "A conversation with his boss"
+          ],
+          "answer": "A group of people painting a mural"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What was Daniel’s first role in the art group?",
+          "options": [
+            "He painted the mural",
+            "He led the project",
+            "He helped with cleaning and setting up"
+          ],
+          "answer": "He helped with cleaning and setting up"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "Why did Daniel quit his job?",
+          "options": [
+            "He got a better offer from another company",
+            "He wanted to explore a new lifestyle",
+            "He was fired"
+          ],
+          "answer": "He wanted to explore a new lifestyle"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "How did Daniel support himself after quitting his job?",
+          "options": [
+            "He lived off his savings and freelanced",
+            "He moved in with his parents",
+            "He started a full-time business"
+          ],
+          "answer": "He lived off his savings and freelanced"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What did Daniel gain from joining the community art projects?",
+          "options": [
+            "Fame and money",
+            "A sense of connection and purpose",
+            "A full-time painting job"
+          ],
+          "answer": "A sense of connection and purpose"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What message does Daniel’s story try to convey?",
+          "options": [
+            "Success always comes from hard work in an office",
+            "Staying in your comfort zone is safest",
+            "Small steps can lead to big life changes"
+          ],
+          "answer": "Small steps can lead to big life changes"
+        }
+      ]
+    },
+    {
+      "id": "b2_lesson_tech_insider_report",
+      "title": "A Tech Insider’s Report",
+      "audio_file": "B2_03.mp3",
+      "questions": [
+        {
+          "type": "multiple_choice",
+          "question": "What was Daniel’s job at the tech company?",
+          "options": [
+            "Software developer",
+            "Marketing specialist",
+            "Customer support"
+          ],
+          "answer": "Software developer"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What kind of user data did the company collect?",
+          "options": [
+            "Only public posts",
+            "Private messages and location histories",
+            "Just user names"
+          ],
+          "answer": "Private messages and location histories"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What was the company’s main goal?",
+          "options": [
+            "Protect user privacy",
+            "Increase profit and user engagement",
+            "Improve user education"
+          ],
+          "answer": "Increase profit and user engagement"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What made Daniel start questioning his work?",
+          "options": [
+            "He didn’t like coding",
+            "He doubted the ethics of data use",
+            "He wanted a promotion"
+          ],
+          "answer": "He doubted the ethics of data use"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What educational platform inspired Daniel?",
+          "options": [
+            "Knowix",
+            "Facebook",
+            "Instagram"
+          ],
+          "answer": "Knowix"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What does Knowix focus on?",
+          "options": [
+            "Learning without intrusive ads or data tracking",
+            "Selling user data",
+            "Increasing social media followers"
+          ],
+          "answer": "Learning without intrusive ads or data tracking"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What does Daniel advise users and developers to do?",
+          "options": [
+            "Demand transparency and ethical practices",
+            "Ignore data privacy",
+            "Use as many apps as possible"
+          ],
+          "answer": "Demand transparency and ethical practices"
+        }
+      ]
+    },
+    {
+      "id": "b2_lesson_indian_scammer",
+      "title": "Confessions of an Indian Scammer",
+      "audio_file": "B2_01.mp3",
+      "questions": [
+        {
+          "type": "multiple_choice",
+          "question": "Why did Rakesh first join the call center?",
+          "options": [
+            "He wanted to learn English.",
+            "He was interested in computers.",
+            "He needed a job after college.",
+            "He wanted to move to another country."
+          ],
+          "answer": "He needed a job after college."
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What was part of the training in the scam center?",
+          "options": [
+            "Learning how to repair computers.",
+            "Practicing how to speak with an American accent.",
+            "Studying international law.",
+            "Using real Microsoft software."
+          ],
+          "answer": "Practicing how to speak with an American accent."
+        },
+        {
+          "type": "multiple_choice",
+          "question": "How did Rakesh feel after his first successful scam?",
+          "options": [
+            "Excited and proud.",
+            "Guilty but surprised by the money.",
+            "Angry at the system.",
+            "Confused and scared."
+          ],
+          "answer": "Guilty but surprised by the money."
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What fake name did Rakesh use?",
+          "options": [
+            "Rahul Sharma",
+            "Michael Johnson",
+            "Kevin Smith",
+            "Jason Patel"
+          ],
+          "answer": "Kevin Smith"
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What changed Rakesh's mind about scamming?",
+          "options": [
+            "He was caught by the police.",
+            "He wanted to earn more money honestly.",
+            "He received a call from his mother.",
+            "He heard a woman crying on the phone."
+          ],
+          "answer": "He heard a woman crying on the phone."
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What does Rakesh do now?",
+          "options": [
+            "He works at another call center.",
+            "He teaches kids how to code.",
+            "He became a police officer.",
+            "He started a chai business."
+          ],
+          "answer": "He teaches kids how to code."
+        },
+        {
+          "type": "multiple_choice",
+          "question": "What is the main message of Rakesh’s story?",
+          "options": [
+            "Scamming is a good way to make money.",
+            "Education is the key to success.",
+            "Easy money often comes at a personal cost.",
+            "Technology is dangerous."
+          ],
+          "answer": "Easy money often comes at a personal cost."
+        }
+      ]
+    }
+  ]
+}
