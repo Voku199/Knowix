@@ -9,6 +9,17 @@ at_on_bp = Blueprint("at_on", __name__, template_folder="templates")
 app.secret_key = os.getenv("SECRET_KEY")
 
 
+@at_on_bp.errorhandler(502)
+@at_on_bp.errorhandler(503)
+@at_on_bp.errorhandler(504)
+@at_on_bp.errorhandler(500)
+@at_on_bp.errorhandler(404)
+@at_on_bp.errorhandler(Exception)
+def server_error(e):
+    # vrátí stránku error.html s informací o výpadku
+    return render_template('error.html', error_code=e.code), e.code
+
+
 def load_exercises():
     with open("static/gram/at_on/at_on_exercises.json", encoding="utf-8") as f:
         return json.load(f)

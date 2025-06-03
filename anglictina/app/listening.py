@@ -7,6 +7,17 @@ listening_bp = Blueprint('listening_bp', __name__, template_folder='templates', 
 DATA_FILE = os.path.join(os.path.dirname(__file__), 'static', 'listening', 'listening_lesson.json')
 
 
+@listening_bp.errorhandler(502)
+@listening_bp.errorhandler(503)
+@listening_bp.errorhandler(504)
+@listening_bp.errorhandler(500)
+@listening_bp.errorhandler(404)
+@listening_bp.errorhandler(Exception)
+def server_error(e):
+    # vrátí stránku error.html s informací o výpadku
+    return render_template('error.html', error_code=e.code), e.code
+
+
 @listening_bp.route('/listening')
 def index():
     with open(DATA_FILE, 'r', encoding='utf-8') as f:

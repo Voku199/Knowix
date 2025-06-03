@@ -1,5 +1,5 @@
 from waitress import serve
-from flask import Flask, current_app
+from flask import Flask, current_app, render_template
 
 from auth import auth_bp
 from nepravidelna_slovesa import verbs_bp
@@ -41,6 +41,17 @@ app.register_blueprint(at_on_bp)
 app.register_blueprint(listening_bp)
 
 
+@app.errorhandler(502)
+@app.errorhandler(503)
+@app.errorhandler(504)
+@app.errorhandler(500)
+@app.errorhandler(404)
+@app.errorhandler(Exception)
+def server_error(e):
+    # vrátí stránku error.html s informací o výpadku
+    return render_template('error.html', error_code=e.code), e.code
+
+
 @app.after_request
 def add_security_headers(response):
     # ✅ Content Security Policy (CSP)
@@ -75,7 +86,11 @@ def add_security_headers(response):
 
 
 # app.run(port=5000) PRO LOCALNÍ SERVER
-# serve(app, host="0.0.0.0", port=8080) PRO SERVER
+
+# =====================================================
+# -------------------!!!SERVER!!!----------------------
+# =====================================================
+# serve(app, host="0.0.0.0", port=8080, threads=24) PRO SERVER
 
 if __name__ == "__main__":
-    serve(app, host="0.0.0.0", port=8080)
+    app.run(port=5000)

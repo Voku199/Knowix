@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Chyba {{ error_code or 'Error' }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;400&family=Fira+Mono&display=swap"
+          rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(120deg, #f8fafc 0%, #c3dafe 100%);
+            color: #222;
+            font-family: 'Montserrat', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .error-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(60, 60, 100, 0.18);
+            padding: 48px 32px 32px 32px;
+            text-align: center;
+            max-width: 420px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .error-illustration {
+            width: 120px;
+            margin: 0 auto 24px auto;
+            display: block;
+            animation: float 2.5s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+
+        .error-code {
+            font-size: 4.5rem;
+            font-family: 'Fira Mono', monospace;
+            font-weight: 700;
+            color: #e53e3e;
+            margin-bottom: 0.2em;
+            letter-spacing: 0.05em;
+            animation: pop 0.7s cubic-bezier(.68, -0.55, .27, 1.55);
+            text-shadow: 0 2px 12px #fbb6ce44;
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(0.7);
+            }
+            80% {
+                transform: scale(1.15);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .error-message {
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-bottom: 0.7em;
+            color: #2b6cb0;
+        }
+
+        .error-desc {
+            color: #555;
+            margin-bottom: 2em;
+            font-size: 1.05rem;
+        }
+
+        a.button {
+            display: inline-block;
+            padding: 0.85em 2.2em;
+            background: linear-gradient(90deg, #4299e1 0%, #805ad5 100%);
+            color: #fff;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px #4299e133;
+            transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+            border: none;
+            outline: none;
+        }
+
+        a.button:hover {
+            background: linear-gradient(90deg, #805ad5 0%, #4299e1 100%);
+            transform: translateY(-2px) scale(1.04) rotate(-1deg);
+            box-shadow: 0 6px 18px #805ad544;
+        }
+
+        @media (max-width: 500px) {
+            .error-container {
+                padding: 32px 8vw 24px 8vw;
+                max-width: 98vw;
+            }
+
+            .error-illustration {
+                width: 80px;
+            }
+
+            .error-code {
+                font-size: 2.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="error-container">
+    <svg class="error-illustration" viewBox="0 0 120 120" fill="none">
+        <ellipse cx="60" cy="100" rx="38" ry="10" fill="#e2e8f0"/>
+        <circle cx="60" cy="60" r="40" fill="#bee3f8"/>
+        <ellipse cx="60" cy="60" rx="28" ry="18" fill="#fff" opacity="0.8"/>
+        <ellipse cx="60" cy="60" rx="18" ry="10" fill="#90cdf4" opacity="0.7"/>
+        <rect x="48" y="48" width="24" height="6" rx="3" fill="#e53e3e" transform="rotate(10 60 51)"/>
+        <rect x="48" y="66" width="24" height="6" rx="3" fill="#e53e3e" transform="rotate(-10 60 69)"/>
+        <circle cx="50" cy="58" r="3" fill="#2b6cb0"/>
+        <circle cx="70" cy="58" r="3" fill="#2b6cb0"/>
+    </svg>
+    <div class="error-code">{{ error_code or 'Error' }}</div>
+    <div class="error-message">
+        {% if error_code == 404 %}
+        Stránka nebyla nalezena
+        {% elif error_code == 500 %}
+        Interní chyba serveru
+        {% elif error_code == 502 %}
+        Server je dočasně nedostupný (Bad Gateway)
+        {% elif error_code == 503 %}
+        Služba není dostupná (Service Unavailable)
+        {% elif error_code == 504 %}
+        Vypršel časový limit serveru (Gateway Timeout)
+        {% else %}
+        Došlo k neočekávané chybě
+        {% endif %}
+    </div>
+    <div class="error-desc">
+        Omlouváme se, ale při zpracování vašeho požadavku došlo k chybě.<br>
+        Zkuste to prosím později nebo se vraťte na hlavní stránku.
+    </div>
+    <a href="/" class="button">Zpět na hlavní stránku</a>
+</div>
+</body>
+</html>

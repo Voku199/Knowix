@@ -5,6 +5,17 @@ from auth import get_db_connection
 news_bp = Blueprint('news', __name__, template_folder='templates')
 
 
+@news_bp.errorhandler(502)
+@news_bp.errorhandler(503)
+@news_bp.errorhandler(504)
+@news_bp.errorhandler(500)
+@news_bp.errorhandler(404)
+@news_bp.errorhandler(Exception)
+def server_error(e):
+    # vrátí stránku error.html s informací o výpadku
+    return render_template('error.html', error_code=e.code), e.code
+
+
 # Třídy modelů
 class User:
     @staticmethod

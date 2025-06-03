@@ -6,6 +6,17 @@ from auth import get_db_connection
 hangman_bp = Blueprint("hangman", __name__, template_folder="templates")
 
 
+@hangman_bp.errorhandler(502)
+@hangman_bp.errorhandler(503)
+@hangman_bp.errorhandler(504)
+@hangman_bp.errorhandler(500)
+@hangman_bp.errorhandler(404)
+@hangman_bp.errorhandler(Exception)
+def server_error(e):
+    # vrátí stránku error.html s informací o výpadku
+    return render_template('error.html', error_code=e.code), e.code
+
+
 def load_words():
     with open("static/hangman/hangman_words.json", "r", encoding="utf-8") as f:
         return json.load(f)

@@ -9,6 +9,17 @@ import os
 chat_bp = Blueprint("chat_bp", __name__)
 
 
+@chat_bp.errorhandler(502)
+@chat_bp.errorhandler(503)
+@chat_bp.errorhandler(504)
+@chat_bp.errorhandler(500)
+@chat_bp.errorhandler(404)
+@chat_bp.errorhandler(Exception)
+def server_error(e):
+    # vrátí stránku error.html s informací o výpadku
+    return render_template('error.html', error_code=e.code), e.code
+
+
 # Načtení lekce z JSON
 
 

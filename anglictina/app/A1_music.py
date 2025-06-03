@@ -12,6 +12,17 @@ import re
 exercises_bp = Blueprint('exercises', __name__, template_folder='templates')
 
 
+@exercises_bp.errorhandler(502)
+@exercises_bp.errorhandler(503)
+@exercises_bp.errorhandler(504)
+@exercises_bp.errorhandler(500)
+@exercises_bp.errorhandler(404)
+@exercises_bp.errorhandler(Exception)
+def server_error(e):
+    # vrátí stránku error.html s informací o výpadku
+    return render_template('error.html', error_code=e.code), e.code
+
+
 def normalize(text):
     text = unicodedata.normalize('NFKD', text)
     text = text.encode('ascii', 'ignore').decode('utf-8').lower()

@@ -10,6 +10,17 @@ with open('verbs.json', 'r') as f:
     verbs_data = json.load(f)
 
 
+@verbs_bp.errorhandler(502)
+@verbs_bp.errorhandler(503)
+@verbs_bp.errorhandler(504)
+@verbs_bp.errorhandler(500)
+@verbs_bp.errorhandler(404)
+@verbs_bp.errorhandler(Exception)
+def server_error(e):
+    # vrátí stránku error.html s informací o výpadku
+    return render_template('error.html', error_code=e.code), e.code
+
+
 # Pomocné funkce
 def generate_test(verb):
     # Find matching verb in all forms

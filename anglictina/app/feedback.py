@@ -5,6 +5,17 @@ from auth import get_db_connection
 feedback_bp = Blueprint('feedback', __name__)
 
 
+@feedback_bp.errorhandler(502)
+@feedback_bp.errorhandler(503)
+@feedback_bp.errorhandler(504)
+@feedback_bp.errorhandler(500)
+@feedback_bp.errorhandler(404)
+@feedback_bp.errorhandler(Exception)
+def server_error(e):
+    # vrátí stránku error.html s informací o výpadku
+    return render_template('error.html', error_code=e.code), e.code
+
+
 @feedback_bp.route('/get_feedbacks', methods=['GET'])
 def get_feedbacks():
     conn = None

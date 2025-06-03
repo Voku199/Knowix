@@ -16,6 +16,17 @@ auth_bp = Blueprint('auth', __name__)
 user_settings = {}
 
 
+@auth_bp.errorhandler(502)
+@auth_bp.errorhandler(503)
+@auth_bp.errorhandler(504)
+@auth_bp.errorhandler(500)
+@auth_bp.errorhandler(404)
+@auth_bp.errorhandler(Exception)
+def server_error(e):
+    # vrátí stránku error.html s informací o výpadku
+    return render_template('error.html', error_code=e.code), e.code
+
+
 # Pomocné funkce
 def get_db_connection():
     return mysql.connector.connect(
