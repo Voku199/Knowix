@@ -1,5 +1,6 @@
 from waitress import serve
 from flask import Flask, current_app
+
 from auth import auth_bp
 from nepravidelna_slovesa import verbs_bp
 from main_routes import main_bp
@@ -11,6 +12,7 @@ from news import news_bp
 from present_perfect import chat_bp
 from at_on import at_on_bp
 from listening import listening_bp
+from flask import after_this_request
 
 import os
 from dotenv import load_dotenv
@@ -38,8 +40,42 @@ app.register_blueprint(chat_bp)
 app.register_blueprint(at_on_bp)
 app.register_blueprint(listening_bp)
 
+
+@app.after_request
+def add_security_headers(response):
+    # ✅ Content Security Policy (CSP)
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline'; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+        "font-src 'self' https://fonts.gstatic.com; "
+        "img-src 'self' data:; "
+        "frame-ancestors 'none';"
+    )
+
+    # ✅ HTTP Strict Transport Security (HSTS)
+    response.headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload'
+
+    # ✅ X-Frame-Options – ochrana proti clickjackingu
+    response.headers['X-Frame-Options'] = 'DENY'
+
+    # ✅ Cross-Origin Opener Policy
+    response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
+
+    # ✅ Cross-Origin Resource Policy
+    response.headers['Cross-Origin-Resource-Policy'] = 'same-origin'
+
+    # ✅ X-Content-Type-Options
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+
+    # ✅ Referrer Policy
+    response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
+
+    return response
+
+
 # app.run(port=5000) PRO LOCALNÍ SERVER
 # serve(app, host="0.0.0.0", port=8080) PRO SERVER
 
 if __name__ == "__main__":
-    serve(app, host="0.0.0.0", port=8080)
+    app.run(port=5000)

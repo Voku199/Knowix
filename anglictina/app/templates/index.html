@@ -3,9 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Procvičuj si angličtinu zábavně s Knowixem – chaty, písničky, překlady a hry.">
+
     <title>Knowix - ALPHA VERZE</title>
     <link rel="stylesheet" href="/static/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Preconnect zrychlí DNS a spojení -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Font načti až po načtení stránky -->
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    </noscript>
+
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
     <!-- Google tag (gtag.js) -->
@@ -86,7 +99,7 @@
 <header>
     <div class="logo">
         <a href="{{ url_for('main.index') }}">
-            <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+            <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
         </a>
     </div>
     <nav>
@@ -102,7 +115,7 @@
                         <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
                              alt="Profilová fotka" width="64" class="profile-pic">
                         {% else %}
-                        <img src="{{ url_for('static', filename='pic/default.jpg') }}" alt="Defaultní profilovka"
+                        <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
                              class="profile-pic" id="profileMenuTrigger">
                         {% endif %}
                         <div class="profile-menu" id="profileMenu">
@@ -136,14 +149,14 @@
 
     <section class="info">
         <div class="bubble">
-            <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+            <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
             <div class="bubble-text">
                 <h3>Kdo vytvořil Knowix?</h3>
                 <p>Vytvořil žák Vojtěch Kurinec</p>
             </div>
         </div>
         <div class="bubble">
-            <img src="{{ url_for('static', filename='pic/introicon-hra.png') }}" alt="Knowix Logo">
+            <img src="{{ url_for('static', filename='pic/introicon-hra.webp') }}" alt="Knowix Logo">
             <div class="bubble-text">
                 <h3>Proč jsem to udělal?</h3>
                 <p>Inspiroval jsem se od táty.</p>
@@ -152,7 +165,7 @@
             </div>
         </div>
         <div class="bubble">
-            <img src="{{ url_for('static', filename='pic/proc.png') }}" alt="Knowix Logo">
+            <img src="{{ url_for('static', filename='pic/proc.webp') }}" alt="Knowix Logo">
             <div class="bubble-text">
                 <h3>Efektivita</h3>
                 <p>Jsou zde nepravidelná slovesa, která se učí ve škole.</p>
@@ -160,14 +173,14 @@
             </div>
         </div>
         <div class="bubble">
-            <img src="{{ url_for('static', filename='pic/introicon-skola.png') }}" alt="Knowix Logo">
+            <img src="{{ url_for('static', filename='pic/introicon-skola.webp') }}" alt="Knowix Logo">
             <div class="bubble-text">
                 <h3>Zdarma</h3>
                 <p>Všechno by bylo zdarma... Zbytečnost kupovat licence...</p>
             </div>
         </div>
         <div class="bubble support-bubble" onclick="window.open('https://ko-fi.com/voku199', '_blank')">
-            <img src="{{ url_for('static', filename='pic/support.png') }}" alt="Podpora">
+            <img src="{{ url_for('static', filename='pic/support.webp') }}" alt="Podpora">
             <div class="bubble-text">
                 <h3>Podpora</h3>
                 <p>Chceš mě finančně podpořit? Klikni na to 😊</p>

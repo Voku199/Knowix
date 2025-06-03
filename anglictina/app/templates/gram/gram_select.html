@@ -5,14 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Knowix - Angličtina</title>
     <link rel="stylesheet" href="/static/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Preconnect zrychlí DNS a spojení -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Font načti až po načtení stránky -->
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    </noscript>
+
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-W1EN990JKP');
+    </script>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
     <div class="logo">
         <a href="{{ url_for('main.index') }}">
-            <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo">
+            <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
         </a>
     </div>
     <nav>
@@ -28,7 +53,7 @@
                         <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
                              alt="Profilová fotka" width="64" class="profile-pic">
                         {% else %}
-                        <img src="{{ url_for('static', filename='pics/default.jpg') }}" alt="Defaultní profilovka"
+                        <img src="{{ url_for('static', filename='pics/default.webp') }}" alt="Defaultní profilovka"
                              class="profile-pic" id="profileMenuTrigger">
                         {% endif %}
                         <div class="profile-menu" id="profileMenu">
@@ -60,14 +85,14 @@
     <section class="info">
         <!-- Nepravidelná slovesa -->
         <a href="/sl_chat" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/present_perfect.png') }}" alt="Slovesa">
+            <img src="{{ url_for('static', filename='pic/present_perfect.webp') }}" alt="Slovesa">
             <div class="bubble-text">
                 <h3>Present Perfect</h3>
                 <p style="color: inherit;">Procvičování rozdílů mezi předpřítomným a minulým časem.</p>
             </div>
         </a>
         <a href="/at-on/fill-word" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/at_on_in.png') }}" alt="Slovesa">
+            <img src="{{ url_for('static', filename='pic/at_on_in.webp') }}" alt="Slovesa">
             <div class="bubble-text">
                 <h3>Předložky času a místa (in/on/at)</h3>
                 <p style="color: inherit;">Procvičování správného použití předložek jako in, on, at v čase a místě.</p>
@@ -83,7 +108,7 @@
         <!--        </a>-->
 
         <a href="/anglictina/test" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/nep_sl.png') }}" alt="Slovesa">
+            <img src="{{ url_for('static', filename='pic/nep_sl.webp') }}" alt="Slovesa">
             <div class="bubble-text">
                 <h3>Nepravidelná slovesa</h3>
                 <p style="color: inherit;">Procvič si všechny tři formy nepravidelných sloves!</p>

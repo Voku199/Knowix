@@ -5,7 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Knowix - Chat lekce</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
-    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"/>
+    <!-- Preconnect zrychlí DNS a spojení -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Font načti až po načtení stránky -->
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    </noscript>
+
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-W1EN990JKP');
+    </script>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
     <style>
@@ -245,7 +270,7 @@
 <header>
     <div class="logo">
         <a href="{{ url_for('main.index') }}">
-            <img src="{{ url_for('static', filename='pic/logo.jpg') }}" alt="Knowix Logo"/>
+            <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo"/>
         </a>
     </div>
     <nav>
@@ -261,7 +286,7 @@
                         <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
                              alt="Profilová fotka" width="64" class="profile-pic"/>
                         {% else %}
-                        <img src="{{ url_for('static', filename='pic/default.jpg') }}" alt="Defaultní profilovka"
+                        <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
                              width="64"
                              class="profile-pic" id="profileMenuTrigger"/>
                         {% endif %}
