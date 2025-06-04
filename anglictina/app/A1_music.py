@@ -10,6 +10,7 @@ import random
 import unicodedata
 import re
 from concurrent.futures import ThreadPoolExecutor
+from collections import deque
 
 # --- ČTENÍ LYRICS Z JSON SOUBORU ---
 LYRICS_JSON_DIR = os.path.join(os.path.dirname(__file__), 'static/music/lyrics_json')
@@ -41,7 +42,9 @@ exercises_bp = Blueprint('exercises', __name__, template_folder='templates')
 @exercises_bp.errorhandler(404)
 @exercises_bp.errorhandler(Exception)
 def server_error(e):
-    return render_template('error.html', error_code=e.code), e.code
+    # Oprava: bezpečně získat error_code, pokud existuje, jinak 500
+    error_code = getattr(e, "code", 500)
+    return render_template('error.html', error_code=error_code), error_code
 
 
 def normalize(text):
@@ -71,25 +74,36 @@ def song_selection():
 
 
 # --- FRONTOVÁNÍ uživatelů pro endpoint /exercise/<int:song_id> ---
-from collections import deque
-
 exercise_lock = Lock()
 exercise_queue = deque()
 
 
 def get_user_id():
     # Vrací unikátní identifikátor pro každého uživatele (přihlášený i anonymní)
-    # Nejprve user_id, pak user_name, pak session sid, nakonec IP
     if "user_id" in session:
         return f"user_{session['user_id']}"
     if "user_name" in session:
         return f"name_{session['user_name']}"
-    # Flask session sid (unikátní pro každého návštěvníka)
     sid = session.get('_id')
     if sid:
         return f"sid_{sid}"
-    # fallback na IP adresu
     return f"ip_{request.remote_addr}"
+
+
+def translate_line_with_retry(translator, line, target_lang='CS', retries=3, delay=2):
+    for attempt in range(retries):
+        try:
+            result = translator.translate_text(line, target_lang=target_lang).text
+            print(f"Překlad: '{line}' -> '{result}'")
+            return result
+        except Exception as exc:
+            print(f"Chyba při překladu řádku '{line}': {exc}")
+            if "Too many requests" in str(exc) or "high load" in str(exc):
+                if attempt < retries - 1:
+                    time.sleep(delay)
+                    continue
+            return f"[Nepřeloženo] {line}"
+    return f"[Nepřeloženo] {line}"
 
 
 @exercises_bp.route('/exercise/<int:song_id>', methods=['GET'])
@@ -98,23 +112,23 @@ def exercise(song_id):
     queue_timeout = 30  # maximální čekání ve frontě v sekundách
     wait_interval = 0.5  # jak často kontrolovat frontu
 
-    # Přidáme uživatele do fronty
     exercise_queue.append(user_id)
     start_time = time.time()
 
     try:
-        # Čekáme, dokud nejsme první ve frontě a lock není volný
         while True:
-            if exercise_queue[0] == user_id and exercise_lock.acquire(blocking=False):
-                break  # jsme na řadě a máme lock
+            if exercise_queue and exercise_queue[0] == user_id and exercise_lock.acquire(blocking=False):
+                break
             if time.time() - start_time > queue_timeout:
-                # Timeout, smažeme se z fronty a vrátíme info uživateli
-                exercise_queue.remove(user_id)
+                if user_id in exercise_queue:
+                    try:
+                        exercise_queue.remove(user_id)
+                    except ValueError:
+                        pass
                 return render_template('music/wait.html', wait=True,
                                        message="Je tu hodně lidí, zkus to za chvíli znovu."), 429
             time.sleep(wait_interval)
 
-        # --- ČTI LYRICS Z JSON SOUBORU ---
         try:
             song_info = current_app.songs[song_id]
         except IndexError:
@@ -137,15 +151,6 @@ def exercise(song_id):
         if len(valid_lines) < 3:
             return "Příliš málo validních řádků v textu písně.", 400
 
-        def translate_line(translator, line, target_lang='CS'):
-            try:
-                result = translator.translate_text(line, target_lang=target_lang).text
-                print(f"Překlad: '{line}' -> '{result}'")
-                return result
-            except Exception as exc:
-                print(f"Chyba při překladu řádku '{line}': {exc}")
-                return f"[Nepřeloženo] {line}"
-
         missing_exercises_lines = random.sample(valid_lines, min(3, len(valid_lines)))
         translation_exercises_lines = random.sample(list(set(valid_lines) - set(missing_exercises_lines)),
                                                     min(3, len(valid_lines) - len(missing_exercises_lines)))
@@ -155,9 +160,11 @@ def exercise(song_id):
 
         translator = current_app.translator
 
-        with ThreadPoolExecutor(max_workers=len(all_lines_to_translate)) as executor:
+        # Omezíme paralelní překlady na 2, aby DeepL tolik nehlásil throttling
+        max_workers = min(2, len(all_lines_to_translate))
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_line = {
-                executor.submit(translate_line, translator, line, 'CS'): line
+                executor.submit(translate_line_with_retry, translator, line, 'CS'): line
                 for line in all_lines_to_translate
             }
             for future in future_to_line:
@@ -225,8 +232,12 @@ def exercise(song_id):
             }
         )
     finally:
+        # Oprava: bezpečně odstraň user_id z fronty
         if user_id in exercise_queue:
-            exercise_queue.remove(user_id)
+            try:
+                exercise_queue.remove(user_id)
+            except ValueError:
+                pass
         if exercise_lock.locked():
             try:
                 exercise_lock.release()
