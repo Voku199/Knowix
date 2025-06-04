@@ -1,5 +1,6 @@
 import os
 import json
+import time
 from threading import Lock
 from flask import Blueprint, render_template, request, jsonify, current_app, session
 from auth import get_db_connection
@@ -27,7 +28,7 @@ def get_lyrics_from_json(song_info):
         lyrics_lines = data.get('lyrics')
         if not lyrics_lines or not isinstance(lyrics_lines, list):
             return None
-        return lyrics_lines  # Vracíme rovnou pole řádků
+        return lyrics_lines
 
 
 exercises_bp = Blueprint('exercises', __name__, template_folder='templates')
@@ -69,124 +70,168 @@ def song_selection():
     return render_template('music/index.html', songs=current_app.songs)
 
 
+# --- FRONTOVÁNÍ uživatelů pro endpoint /exercise/<int:song_id> ---
+from collections import deque
+
+exercise_lock = Lock()
+exercise_queue = deque()
+
+
+def get_user_id():
+    # Vrací unikátní identifikátor pro každého uživatele (přihlášený i anonymní)
+    # Nejprve user_id, pak user_name, pak session sid, nakonec IP
+    if "user_id" in session:
+        return f"user_{session['user_id']}"
+    if "user_name" in session:
+        return f"name_{session['user_name']}"
+    # Flask session sid (unikátní pro každého návštěvníka)
+    sid = session.get('_id')
+    if sid:
+        return f"sid_{sid}"
+    # fallback na IP adresu
+    return f"ip_{request.remote_addr}"
+
+
 @exercises_bp.route('/exercise/<int:song_id>', methods=['GET'])
 def exercise(song_id):
+    user_id = get_user_id()
+    queue_timeout = 30  # maximální čekání ve frontě v sekundách
+    wait_interval = 0.5  # jak často kontrolovat frontu
+
+    # Přidáme uživatele do fronty
+    exercise_queue.append(user_id)
+    start_time = time.time()
+
     try:
-        song_info = current_app.songs[song_id]
-    except IndexError:
-        return "Neplatné ID písničky", 404
+        # Čekáme, dokud nejsme první ve frontě a lock není volný
+        while True:
+            if exercise_queue[0] == user_id and exercise_lock.acquire(blocking=False):
+                break  # jsme na řadě a máme lock
+            if time.time() - start_time > queue_timeout:
+                # Timeout, smažeme se z fronty a vrátíme info uživateli
+                exercise_queue.remove(user_id)
+                return render_template('music/wait.html', wait=True,
+                                       message="Je tu hodně lidí, zkus to za chvíli znovu."), 429
+            time.sleep(wait_interval)
 
-    # --- ČTI LYRICS Z JSON SOUBORU ---
-    lyrics_lines = get_lyrics_from_json(song_info)
-    if lyrics_lines is None:
-        return "Text písně nebyl nalezen v JSON souboru.", 404
-
-    # 🧽 Filtrace řádků – odstraníme jen opravdu prázdné nebo zjevně nevhodné řádky
-    def is_valid_lyric_line(line):
-        line = line.strip()
-        if not line:
-            return False
-        if line.startswith('[') and line.endswith(']'):
-            return False
-        if len(line.split()) < 2:  # povolíme i krátké řádky, ale ne jednoslovné
-            return False
-        return True
-
-    valid_lines = [line for line in lyrics_lines if is_valid_lyric_line(line)]
-
-    if len(valid_lines) < 3:
-        return "Příliš málo validních řádků v textu písně.", 400
-
-    # --- Překlad přes DeepL (paralelně, BEZ current_app v threadu) ---
-    def translate_line(translator, line, target_lang='CS'):
+        # --- ČTI LYRICS Z JSON SOUBORU ---
         try:
-            return translator.translate_text(line, target_lang=target_lang).text
-        except Exception as exc:
-            print(f"Chyba při překladu řádku '{line}': {exc}")
-            return f"[Nepřeloženo] {line}"
+            song_info = current_app.songs[song_id]
+        except IndexError:
+            return "Neplatné ID písničky", 404
 
-    missing_exercises_lines = random.sample(valid_lines, min(3, len(valid_lines)))
-    translation_exercises_lines = random.sample(list(set(valid_lines) - set(missing_exercises_lines)),
-                                                min(3, len(valid_lines) - len(missing_exercises_lines)))
+        lyrics_lines = get_lyrics_from_json(song_info)
+        if lyrics_lines is None:
+            return "Text písně nebyl nalezen v JSON souboru.", 404
 
-    all_lines_to_translate = missing_exercises_lines + translation_exercises_lines
-    translations = {}
+        def is_valid_lyric_line(line):
+            line = line.strip()
+            if not line:
+                return False
+            if line.startswith('[') and line.endswith(']'):
+                return False
+            return True
 
-    translator = current_app.translator
+        valid_lines = [line for line in lyrics_lines if is_valid_lyric_line(line)]
 
-    with ThreadPoolExecutor(max_workers=6) as executor:
-        future_to_line = {
-            executor.submit(translate_line, translator, line, 'CS'): line
-            for line in all_lines_to_translate
-        }
-        for future in future_to_line:
-            line = future_to_line[future]
+        if len(valid_lines) < 3:
+            return "Příliš málo validních řádků v textu písně.", 400
+
+        def translate_line(translator, line, target_lang='CS'):
             try:
-                translations[line] = future.result()
+                result = translator.translate_text(line, target_lang=target_lang).text
+                print(f"Překlad: '{line}' -> '{result}'")
+                return result
             except Exception as exc:
-                translations[line] = f"[Nepřeloženo] {line}"
                 print(f"Chyba při překladu řádku '{line}': {exc}")
+                return f"[Nepřeloženo] {line}"
 
-    # 🎯 Doplňovačky
-    missing_exercises = []
-    for line in missing_exercises_lines:
-        words = line.split()
-        missing_word = random.choice(words)
-        missing_exercises.append({
-            'original': line,
-            'with_blank': line.replace(missing_word, '_____'),
-            'missing_word': missing_word,
-            'translated': translations.get(line, f"[Nepřeloženo] {line}")
-        })
+        missing_exercises_lines = random.sample(valid_lines, min(3, len(valid_lines)))
+        translation_exercises_lines = random.sample(list(set(valid_lines) - set(missing_exercises_lines)),
+                                                    min(3, len(valid_lines) - len(missing_exercises_lines)))
 
-    # 📘 Překlady
-    translation_exercises = [
-        {
-            'original': line,
-            'translated': translations.get(line, f"[Nepřeloženo] {line}")
-        }
-        for line in translation_exercises_lines
-    ]
+        all_lines_to_translate = missing_exercises_lines + translation_exercises_lines
+        translations = {}
 
-    # 🧠 Slovní páry
-    current_word_pairs = current_app.word_pairs.get(song_info['title'], {})
-    selected_pairs = random.sample(list(current_word_pairs.items()), min(6, len(current_word_pairs)))
-    bidirectional_pairs = {**dict(selected_pairs), **{v: k for k, v in selected_pairs}}
+        translator = current_app.translator
 
-    session['missing_exercises'] = missing_exercises
-    session['translation_exercises'] = translation_exercises
-    session['current_exercise_pairs'] = dict(selected_pairs)
-    english_words = [en for en, cs in selected_pairs]
-    czech_words = [cs for en, cs in selected_pairs]
-    random.shuffle(english_words)
-    random.shuffle(czech_words)
+        with ThreadPoolExecutor(max_workers=len(all_lines_to_translate)) as executor:
+            future_to_line = {
+                executor.submit(translate_line, translator, line, 'CS'): line
+                for line in all_lines_to_translate
+            }
+            for future in future_to_line:
+                line = future_to_line[future]
+                try:
+                    translations[line] = future.result()
+                except Exception as exc:
+                    translations[line] = f"[Nepřeloženo] {line}"
+                    print(f"Chyba při překladu řádku '{line}': {exc}")
 
-    # 🎵 LRC synchronizovaný text (volitelné)
-    lrc_content = ''
-    lrc_path = os.path.join(current_app.static_folder, 'music/audio/lyrics', song_info.get('lyrics_file', ''))
-    if os.path.exists(lrc_path):
-        with open(lrc_path, 'r', encoding='utf-8') as f:
-            lrc_content = f.read()
+        missing_exercises = []
+        for line in missing_exercises_lines:
+            words = line.split()
+            missing_word = random.choice(words)
+            missing_exercises.append({
+                'original': line,
+                'with_blank': line.replace(missing_word, '_____'),
+                'missing_word': missing_word,
+                'translated': translations.get(line, f"[Nepřeloženo] {line}")
+            })
 
-    return render_template(
-        'music/exercises.html',
-        missing_exercises=missing_exercises,
-        translation_exercises=translation_exercises,
-        english_words=english_words,
-        czech_words=czech_words,
-        word_pairs=dict(selected_pairs),
-        audio_file=song_info['audio_file'],
-        song_title=song_info["title"],
-        lrc_lyrics=lrc_content,
-        user_name=session.get("user_name"),
-        profile_pic=session.get("profile_pic", "default.jpg"),
-        config={
-            'song_title': song_info['title'],
-            'word_pairs': bidirectional_pairs,
-            'missing_exercises': [ex['missing_word'] for ex in missing_exercises],
-            'translation_exercises': [ex['translated'] for ex in translation_exercises]
-        }
-    )
+        translation_exercises = [
+            {
+                'original': line,
+                'translated': translations.get(line, f"[Nepřeloženo] {line}")
+            }
+            for line in translation_exercises_lines
+        ]
+
+        current_word_pairs = current_app.word_pairs.get(song_info['title'], {})
+        selected_pairs = random.sample(list(current_word_pairs.items()), min(6, len(current_word_pairs)))
+        bidirectional_pairs = {**dict(selected_pairs), **{v: k for k, v in selected_pairs}}
+
+        session['missing_exercises'] = missing_exercises
+        session['translation_exercises'] = translation_exercises
+        session['current_exercise_pairs'] = dict(selected_pairs)
+        english_words = [en for en, cs in selected_pairs]
+        czech_words = [cs for en, cs in selected_pairs]
+        random.shuffle(english_words)
+        random.shuffle(czech_words)
+
+        lrc_content = ''
+        lrc_path = os.path.join(current_app.static_folder, 'music/audio/lyrics', song_info.get('lyrics_file', ''))
+        if os.path.exists(lrc_path):
+            with open(lrc_path, 'r', encoding='utf-8') as f:
+                lrc_content = f.read()
+
+        return render_template(
+            'music/exercises.html',
+            missing_exercises=missing_exercises,
+            translation_exercises=translation_exercises,
+            english_words=english_words,
+            czech_words=czech_words,
+            word_pairs=dict(selected_pairs),
+            audio_file=song_info['audio_file'],
+            song_title=song_info["title"],
+            lrc_lyrics=lrc_content,
+            user_name=session.get("user_name"),
+            profile_pic=session.get("profile_pic", "default.jpg"),
+            config={
+                'song_title': song_info['title'],
+                'word_pairs': bidirectional_pairs,
+                'missing_exercises': [ex['missing_word'] for ex in missing_exercises],
+                'translation_exercises': [ex['translated'] for ex in translation_exercises]
+            }
+        )
+    finally:
+        if user_id in exercise_queue:
+            exercise_queue.remove(user_id)
+        if exercise_lock.locked():
+            try:
+                exercise_lock.release()
+            except RuntimeError:
+                pass
 
 
 @exercises_bp.route('/check-answer', methods=['POST'])

@@ -90,7 +90,7 @@ def add_security_headers(response):
 # =====================================================
 # -------------------!!!SERVER!!!----------------------
 # =====================================================
-# serve(app, host="0.0.0.0", port=8080, threads=24) PRO SERVER
+# serve(app, host="0.0.0.0", port=8080, threads=32) PRO SERVER
 
 if __name__ == "__main__":
-    serve(app, host="0.0.0.0", port=8080, threads=24)
+    serve(app, host="0.0.0.0", port=8080, threads=32)

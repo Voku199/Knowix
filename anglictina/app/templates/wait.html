@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Chvilku strpení...</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;400&family=Fira+Mono&display=swap"
+          rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(120deg, #f8fafc 0%, #c3dafe 100%);
+            color: #222;
+            font-family: 'Montserrat', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .wait-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(60, 60, 100, 0.18);
+            padding: 48px 32px 32px 32px;
+            text-align: center;
+            max-width: 420px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wait-illustration {
+            width: 120px;
+            margin: 0 auto 24px auto;
+            display: block;
+            animation: float 2.5s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+
+        .wait-title {
+            font-size: 2.2rem;
+            font-family: 'Fira Mono', monospace;
+            font-weight: 700;
+            color: #4299e1;
+            margin-bottom: 0.5em;
+            letter-spacing: 0.05em;
+            animation: pop 0.7s cubic-bezier(.68, -0.55, .27, 1.55);
+            text-shadow: 0 2px 12px #bee3f844;
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(0.7);
+            }
+            80% {
+                transform: scale(1.15);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .wait-message {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.2em;
+            color: #2b6cb0;
+        }
+
+        .wait-desc {
+            color: #555;
+            margin-bottom: 2em;
+            font-size: 1.05rem;
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #4299e1;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5em auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        a.button {
+            display: inline-block;
+            padding: 0.85em 2.2em;
+            background: linear-gradient(90deg, #4299e1 0%, #805ad5 100%);
+            color: #fff;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px #4299e133;
+            transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+            border: none;
+            outline: none;
+        }
+
+        a.button:hover {
+            background: linear-gradient(90deg, #805ad5 0%, #4299e1 100%);
+            transform: translateY(-2px) scale(1.04) rotate(-1deg);
+            box-shadow: 0 6px 18px #805ad544;
+        }
+
+        @media (max-width: 500px) {
+            .wait-container {
+                padding: 32px 8vw 24px 8vw;
+                max-width: 98vw;
+            }
+
+            .wait-illustration {
+                width: 80px;
+            }
+
+            .wait-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="wait-container">
+    <svg class="wait-illustration" viewBox="0 0 120 120" fill="none">
+        <ellipse cx="60" cy="100" rx="38" ry="10" fill="#e2e8f0"/>
+        <circle cx="60" cy="60" r="40" fill="#bee3f8"/>
+        <ellipse cx="60" cy="60" rx="28" ry="18" fill="#fff" opacity="0.8"/>
+        <ellipse cx="60" cy="60" rx="18" ry="10" fill="#90cdf4" opacity="0.7"/>
+        <rect x="48" y="48" width="24" height="6" rx="3" fill="#4299e1" transform="rotate(10 60 51)"/>
+        <rect x="48" y="66" width="24" height="6" rx="3" fill="#4299e1" transform="rotate(-10 60 69)"/>
+        <circle cx="50" cy="58" r="3" fill="#2b6cb0"/>
+        <circle cx="70" cy="58" r="3" fill="#2b6cb0"/>
+    </svg>
+    <div class="wait-title">Chvilku strpení...</div>
+    <div class="wait-message">
+        {{ message or "Někdo právě generuje cvičení. Jakmile bude hotovo, pustíme tě dál!" }}
+    </div>
+    <div class="spinner"></div>
+    <div class="wait-desc">
+        Pokud čekáš déle než 30 sekund, zkus to prosím znovu později.<br>
+        <a href="/" class="button" style="margin-top:1.5em;">Zpět na hlavní stránku</a>
+    </div>
+</div>
+</body>
+</html>
