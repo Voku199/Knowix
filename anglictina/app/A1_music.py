@@ -13,7 +13,7 @@ from concurrent.futures import ThreadPoolExecutor
 from collections import deque
 
 # --- ČTENÍ LYRICS Z JSON SOUBORU ---
-LYRICS_JSON_DIR = os.path.join(os.path.dirname(__file__), 'static\music\lyrics_json')
+LYRICS_JSON_DIR = os.path.join(os.path.dirname(__file__), 'static/music/lyrics_json')
 
 
 def get_lyrics_and_translations_from_json(song_info):
@@ -22,12 +22,12 @@ def get_lyrics_and_translations_from_json(song_info):
     Vrací tuple (lyrics_lines, translations_lines) nebo (None, None) při chybě.
     """
     song_title = song_info.get('title')
-    print(song_title)
+
     if not song_title:
         return None, None
     safe_title = re.sub(r'[^\w\s-]', '', song_title).replace(' ', '_')
     json_path = os.path.join(LYRICS_JSON_DIR, f"{safe_title}.json")
-    print(json_path)
+
     if not os.path.exists(json_path):
         return None, None
     with open(json_path, 'r', encoding='utf-8') as f:
