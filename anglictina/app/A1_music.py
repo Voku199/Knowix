@@ -16,20 +16,27 @@ from collections import deque
 LYRICS_JSON_DIR = os.path.join(os.path.dirname(__file__), 'static/music/lyrics_json')
 
 
-def get_lyrics_from_json(song_info):
+def get_lyrics_and_translations_from_json(song_info):
+    """
+    Načte lyrics a jejich překlady z JSON souboru.
+    Vrací tuple (lyrics_lines, translations_lines) nebo (None, None) při chybě.
+    """
     song_title = song_info.get('title')
     if not song_title:
-        return None
+        return None, None
     safe_title = re.sub(r'[^\w\s-]', '', song_title).replace(' ', '_')
     json_path = os.path.join(LYRICS_JSON_DIR, f"{safe_title}.json")
     if not os.path.exists(json_path):
-        return None
+        return None, None
     with open(json_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
         lyrics_lines = data.get('lyrics')
-        if not lyrics_lines or not isinstance(lyrics_lines, list):
-            return None
-        return lyrics_lines
+        translations_lines = data.get('translations')
+        if (not lyrics_lines or not isinstance(lyrics_lines, list) or
+                not translations_lines or not isinstance(translations_lines, list) or
+                len(lyrics_lines) != len(translations_lines)):
+            return None, None
+        return lyrics_lines, translations_lines
 
 
 exercises_bp = Blueprint('exercises', __name__, template_folder='templates')
@@ -109,8 +116,8 @@ def translate_line_with_retry(translator, line, target_lang='CS', retries=3, del
 @exercises_bp.route('/exercise/<int:song_id>', methods=['GET'])
 def exercise(song_id):
     user_id = get_user_id()
-    queue_timeout = 30  # maximální čekání ve frontě v sekundách
-    wait_interval = 0.5  # jak často kontrolovat frontu
+    queue_timeout = 30
+    wait_interval = 0.5
 
     exercise_queue.append(user_id)
     start_time = time.time()
@@ -134,9 +141,10 @@ def exercise(song_id):
         except IndexError:
             return "Neplatné ID písničky", 404
 
-        lyrics_lines = get_lyrics_from_json(song_info)
-        if lyrics_lines is None:
-            return "Text písně nebyl nalezen v JSON souboru.", 404
+        # Nově načítáme lyrics i překlady
+        lyrics_lines, translations_lines = get_lyrics_and_translations_from_json(song_info)
+        if lyrics_lines is None or translations_lines is None:
+            return "Text písně nebo překlad nebyl nalezen v JSON souboru.", 404
 
         def is_valid_lyric_line(line):
             line = line.strip()
@@ -146,52 +154,35 @@ def exercise(song_id):
                 return False
             return True
 
-        valid_lines = [line for line in lyrics_lines if is_valid_lyric_line(line)]
-
-        if len(valid_lines) < 3:
+        valid_indices = [i for i, line in enumerate(lyrics_lines) if is_valid_lyric_line(line)]
+        if len(valid_indices) < 3:
             return "Příliš málo validních řádků v textu písně.", 400
 
-        missing_exercises_lines = random.sample(valid_lines, min(3, len(valid_lines)))
-        translation_exercises_lines = random.sample(list(set(valid_lines) - set(missing_exercises_lines)),
-                                                    min(3, len(valid_lines) - len(missing_exercises_lines)))
-
-        all_lines_to_translate = missing_exercises_lines + translation_exercises_lines
-        translations = {}
-
-        translator = current_app.translator
-
-        # Omezíme paralelní překlady na 2, aby DeepL tolik nehlásil throttling
-        max_workers = min(2, len(all_lines_to_translate))
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            future_to_line = {
-                executor.submit(translate_line_with_retry, translator, line, 'CS'): line
-                for line in all_lines_to_translate
-            }
-            for future in future_to_line:
-                line = future_to_line[future]
-                try:
-                    translations[line] = future.result()
-                except Exception as exc:
-                    translations[line] = f"[Nepřeloženo] {line}"
-                    print(f"Chyba při překladu řádku '{line}': {exc}")
+        # Vybereme náhodné řádky pro missing a translation cvičení
+        missing_indices = random.sample(valid_indices, min(3, len(valid_indices)))
+        remaining_indices = list(set(valid_indices) - set(missing_indices))
+        translation_indices = random.sample(remaining_indices,
+                                            min(3, len(remaining_indices))) if remaining_indices else []
 
         missing_exercises = []
-        for line in missing_exercises_lines:
+        for idx in missing_indices:
+            line = lyrics_lines[idx]
+            translation = translations_lines[idx]
             words = line.split()
             missing_word = random.choice(words)
             missing_exercises.append({
                 'original': line,
                 'with_blank': line.replace(missing_word, '_____'),
                 'missing_word': missing_word,
-                'translated': translations.get(line, f"[Nepřeloženo] {line}")
+                'translated': translation
             })
 
         translation_exercises = [
             {
-                'original': line,
-                'translated': translations.get(line, f"[Nepřeloženo] {line}")
+                'original': lyrics_lines[idx],
+                'translated': translations_lines[idx]
             }
-            for line in translation_exercises_lines
+            for idx in translation_indices
         ]
 
         current_word_pairs = current_app.word_pairs.get(song_info['title'], {})
@@ -232,7 +223,6 @@ def exercise(song_id):
             }
         )
     finally:
-        # Oprava: bezpečně odstraň user_id z fronty
         if user_id in exercise_queue:
             try:
                 exercise_queue.remove(user_id)

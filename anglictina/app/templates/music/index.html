@@ -5,33 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Knowix - Výběr chatové lekce</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-        <!-- Preconnect zrychlí DNS a spojení -->
+    <!-- Preconnect zrychlí DNS a spojení -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
     <!-- Font načti až po načtení stránky -->
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
           media="print" onload="this.media='all'">
     <noscript>
         <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
     </noscript>
-
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-W1EN990JKP');
     </script>
-        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <style>
+        /* Modal pozadí */
+        #explicitModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        /* Obsah modalu */
+        #explicitModal .modal-content {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            max-width: 400px;
+            text-align: center;
+            font-family: 'League Spartan', sans-serif;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+        #explicitModal button {
+            margin: 10px 15px 0 15px;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'League Spartan', sans-serif;
+            font-size: 1em;
+        }
+        #explicitModal button#continueBtn {
+            background-color: #007bff;
+            color: white;
+        }
+        #explicitModal button#leaveBtn {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
@@ -80,15 +115,19 @@
     <div class="song-grid">
         {% for song in songs %}
         <div class="song-card" style="background-image: url('{{ url_for('static', filename='pic/' + song.image) }}')">
-        <a href="{{ url_for('exercises.exercise', song_id=loop.index0) }}" class="song-link">
-            <h3>{{ song.title }}</h3>
-            <p>{{ song.artist }}</p>
-        </a>
-    </div>
-
+            <!-- Změnil jsem sem link na # a přidal data atributy pro JS -->
+            <a href="#" class="song-link"
+               data-song-title="{{ song.title|lower }}"
+               data-song-filename="{{ song.filename|lower }}"
+               data-href="{{ url_for('exercises.exercise', song_id=loop.index0) }}">
+                <h3>{{ song.title }}</h3>
+                <p>{{ song.artist }}</p>
+            </a>
+        </div>
         {% endfor %}
     </div>
 </main>
+
 <footer>
   <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
   <p class="footer-signature">
@@ -97,6 +136,17 @@
     and lot of ☕
   </p>
 </footer>
+
+<!-- Modal pro explicit warning -->
+<div id="explicitModal">
+    <div class="modal-content">
+        <h2>Upozornění ⚠️</h2>
+        <p>Tato písnička obsahuje vulgarismy a nevhodný jazyk.</p>
+        <p>Pokračuj jen pokud ti to nevadí.</p>
+        <button id="continueBtn">Pokračovat</button>
+        <button id="leaveBtn">Odejít</button>
+    </div>
+</div>
 
 <script>
     // theme-toggle.js
@@ -109,19 +159,55 @@
             })
         }).then(() => {
             document.body.classList.toggle('dark-mode');
-            session.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
         });
     });
 
+    // Zavření profilového menu kliknutím mimo
     document.addEventListener('click', (e) => {
         const profileMenu = document.getElementById('profileMenu');
         const trigger = document.getElementById('profileMenuTrigger');
 
-        if (!trigger.contains(e.target) && !profileMenu.contains(e.target)) {
+        if (trigger && !trigger.contains(e.target) && !profileMenu.contains(e.target)) {
             profileMenu.style.opacity = '0';
             profileMenu.style.visibility = 'hidden';
             profileMenu.style.transform = 'translateY(10px)';
         }
+    });
+
+    // Explicitní varování pro písničku Magnolia
+    const explicitSongs = ['magnolia', 'magnolia.json'];
+
+    const modal = document.getElementById('explicitModal');
+    const continueBtn = document.getElementById('continueBtn');
+    const leaveBtn = document.getElementById('leaveBtn');
+
+    document.querySelectorAll('.song-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const title = link.getAttribute('data-song-title');
+            const filename = link.getAttribute('data-song-filename');
+            const href = link.getAttribute('data-href');
+
+            // Jestli písnička je Magnolia (podle názvu nebo souboru)
+            if (explicitSongs.includes(title) || explicitSongs.includes(filename)) {
+                // Ukázat modal
+                modal.style.display = 'flex';
+
+                // Po kliknutí pokračovat se přesměruje na cílovou stránku
+                continueBtn.onclick = () => {
+                    modal.style.display = 'none';
+                    window.location.href = href;
+                };
+                // Po kliknutí odejít zavřít modal a zůstat na stránce
+                leaveBtn.onclick = () => {
+                    modal.style.display = 'none';
+                };
+            } else {
+                // Pokud není explicit, prostě pokračuj normálně
+                window.location.href = href;
+            }
+        });
     });
 </script>
 </body>
