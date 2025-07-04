@@ -32,9 +32,9 @@ colorama==0.4.6
 packaging==25.0
 
 # Game Development
-pygame==2.6.0
-pytmx==3.32.0
-pyscroll==3.0.0
+#pygame==2.6.0
+#pytmx==3.32.0
+#pyscroll==3.0.0
 
 # Async
 asyncio==3.4.3
