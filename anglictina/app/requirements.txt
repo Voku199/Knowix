@@ -12,6 +12,7 @@ lyricsgenius==3.0.1
 
 packaging==23.2
 mysql-connector-python==9.3.0
+deepl==1.22.0
 
 
 requests==2.31.0
