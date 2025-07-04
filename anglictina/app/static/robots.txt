@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://knowix.up.railway.app/sitemap.xml

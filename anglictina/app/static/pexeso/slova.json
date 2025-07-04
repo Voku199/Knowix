@@ -1,0 +1,654 @@
+{
+  "A1": [
+    {
+      "cz": "ahoj",
+      "en": "hello"
+    },
+    {
+      "cz": "kočka",
+      "en": "cat"
+    },
+    {
+      "cz": "pes",
+      "en": "dog"
+    },
+    {
+      "cz": "jablko",
+      "en": "apple"
+    },
+    {
+      "cz": "auto",
+      "en": "car"
+    },
+    {
+      "cz": "dům",
+      "en": "house"
+    },
+    {
+      "cz": "kniha",
+      "en": "book"
+    },
+    {
+      "cz": "slunce",
+      "en": "sun"
+    },
+    {
+      "cz": "voda",
+      "en": "water"
+    },
+    {
+      "cz": "strom",
+      "en": "tree"
+    },
+    {
+      "cz": "škola",
+      "en": "school"
+    },
+    {
+      "cz": "přítel",
+      "en": "friend"
+    },
+    {
+      "cz": "počítač",
+      "en": "computer"
+    },
+    {
+      "cz": "hudba",
+      "en": "music"
+    },
+    {
+      "cz": "jídlo",
+      "en": "food"
+    },
+    {
+      "cz": "rodina",
+      "en": "family"
+    },
+    {
+      "cz": "matka",
+      "en": "mother"
+    },
+    {
+      "cz": "otec",
+      "en": "father"
+    },
+    {
+      "cz": "sestra",
+      "en": "sister"
+    },
+    {
+      "cz": "bratr",
+      "en": "brother"
+    },
+    {
+      "cz": "stůl",
+      "en": "table"
+    },
+    {
+      "cz": "židle",
+      "en": "chair"
+    },
+    {
+      "cz": "okno",
+      "en": "window"
+    },
+    {
+      "cz": "dveře",
+      "en": "door"
+    },
+    {
+      "cz": "pero",
+      "en": "pen"
+    },
+    {
+      "cz": "tužka",
+      "en": "pencil"
+    },
+    {
+      "cz": "taška",
+      "en": "bag"
+    },
+    {
+      "cz": "telefon",
+      "en": "phone"
+    },
+    {
+      "cz": "ulice",
+      "en": "street"
+    },
+    {
+      "cz": "město",
+      "en": "city"
+    },
+    {
+      "cz": "chlapec",
+      "en": "boy"
+    },
+    {
+      "cz": "dívka",
+      "en": "girl"
+    },
+    {
+      "cz": "učitel",
+      "en": "teacher"
+    },
+    {
+      "cz": "student",
+      "en": "student"
+    },
+    {
+      "cz": "pták",
+      "en": "bird"
+    },
+    {
+      "cz": "ryba",
+      "en": "fish"
+    },
+    {
+      "cz": "mléko",
+      "en": "milk"
+    },
+    {
+      "cz": "chléb",
+      "en": "bread"
+    },
+    {
+      "cz": "vejce",
+      "en": "egg"
+    }
+  ],
+  "A2": [
+    {
+      "cz": "letiště",
+      "en": "airport"
+    },
+    {
+      "cz": "láhev",
+      "en": "bottle"
+    },
+    {
+      "cz": "most",
+      "en": "bridge"
+    },
+    {
+      "cz": "bratranec/sestřenice",
+      "en": "cousin"
+    },
+    {
+      "cz": "doktor",
+      "en": "doctor"
+    },
+    {
+      "cz": "inženýr",
+      "en": "engineer"
+    },
+    {
+      "cz": "les",
+      "en": "forest"
+    },
+    {
+      "cz": "zahrada",
+      "en": "garden"
+    },
+    {
+      "cz": "dovolená",
+      "en": "holiday"
+    },
+    {
+      "cz": "ostrov",
+      "en": "island"
+    },
+    {
+      "cz": "bunda",
+      "en": "jacket"
+    },
+    {
+      "cz": "kuchyně",
+      "en": "kitchen"
+    },
+    {
+      "cz": "jazyk",
+      "en": "language"
+    },
+    {
+      "cz": "trh",
+      "en": "market"
+    },
+    {
+      "cz": "zdravotní sestra",
+      "en": "nurse"
+    },
+    {
+      "cz": "kancelář",
+      "en": "office"
+    },
+    {
+      "cz": "polštář",
+      "en": "pillow"
+    },
+    {
+      "cz": "tichý",
+      "en": "quiet"
+    },
+    {
+      "cz": "řeka",
+      "en": "river"
+    },
+    {
+      "cz": "stanice",
+      "en": "station"
+    },
+    {
+      "cz": "lístek",
+      "en": "ticket"
+    },
+    {
+      "cz": "deštník",
+      "en": "umbrella"
+    },
+    {
+      "cz": "vesnice",
+      "en": "village"
+    },
+    {
+      "cz": "číšník",
+      "en": "waiter"
+    },
+    {
+      "cz": "včera",
+      "en": "yesterday"
+    },
+    {
+      "cz": "zebra",
+      "en": "zebra"
+    },
+    {
+      "cz": "rada",
+      "en": "advice"
+    },
+    {
+      "cz": "kolo",
+      "en": "bicycle"
+    },
+    {
+      "cz": "oblečení",
+      "en": "clothes"
+    },
+    {
+      "cz": "nebezpečí",
+      "en": "danger"
+    },
+    {
+      "cz": "energie",
+      "en": "energy"
+    },
+    {
+      "cz": "budoucnost",
+      "en": "future"
+    },
+    {
+      "cz": "host",
+      "en": "guest"
+    },
+    {
+      "cz": "koníček",
+      "en": "hobby"
+    },
+    {
+      "cz": "nápad",
+      "en": "idea"
+    },
+    {
+      "cz": "džus",
+      "en": "juice"
+    },
+    {
+      "cz": "klíč",
+      "en": "key"
+    },
+    {
+      "cz": "lekce",
+      "en": "lesson"
+    },
+    {
+      "cz": "hora",
+      "en": "mountain"
+    },
+    {
+      "cz": "zprávy",
+      "en": "news"
+    },
+    {
+      "cz": "názor",
+      "en": "opinion"
+    }
+  ],
+  "B1": [
+    {
+      "cz": "úspěch",
+      "en": "achievement"
+    },
+    {
+      "cz": "chování",
+      "en": "behavior"
+    },
+    {
+      "cz": "výzva",
+      "en": "challenge"
+    },
+    {
+      "cz": "rozhodnutí",
+      "en": "decision"
+    },
+    {
+      "cz": "vzdělání",
+      "en": "education"
+    },
+    {
+      "cz": "svoboda",
+      "en": "freedom"
+    },
+    {
+      "cz": "generace",
+      "en": "generation"
+    },
+    {
+      "cz": "zvyk",
+      "en": "habit"
+    },
+    {
+      "cz": "představivost",
+      "en": "imagination"
+    },
+    {
+      "cz": "spravedlnost",
+      "en": "justice"
+    },
+    {
+      "cz": "znalost",
+      "en": "knowledge"
+    },
+    {
+      "cz": "vůdcovství",
+      "en": "leadership"
+    },
+    {
+      "cz": "motivace",
+      "en": "motivation"
+    },
+    {
+      "cz": "vyjednávání",
+      "en": "negotiation"
+    },
+    {
+      "cz": "příležitost",
+      "en": "opportunity"
+    },
+    {
+      "cz": "priorita",
+      "en": "priority"
+    },
+    {
+      "cz": "kvalita",
+      "en": "quality"
+    },
+    {
+      "cz": "vztah",
+      "en": "relationship"
+    },
+    {
+      "cz": "řešení",
+      "en": "solution"
+    },
+    {
+      "cz": "tradice",
+      "en": "tradition"
+    },
+    {
+      "cz": "vesmír",
+      "en": "universe"
+    },
+    {
+      "cz": "násilí",
+      "en": "violence"
+    },
+    {
+      "cz": "bohatství",
+      "en": "wealth"
+    },
+    {
+      "cz": "mládež",
+      "en": "youth"
+    },
+    {
+      "cz": "ambice",
+      "en": "ambition"
+    },
+    {
+      "cz": "rovnováha",
+      "en": "balance"
+    },
+    {
+      "cz": "společenství",
+      "en": "community"
+    },
+    {
+      "cz": "rozvoj",
+      "en": "development"
+    },
+    {
+      "cz": "životní prostředí",
+      "en": "environment"
+    },
+    {
+      "cz": "základ",
+      "en": "foundation"
+    },
+    {
+      "cz": "cíl",
+      "en": "goal"
+    },
+    {
+      "cz": "poctivost",
+      "en": "honesty"
+    },
+    {
+      "cz": "identita",
+      "en": "identity"
+    },
+    {
+      "cz": "cesta",
+      "en": "journey"
+    },
+    {
+      "cz": "znalost",
+      "en": "knowledge"
+    },
+    {
+      "cz": "logika",
+      "en": "logic"
+    },
+    {
+      "cz": "paměť",
+      "en": "memory"
+    },
+    {
+      "cz": "síť",
+      "en": "network"
+    },
+    {
+      "cz": "možnost",
+      "en": "option"
+    },
+    {
+      "cz": "pokrok",
+      "en": "progress"
+    }
+  ],
+  "B2": [
+    {
+      "cz": "opustit",
+      "en": "abandon"
+    },
+    {
+      "cz": "prospěch",
+      "en": "benefit"
+    },
+    {
+      "cz": "následek",
+      "en": "consequence"
+    },
+    {
+      "cz": "rozmanitost",
+      "en": "diversity"
+    },
+    {
+      "cz": "důraz",
+      "en": "emphasis"
+    },
+    {
+      "cz": "základní",
+      "en": "fundamental"
+    },
+    {
+      "cz": "záruka",
+      "en": "guarantee"
+    },
+    {
+      "cz": "hypotéza",
+      "en": "hypothesis"
+    },
+    {
+      "cz": "výklad",
+      "en": "interpretation"
+    },
+    {
+      "cz": "odůvodnění",
+      "en": "justification"
+    },
+    {
+      "cz": "zákonodárství",
+      "en": "legislation"
+    },
+    {
+      "cz": "mechanismus",
+      "en": "mechanism"
+    },
+    {
+      "cz": "pojem",
+      "en": "notion"
+    },
+    {
+      "cz": "cíl",
+      "en": "objective"
+    },
+    {
+      "cz": "jev",
+      "en": "phenomenon"
+    },
+    {
+      "cz": "citace",
+      "en": "quotation"
+    },
+    {
+      "cz": "spolehlivý",
+      "en": "reliable"
+    },
+    {
+      "cz": "strategie",
+      "en": "strategy"
+    },
+    {
+      "cz": "teorie",
+      "en": "theory"
+    },
+    {
+      "cz": "jedinečný",
+      "en": "unique"
+    },
+    {
+      "cz": "proměnná",
+      "en": "variable"
+    },
+    {
+      "cz": "blahobyt",
+      "en": "welfare"
+    },
+    {
+      "cz": "výnos",
+      "en": "yield"
+    },
+    {
+      "cz": "získání",
+      "en": "acquisition"
+    },
+    {
+      "cz": "předpojatost",
+      "en": "bias"
+    },
+    {
+      "cz": "soudržný",
+      "en": "coherent"
+    },
+    {
+      "cz": "diskriminace",
+      "en": "discrimination"
+    },
+    {
+      "cz": "hodnocení",
+      "en": "evaluation"
+    },
+    {
+      "cz": "rámec",
+      "en": "framework"
+    },
+    {
+      "cz": "hierarchie",
+      "en": "hierarchy"
+    },
+    {
+      "cz": "implementace",
+      "en": "implementation"
+    },
+    {
+      "cz": "odůvodnění",
+      "en": "justification"
+    },
+    {
+      "cz": "legitimní",
+      "en": "legitimate"
+    },
+    {
+      "cz": "manipulace",
+      "en": "manipulation"
+    },
+    {
+      "cz": "zanedbání",
+      "en": "neglect"
+    },
+    {
+      "cz": "orientace",
+      "en": "orientation"
+    },
+    {
+      "cz": "vnímání",
+      "en": "perception"
+    },
+    {
+      "cz": "regulace",
+      "en": "regulation"
+    },
+    {
+      "cz": "udržet",
+      "en": "sustain"
+    },
+    {
+      "cz": "přenášet",
+      "en": "transmit"
+    },
+    {
+      "cz": "porušení",
+      "en": "violation"
+    }
+  ]
+}

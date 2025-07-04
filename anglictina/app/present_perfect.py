@@ -5,6 +5,8 @@ import unicodedata
 from difflib import SequenceMatcher
 import re
 import os
+from xp import add_xp_to_user
+from streak import update_user_streak, get_user_streak
 
 chat_bp = Blueprint("chat_bp", __name__)
 
@@ -21,6 +23,14 @@ def server_error(e):
 
 
 # Načtení lekce z JSON
+
+@chat_bp.context_processor
+def inject_streak():
+    user_id = session.get('user_id')
+    if user_id:
+        streak = get_user_streak(user_id)
+        return dict(user_streak=streak)
+    return dict(user_streak=0)
 
 
 def normalize_text(text):
@@ -173,8 +183,39 @@ def next_step():
     current_index = session.get("chat_index", 0)
     chat_data = session.get("chat_data", [])
 
+    # Speciální testovací heslo pro okamžité dokončení lekce
+    if normalize_text(user_answer) == "abraka dabra bum":
+        xp_awarded = 10  # nebo jiná logika
+        xp_result = None
+        streak_info = None
+        if session.get('user_id'):
+            xp_result = add_xp_to_user(session['user_id'], xp_awarded)
+            streak_info = update_user_streak(session['user_id'])
+        # Nastavíme index na konec, aby session reflektovala dokončení
+        session['chat_index'] = len(chat_data)
+        return jsonify({
+            "correct": True,
+            "done": True,
+            "xp": xp_awarded,
+            "xp_result": xp_result,
+            "streak_info": streak_info,
+            "test_magic": True
+        })
+
     if current_index >= len(chat_data):
-        return jsonify({"done": True})
+        # Lekce je dokončena
+        xp_awarded = 10  # nebo jiná logika
+        xp_result = None
+        streak_info = None
+        if session.get('user_id'):
+            xp_result = add_xp_to_user(session['user_id'], xp_awarded)
+            streak_info = update_user_streak(session['user_id'])
+        return jsonify({
+            "done": True,
+            "xp": xp_awarded,
+            "xp_result": xp_result,
+            "streak_info": streak_info
+        })
 
     accepted = chat_data[current_index]["accepted_answers"]
     normalized_user = normalize_text(user_answer)
@@ -200,7 +241,20 @@ def next_step():
                 "cz_reply": next_message["cz_reply"]
             })
         else:
-            return jsonify({"correct": True, "done": True})
+            # Lekce dokončena
+            xp_awarded = 10
+            xp_result = None
+            streak_info = None
+            if session.get('user_id'):
+                xp_result = add_xp_to_user(session['user_id'], xp_awarded)
+                streak_info = update_user_streak(session['user_id'])
+            return jsonify({
+                "correct": True,
+                "done": True,
+                "xp": xp_awarded,
+                "xp_result": xp_result,
+                "streak_info": streak_info
+            })
 
     elif best_similarity >= 0.8:
         # Skoro správně – uznáme, ale upozorníme na chybu
@@ -216,11 +270,20 @@ def next_step():
                 "cz_reply": next_message["cz_reply"]
             })
         else:
+            xp_awarded = 10
+            xp_result = None
+            streak_info = None
+            if session.get('user_id'):
+                xp_result = add_xp_to_user(session['user_id'], xp_awarded)
+                streak_info = update_user_streak(session['user_id'])
             return jsonify({
                 "correct": True,
                 "almost": True,
                 "expected": best_match,
-                "done": True
+                "done": True,
+                "xp": xp_awarded,
+                "xp_result": xp_result,
+                "streak_info": streak_info
             })
 
     else:

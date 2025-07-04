@@ -5,76 +5,231 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Knowix - Poslouchání</title>
     <link rel="stylesheet" href="/static/style_lis.css">
-    <!-- Preconnect zrychlí DNS a spojení -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Font načti až po načtení stránky -->
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
           media="print" onload="this.media='all'">
     <noscript>
         <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
     </noscript>
-
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
+    <style>
+    .popup-container {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.65);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.2s;
+        animation: fadeIn 0.3s;
+    }
+    .popup-container.show {
+        display: flex;
+    }
+    .popup-content {
+        background: #fff;
+        padding: 2.5rem 2rem 2rem 2rem;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+        max-width: 400px;
+        min-width: 280px;
+        width: 95vw;
+        text-align: center;
+        animation: popIn 0.3s;
+        position: relative;
+    }
+    .popup-icon {
+        margin-bottom: 0.5rem;
+        font-size: 3rem;
+    }
+    .popup-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    .popup-button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 2px 8px rgba(76, 175, 80, 0.08);
+        outline: none;
+    }
+    .popup-button.confirm {
+        background: linear-gradient(135deg, #4CAF50, #45a049);
+        color: white;
+    }
+    .popup-button.confirm:hover {
+        background: linear-gradient(135deg, #45a049, #3d8b40);
+    }
+    .popup-button.cancel {
+        background: linear-gradient(135deg, #f44336, #e53935);
+        color: white;
+    }
+    .popup-button.cancel:hover {
+        background: linear-gradient(135deg, #d32f2f, #b71c1c);
+    }
+    @keyframes popIn {
+        0% { transform: scale(0.95); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    body.dark-mode .popup-content {
+        background: #23272f;
+        color: #e2e8f0;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+    }
+    body.dark-mode .popup-button.confirm {
+        background: linear-gradient(135deg, #2e7d32, #1b5e20);
+    }
+    body.dark-mode .popup-button.confirm:hover {
+        background: linear-gradient(135deg, #388e3c, #2e7d32);
+    }
+    body.dark-mode .popup-button.cancel {
+        background: linear-gradient(135deg, #b71c1c, #c62828);
+    }
+    body.dark-mode .popup-button.cancel:hover {
+        background: linear-gradient(135deg, #d32f2f, #b71c1c);
+    }
+    @media (max-width: 600px) {
+        .popup-content {
+            padding: 1.2rem 0.5rem;
+            min-width: 0;
+            width: 98vw;
         }
-
-        gtag('js', new Date());
-
-        gtag('config', 'G-W1EN990JKP');
-    </script>
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        .popup-button {
+            font-size: 1rem;
+            padding: 0.7rem 1rem;
+        }
+    }
+    /* --- STREAK TOAST --- */
+    .streak-toast {
+        position: fixed;
+        top: 80px;
+        right: 30px;
+        background: #fffbe6;
+        color: #d35400;
+        border: 2px solid #ffc107;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+        padding: 1em 2em;
+        font-size: 1.3em;
+        display: flex;
+        align-items: center;
+        z-index: 3000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s, transform 0.4s;
+        transform: translateY(-30px);
+    }
+    .streak-toast.active {
+        opacity: 1;
+        pointer-events: all;
+        transform: translateY(0);
+    }
+    .streak-fire {
+        height: 2em;
+        margin-right: 0.7em;
+        animation: firePop 0.7s cubic-bezier(.68,-0.55,.27,1.55);
+    }
+    @keyframes firePop {
+        0% { transform: scale(0.7) rotate(-10deg);}
+        60% { transform: scale(1.2) rotate(10deg);}
+        100% { transform: scale(1) rotate(0);}
+    }
+    </style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
-    <div class="logo">
-        <a href="{{ url_for('main.index') }}">
-            <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
-        </a>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
     </div>
-    <nav>
+    <div class="nav-profile-wrapper">
         <ul class="nav-right">
-            <li><a href="/anglictina">Angličtina</a></li>
-            <li><a href="/feedback">Feedback</a></li>
-            <li><a href="/news">Novinky</a></li>
             <li>
-                {% if session['user_name'] %}
-                <div class="user-profile">
-                    <div class="profile-container">
-                        {% if session.get('profile_pic') %}
-                        <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
-                             alt="Profilová fotka" width="64" class="profile-pic">
-                        {% else %}
-                        <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
-                             class="profile-pic" id="profileMenuTrigger">
-                        {% endif %}
-                        <div class="profile-menu" id="profileMenu">
-                            <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
-                            <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
-                        </div>
-                    </div>
-                    <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
-                </div>
-                {% else %}
-                <div class="auth-links">
-                    <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
-                    <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
-                </div>
-                {% endif %}
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
             </li>
             <li>
-                <button id="theme-toggle">🌙</button>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
             </li>
         </ul>
-    </nav>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
 </header>
 
 <main class="lesson-container">
@@ -113,6 +268,26 @@
     </div>
 </main>
 
+<!-- STREAK TOAST -->
+<div id="streakToast" class="streak-toast" style="display:none;">
+    <img src="/static/fire.svg" alt="Streak" class="streak-fire">
+    <span id="streakToastText"></span>
+</div>
+
+<!-- MODERNÍ POPUP BUBLINA -->
+<div id="quizPopup" class="popup-container" tabindex="-1" aria-modal="true" role="dialog">
+  <div class="popup-content" id="quizPopupContent">
+    <!-- Dynamický obsah se vloží JS -->
+  </div>
+</div>
+
+<!-- POPUP pro správné odpovědi -->
+<div id="answersPopup" class="popup-container" tabindex="-1" aria-modal="true" role="dialog">
+  <div class="popup-content" id="answersPopupContent">
+    <!-- Dynamický obsah se vloží JS -->
+  </div>
+</div>
+
 <footer>
     <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
     <p class="footer-signature">
@@ -124,158 +299,241 @@
 </footer>
 
 <script defer>
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('quiz-form');
-        const resultDiv = document.getElementById('result');
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('quiz-form');
+    const quizPopup = document.getElementById('quizPopup');
+    const quizPopupContent = document.getElementById('quizPopupContent');
+    const answersPopup = document.getElementById('answersPopup');
+    const answersPopupContent = document.getElementById('answersPopupContent');
+    let lastQuizData = null;
 
-        if (form) {
-            form.addEventListener('submit', function (event) {
-                event.preventDefault();
-                resultDiv.innerHTML = ""; // Clear previous result
+    // --- STREAK TOAST FUNKCE ---
+    function showStreakToast(streak) {
+        const toast = document.getElementById('streakToast');
+        const text = document.getElementById('streakToastText');
+        text.textContent = `🔥 Máš streak ${streak} dní v řadě!`;
+        toast.classList.add('active');
+        toast.style.display = 'flex';
+        setTimeout(() => {
+            toast.classList.remove('active');
+            setTimeout(() => { toast.style.display = 'none'; }, 400);
+        }, 3500);
+    }
 
-                // Odstraníme předchozí zvýraznění
-                document.querySelectorAll('.question-block').forEach(block => {
-                    block.querySelectorAll('label').forEach(label => {
-                        label.style.backgroundColor = '';
-                        label.style.color = '';
-                        label.style.fontWeight = '';
-                    });
-                });
-
-                const formData = new FormData(form);
-
-                fetch('{{ url_for("listening_bp.validate_quiz") }}', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(async response => {
-                        let data;
-                        try {
-                            data = await response.json();
-                        } catch (e) {
-                            throw new Error('Server returned invalid response.');
-                        }
-                        // Debug: vypiš odpověď backendu do konzole
-                        console.log("Backend response:", data);
-
-                        if (!response.ok) {
-                            resultDiv.innerHTML = `<p style="color:red;">${data.error || 'Nastala chyba při vyhodnocení.'}</p>`;
-                            resultDiv.style.backgroundColor = '#f8d7da';
-                            resultDiv.style.color = '#721c24';
-                            return;
-                        }
-
-                        // ZVÝRAZNĚNÍ ODPOVĚDÍ V KVÍZU
-                        if (
-                            data.answers && Array.isArray(data.answers) &&
-                            data.user_answers && Array.isArray(data.user_answers)
-                        ) {
-                            data.answers.forEach((correctAns, idx) => {
-                                const userAns = data.user_answers[idx] || "";
-                                const questionBlock = form.querySelectorAll('.question-block')[idx];
-                                if (!questionBlock) return;
-                                questionBlock.querySelectorAll('label').forEach(label => {
-                                    const input = label.querySelector('input[type="radio"]');
-                                    if (!input) return;
-                                    // Správná odpověď
-                                    if (input.value.trim().toLowerCase() === correctAns.trim().toLowerCase()) {
-                                        label.style.backgroundColor = '#d4edda'; // zelená
-                                        label.style.color = '#155724';
-                                        label.style.fontWeight = 'bold';
-                                    }
-                                    // Uživatelem zvolená, ale špatná odpověď
-                                    if (
-                                        input.checked &&
-                                        input.value.trim().toLowerCase() !== correctAns.trim().toLowerCase()
-                                    ) {
-                                        label.style.backgroundColor = '#f8d7da'; // červená
-                                        label.style.color = '#721c24';
-                                        label.style.fontWeight = 'bold';
-                                    }
-                                });
-                            });
-                        }
-
-                        // Zobraz výsledek a odpovědi uživatele
-                        let html = `<p><strong>Správně:</strong> ${data.score} z ${data.total}</p>`;
-                        if (
-                            data.answers && Array.isArray(data.answers) &&
-                            data.user_answers && Array.isArray(data.user_answers)
-                        ) {
-                            html += `<ul>`;
-                            data.answers.forEach((ans, idx) => {
-                                const userAns = data.user_answers[idx] || "";
-                                const isCorrect = userAns.trim().toLowerCase() === ans.trim().toLowerCase();
-                                html += `<li>
-                                    <strong>Otázka ${idx + 1}:</strong>
-                                    <span style="color:${isCorrect ? 'green' : 'red'}">
-                                        Tvoje odpověď: ${userAns || '<em>nevyplněno</em>'}
-                                    </span>
-                                    <br>
-                                    <span style="color:gray">
-                                        Správná odpověď: ${ans}
-                                    </span>
-                                </li>`;
-                            });
-                            html += `</ul>`;
-                        } else if (data.answers && Array.isArray(data.answers)) {
-                            // fallback pokud backend neposílá user_answers
-                            html += `<ul>`;
-                            data.answers.forEach((ans, idx) => {
-                                html += `<li>Otázka ${idx + 1}: <strong>${ans}</strong></li>`;
-                            });
-                            html += `</ul>`;
-                        }
-                        resultDiv.innerHTML = html;
-                        resultDiv.style.backgroundColor = data.score === data.total ? '#d4edda' : '#f8d7da';
-                        resultDiv.style.color = data.score === data.total ? '#155724' : '#721c24';
-                    })
-                    .catch(error => {
-                        resultDiv.innerHTML = `<p style="color:red;">Chyba: ${error.message}</p>`;
-                        resultDiv.style.backgroundColor = '#f8d7da';
-                        resultDiv.style.color = '#721c24';
-                    });
-            });
+    // Helper pro zobrazení hlavního popupu
+    function showQuizPopup({success, score, total, xp, errorMsg, streak_info}) {
+        let icon = success ? '🎉' : '😕';
+        let title = success ? 'Skvělá práce!' : 'Zkus další lekci nebo si zobraz správné odpovědi';
+        let msg = success
+            ? `Všechny odpovědi jsou správně.<br>Získáváš <b>+${xp || 10} XP</b>!`
+            : (errorMsg ? `<span style="color:#f44336">${errorMsg}</span>` : `Správně: <b>${score} / ${total}</b><br>Zkus to ještě jednou!`);
+        let buttons = '';
+        if (success) {
+            buttons = `
+                <button class="popup-button confirm" id="popupShowAnswersBtn">Zobrazit správné odpovědi</button>
+                <a href="/listening" class="popup-button confirm" id="popupNextLessonBtn" style="text-decoration:none;">Další lekce</a>
+            `;
+        } else {
+            buttons = `<button class="popup-button confirm" id="popupRetryBtn">Zkusit znovu</button>`;
         }
 
-        // Theme toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        if (themeToggle) {
-            themeToggle.addEventListener('click', () => {
-                fetch('/set_theme', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark'
-                    })
-                }).then(() => {
-                    document.body.classList.toggle('dark-mode');
-                    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-                });
-            });
+        quizPopupContent.innerHTML = `
+            <div class="popup-icon">${icon}</div>
+            <h2 style="margin:1rem 0 0.5rem 0;">${title}</h2>
+            <div style="font-size:1.2rem; margin-bottom:1rem;">${msg}</div>
+            <div class="popup-buttons">${buttons}</div>
+        `;
+        quizPopup.style.display = 'flex';
+        quizPopup.classList.add('show');
+        quizPopup.focus();
+
+        // --- ZOBRAZ STREAK TOAST ---
+        if (streak_info && (streak_info.status === "started" || streak_info.status === "continued")) {
+            showStreakToast(streak_info.streak);
         }
 
-        // Profile menu handling
-        const profileMenu = document.getElementById('profileMenu');
-        const profileMenuTrigger = document.getElementById('profileMenuTrigger');
+        // Tlačítka
+        if (success) {
+            document.getElementById('popupShowAnswersBtn').onclick = function () {
+                showCorrectAnswersPopup();
+            };
+            // Další lekce je <a>, není potřeba JS
+        } else {
+            document.getElementById('popupRetryBtn').onclick = function () {
+                quizPopup.style.display = 'none';
+                quizPopup.classList.remove('show');
+                form.reset();
+                // Odstraníme zvýraznění
+                document.querySelectorAll('.question-block label').forEach(label => {
+                    label.style.backgroundColor = '';
+                    label.style.color = '';
+                    label.style.fontWeight = '';
+                });
+            };
+        }
 
-        if (profileMenuTrigger && profileMenu) {
-            profileMenuTrigger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                profileMenu.style.visibility = 'visible';
-                profileMenu.style.opacity = '1';
-                profileMenu.style.transform = 'translateY(0)';
+        // Zavření popup kliknutím mimo obsah
+        quizPopup.onclick = function (e) {
+            if (e.target === quizPopup) {
+                quizPopup.style.display = 'none';
+                quizPopup.classList.remove('show');
+            }
+        };
+        // Zavření ESC
+        document.onkeydown = function(e) {
+            if (e.key === "Escape") {
+                quizPopup.style.display = 'none';
+                quizPopup.classList.remove('show');
+                answersPopup.style.display = 'none';
+                answersPopup.classList.remove('show');
+            }
+        };
+    }
+
+    // Zobrazí popup se správnými odpověďmi
+    function showCorrectAnswersPopup() {
+        if (!lastQuizData || !lastQuizData.answers) return;
+        let html = `<div class="popup-icon">✅</div>
+            <h2 style="margin:1rem 0 0.5rem 0;">Správné odpovědi</h2>
+            <div style="text-align:left; margin: 1rem 0; font-size:1.1rem;">
+                <ol style="padding-left:1.2em;">`;
+        lastQuizData.answers.forEach((ans, idx) => {
+            html += `<li><b>${ans}</b></li>`;
+        });
+        html += `</ol></div>
+            <div class="popup-buttons">
+                <a href="/listening" class="popup-button confirm" id="popupNextLessonBtn2" style="text-decoration:none;">Další lekce</a>
+                <button class="popup-button cancel" id="popupCloseBtn">Zavřít</button>
+            </div>`;
+        answersPopupContent.innerHTML = html;
+        answersPopup.style.display = 'flex';
+        answersPopup.classList.add('show');
+        answersPopup.focus();
+
+        document.getElementById('popupCloseBtn').onclick = function () {
+            answersPopup.style.display = 'none';
+            answersPopup.classList.remove('show');
+        };
+        // Další lekce je <a>, není potřeba JS
+        answersPopup.onclick = function (e) {
+            if (e.target === answersPopup) {
+                answersPopup.style.display = 'none';
+                answersPopup.classList.remove('show');
+            }
+        };
+        document.onkeydown = function(e) {
+            if (e.key === "Escape") {
+                answersPopup.style.display = 'none';
+                answersPopup.classList.remove('show');
+            }
+        };
+    }
+
+    if (form) {
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // Odstraníme zvýraznění
+            document.querySelectorAll('.question-block label').forEach(label => {
+                label.style.backgroundColor = '';
+                label.style.color = '';
+                label.style.fontWeight = '';
             });
 
-            document.addEventListener('click', (e) => {
-                if (!profileMenu.contains(e.target) && !profileMenuTrigger.contains(e.target)) {
-                    profileMenu.style.opacity = '0';
-                    profileMenu.style.visibility = 'hidden';
-                    profileMenu.style.transform = 'translateY(10px)';
+            const formData = new FormData(form);
+
+            fetch('{{ url_for("listening_bp.validate_quiz") }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(async response => {
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    showQuizPopup({success: false, errorMsg: 'Chyba serveru. Zkuste to prosím znovu.'});
+                    return;
                 }
+                lastQuizData = data;
+
+                // Zvýraznění pouze špatných odpovědí
+                if (
+                    data.answers && Array.isArray(data.answers) &&
+                    data.user_answers && Array.isArray(data.user_answers)
+                ) {
+                    data.answers.forEach((correctAns, idx) => {
+                        const userAns = data.user_answers[idx] || "";
+                        const questionBlock = form.querySelectorAll('.question-block')[idx];
+                        if (!questionBlock) return;
+                        questionBlock.querySelectorAll('label').forEach(label => {
+                            const input = label.querySelector('input[type="radio"]');
+                            if (!input) return;
+                            // Uživatelem zvolená, ale špatná odpověď
+                            if (
+                                input.checked &&
+                                input.value.trim().toLowerCase() !== correctAns.trim().toLowerCase()
+                            ) {
+                                label.style.backgroundColor = '#f8d7da'; // červená
+                                label.style.color = '#721c24';
+                                label.style.fontWeight = 'bold';
+                            }
+                        });
+                    });
+                }
+
+                // Zobraz popup vždy (úspěch i chyba) + streak_info
+                showQuizPopup({
+                    success: !!data.all_correct,
+                    score: data.score,
+                    total: data.total,
+                    xp: data.xp_awarded,
+                    streak_info: data.streak_info
+                });
+            })
+            .catch(error => {
+                showQuizPopup({success: false, errorMsg: error.message});
             });
-        }
-    });
+        });
+    }
+
+    // Theme toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            fetch('/set_theme', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark'
+                })
+            }).then(() => {
+                document.body.classList.toggle('dark-mode');
+                localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            });
+        });
+    }
+
+    // Profile menu handling
+    const profileMenu = document.getElementById('profileMenu');
+    const profileMenuTrigger = document.getElementById('profileMenuTrigger');
+
+    if (profileMenuTrigger && profileMenu) {
+        profileMenuTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileMenu.style.visibility = 'visible';
+            profileMenu.style.opacity = '1';
+            profileMenu.style.transform = 'translateY(0)';
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!profileMenu.contains(e.target) && !profileMenuTrigger.contains(e.target)) {
+                profileMenu.style.opacity = '0';
+                profileMenu.style.visibility = 'hidden';
+                profileMenu.style.transform = 'translateY(10px)';
+            }
+        });
+    }
+});
 </script>
 </body>
 </html>

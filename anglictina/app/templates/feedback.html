@@ -5,272 +5,140 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zpětná vazba | Knowix</title>
     <link rel="stylesheet" href="/static/style.css">
-    <!-- Preconnect zrychlí DNS a spojení -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Font načti až po načtení stránky -->
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
           media="print" onload="this.media='all'">
     <noscript>
         <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
     </noscript>
-
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-
-        gtag('js', new Date());
-
-        gtag('config', 'G-W1EN990JKP');
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <style>
-        .feedback-textarea {
-            resize: none;
-            width: 100%;
-            padding: 10px;
-            font-size: 1em;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            transition: border-color 0.3s;
-        }
-
-        .feedback-textarea:focus {
-            outline: none;
-            border-color: #007bff;
-        }
-
-        .feedback-item {
-            position: relative;
-            display: flex;
-            align-items: flex-start;
-            border-bottom: 1px solid #e0e0e0;
-            padding: 15px 0;
-        }
-
-        .feedback-profile-pic {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 15px;
-        }
-
-        .feedback-content {
-            flex-grow: 1;
-        }
-
-        .feedback-header {
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .feedback-user-name {
-            font-weight: bold;
-        }
-
-        .feedback-time {
-            font-size: 0.9em;
-            color: #777;
-        }
-
-        .feedback-message {
-            margin: 5px 0;
-            white-space: pre-wrap;
-        }
-
-        .feedback-actions {
-            margin-top: 10px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .feedback-item:hover .feedback-actions {
-            opacity: 1;
-        }
-
-        .edit-btn, .delete-btn {
-            padding: 5px 10px;
-            margin-right: 5px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
-
-        .edit-btn {
-            background: #ffc107;
-            color: black;
-        }
-
-        .delete-btn {
-            background: #dc3545;
-            color: white;
-        }
-
-        .edit-textarea {
-            width: 100%;
-            height: 100px;
-            margin: 10px 0;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        .edit-stars {
-            margin: 10px 0;
-            font-size: 1.2em;
-            color: #ffd700;
-            cursor: pointer;
-        }
-
-        .edit-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .save-edit, .cancel-edit {
-            padding: 5px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .save-edit {
-            background: #28a745;
-            color: white;
-        }
-
-        .cancel-edit {
-            background: #6c757d;
-            color: white;
-        }
-
-        .rating-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .stars i {
-            cursor: pointer;
-            font-size: 1.5em;
-            margin: 0 2px;
-            transition: color 0.2s;
-        }
-
-        .result-message {
-            margin: 15px 0;
-            padding: 10px;
-            border-radius: 4px;
-            display: none;
-        }
-
-        .result-message.show {
-            display: block;
-        }
-
-        .loading-message {
-            padding: 20px;
-            text-align: center;
-            color: #666;
-        }
-    </style>
+    <!-- Removed Google Tag Manager for CSP compliance -->
+    <!-- Use local Font Awesome for CSP compliance -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}">
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
-<div class="feedback-page">
-    <header>
+<header>
+    <div class="logo-streak-wrapper">
         <div class="logo">
             <a href="{{ url_for('main.index') }}">
                 <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
             </a>
         </div>
-        <nav>
-            <ul class="nav-right">
-                <li><a href="/anglictina">Angličtina</a></li>
-                <li><a href="/feedback">Feedback</a></li>
-                <li><a href="/news">Novinky</a></li>
-                <li>
-                    {% if session['user_name'] %}
-                    <div class="user-profile">
-                        <div class="profile-container">
-                            {% if session.get('profile_pic') %}
-                            <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
-                                 alt="Profilová fotka" width="64" class="profile-pic">
-                            {% else %}
-                            <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
-                                 class="profile-pic" id="profileMenuTrigger">
-                            {% endif %}
-                            <div class="profile-menu" id="profileMenu">
-                                <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
-                                <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
+    </div>
+    <div class="nav-profile-wrapper">
+        <ul class="nav-right">
+            <li>
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
+            </li>
+        </ul>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
+</header>
 
-                            </div>
-                        </div>
-                        <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
-                    </div>
-                    {% else %}
-                    <div class="auth-links">
-                        <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
-                        <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
-                    </div>
-                    {% endif %}
-                </li>
-                <li>
-                    <button id="theme-toggle">🌙</button>
-                </li>
-            </ul>
-        </nav>
-    </header>
+<div class="feedback-page">
+<main class="feedback-main">
+    <div class="feedback-card">
+        <div class="feedback-header">
+            <i class="fas fa-comment-dots feedback-icon"></i>
+            <h1>Dej nám zpětnou vazbu</h1>
+        </div>
 
-    <main class="feedback-main">
-        <div class="feedback-card">
-            <div class="feedback-header">
-                <i class="fas fa-comment-dots feedback-icon"></i>
-                <h1>Dej nám zpětnou vazbu</h1>
+        <form id="feedbackForm">
+            <div class="rating-container">
+                <div class="stars" id="starRating">
+                    <i class="far fa-star" data-rating="1"></i>
+                    <i class="far fa-star" data-rating="2"></i>
+                    <i class="far fa-star" data-rating="3"></i>
+                    <i class="far fa-star" data-rating="4"></i>
+                    <i class="far fa-star" data-rating="5"></i>
+                </div>
+                <input type="hidden" id="ratingValue" name="rating" value="0">
             </div>
 
-            <form id="feedbackForm">
-                <div class="rating-container">
-                    <div class="stars">
-                        <i class="far fa-star" data-rating="1"></i>
-                        <i class="far fa-star" data-rating="2"></i>
-                        <i class="far fa-star" data-rating="3"></i>
-                        <i class="far fa-star" data-rating="4"></i>
-                        <i class="far fa-star" data-rating="5"></i>
-                    </div>
-                    <input type="hidden" id="ratingValue" name="rating" value="0">
-                </div>
 
-                <div class="form-group">
-                    <textarea id="message" class="feedback-textarea"
-                              placeholder="Napiš svůj názor, nápad nebo připomínku..."
-                              rows="5" required></textarea>
-                </div>
-                <button type="submit" class="submit-btn">
-                    <i class="fas fa-paper-plane"></i> Odeslat zpětnou vazbu
-                </button>
-            </form>
+            <div class="form-group">
+                <textarea id="message" class="feedback-textarea"
+                          placeholder="Napiš svůj názor, nápad nebo připomínku..."
+                          rows="5" required></textarea>
+            </div>
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-paper-plane"></i> Odeslat zpětnou vazbu
+            </button>
+        </form>
 
-            <div id="feedbackResult" class="result-message"></div>
-        </div>
+        <div id="feedbackResult" class="result-message"></div>
+    </div>
 
-        <div class="feedbacks-container">
-            <h2>Recenze uživatelů <i class="fas fa-comments"></i></h2>
-            <div id="feedbacksList" class="feedbacks-list"></div>
-        </div>
-    </main>
+    <div class="feedbacks-container">
+        <h2>Recenze uživatelů <i class="fas fa-comments"></i></h2>
+        <div id="feedbacksList" class="feedbacks-list"></div>
+    </div>
+</main>
 </div>
 
 <footer>
@@ -283,8 +151,7 @@
 </footer>
 
 <script>
-
-    // theme-toggle.js
+    // Theme toggle
     document.getElementById('theme-toggle').addEventListener('click', () => {
         fetch('/set_theme', {
             method: 'POST',
@@ -294,37 +161,65 @@
             })
         }).then(() => {
             document.body.classList.toggle('dark-mode');
-            session.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
         });
     });
 
-    // Star rating functionality
-    const stars = document.querySelectorAll('.stars i');
-    const ratingInput = document.getElementById('ratingValue');
+    // Hvězdičkové hodnocení
+    document.addEventListener('DOMContentLoaded', function () {
+        const stars = document.querySelectorAll('#starRating i');
+        const ratingInput = document.getElementById('ratingValue');
+        let currentRating = 0;
 
-    function setRating(rating) {
-        ratingInput.value = rating;
-        stars.forEach((star, index) => {
-            star.classList.toggle('fas', index < rating);
-            star.classList.toggle('far', index >= rating);
-            star.style.color = index < rating ? '#ffc107' : '#ccc';
+        function setRating(rating) {
+            currentRating = rating;
+            ratingInput.value = rating;
+            stars.forEach((star, idx) => {
+                if (idx < rating) {
+                    star.classList.add('fas');
+                    star.classList.remove('far');
+                    star.style.color = '#ffc107';
+                } else {
+                    star.classList.add('far');
+                    star.classList.remove('fas');
+                    star.style.color = '#ccc';
+                }
+            });
+        }
+
+        stars.forEach((star, idx) => {
+            star.addEventListener('mouseenter', () => {
+                setRating(idx + 1);
+            });
+            star.addEventListener('mouseleave', () => {
+                setRating(currentRating);
+            });
+            star.addEventListener('click', () => {
+                setRating(idx + 1);
+            });
         });
-    }
 
-    stars.forEach(star => {
-        star.addEventListener('click', () => {
-            const rating = parseInt(star.dataset.rating);
-            setRating(rating);
+        // Reset hvězdiček po odeslání
+        document.getElementById('feedbackForm').addEventListener('reset', () => {
+            setRating(0);
         });
     });
 
-    // Form submission
     document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const form = e.target;
         const message = document.getElementById('message').value;
-        const rating = ratingInput.value;
+        const rating = parseInt(document.getElementById('ratingValue').value, 10);
         const resultDiv = document.getElementById('feedbackResult');
+
+        // Kontrola hvězdiček
+        if (rating < 1 || rating > 5) {
+            resultDiv.textContent = "Prosím, ohodnoťte hvězdičkami (1-5).";
+            resultDiv.style.color = 'red';
+            resultDiv.classList.add('show');
+            setTimeout(() => resultDiv.classList.remove('show'), 3000);
+            return;
+        }
 
         try {
             const response = await fetch('/feedback', {
@@ -337,18 +232,24 @@
 
             if (data.status === 'success') {
                 renderFeedback({
-                    id: data.feedback_id,
-                    user_name: data.user_name,
-                    profile_pic: data.profile_pic,
-                    message: message,
-                    rating: rating,
-                    timestamp: data.timestamp,
+                    id: data.feedback?.id,
+                    user_name: data.feedback?.user_name,
+                    profile_pic: data.feedback?.profile_pic,
+                    message: data.feedback?.message,
+                    rating: data.feedback?.rating,
+                    timestamp: data.feedback?.timestamp,
                     is_owner: true,
                     is_edited: false
                 });
 
                 form.reset();
-                setRating(0);
+                // Reset hvězdiček
+                const stars = document.querySelectorAll('#starRating i');
+                stars.forEach(star => {
+                    star.classList.remove('fas');
+                    star.classList.add('far');
+                    star.style.color = '#ccc';
+                });
                 resultDiv.textContent = data.message;
                 resultDiv.style.color = 'green';
             } else {
@@ -368,8 +269,6 @@
     // Feedback rendering
     function renderFeedback(fb) {
         const container = document.getElementById('feedbacksList');
-
-        // Validace vstupních dat
         const safeData = {
             id: fb.id || Date.now(),
             user_name: fb.user_name || 'Anonymní uživatel',
@@ -391,7 +290,8 @@
             <div class="feedback-header">
                 <span class="feedback-user-name">${safeData.user_name}</span>
                 <div class="rating-stars">
-                    ${'⭐'.repeat(safeData.rating)}${'☆'.repeat(5 - safeData.rating)}
+                    ${'<i class="fas fa-star"></i>'.repeat(safeData.rating)}
+                    ${'<i class="far fa-star"></i>'.repeat(5 - safeData.rating)}
                 </div>
                 <span class="feedback-time">
                     ${safeData.timestamp}
@@ -415,28 +315,18 @@
     async function loadFeedbacks() {
         try {
             const res = await fetch('/get_feedbacks');
-
-            if (!res.ok) {
-                throw new Error(`HTTP error! status: ${res.status}`);
-            }
-
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
             const data = await res.json();
             const container = document.getElementById('feedbacksList');
             container.innerHTML = '';
-
-            // Bezpečné zpracování neexistujícího pole
             const feedbacks = data.feedbacks || [];
-
             feedbacks.forEach(fb => {
-                // Zajistěte výchozí hodnoty pro chybějící data
                 fb.profile_pic = fb.profile_pic || 'default.webp';
                 fb.is_edited = fb.is_edited || false;
                 renderFeedback(fb);
             });
-
         } catch (error) {
             console.error("Chyba při načítání feedbacků:", error);
-            // Můžete zde přidat zobrazení chyby uživateli
         }
     }
 
@@ -444,9 +334,8 @@
     document.getElementById('feedbacksList').addEventListener('click', async (e) => {
         const target = e.target;
         const feedbackItem = target.closest('.feedback-item');
-        const id = feedbackItem?.dataset.id;
-
-        if (!id) return;
+        if (!feedbackItem) return;
+        const id = feedbackItem.querySelector('.edit-btn, .delete-btn')?.dataset.id;
 
         // Delete feedback
         if (target.classList.contains('delete-btn')) {
@@ -540,10 +429,10 @@
     // Initial load
     window.addEventListener('DOMContentLoaded', loadFeedbacks);
 
-
     // Profile menu
-    document.querySelector('.profile-pic').addEventListener('click', function () {
+    document.querySelector('.profile-pic')?.addEventListener('click', function () {
         const menu = document.getElementById('profileMenu');
+        if (!menu) return;
         menu.style.opacity = menu.style.opacity === '1' ? '0' : '1';
         menu.style.visibility = menu.style.visibility === 'visible' ? 'hidden' : 'visible';
         menu.style.transform = menu.style.transform === 'translateY(0)' ? 'translateY(10px)' : 'translateY(0)';

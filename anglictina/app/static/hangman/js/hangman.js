@@ -3,7 +3,6 @@ const buttonsContainer = document.getElementById("letterButtons");
 let gameActive = true;
 let currentHintCz = ""; // <-- tady to chybělo
 
-
 const HANGMAN_STAGES = [
     `
      +–––––+
@@ -63,6 +62,20 @@ const HANGMAN_STAGES = [
     ===========`
 ];
 
+// --- STREAK TOAST FUNKCE ---
+function showStreakToast(streak) {
+    const toast = document.getElementById('streakToast');
+    const text = document.getElementById('streakToastText');
+    text.textContent = `🔥 Máš streak ${streak} dní v řadě!`;
+    toast.classList.add('active');
+    toast.style.display = 'flex';
+    setTimeout(() => {
+        toast.classList.remove('active');
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 400);
+    }, 3500);
+}
 
 function createButtons() {
     buttonsContainer.innerHTML = "";
@@ -115,6 +128,11 @@ function guessLetter(letter) {
                 document.getElementById("nextWordBtn").style.display = "block";
                 disableButtons();
                 gameActive = false;
+
+                // --- ZOBRAZ STREAK TOAST ---
+                if (data.streak_info && (data.streak_info.status === "started" || data.streak_info.status === "continued")) {
+                    showStreakToast(data.streak_info.streak);
+                }
             } else if (data.status === "lose") {
                 resultMessage.innerHTML = `
                 <div class="result-lose">
@@ -133,9 +151,6 @@ function disableButtons() {
     const buttons = document.querySelectorAll(".letter-btn");
     buttons.forEach(btn => btn.disabled = true);
 }
-
-
-// Zbytek kódu zůstává stejný
 
 function startGame() {
     gameActive = true;
@@ -180,7 +195,6 @@ function startGame() {
         });
 }
 
-
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("nextWordBtn").addEventListener("click", startGame);
     startGame();
@@ -190,20 +204,18 @@ document.addEventListener("DOMContentLoaded", () => {
         hintDiv.innerHTML = `
             💡 Nápověda: ${currentHintCz}
         `;
+    });
 
-        // 💡 Klávesnice support
-        document.addEventListener("keydown", (event) => {
-            if (!gameActive) return;
+    // 💡 Klávesnice support
+    document.addEventListener("keydown", (event) => {
+        if (!gameActive) return;
 
-            const letter = event.key.toUpperCase();
-            if (alphabet.includes(letter)) {
-                const button = [...buttonsContainer.children].find(b => b.textContent === letter);
-                if (button && !button.disabled) {
-                    button.click();
-                }
+        const letter = event.key.toUpperCase();
+        if (alphabet.includes(letter)) {
+            const button = [...buttonsContainer.children].find(b => b.textContent === letter);
+            if (button && !button.disabled) {
+                button.click();
             }
-        });
-    })
-})
-
-
+        }
+    });
+});

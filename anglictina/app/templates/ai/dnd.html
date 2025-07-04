@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Procvičuj si angličtinu zábavně s Knowixem – chaty, písničky, překlady a hry.">
+
+    <title>Knowix - DND</title>
+    <link rel="stylesheet" href="/static/style.css">
+
+    <!-- Preconnect zrychlí DNS a spojení -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Font načti až po načtení stránky -->
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    </noscript>
+
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-W1EN990JKP');
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f6f8fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .chat-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            padding: 24px 16px 16px 16px;
+        }
+
+        .chat-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .inventory-bar {
+            margin-bottom: 16px;
+            text-align: center;
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 8px 0;
+        }
+
+        .inventory-bar strong {
+            color: #1976d2;
+        }
+
+        .chat-history {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+        }
+
+        .message {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message.ai {
+            flex-direction: row;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            margin: 0 8px;
+            object-fit: cover;
+            background: #eee;
+            border: 1px solid #ddd;
+        }
+
+        .bubble {
+            max-width: 80%;
+            padding: 10px 16px;
+            border-radius: 18px;
+            font-size: 1rem;
+            line-height: 1.4;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+            word-break: break-word;
+        }
+
+        .message.user .bubble {
+            background: #e0f7fa;
+            color: #00796b;
+            align-self: flex-end;
+        }
+
+        .message.ai .bubble {
+            background: #f1f8e9;
+            color: #33691e;
+            align-self: flex-start;
+        }
+
+        .chat-input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input-row input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border-radius: 18px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+        .chat-input-row button {
+            padding: 10px 18px;
+            border-radius: 18px;
+            border: none;
+            background: #00796b;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .chat-input-row button:hover {
+            background: #004d40;
+        }
+/* Horizontální seznam v bublině */
+.bubble ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8em; /* Menší mezera */
+    margin: 0.5em 0;
+    padding: 0;
+    list-style: none;
+}
+
+.bubble ul li {
+    background: #e3f2fd;
+    border-radius: 8px;
+    padding: 0.6em 1em;
+    margin: 0;
+    font-size: 0.9em;
+    position: relative;
+    min-width: auto; /* Odstranit fixní šířku */
+    white-space: nowrap; /* Zabránit zalomení */
+}
+
+.bubble ul li::before {
+    content: "•"; /* Jednodušší indikátor */
+    margin-right: 0.5em;
+    color: #1976d2;
+}
+.bubble b, .bubble strong {
+    font-weight: bold;
+    color: #fff;
+    background: #1976d2;
+    border-radius: 6px;
+    padding: 0.18em 0.7em;
+    margin: 0 0.2em;
+    display: inline-flex;
+    align-items: center;
+    font-size: 1em;
+    transition: background 0.2s;
+    box-shadow: 0 1px 2px rgba(25, 118, 210, 0.08);
+    white-space: normal;
+    line-height: 1.2;
+}
+.bubble {
+    white-space: pre-line;
+}
+
+    </style>
+</head>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}"></body>
+<header>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
+    </div>
+    <div class="nav-profile-wrapper">
+        <ul class="nav-right">
+            <li>
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
+            </li>
+        </ul>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
+</header>
+<body>
+<div class="chat-container">
+    <div class="chat-header">D&D Adventure</div>
+    <div class="inventory-bar">
+        <strong>Inventory:</strong>
+        {% if inventory and inventory|length > 0 %}
+        {{ inventory|join(', ') }}
+        {% else %}
+        nothing
+        {% endif %}
+    </div>
+    <div class="chat-history" id="chat-history">
+        {% for msg in history %}
+        <div class="message {{ 'user' if msg.sender in ['users', 'user'] else 'ai' }}">
+            {% if msg.sender in ['users', 'user'] %}
+            <img class="avatar" src="{{ url_for('static', filename='pic/default.webp') }}" alt="User">
+            <div class="bubble">{{ msg.content }}</div>
+            {% else %}
+            <img class="avatar" src="{{ url_for('static', filename='pic/ai_avatar.png') }}" alt="AI">
+            <div class="bubble">{{ msg.content|safe }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    <form class="chat-input-row" id="chat-form" autocomplete="off">
+        <input type="text" id="user_input" name="user_input" placeholder="What will you do?" required autofocus>
+        <button type="submit">Send</button>
+    </form>
+</div>
+<script>
+    const chatHistory = document.getElementById('chat-history');
+    const chatForm = document.getElementById('chat-form');
+    const userInput = document.getElementById('user_input');
+    const inventoryBar = document.querySelector('.inventory-bar');
+
+    chatForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const text = userInput.value.trim();
+        if (!text) return;
+        // Add user message to chat
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message user';
+        msgDiv.innerHTML = `<img class="avatar" src="{{ url_for('static', filename='pic/default.webp') }}" alt="User"><div class="bubble"></div>`;
+        msgDiv.querySelector('.bubble').textContent = text;
+        chatHistory.appendChild(msgDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        userInput.value = '';
+        // Add loading AI message
+        const aiDiv = document.createElement('div');
+        aiDiv.className = 'message ai';
+        aiDiv.innerHTML = `<img class="avatar" src="{{ url_for('static', filename='pic/ai_avatar.png') }}" alt="AI"><div class="bubble">...</div>`;
+        chatHistory.appendChild(aiDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        fetch('{{ url_for("ai_bp.dnd") }}', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'user_input=' + encodeURIComponent(text)
+        })
+            .then(response => response.json())
+            .then(data => {
+                aiDiv.querySelector('.bubble').textContent = data.response || 'Error!';
+                // Aktualizace inventáře v horním panelu
+                if (data.inventory !== undefined) {
+                    let inv = data.inventory;
+                    if (Array.isArray(inv) && inv.length > 0) {
+                        inventoryBar.innerHTML = '<strong>Inventory:</strong> ' + inv.join(', ');
+                    } else {
+                        inventoryBar.innerHTML = '<strong>Inventory:</strong> nothing';
+                    }
+                }
+            })
+            .catch(error => {
+                aiDiv.querySelector('.bubble').textContent = 'Error!';
+                console.error(error);
+            });
+    });
+</script>
+</body>
+</html>

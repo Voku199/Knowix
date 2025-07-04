@@ -11,9 +11,52 @@ import json
 import string
 import time
 import random
+from xp import get_user_achievements, get_all_achievements, get_top_users, get_user_xp_and_level
+from db import get_db_connection
 
 auth_bp = Blueprint('auth', __name__)
 user_settings = {}
+
+LEVEL_NAMES = [
+    "Začátečník", "Učeň", "Student", "Pokročilý", "Expert", "Mistr", "Legenda"
+]
+
+
+def get_level_name(level):
+    if level <= 1:
+        return LEVEL_NAMES[0]
+    elif level <= 2:
+        return LEVEL_NAMES[1]
+    elif level <= 4:
+        return LEVEL_NAMES[2]
+    elif level <= 6:
+        return LEVEL_NAMES[3]
+    elif level <= 8:
+        return LEVEL_NAMES[4]
+    elif level <= 10:
+        return LEVEL_NAMES[5]
+    else:
+        return LEVEL_NAMES[6]
+
+
+@auth_bp.context_processor
+def inject_xp_info():
+    user_id = session.get('user_id')
+    if user_id:
+        user_data = get_user_xp_and_level(user_id)
+        xp = user_data.get("xp", 0)
+        level = user_data.get("level", 1)
+        xp_in_level = xp % 50
+        percent = int((xp_in_level / 50) * 100)
+        level_name = get_level_name(level)
+        return dict(
+            user_xp=xp,
+            user_level=level,
+            user_level_name=level_name,
+            user_progress_percent=percent,
+            user_xp_in_level=xp_in_level
+        )
+    return {}
 
 
 @auth_bp.errorhandler(502)
@@ -28,15 +71,15 @@ def server_error(e):
 
 
 # Pomocné funkce
-def get_db_connection():
-    return mysql.connector.connect(
-        host=os.environ["DB_HOST"],
-        port=int(os.environ["DB_PORT"]),
-        user=os.environ["DB_USER"],
-        password=os.environ["DB_PASS"],
-        database=os.environ["DB_NAME"],
-        connection_timeout=30
-    )
+# def get_db_connection():
+#     return mysql.connector.connect(
+#         host=os.environ["DB_HOST"],
+#         port=int(os.environ["DB_PORT"]),
+#         user=os.environ["DB_USER"],
+#         password=os.environ["DB_PASS"],
+#         database=os.environ["DB_NAME"],
+#         connection_timeout=30
+#     )
 
 
 def allowed_file(filename):
@@ -85,10 +128,17 @@ def settings():
     cur.close()
     db.close()
 
+    user_achievements = get_user_achievements(user)
+    all_achievements = get_all_achievements()
+    top_users = get_top_users(10)
+
     return render_template('settings.html',
                            theme=theme,
                            english_level=english_level,
-                           profile_pic=session['profile_pic'])
+                           profile_pic=session['profile_pic'],
+                           user_achievements=user_achievements,
+                           all_achievements=all_achievements,
+                           top_users=top_users)
 
 
 @auth_bp.route('/set_english_level', methods=['POST'])

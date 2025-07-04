@@ -1,5 +1,5 @@
 from flask import Blueprint, session, jsonify, request
-from auth import get_db_connection
+from db import get_db_connection
 
 theme_bp = Blueprint("theme", __name__)
 

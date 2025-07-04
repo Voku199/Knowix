@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="description" content="Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam.">
+  <meta name="keywords" content="angličtina, procvičování, písničky, testy, chat, výuka, zdarma">
+  <meta name="robots" content="index, anglictina">
     <title>Knowix - Angličtina</title>
     <link rel="stylesheet" href="/static/style.css">
     <!-- Preconnect zrychlí DNS a spojení -->
@@ -35,46 +38,85 @@
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
-    <div class="logo">
-        <a href="{{ url_for('main.index') }}">
-            <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
-        </a>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
     </div>
-    <nav>
+    <div class="nav-profile-wrapper">
         <ul class="nav-right">
-            <li><a href="/anglictina">Angličtina</a></li>
-            <li><a href="/feedback">Feedback</a></li>
-            <li><a href="/news">Novinky</a></li>
             <li>
-                {% if session['user_name'] %}
-                <div class="user-profile">
-                    <div class="profile-container">
-                        {% if session.get('profile_pic') %}
-                        <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
-                             alt="Profilová fotka" width="64" class="profile-pic">
-                        {% else %}
-                        <img src="{{ url_for('static', filename='pics/default.webp') }}" alt="Defaultní profilovka"
-                             class="profile-pic" id="profileMenuTrigger">
-                        {% endif %}
-                        <div class="profile-menu" id="profileMenu">
-                            <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
-                            <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
-                        </div>
-                    </div>
-                    <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
-                </div>
-                {% else %}
-                <div class="auth-links">
-                    <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
-                    <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
-                </div>
-                {% endif %}
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
             </li>
             <li>
-                <button id="theme-toggle">🌙</button>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
             </li>
         </ul>
-    </nav>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
 </header>
 <main>
     <section class="intro">
@@ -89,6 +131,22 @@
             <div class="bubble-text">
                 <h3>Poslouchání</h3>
                 <p style="color: inherit;">Procvič si normalní bázi poslouchaní konverzací!</p>
+            </div>
+        </a>
+
+        <a href="/ai/chats" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+            <img src="{{ url_for('static', filename='pic/ai-chat.png') }}" alt="Slovesa">
+            <div class="bubble-text">
+                <h3>AI chat</h3>
+                <p style="color: inherit;">Chceš se naučit trošku angličtinu? Lepší způsob nenajdeš.</p>
+            </div>
+        </a>
+
+        <a href="/dnd" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+            <img src="{{ url_for('static', filename='pic/dnd.png') }}" alt="Slovesa">
+            <div class="bubble-text">
+                <h3>DND (Dungeons And Dragons</h3>
+                <p style="color: inherit;">Slovní příběhovka kterou si buduješ sám...</p>
             </div>
         </a>
 
@@ -114,6 +172,20 @@
             <div class="bubble-text">
                 <h3>Gramatika</h3>
                 <p style="color: inherit;">Gramatika, kde si můžeš procvičit svojí gramatiku zábavnou formou!</p>
+            </div>
+        </a>
+        <a href="/roleplaying" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+            <img src="{{ url_for('static', filename='pic/mic.png') }}" alt="Slovesa">
+            <div class="bubble-text">
+                <h3>Mluvení</h3>
+                <p style="color: inherit;">Mluvení, kde si můžeš procvičit své mluvení!</p>
+            </div>
+        </a>
+        <a href="/pexeso" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+            <img src="{{ url_for('static', filename='pic/pexeso.png') }}" alt="Slovesa">
+            <div class="bubble-text">
+                <h3>Pexeso (Multiplayer)</h3>
+                <p style="color: inherit;">Pexeso kde hraješ s ostatními! (Beta verze)</p>
             </div>
         </a>
     </section>

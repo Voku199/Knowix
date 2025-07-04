@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Procvičuj si angličtinu zábavně s Knowixem – chaty, písničky, překlady a hry.">
+
+    <title>Knowix - AI chat</title>
+    <link rel="stylesheet" href="/static/style.css">
+
+    <!-- Preconnect zrychlí DNS a spojení -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Font načti až po načtení stránky -->
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    </noscript>
+
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-W1EN990JKP');
+    </script>
+    <style>
+        body {
+            font-family: 'League Spartan', Arial, sans-serif;
+            background: #f6f8fa;
+            margin: 0;
+            padding: 0;
+        }
+        .main-flex {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 220px;
+            background: #f1f8e9;
+            border-right: 1px solid #e0e0e0;
+            padding: 18px 10px 10px 10px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .sidebar h2 {
+            font-size: 1.1em;
+            margin: 0 0 10px 0;
+            color: #33691e;
+            text-align: center;
+        }
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 16px;
+        }
+        .chat-list-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            background: #fff;
+            cursor: pointer;
+            transition: background 0.15s;
+            text-decoration: none;
+            color: #222;
+        }
+        .chat-list-item.active, .chat-list-item:hover {
+            background: #e0f7fa;
+            color: #00796b;
+        }
+        .chat-list-item .chat-title {
+            flex: 1;
+            font-weight: 500;
+            font-size: 1em;
+        }
+        .chat-list-item .chat-date {
+            font-size: 0.85em;
+            color: #888;
+            margin-left: 8px;
+        }
+        .new-chat-btn {
+            width: 100%;
+            padding: 10px 0;
+            border: none;
+            border-radius: 8px;
+            background: #00796b;
+            color: #fff;
+            font-weight: 600;
+            font-size: 1em;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: background 0.2s;
+        }
+        .new-chat-btn:hover {
+            background: #004d40;
+        }
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 24px 16px 16px 16px;
+            display: flex;
+            flex-direction: column;
+            min-height: 70vh;
+        }
+        .chat-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .chat-history {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 16px;
+            padding-right: 4px;
+        }
+        .message {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-end;
+        }
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        .message.ai {
+            flex-direction: row;
+        }
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            margin: 0 8px;
+            object-fit: cover;
+            background: #eee;
+            border: 1px solid #ddd;
+        }
+        .bubble {
+            max-width: 80%;
+            padding: 10px 16px;
+            border-radius: 18px;
+            font-size: 1rem;
+            line-height: 1.4;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .message.user .bubble {
+            background: #e0f7fa;
+            color: #00796b;
+            align-self: flex-end;
+        }
+        .message.ai .bubble {
+            background: #f1f8e9;
+            color: #33691e;
+            align-self: flex-start;
+        }
+        .chat-input-row {
+            display: flex;
+            gap: 8px;
+        }
+        .chat-input-row input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border-radius: 18px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+        .chat-input-row button {
+            padding: 10px 18px;
+            border-radius: 18px;
+            border: none;
+            background: #00796b;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .chat-input-row button:hover {
+            background: #004d40;
+        }
+        @media (max-width: 900px) {
+            .main-flex { flex-direction: column; }
+            .sidebar { width: 100%; min-height: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid #e0e0e0; }
+            .chat-main { min-height: auto; }
+        }
+        @media (max-width: 700px) {
+            .chat-container { max-width: 98vw; }
+        }
+    </style>
+</head>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}"></body>
+<header>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
+    </div>
+    <div class="nav-profile-wrapper">
+        <ul class="nav-right">
+            <li>
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
+            </li>
+        </ul>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
+</header>
+<body>
+<div class="main-flex">
+    <div class="sidebar">
+        <form id="new-chat-form" style="margin-bottom: 12px;">
+            <button type="submit" class="new-chat-btn">+ New Chat</button>
+        </form>
+        <div class="chat-list" id="chat-list">
+            {% for chat in chats %}
+            <div class="chat-list-item{% if chat_id is defined and chat_id == chat.id %} active{% endif %}" data-chat-id="{{ chat.id }}">
+                <span class="chat-title">{{ chat.title }}</span>
+                <span class="chat-date">{{ chat.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="chat-main">
+        <div class="chat-container">
+            <div class="chat-header">Chat s AI</div>
+            <div class="chat-history" id="chat-history">
+                {% if history %}
+                    {% for msg in history %}
+                    <div class="message {{ 'user' if msg.sender in ['users', 'user'] else 'ai' }}">
+                        {% if msg.sender in ['users', 'user'] %}
+                        <img class="avatar" src="{{ url_for('static', filename='pic/default.webp') }}" alt="User">
+                        <div class="bubble">{{ msg.content }}</div>
+                        {% else %}
+                        <img class="avatar" src="{{ url_for('static', filename='pic/ai_avatar.png') }}" alt="AI">
+                        <div class="bubble">{{ msg.content }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="text-align:center;opacity:0.7;margin-top:40px;">Vyber nebo založ chat vlevo.</div>
+                {% endif %}
+            </div>
+            {% if chat_id %}
+            <form class="chat-input-row" id="chat-form" autocomplete="off">
+                <input type="text" id="user_input" name="user_input" placeholder="Napiš zprávu..." required autofocus>
+                <button type="submit">Odeslat</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<script>
+    // Přepínání chatů AJAXem
+    document.querySelectorAll('.chat-list-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const chatId = this.getAttribute('data-chat-id');
+            window.location.href = "{{ url_for('ai_bp.chat_multi', chat_id=0) }}".replace('0', chatId);
+        });
+    });
+
+    // Nový chat AJAXem (nebo fallback na reload)
+    document.getElementById('new-chat-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        fetch("{{ url_for('ai_bp.chat_list') }}", {
+            method: "POST",
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: "title="
+        })
+        .then(response => response.redirected ? window.location.href = response.url : location.reload());
+    });
+
+    // Odesílání zpráv AJAXem (pouze pokud je chat_id)
+    {% if chat_id %}
+    const chatForm = document.getElementById('chat-form');
+    const chatHistory = document.getElementById('chat-history');
+    const userInput = document.getElementById('user_input');
+    chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const text = userInput.value.trim();
+        if (!text) return;
+        // Přidej zprávu uživatele
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message user';
+        msgDiv.innerHTML = `<img class="avatar" src="{{ url_for('static', filename='pic/default.webp') }}" alt="User"><div class="bubble"></div>`;
+        msgDiv.querySelector('.bubble').textContent = text;
+        chatHistory.appendChild(msgDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        userInput.value = '';
+        // Přidej loading AI zprávu
+        const aiDiv = document.createElement('div');
+        aiDiv.className = 'message ai';
+        aiDiv.innerHTML = `<img class="avatar" src="{{ url_for('static', filename='pic/ai_avatar.png') }}" alt="AI"><div class="bubble">...</div>`;
+        chatHistory.appendChild(aiDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        fetch('{{ url_for("ai_bp.chat_multi", chat_id=chat_id) }}', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'user_input=' + encodeURIComponent(text)
+        })
+        .then(response => response.json())
+        .then(data => {
+            aiDiv.querySelector('.bubble').textContent = data.response || 'Chyba!';
+        })
+        .catch(error => {
+            aiDiv.querySelector('.bubble').textContent = 'Došlo k chybě!';
+            console.error(error);
+        });
+    });
+    {% endif %}
+</script>
+</body>
+</html>

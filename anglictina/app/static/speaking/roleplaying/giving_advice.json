@@ -1,0 +1,108 @@
+{
+  "topic": "giving_advice",
+  "level": "B2",
+  "characters": [
+    "Alex",
+    "Uživatel"
+  ],
+  "dialogue": [
+    {
+      "speaker": "Alex",
+      "cz": "Ahoj... potřebuju tvoji pomoc s jednou věcí. Je to trochu trapný.",
+      "en": "Hey... I need your help with something. It's a bit embarrassing."
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Zeptej se, co se děje a ujisti ji, že ti může věřit.",
+      "en": [
+        "What's going on? You can trust me.",
+        "Tell me, what happened? You know you can talk to me.",
+        "What is it? I won’t judge, I promise."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Je tu jeden kluk, který se mi fakt líbí... a já vůbec nevím, jak mu to dát najevo.",
+      "en": "There's this guy I really like... and I have no idea how to show it."
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Navrhni, aby začala tím, že s ním bude mluvit častěji a přirozeně.",
+      "en": [
+        "Start by talking to him more often. Just be natural.",
+        "Try to spend more time around him and talk casually.",
+        "Just start a conversation and see how he reacts."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "No jo, ale já se vždycky cítím trapně. Co když si myslí, že jsem jen kámoška?",
+      "en": "Yeah, but I always feel awkward. What if he thinks I'm just a friend?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Porad, ať dává jemné náznaky – jako úsměvy, zájem o jeho koníčky, doteky.",
+      "en": [
+        "Give him subtle signs – smile more, ask about his hobbies, maybe some light touches.",
+        "Try to show interest in what he likes and compliment him now and then.",
+        "Flirt just a little – enough to make him wonder."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "To zní zvládnutelně... Myslíš, že mu mám napsat zprávu, nebo to říct osobně?",
+      "en": "That sounds manageable... Do you think I should text him or say it in person?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Porad podle situace – pokud je plachý, možná zprávu; jinak osobně je lepší.",
+      "en": [
+        "If he's shy, maybe text him first. But in person is always better.",
+        "Depends on the moment – but face to face makes it more real.",
+        "If you have a chance, tell him in person. It shows confidence."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Dobře… Co třeba: 'Ahoj, jsi mi fakt sympatický a ráda bych tě víc poznala.' Je to moc divný?",
+      "en": "Okay... What about: 'Hey, I really like you and I’d love to get to know you better.' Is that too weird?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "To je vlastně docela dobré! Možná by to mohlo být trochu neformálnější, třeba: „Ahoj, myslím, že jsi super a rád bych si s tebou někdy vyrazil.“",
+      "en": [
+        "That’s actually pretty good! Maybe make it more casual, like: 'Hey, I think you're cool and I'd like to hang out sometime.'",
+        "It’s honest, which is great. You could also say: 'I like spending time with you. Want to hang out more?'",
+        "It’s fine as it is, but if you want to be more subtle, try something like: 'We should do something together one day.'"
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Díky! Fakt si cením tvojí pomoci. Drž mi palce, jo?",
+      "en": "Thanks! I really appreciate your help. Wish me luck, okay?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Popřej jí hodně štěstí a řekni, že to určitě zvládne.",
+      "en": [
+        "Good luck! You’ve got this!",
+        "He’d be lucky to have you. Go get him!",
+        "You’ll be amazing. I believe in you!"
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Kdyby to vyšlo, tak ty něco dám \uD83D\uDE0F",
+      "en": "If it works out, I’ll will give you something \uD83D\uDE0F"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Zasměj se a odpověz s nadšením.",
+      "en": [
+        "Okay, but nothing stupid okay?",
+        "Thats sounds great! I’ll wait \uD83D\uDE0F",
+        "Okay, thank you! \uD83D\uDE0F"
+      ]
+    }
+  ]
+}

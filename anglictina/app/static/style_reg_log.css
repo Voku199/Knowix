@@ -7,6 +7,81 @@
     --error: #ef4444;
 }
 
+.user-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3em;
+}
+
+.profile-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.xp-header-bar {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    width: 220px;
+    max-width: 90vw;
+}
+
+.xp-header-bar-labels {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1em;
+    margin-bottom: 0.2em;
+}
+
+.xp-level-badge {
+    background: #4CAF50;
+    color: #fff;
+    border-radius: 8px;
+    padding: 2px 10px;
+    font-weight: 600;
+    font-size: 0.95em;
+    margin-right: 0.5em;
+}
+
+.xp-value {
+    color: #333;
+    font-size: 0.95em;
+}
+
+body.dark-mode .xp-level-badge {
+    background: #2e7d32;
+}
+
+body.dark-mode .xp-value {
+    color: #eee;
+}
+
+.xp-header-bar-progress-bg {
+    background: #e0e0e0;
+    border-radius: 8px;
+    height: 12px;
+    width: 100%;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.xp-header-bar-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50 60%, #43a047 100%);
+    border-radius: 8px 0 0 8px;
+    transition: width 0.4s;
+}
+
+body.dark-mode .xp-header-bar-progress-bg {
+    background: #333;
+}
+
+body.dark-mode .xp-header-bar-progress {
+    background: linear-gradient(90deg, #2e7d32 60%, #1b5e20 100%);
+}
+
 * {
     margin: 0;
     padding: 0;

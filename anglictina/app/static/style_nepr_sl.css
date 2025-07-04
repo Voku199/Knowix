@@ -5,6 +5,81 @@
     box-sizing: border-box;
 }
 
+.user-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3em;
+}
+
+.profile-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.xp-header-bar {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    width: 220px;
+    max-width: 90vw;
+}
+
+.xp-header-bar-labels {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1em;
+    margin-bottom: 0.2em;
+}
+
+.xp-level-badge {
+    background: #4CAF50;
+    color: #fff;
+    border-radius: 8px;
+    padding: 2px 10px;
+    font-weight: 600;
+    font-size: 0.95em;
+    margin-right: 0.5em;
+}
+
+.xp-value {
+    color: #333;
+    font-size: 0.95em;
+}
+
+body.dark-mode .xp-level-badge {
+    background: #2e7d32;
+}
+
+body.dark-mode .xp-value {
+    color: #eee;
+}
+
+.xp-header-bar-progress-bg {
+    background: #e0e0e0;
+    border-radius: 8px;
+    height: 12px;
+    width: 100%;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.xp-header-bar-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50 60%, #43a047 100%);
+    border-radius: 8px 0 0 8px;
+    transition: width 0.4s;
+}
+
+body.dark-mode .xp-header-bar-progress-bg {
+    background: #333;
+}
+
+body.dark-mode .xp-header-bar-progress {
+    background: linear-gradient(90deg, #2e7d32 60%, #1b5e20 100%);
+}
+
 body {
     font-family: 'League Spartan', sans-serif;
     background-color: #fff;
@@ -21,22 +96,239 @@ body.dark-mode {
     color: #f5f5f5;
 }
 
-/* Hlavička */
+/* Upravíme header, aby .logo-streak-wrapper byla vlevo */
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
     border-bottom: 2px solid #ddd;
+    transition: all 0.3s ease;
 }
 
-/* Logo */
+/* --- Streak badge (ohýnek) vedle loga --- */
+.streak-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    background: linear-gradient(90deg, #fffbe6 60%, #ffe0b2 100%);
+    color: #ff9800;
+    font-weight: 700;
+    font-size: 1.15em;
+    border-radius: 18px;
+    padding: 0.25em 1em 0.25em 0.7em;
+    margin-left: 1.2em;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.08);
+    border: 1.5px solid #ffd54f;
+    transition: background 0.3s, box-shadow 0.3s, color 0.3s;
+    cursor: default;
+    user-select: none;
+    min-width: 60px;
+    min-height: 2.2em;
+    position: relative;
+}
+
+.logo-streak-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+}
+
+/* Responsivní úprava pro mobil */
+@media (max-width: 700px) {
+    .logo-streak-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.2em;
+    }
+}
+
+.logo-streak-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+}
+
+.nav-profile-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.nav-right li {
+    display: flex;
+    align-items: center;
+}
+
+.nav-icon {
+    width: 2.3em;
+    height: 2.3em;
+    display: block;
+    filter: drop-shadow(0 1px 2px rgba(25, 118, 210, 0.08));
+    transition: transform 0.15s;
+}
+
+.nav-right li a {
+    padding: 0.2em 0.5em;
+    border-radius: 8px;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+}
+
+.nav-right li a:hover .nav-icon {
+    transform: scale(1.18) rotate(-6deg);
+}
+
+.nav-right li button#theme-toggle {
+    font-size: 2em;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.1em 0.4em;
+    border-radius: 8px;
+    transition: background 0.15s;
+    color: #1976d2;
+}
+
+.nav-right li button#theme-toggle:hover {
+    background: #e3f2fd;
+    color: #0d47a1;
+}
+
+body.dark-mode .nav-right li a,
+body.dark-mode .nav-right li button#theme-toggle {
+    color: #90caf9;
+}
+
+body.dark-mode .nav-right li a:hover,
+body.dark-mode .nav-right li button#theme-toggle:hover {
+    background: #1565c0;
+    color: #fff;
+}
+
+body.dark-mode .nav-icon {
+    filter: brightness(0.8) drop-shadow(0 1px 2px rgba(144, 202, 249, 0.13));
+}
+
+.auth-links {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.auth-btn {
+    display: inline-block;
+    padding: 0.55em 1.5em;
+    font-size: 1.08em;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #fff;
+    background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.10);
+    transition: background 0.18s, box-shadow 0.18s, color 0.18s;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    outline: none;
+}
+
+.auth-btn:hover, .auth-btn:focus {
+    background: linear-gradient(90deg, #1565c0 60%, #1976d2 100%);
+    color: #e3f2fd;
+    box-shadow: 0 4px 16px rgba(25, 118, 210, 0.18);
+    text-decoration: none;
+}
+
+.login-btn {
+    background: linear-gradient(90deg, #43a047 60%, #66bb6a 100%);
+}
+
+.login-btn:hover, .login-btn:focus {
+    background: linear-gradient(90deg, #388e3c 60%, #43a047 100%);
+    color: #e8f5e9;
+}
+
+.register-btn {
+    background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
+}
+
+.register-btn:hover, .register-btn:focus {
+    background: linear-gradient(90deg, #1565c0 60%, #1976d2 100%);
+    color: #e3f2fd;
+}
+
+body.dark-mode .auth-btn {
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.18);
+}
+
+body.dark-mode .login-btn {
+    background: linear-gradient(90deg, #388e3c 60%, #43a047 100%);
+}
+
+body.dark-mode .register-btn {
+    background: linear-gradient(90deg, #1565c0 60%, #1976d2 100%);
+}
+
+
+.streak-badge img {
+    height: 1.5em;
+    width: auto;
+    margin-right: 0.3em;
+    filter: drop-shadow(0 1px 2px rgba(255, 152, 0, 0.15));
+    animation: streakFire 1.2s infinite alternate;
+}
+
+@keyframes streakFire {
+    0% {
+        transform: scale(1) rotate(-2deg);
+    }
+    50% {
+        transform: scale(1.08) rotate(2deg);
+    }
+    100% {
+        transform: scale(1) rotate(-2deg);
+    }
+}
+
+.streak-badge:hover {
+    background: linear-gradient(90deg, #ffe0b2 60%, #ffd54f 100%);
+    box-shadow: 0 4px 16px rgba(255, 152, 0, 0.18);
+    color: #e65100;
+}
+
+body.dark-mode .streak-badge {
+    background: linear-gradient(90deg, #2a1a00 60%, #3e2723 100%);
+    color: #ffb74d;
+    border-color: #ff9800;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.13);
+}
+
+body.dark-mode .streak-badge:hover {
+    background: linear-gradient(90deg, #3e2723 60%, #ff9800 100%);
+    color: #fff3e0;
+}
+
+/* Logo s 3D efektem */
 .logo img {
-    width: 80px;
+    width: 100px;
     height: auto;
     border-radius: 12px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform-style: preserve-3d;
 }
 
 .logo a {

@@ -1,13 +1,65 @@
 from flask import Blueprint, session, request, render_template, redirect, url_for, flash
-from auth import get_db_connection
+from db import get_db_connection
 import json
 import random
+from xp import get_user_xp_and_level, add_xp_to_user  # Přidán import add_xp_to_user
+from streak import update_user_streak, get_user_streak  # <-- Přidán import streak systému
 
 verbs_bp = Blueprint('verbs', __name__)
 
 # Načtení dat se slovesy
 with open('verbs.json', 'r') as f:
     verbs_data = json.load(f)
+
+LEVEL_NAMES = [
+    "Začátečník", "Učeň", "Student", "Pokročilý", "Expert", "Mistr", "Legenda"
+]
+
+
+def get_level_name(level):
+    if level <= 1:
+        return LEVEL_NAMES[0]
+    elif level <= 2:
+        return LEVEL_NAMES[1]
+    elif level <= 4:
+        return LEVEL_NAMES[2]
+    elif level <= 6:
+        return LEVEL_NAMES[3]
+    elif level <= 8:
+        return LEVEL_NAMES[4]
+    elif level <= 10:
+        return LEVEL_NAMES[5]
+    else:
+        return LEVEL_NAMES[6]
+
+
+@verbs_bp.context_processor
+def inject_streak():
+    user_id = session.get('user_id')
+    if user_id:
+        streak = get_user_streak(user_id)
+        return dict(user_streak=streak)
+    return dict(user_streak=0)
+
+
+@verbs_bp.context_processor
+def inject_xp_info():
+    user_id = session.get('user_id')
+    if user_id:
+        user_data = get_user_xp_and_level(user_id)
+        xp = user_data.get("xp", 0)
+        level = user_data.get("level", 1)
+        xp_in_level = xp % 50
+        percent = int((xp_in_level / 50) * 100)
+        level_name = get_level_name(level)
+        return dict(
+            user_xp=xp,
+            user_level=level,
+            user_level_name=level_name,
+            user_progress_percent=percent,
+            user_xp_in_level=xp_in_level
+        )
+    return {}
 
 
 @verbs_bp.errorhandler(502)
@@ -189,6 +241,18 @@ def test():
         if is_correct:
             session['correct_answers_for_verb'] = session.get('correct_answers_for_verb', 0) + 1
 
+            # --- XP ZA KAŽDOU SPRÁVNOU ODPOVĚĎ ---
+            if not is_guest:
+                result = add_xp_to_user(session['user_id'], 2)
+                if "error" in result:
+                    flash(f"XP se nepodařilo přidat: {result['error']}", "error")
+                else:
+                    flash(f"Získáváš 2 XP za správnou odpověď!", "success")
+                    # --- STREAK LOGIKA ---
+                    streak_info = update_user_streak(session['user_id'])
+                    if streak_info and streak_info.get("status") in ("started", "continued"):
+                        flash(f"🔥 Máš streak {streak_info['streak']} dní v řadě!", "streak")
+
             if session['correct_answers_for_verb'] >= 6 and not is_guest:
                 with get_db_connection() as conn:
                     cursor = conn.cursor()
@@ -216,19 +280,6 @@ def test():
                 """, (session['user_id'], LESSON_ID))
                 verbs_done = cursor.fetchone()[0] or 0
         session['verbs_done'] = verbs_done
-
-        if verbs_done >= VERBS_PER_LESSON and not is_guest:
-            with get_db_connection() as conn:
-                cursor = conn.cursor()
-                cursor.execute("""
-                    INSERT INTO user_lessons (user_id, lesson_id, completed, completion_date)
-                    VALUES (%s, %s, TRUE, NOW())
-                    ON DUPLICATE KEY UPDATE completed = TRUE, completion_date = NOW()
-                """, (session['user_id'], LESSON_ID))
-                conn.commit()
-            session['lesson_complete'] = True
-        else:
-            session['lesson_complete'] = False
 
         sentence, correct_answer, tense = generate_test(verb)
         if not sentence:

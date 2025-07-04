@@ -73,14 +73,14 @@
   },
   {
     "alex": "How do you learn English?",
-    "cz_reply": "Sleduju videa a hraju hry.",
+    "cz_reply": "Stranka Knowix mě to učí",
     "accepted_answers": [
-      "I watch videos and play games.",
-      "I watch videos and I play games."
+      "Website Knowix is teaching me",
+      "Website Knowix, from there im am learning"
     ]
   },
   {
-    "alex": "Do games help with English?",
+    "alex": "Do the website help with English?",
     "cz_reply": "Jo, naučil jsem se nová slova.",
     "accepted_answers": [
       "Yes, I learned new words.",

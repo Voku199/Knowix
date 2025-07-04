@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+          content="script-src 'self' 'unsafe-inline' https://cdn.socket.io https://www.googletagmanager.com;">
+    <meta name="description" content="Procvičuj si angličtinu zábavně s Knowixem – chaty, písničky, překlady a hry.">
+
+    <title>Pexeso – Knowix</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    </noscript>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+        gtag('config', 'G-W1EN990JKP');
+    </script>
+    <style>
+        /* Přehlednější lobby a herní UI */
+        #lobby {
+            max-width: 400px;
+            margin: 40px auto 0 auto;
+            padding: 24px 32px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        #lobby h2 {
+            margin-bottom: 16px;
+        }
+
+        #lobby input[type="text"] {
+            width: 180px;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border: 1px solid #bbb;
+            font-size: 1rem;
+        }
+
+        #lobby button {
+            margin: 0 4px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            background: #2d7ff9;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #lobby button:hover {
+            background: #155ab6;
+        }
+
+        #room-status {
+            margin-top: 10px;
+            min-height: 24px;
+            color: #2d7ff9;
+            font-weight: 500;
+        }
+
+        #game-area {
+            max-width: 600px;
+            margin: 40px auto 0 auto;
+            padding: 24px 32px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        #info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(4, 80px);
+            grid-gap: 12px;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+
+        .card {
+            width: 80px;
+            height: 100px;
+            background: #e3e8f0;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+            cursor: pointer;
+            perspective: 600px;
+            position: relative;
+            transition: box-shadow 0.2s;
+        }
+
+        .card.flipped .card-inner, .card.matched .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card.matched {
+            box-shadow: 0 0 0 2px #2ecc40;
+            background: #eaffea;
+            cursor: default;
+        }
+
+        .card.selected {
+            box-shadow: 0 0 0 2px #2d7ff9;
+        }
+
+        .card-inner {
+            width: 100%;
+            height: 100%;
+            transition: transform 0.4s;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .card-front {
+            background: #fff;
+            color: #2d7ff9;
+            border-radius: 8px;
+            transform: rotateY(180deg);
+        }
+
+        .card-back {
+            background: #2d7ff9;
+            color: #fff;
+            border-radius: 8px;
+        }
+
+        #score-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        #result {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d7ff9;
+            margin-top: 12px;
+        }
+
+        #new-game-btn {
+            margin-left: 12px;
+            background: #2ecc40;
+        }
+
+        #new-game-btn:hover {
+            background: #1eab2c;
+        }
+    </style>
+</head>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
+
+<header>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
+    </div>
+    <div class="nav-profile-wrapper">
+        <ul class="nav-right">
+            <li>
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
+            </li>
+        </ul>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
+</header>
+
+
+<div id="lobby">
+    <h2>Pexeso – Připoj se nebo vytvoř místnost</h2>
+    <input type="text" id="room-id" placeholder="Zadej kód místnosti">
+    <button id="join-btn">Připojit se</button>
+    <button id="create-btn">Vytvořit místnost</button>
+    <div id="room-status"></div>
+    <select id="level-select">
+  <option value="A1">A1</option>
+  <option value="A2">A2</option>
+  <option value="B1">B1</option>
+  <option value="B2">B2</option>
+</select>
+</div>
+
+<div id="game-area" style="display:none;">
+    <div id="info-bar">
+        <span id="player-info"></span>
+        <span id="turn-info"></span>
+        <button id="new-game-btn" style="display:none;">Nová hra</button>
+    </div>
+    <div id="score-bar">
+        <span id="score-1">Hráč 1: 0</span>
+        <span id="score-2">Hráč 2: 0</span>
+    </div>
+    <div id="board"></div>
+    <div id="result" style="display:none;"></div>
+</div>
+
+<audio id="flip-sound" src="{{ url_for('static', filename='pexeso/flip.mp3') }}"></audio>
+<audio id="success-sound" src="{{ url_for('static', filename='pexeso/success.mp3') }}"></audio>
+<audio id="fail-sound" src="{{ url_for('static', filename='pexeso/fail.mp3') }}"></audio>
+<script src="{{ url_for('static', filename='pexeso/js/socket.io.min.js') }}"></script>
+<script src="{{ url_for('static', filename='pexeso/js/main.js') }}"></script>
+<script>
+
+</script>
+</body>
+</html>

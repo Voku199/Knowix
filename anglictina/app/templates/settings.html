@@ -5,103 +5,98 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Nastavení – Knowix</title>
     <link rel="stylesheet" href="/static/style.css">
-        <!-- Preconnect zrychlí DNS a spojení -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Font načti až po načtení stránky -->
-    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
-          media="print" onload="this.media='all'">
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <noscript>
         <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
     </noscript>
-
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-
-        gtag('js', new Date());
-
-        gtag('config', 'G-W1EN990JKP');
-    </script>
-        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    </style>
 </head>
-
-<style>
-.english-level-select {
-    margin-top: 20px;
-    max-width: 400px;
-}
-
-.form-select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.btn-save {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.btn-save:hover {
-    background-color: #45a049;
-}
-</style>
-<body class="{{ 'dark-mode' if theme == 'dark' else '' }}">
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
-    <div class="logo">
-        <a href="{{ url_for('main.index') }}">
-            <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
-        </a>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
     </div>
-    <nav>
+    <div class="nav-profile-wrapper">
         <ul class="nav-right">
-            <li><a href="/anglictina">Angličtina</a></li>
-            <li><a href="/feedback">Feedback</a></li>
             <li>
-                {% if session['user_name'] %}
-                <div class="user-profile">
-                    <div class="profile-container">
-                        {% if session.get('profile_pic') %}
-                        <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
-                             alt="Profilová fotka" width="64" class="profile-pic">
-                        {% else %}
-                        <img src="{{ url_for('static', filename='pics/default.webp') }}" alt="Defaultní profilovka"
-                             class="profile-pic" id="profileMenuTrigger">
-                        {% endif %}
-                        <div class="profile-menu" id="profileMenu">
-                            <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
-                            <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
-                        </div>
-                    </div>
-                    <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
-                </div>
-                {% else %}
-                <div class="auth-links">
-                    <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
-                    <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
-                </div>
-                {% endif %}
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
             </li>
             <li>
-                <button id="theme-toggle">🌙</button>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
             </li>
         </ul>
-    </nav>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
 </header>
 
 <main class="settings-container">
@@ -114,7 +109,6 @@
                  alt="Aktuální profilovka"
                  class="current-profile-pic">
         </div>
-
         <form method="POST" action="/upload_profile_pic" enctype="multipart/form-data" class="upload-form">
             <label for="file-upload">
                 📸 Vybrat soubor
@@ -125,19 +119,57 @@
     </div>
 
     <div class="settings-section">
-    <h2>Úroveň angličtiny</h2>
-    <div class="english-level-select">
-        <select id="englishLevelSelect" class="form-select">
-            <option value="A1" {% if english_level == 'A1' %}selected{% endif %}>A1 - Začátečník</option>
-            <option value="A2" {% if english_level == 'A2' %}selected{% endif %}>A2 - Mírně pokročilý</option>
-            <option value="B1" {% if english_level == 'B1' %}selected{% endif %}>B1 - Středně pokročilý</option>
-            <option value="B2" {% if english_level == 'B2' %}selected{% endif %}>B2 - Vyšší středně pokročilý</option>
-            <option value="C1" {% if english_level == 'C1' %}selected{% endif %}>C1 - Pokročilý</option>
-            <option value="C2" {% if english_level == 'C2' %}selected{% endif %}>C2 - Expert</option>
-        </select>
-        <button onclick="updateEnglishLevel()" class="btn-save">Uložit změny</button>
+        <h2>Úroveň angličtiny</h2>
+        <div class="english-level-select">
+            <select id="englishLevelSelect" class="form-select">
+                <option value="A1" {% if english_level == 'A1' %}selected{% endif %}>A1 - Začátečník</option>
+                <option value="A2" {% if english_level == 'A2' %}selected{% endif %}>A2 - Mírně pokročilý</option>
+                <option value="B1" {% if english_level == 'B1' %}selected{% endif %}>B1 - Středně pokročilý</option>
+                <option value="B2" {% if english_level == 'B2' %}selected{% endif %}>B2 - Vyšší středně pokročilý</option>
+                <option value="C1" {% if english_level == 'C1' %}selected{% endif %}>C1 - Pokročilý</option>
+                <option value="C2" {% if english_level == 'C2' %}selected{% endif %}>C2 - Expert</option>
+            </select>
+            <button onclick="updateEnglishLevel()" class="btn-save">Uložit změny</button>
+        </div>
     </div>
-</div>
+
+    <div class="settings-section">
+        <h2>Moje achievementy</h2>
+        <div class="achievements-list">
+            {% for ach in all_achievements %}
+            <div class="achievement-item {% if ach.id in user_achievements|map(attribute='id') %}unlocked{% else %}locked{% endif %}">
+                <strong>{{ ach.name }}</strong>
+                <span>{{ ach.description }}</span>
+                {% if ach.id in user_achievements|map(attribute='id') %}
+                <span class="badge">✅ Získáno</span>
+                {% else %}
+                <span class="badge">🔒</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <h2>Top 10 uživatelů podle XP</h2>
+        <ol class="top-users-list">
+            {% for user in top_users %}
+            <li class="top{{ loop.index if loop.index <= 3 }}">
+                {% if loop.index == 1 %}
+                <span class="medal">🥇</span>
+                {% elif loop.index == 2 %}
+                <span class="medal">🥈</span>
+                {% elif loop.index == 3 %}
+                <span class="medal">🥉</span>
+                {% endif %}
+                <img src="{{ url_for('static', filename='profile_pics/' + (user.profile_pic or 'default.jpg')) }}">
+                <strong>{{ user.display_name }}</strong>
+                <span>XP: {{ user.xp }}</span>
+                <span>Level: {{ user.level }}</span>
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
 </main>
 
 <footer>
@@ -151,59 +183,48 @@
 
 <script>
     const themeToggle = document.getElementById('theme-toggle');
-
-    // Nastavení tlačítka podle aktuálního tématu
     const isDark = document.body.classList.contains('dark-mode');
     themeToggle.textContent = isDark ? '☀️' : '🌙';
 
     themeToggle.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
-
         const newTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
         themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-
-        // Pošli změnu na backend
         fetch('/set_theme', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({theme: newTheme}),
         })
-            .then(res => res.json())
-            .then(data => {
-                if (!data.success) {
-                    alert('Nepodařilo se uložit téma.');
-                }
-            })
-            .catch(() => alert('Chyba při ukládání tématu.'));
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) {
+                alert('Nepodařilo se uložit téma.');
+            }
+        })
+        .catch(() => alert('Chyba při ukládání tématu.'));
     });
 
     function updateEnglishLevel() {
         const select = document.getElementById('englishLevelSelect');
         const level = select.value;
-
         fetch('/set_english_level', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({level: level})
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Úroveň angličtiny byla úspěšně aktualizována!');
-                } else {
-                    alert('Chyba při ukládání: ' + (data.error || 'Neznámá chyba'));
-                }
-            })
-            .catch(error => {
-                console.error('Chyba:', error);
-                alert('Nastala chyba při komunikaci se serverem.');
-            });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Úroveň angličtiny byla úspěšně aktualizována!');
+            } else {
+                alert('Chyba při ukládání: ' + (data.error || 'Neznámá chyba'));
+            }
+        })
+        .catch(error => {
+            console.error('Chyba:', error);
+            alert('Nastala chyba při komunikaci se serverem.');
+        });
     }
 </script>
-
 </body>
 </html>

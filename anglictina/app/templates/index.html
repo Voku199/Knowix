@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Procvičuj si angličtinu zábavně s Knowixem – chaty, písničky, překlady a hry.">
+          <meta name="description" content="Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam.">
+  <meta name="keywords" content="angličtina, procvičování, písničky, testy, chat, výuka, zdarma">
+  <meta name="robots" content="index, anglictina">
 
     <title>Knowix - ALPHA VERZE</title>
     <link rel="stylesheet" href="/static/style.css">
@@ -25,13 +27,8 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-W1EN990JKP');
     </script>
     <style>
@@ -47,14 +44,12 @@
             border-radius: 20px;
             background: rgba(255, 0, 0, 0.1);
         }
-
         .footer-signature {
             font-size: 1em;
             font-weight: bold;
             color: #666;
             margin-top: 10px;
         }
-
         .logo-name {
             font-size: 4rem;
             color: #2c3e50;
@@ -62,16 +57,12 @@
             margin-bottom: 15px;
             letter-spacing: -2px;
         }
-
-        /* New styles for profile menu */
         .profile-container {
             position: relative;
         }
-
         .profile-pic {
             border-radius: 50%;
         }
-
         .profile-menu {
             position: absolute;
             top: 70px;
@@ -86,58 +77,148 @@
             transform: translateY(10px);
             transition: all 0.3s ease-in-out;
         }
-
         .profile-container:hover .profile-menu {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
         }
+        /* XP Progress bar v headeru */
+        .xp-header-bar {
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            width: 220px;
+            max-width: 90vw;
+        }
+        .xp-header-bar-labels {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1em;
+            margin-bottom: 0.2em;
+        }
+        .xp-level-badge {
+            background: #4CAF50;
+            color: #fff;
+            border-radius: 8px;
+            padding: 2px 10px;
+            font-weight: 600;
+            font-size: 0.95em;
+            margin-right: 0.5em;
+        }
+        .xp-value {
+            color: #333;
+            font-size: 0.95em;
+        }
+        body.dark-mode .xp-level-badge {
+            background: #2e7d32;
+        }
+        body.dark-mode .xp-value {
+            color: #eee;
+        }
+        .xp-header-bar-progress-bg {
+            background: #e0e0e0;
+            border-radius: 8px;
+            height: 12px;
+            width: 100%;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .xp-header-bar-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50 60%, #43a047 100%);
+            border-radius: 8px 0 0 8px;
+            transition: width 0.4s;
+        }
+        body.dark-mode .xp-header-bar-progress-bg {
+            background: #333;
+        }
+        body.dark-mode .xp-header-bar-progress {
+            background: linear-gradient(90deg, #2e7d32 60%, #1b5e20 100%);
+        }
+
     </style>
 </head>
-<!-- Odstraňte lokální proměnnou theme -->
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
-    <div class="logo">
-        <a href="{{ url_for('main.index') }}">
-            <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
-        </a>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
     </div>
-    <nav>
+    <div class="nav-profile-wrapper">
         <ul class="nav-right">
-            <li><a href="/anglictina">Angličtina</a></li>
-            <li><a href="/feedback">Feedback</a></li>
-            <li><a href="/news">Novinky</a></li>
             <li>
-                {% if session['user_name'] %}
-                <div class="user-profile">
-                    <div class="profile-container">
-                        {% if session.get('profile_pic') %}
-                        <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
-                             alt="Profilová fotka" width="64" class="profile-pic">
-                        {% else %}
-                        <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
-                             class="profile-pic" id="profileMenuTrigger">
-                        {% endif %}
-                        <div class="profile-menu" id="profileMenu">
-                            <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
-                            <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
-
-                        </div>
-                    </div>
-                    <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
-                </div>
-                {% else %}
-                <div class="auth-links">
-                    <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
-                    <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
-                </div>
-                {% endif %}
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
             </li>
             <li>
-                <button id="theme-toggle">🌙</button>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
             </li>
         </ul>
-    </nav>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
 </header>
 
 <main>
@@ -187,7 +268,6 @@
                 <p>Dobrovolný příspěvek!</p>
             </div>
         </div>
-
     </section>
 </main>
 
@@ -211,7 +291,7 @@
             })
         }).then(() => {
             document.body.classList.toggle('dark-mode');
-            session.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
         });
     });
 
@@ -219,8 +299,7 @@
     document.addEventListener('click', (e) => {
         const profileMenu = document.getElementById('profileMenu');
         const trigger = document.getElementById('profileMenuTrigger');
-
-        if (!trigger.contains(e.target) && !profileMenu.contains(e.target)) {
+        if (profileMenu && trigger && !trigger.contains(e.target) && !profileMenu.contains(e.target)) {
             profileMenu.style.opacity = '0';
             profileMenu.style.visibility = 'hidden';
             profileMenu.style.transform = 'translateY(10px)';

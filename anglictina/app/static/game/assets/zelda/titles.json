@@ -1,0 +1,26 @@
+{
+  "name": "tiles",
+  "tilewidth": 32,
+  "tileheight": 32,
+  "tilecount": 2,
+  "columns": 2,
+  "image": "tiles.png",
+  "imagewidth": 64,
+  "imageheight": 32,
+  "tiles": [
+    {
+      "id": 0,
+      "properties": []
+    },
+    {
+      "id": 1,
+      "properties": [
+        {
+          "name": "collides",
+          "type": "bool",
+          "value": true
+        }
+      ]
+    }
+  ]
+}

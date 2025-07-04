@@ -1,8 +1,50 @@
 from flask import Blueprint, render_template, request, jsonify, session
 from datetime import datetime
-from auth import get_db_connection
+from db import get_db_connection
+from xp import get_user_xp_and_level
 
 news_bp = Blueprint('news', __name__, template_folder='templates')
+
+LEVEL_NAMES = [
+    "Začátečník", "Učeň", "Student", "Pokročilý", "Expert", "Mistr", "Legenda"
+]
+
+
+def get_level_name(level):
+    if level <= 1:
+        return LEVEL_NAMES[0]
+    elif level <= 2:
+        return LEVEL_NAMES[1]
+    elif level <= 4:
+        return LEVEL_NAMES[2]
+    elif level <= 6:
+        return LEVEL_NAMES[3]
+    elif level <= 8:
+        return LEVEL_NAMES[4]
+    elif level <= 10:
+        return LEVEL_NAMES[5]
+    else:
+        return LEVEL_NAMES[6]
+
+
+@news_bp.context_processor
+def inject_xp_info():
+    user_id = session.get('user_id')
+    if user_id:
+        user_data = get_user_xp_and_level(user_id)
+        xp = user_data.get("xp", 0)
+        level = user_data.get("level", 1)
+        xp_in_level = xp % 50
+        percent = int((xp_in_level / 50) * 100)
+        level_name = get_level_name(level)
+        return dict(
+            user_xp=xp,
+            user_level=level,
+            user_level_name=level_name,
+            user_progress_percent=percent,
+            user_xp_in_level=xp_in_level
+        )
+    return {}
 
 
 @news_bp.errorhandler(502)

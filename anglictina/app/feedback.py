@@ -1,8 +1,50 @@
 from flask import Blueprint, jsonify, request, session, render_template, redirect, url_for
 from datetime import datetime, timedelta
-from auth import get_db_connection
+from db import get_db_connection
+from xp import get_user_xp_and_level, check_and_award_achievements
 
 feedback_bp = Blueprint('feedback', __name__)
+
+LEVEL_NAMES = [
+    "Začátečník", "Učeň", "Student", "Pokročilý", "Expert", "Mistr", "Legenda"
+]
+
+
+def get_level_name(level):
+    if level <= 1:
+        return LEVEL_NAMES[0]
+    elif level <= 2:
+        return LEVEL_NAMES[1]
+    elif level <= 4:
+        return LEVEL_NAMES[2]
+    elif level <= 6:
+        return LEVEL_NAMES[3]
+    elif level <= 8:
+        return LEVEL_NAMES[4]
+    elif level <= 10:
+        return LEVEL_NAMES[5]
+    else:
+        return LEVEL_NAMES[6]
+
+
+@feedback_bp.context_processor
+def inject_xp_info():
+    user_id = session.get('user_id')
+    if user_id:
+        user_data = get_user_xp_and_level(user_id)
+        xp = user_data.get("xp", 0)
+        level = user_data.get("level", 1)
+        xp_in_level = xp % 50
+        percent = int((xp_in_level / 50) * 100)
+        level_name = get_level_name(level)
+        return dict(
+            user_xp=xp,
+            user_level=level,
+            user_level_name=level_name,
+            user_progress_percent=percent,
+            user_xp_in_level=xp_in_level
+        )
+    return {}
 
 
 @feedback_bp.errorhandler(502)
@@ -114,24 +156,37 @@ def manage_feedback(feedback_id):
                 }), 400
 
             cursor.execute('''
-                UPDATE feedback 
-                SET message = %s, 
-                    rating = %s, 
-                    last_modified = NOW(),
-                    is_edited = TRUE
-                WHERE id = %s
-            ''', (new_message, new_rating, feedback_id))
+                        UPDATE feedback 
+                        SET message = %s, 
+                            rating = %s, 
+                            last_modified = NOW(),
+                            is_edited = 1
+                        WHERE id = %s
+                    ''', (new_message, new_rating, feedback_id))
 
             cursor.execute('''
-                SELECT 
-                    timestamp,
-                    last_modified 
-                FROM feedback 
-                WHERE id = %s
-            ''', (feedback_id,))
+                        SELECT 
+                            timestamp,
+                            last_modified 
+                        FROM feedback 
+                        WHERE id = %s
+                    ''', (feedback_id,))
             updated = cursor.fetchone()
 
             conn.commit()
+
+            # NOVĚ: zkontroluj a případně přidej achievementy po editaci
+            unlocked_achievements = check_and_award_achievements(session['user_id'])
+
+            return jsonify({
+                "status": "success",
+                "message": "Feedback aktualizován",
+                "new_message": new_message,
+                "new_rating": new_rating,
+                "last_modified": updated['last_modified'].strftime('%d.%m.%Y %H:%M'),
+                "is_edited": True,
+                "new_achievements": unlocked_achievements  # seznam nově získaných achievementů (může být prázdný)
+            })
 
             return jsonify({
                 "status": "success",
@@ -141,7 +196,6 @@ def manage_feedback(feedback_id):
                 "last_modified": updated['last_modified'].strftime('%d.%m.%Y %H:%M'),
                 "is_edited": True
             })
-
         elif request.method == 'DELETE':
             cursor.execute('''
                 DELETE FROM feedback 
@@ -252,6 +306,9 @@ def handle_feedback():
 
         conn.commit()
 
+        # --- NOVĚ: Kontrola a přidělení achievementů ---
+        unlocked_achievements = check_and_award_achievements(session['user_id'])
+
         return jsonify({
             "status": "success",
             "message": "Děkujeme za zpětnou vazbu!",
@@ -264,7 +321,8 @@ def handle_feedback():
                 "timestamp": new_feedback['timestamp'].strftime('%d.%m.%Y %H:%M'),
                 "is_owner": True,
                 "is_edited": False
-            }
+            },
+            "new_achievements": unlocked_achievements  # seznam nově získaných achievementů (může být prázdný)
         })
 
     except Exception as e:

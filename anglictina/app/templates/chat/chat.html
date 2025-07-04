@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Veřejný chat – Zprávy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .zpravy-container {
+            max-width: 540px;
+            margin: 2.5em auto 2em auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            padding: 2em 1.2em 1.2em 1.2em;
+        }
+
+        .zpravy-seznam {
+            background: #f6fafd;
+            border-radius: 12px;
+            min-height: 260px;
+            max-height: 340px;
+            overflow-y: auto;
+            padding: 1em;
+            margin-bottom: 1.2em;
+            font-size: 1.08em;
+        }
+
+        .zprava-item {
+            margin-bottom: 0.7em;
+            padding-bottom: 0.3em;
+            border-bottom: 1px solid #e3eaf2;
+        }
+
+        .zprava-item:last-child {
+            border-bottom: none;
+        }
+
+        .zprava-user {
+            font-weight: 600;
+            color: #1976d2;
+            margin-right: 0.5em;
+        }
+
+        .zprava-time {
+            color: #aaa;
+            font-size: 0.93em;
+            margin-left: 0.5em;
+        }
+
+        .zprava-form {
+            display: flex;
+            gap: 0.7em;
+        }
+
+        .zprava-form input[type="text"] {
+            flex: 1;
+            padding: 0.7em;
+            border-radius: 7px;
+            border: 1.5px solid #b3c6e0;
+            font-size: 1.08em;
+        }
+
+        .zprava-form button {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 0.7em 1.5em;
+            font-size: 1.08em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .zprava-form button:hover {
+            background: #1256a0;
+        }
+
+        /* Styly pro obrázky */
+        .zprava-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .zprava-image:hover {
+            transform: scale(1.05);
+        }
+        .image-actions {
+            margin-top: 5px;
+        }
+        .image-btn {
+            background: #e3eaf2;
+            border: none;
+            border-radius: 4px;
+            padding: 3px 8px;
+            margin-right: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+        }
+        .message-link {
+            color: #1976d2;
+            text-decoration: underline;
+        }
+        #uploadBtn {
+            padding: 0.7em;
+            border-radius: 7px;
+            background: #f0f4f9;
+            border: 1.5px solid #b3c6e0;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+        .image-preview {
+            max-width: 100px;
+            max-height: 100px;
+            margin-top: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
+<header>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
+    </div>
+    <div class="nav-profile-wrapper">
+        <ul class="nav-right">
+            <li>
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
+            </li>
+        </ul>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
+</header>
+
+
+<div class="zpravy-container">
+    <h1>Veřejný chat</h1>
+    <div id="zpravySeznam" class="zpravy-seznam"></div>
+<form id="zpravaForm" class="zprava-form" autocomplete="off" enctype="multipart/form-data">
+    <input type="text" id="zpravaInput" name="zprava" maxlength="500" placeholder="Napiš zprávu...">
+    <input type="file" id="imageUpload" name="image" accept="image/*" style="display:none">
+    <button type="button" id="uploadBtn">🖼️</button>
+    <button type="submit">Odeslat</button>
+</form>
+    <img id="imagePreview" class="image-preview" alt="Náhled obrázku">
+</div>
+
+<footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p class="footer-signature">
+        Made with ❤️ by
+        <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+        and lot of ☕
+    </p>
+</footer>
+<script>
+    // theme-toggle.js
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        fetch('/set_theme', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark'
+            })
+        }).then(() => {
+            document.body.classList.toggle('dark-mode');
+            sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+    });
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function linkify(text) {
+        if (!text) return '';
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        return text.replace(urlRegex, url => {
+            return `<a href="${escapeHtml(url)}" target="_blank" class="message-link">${escapeHtml(url)}</a>`;
+        });
+    }
+
+    // Funkce pro zobrazení obrázků
+    function displayImage(imageData, id) {
+        const container = document.createElement('div');
+        container.className = 'image-container';
+
+        const img = document.createElement('img');
+        img.src = imageData;
+        img.className = 'zprava-image';
+        img.onclick = () => window.open(imageData, '_blank');
+
+        const actions = document.createElement('div');
+        actions.className = 'image-actions';
+
+        const downloadBtn = document.createElement('button');
+        downloadBtn.className = 'image-btn';
+        downloadBtn.textContent = 'Stáhnout';
+        downloadBtn.onclick = (e) => {
+            e.stopPropagation();
+            const a = document.createElement('a');
+            a.href = imageData;
+            a.download = `zprava-${id}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        };
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'image-btn';
+        copyBtn.textContent = 'Kopírovat';
+        copyBtn.onclick = async (e) => {
+            e.stopPropagation();
+            try {
+                const response = await fetch(imageData);
+                const blob = await response.blob();
+                await navigator.clipboard.write([new ClipboardItem({[blob.type]: blob})]);
+                alert('Obrázek zkopírován do schránky!');
+            } catch (err) {
+                console.error('Chyba při kopírování:', err);
+                alert('Nepodařilo se zkopírovat obrázek.');
+            }
+        };
+
+        actions.appendChild(downloadBtn);
+        actions.appendChild(copyBtn);
+        container.appendChild(img);
+        container.appendChild(actions);
+
+        return container;
+    }
+
+    function fetchZpravy() {
+        fetch('{{ url_for("zpravy.zpravy_seznam") }}')
+            .then(response => response.json())
+            .then(zpravy => {
+                const seznam = document.getElementById('zpravySeznam');
+                seznam.innerHTML = '';
+                zpravy.forEach(zprava => {
+                    const div = document.createElement('div');
+                    div.className = 'zprava-item';
+
+                    // Záhlaví zprávy (uživatel + čas)
+                    const headerDiv = document.createElement('div');
+                    headerDiv.style.marginBottom = '5px';
+
+                    const userSpan = document.createElement('span');
+                    userSpan.className = 'zprava-user';
+                    userSpan.textContent = escapeHtml(zprava.user_name);
+
+                    const timeSpan = document.createElement('span');
+                    timeSpan.className = 'zprava-time';
+                    timeSpan.textContent = new Date(zprava.created_at).toLocaleTimeString('cs-CZ', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    headerDiv.appendChild(userSpan);
+                    headerDiv.appendChild(timeSpan);
+                    div.appendChild(headerDiv);
+
+                    // Text zprávy s odkazy
+                    if (zprava.zprava) {
+                        const zpravaDiv = document.createElement('div');
+                        zpravaDiv.style.marginBottom = '10px';
+                        zpravaDiv.innerHTML = linkify(escapeHtml(zprava.zprava));
+                        div.appendChild(zpravaDiv);
+                    }
+
+                    // Obrázek pokud existuje
+if (zprava.image_url) {
+    const imageContainer = displayImage(zprava.image_url, zprava.id);
+    div.appendChild(imageContainer);
+}
+
+                    seznam.appendChild(div);
+                });
+                seznam.scrollTop = seznam.scrollHeight;
+            });
+    }
+
+    // Nahrávání obrázků
+    document.getElementById('uploadBtn').addEventListener('click', () => {
+        document.getElementById('imageUpload').click();
+    });
+
+    // Náhled obrázku
+    const imageUpload = document.getElementById('imageUpload');
+    const imagePreview = document.getElementById('imagePreview');
+
+    imageUpload.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+            }
+            reader.readAsDataURL(this.files[0]);
+        } else {
+            imagePreview.style.display = 'none';
+        }
+    });
+
+    // Odesílání formuláře
+    document.getElementById('zpravaForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+
+        fetch('{{ url_for("zpravy.zpravy_poslat") }}', {
+            method: 'POST',
+            body: formData
+        }).then(res => res.json()).then(data => {
+            if (data.success) {
+                document.getElementById('zpravaInput').value = '';
+                imageUpload.value = '';
+                imagePreview.style.display = 'none';
+                fetchZpravy();
+            } else {
+                alert(data.error || 'Chyba při odesílání zprávy.');
+            }
+        }).catch(error => {
+            console.error('Chyba:', error);
+            alert('Došlo k chybě při odesílání.');
+        });
+    });
+
+    // Načti zprávy při načtení a každé 3 sekundy
+    document.addEventListener('DOMContentLoaded', fetchZpravy);
+    setInterval(fetchZpravy, 3000);
+</script>
+</body>
+</html>

@@ -16,68 +16,127 @@
     </noscript>
 
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-
-        gtag('js', new Date());
-
-        gtag('config', 'G-W1EN990JKP');
-    </script>
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="/static/style_hangman.css">
     <script defer src="{{ url_for('static', filename='hangman/js/hangman.js') }}"></script>
+    <style>
+        /* --- STREAK TOAST --- */
+        .streak-toast {
+            position: fixed;
+            top: 80px;
+            right: 30px;
+            background: #fffbe6;
+            color: #d35400;
+            border: 2px solid #ffc107;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+            padding: 1em 2em;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            z-index: 3000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s, transform 0.4s;
+            transform: translateY(-30px);
+        }
+        .streak-toast.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
+        }
+        .streak-fire {
+            height: 2em;
+            margin-right: 0.7em;
+            animation: firePop 0.7s cubic-bezier(.68,-0.55,.27,1.55);
+        }
+        @keyframes firePop {
+            0% { transform: scale(0.7) rotate(-10deg);}
+            60% { transform: scale(1.2) rotate(10deg);}
+            100% { transform: scale(1) rotate(0);}
+        }
+    </style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
-
 <header>
-    <div class="logo">
-        <a href="{{ url_for('main.index') }}">
-            <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
-        </a>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
     </div>
-    <nav>
+    <div class="nav-profile-wrapper">
         <ul class="nav-right">
-            <li><a href="/anglictina">Angličtina</a></li>
-            <li><a href="/feedback">Feedback</a></li>
-            <li><a href="/news">Novinky</a></li>
             <li>
-                {% if session['user_name'] %}
-                <div class="user-profile">
-                    <div class="profile-container">
-                        {% if session.get('profile_pic') %}
-                        <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
-                             alt="Profilová fotka" width="64" class="profile-pic">
-                        {% else %}
-                        <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
-                             class="profile-pic" id="profileMenuTrigger">
-                        {% endif %}
-                        <div class="profile-menu" id="profileMenu">
-                            <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
-                            <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
-
-                        </div>
-                    </div>
-                    <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
-                </div>
-                {% else %}
-                <div class="auth-links">
-                    <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
-                    <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
-                </div>
-                {% endif %}
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
             </li>
             <li>
-                <button id="theme-toggle">🌙</button>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
             </li>
         </ul>
-    </nav>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
 </header>
 <div class="hangman-container">
     <h2>Hangman</h2>
@@ -89,11 +148,8 @@
         <div id="hintCz" style="margin-top: 10px; font-weight: bold;"></div>
     </div>
 
-
     <div id="hangmanDrawing"></div>
-
     <div id="maskedWord">_ _ _ _ _</div>
-
     <div id="letterButtons" class="alphabet"></div>
 
     <div class="game-stats">
@@ -103,6 +159,12 @@
 
     <div id="resultMessage"></div>
     <button id="nextWordBtn" class="modern-btn">Další slovo →</button>
+</div>
+
+<!-- STREAK TOAST -->
+<div id="streakToast" class="streak-toast" style="display:none;">
+    <img src="/static/fire.svg" alt="Streak" class="streak-fire">
+    <span id="streakToastText"></span>
 </div>
 
 <footer>
@@ -125,7 +187,7 @@
             })
         }).then(() => {
             document.body.classList.toggle('dark-mode');
-            session.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
         });
     });
 
@@ -133,13 +195,39 @@
     document.addEventListener('click', (e) => {
         const profileMenu = document.getElementById('profileMenu');
         const trigger = document.getElementById('profileMenuTrigger');
-
-        if (!trigger.contains(e.target) && !profileMenu.contains(e.target)) {
+        if (profileMenu && trigger && !trigger.contains(e.target) && !profileMenu.contains(e.target)) {
             profileMenu.style.opacity = '0';
             profileMenu.style.visibility = 'hidden';
             profileMenu.style.transform = 'translateY(10px)';
         }
     });
+
+    // --- STREAK TOAST FUNKCE ---
+    function showStreakToast(streak) {
+        const toast = document.getElementById('streakToast');
+        const text = document.getElementById('streakToastText');
+        text.textContent = `🔥 Máš streak ${streak} dní v řadě!`;
+        toast.classList.add('active');
+        toast.style.display = 'flex';
+        setTimeout(() => {
+            toast.classList.remove('active');
+            setTimeout(() => { toast.style.display = 'none'; }, 400);
+        }, 3500);
+    }
+
+    // --- Integrace streak toastu do Hangmanu ---
+    // Předpokládáme, že hangman.js volá /hangman/guess a zpracovává odpověď
+    // Pokud odpověď obsahuje streak_info se status "started" nebo "continued", zobrazíme toast
+
+    // Tento kód můžeš vložit do hangman.js po zpracování odpovědi z guess
+    // Pokud chceš, můžeš ho dát i sem, pokud odpověď z guess zpracováváš zde
+
+    // Příklad: Pokud používáš fetch v hangman.js, přidej tam:
+    /*
+    if (data.streak_info && (data.streak_info.status === "started" || data.streak_info.status === "continued")) {
+        showStreakToast(data.streak_info.streak);
+    }
+    */
 </script>
 
 </body>

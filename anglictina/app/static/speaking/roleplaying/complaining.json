@@ -1,0 +1,146 @@
+{
+  "topic": "complaining",
+  "characters": [
+    "Alex",
+    "Uživatel"
+  ],
+  "dialogue": [
+    {
+      "speaker": "Alex",
+      "cz": "Dobrý den, vítejte v naší restauraci. Máte rezervaci?",
+      "en": "Good afternoon, welcome to our restaurant. Do you have a reservation?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Pozdrav a řekni, že nemáš rezervaci, ale chtěl bys stůl pro jednoho.",
+      "en": [
+        "Hi, I don't have a reservation, but I’d like a table for one.",
+        "Hello, no reservation, but is there a table for one person?",
+        "Hi! Just me, do you have a free table?"
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Jistě, pojďte prosím za mnou. Tady je jídelní lístek.",
+      "en": "Of course, please follow me. Here's the menu."
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Po chvíli si stěžuj, že jídlo je studené.",
+      "en": [
+        "Excuse me, my food is cold.",
+        "Sorry, but my meal isn't hot.",
+        "Can I say something? My dish is cold.",
+        "I'm sorry, but my food is not warm enough."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Omlouvám se, hned vám přinesu nové.",
+      "en": "I’m so sorry. I’ll bring you a new one right away."
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Poděkuj a řekni, že jinak všechno ostatní je v pořádku.",
+      "en": [
+        "Thank you. Everything else is fine.",
+        "Thanks. Apart from that, everything's okay.",
+        "Thank you, the rest is good."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Děkuji za pochopení. Nové jídlo bude za pár minut.",
+      "en": "Thank you for your understanding. The new dish will be ready in a few minutes."
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Po jídle požádej o účet.",
+      "en": [
+        "Can I have the bill, please?",
+        "Could you bring me the check, please?",
+        "I'd like to pay, can I get the bill?"
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Tady je účet. Doufám, že příště bude všechno perfektní.",
+      "en": "Here’s your bill. I hope everything will be perfect next time."
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Rozluč se a řekni, že se možná vrátíš.",
+      "en": [
+        "Goodbye! I might come back again.",
+        "Thanks, see you next time maybe!",
+        "Bye, I’ll give it another try next time."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Měj se hezky a děkujeme, že jste přišel.",
+      "en": "Take care and thank you for coming."
+    },
+    {
+      "speaker": "Alex",
+      "cz": "(v obchodě) Dobrý den, jak vám mohu pomoci?",
+      "en": "(in store) Hello, how can I help you?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Řekni, že si koupil oblečení včera, ale má vadu.",
+      "en": [
+        "Hi, I bought this shirt yesterday but it has a defect.",
+        "Hello, I bought this yesterday and noticed a flaw.",
+        "Excuse me, this has a tear and I just bought it."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Opravdu? Můžu se podívat? Máte účtenku?",
+      "en": "Really? May I take a look? Do you have the receipt?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Řekni, že máš účtenku a ukaž ji.",
+      "en": [
+        "Yes, I have it here.",
+        "Sure, here's the receipt.",
+        "Yes, I kept it. Here you go."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Děkuji. Můžeme vám nabídnout výměnu nebo vrácení peněz.",
+      "en": "Thank you. We can offer you an exchange or a refund."
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Řekni, že bys radši peníze zpět.",
+      "en": [
+        "I'd prefer a refund, please.",
+        "I’d like my money back, if that’s okay.",
+        "A refund would be better for me."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Samozřejmě. Vrátíme peníze na vaši kartu během 3 pracovních dnů.",
+      "en": "Of course. We'll refund the money to your card within 3 business days."
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Poděkuj a řekni, že si toho vážíš.",
+      "en": [
+        "Thank you, I appreciate it.",
+        "Thanks a lot, that’s very helpful.",
+        "Thank you, that means a lot."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Rádo se stalo. Doufáme, že vás příště nezklameme.",
+      "en": "You're welcome. We hope not to disappoint you next time."
+    }
+  ]
+}

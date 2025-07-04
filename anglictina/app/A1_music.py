@@ -3,7 +3,7 @@ import json
 import time
 from threading import Lock
 from flask import Blueprint, render_template, request, jsonify, current_app, session
-from auth import get_db_connection
+from db import get_db_connection
 from difflib import SequenceMatcher
 import deepl
 import random
@@ -11,6 +11,9 @@ import unicodedata
 import re
 from concurrent.futures import ThreadPoolExecutor
 from collections import deque
+import traceback
+from xp import add_xp_to_user, get_user_xp_and_level  # DŮLEŽITÉ: XP systém
+from streak import update_user_streak, get_user_streak
 
 # --- ČTENÍ LYRICS Z JSON SOUBORU ---
 LYRICS_JSON_DIR = os.path.join(os.path.dirname(__file__), 'static/music/lyrics_json')
@@ -42,6 +45,56 @@ def get_lyrics_and_translations_from_json(song_info):
 
 
 exercises_bp = Blueprint('exercises', __name__, template_folder='templates')
+
+LEVEL_NAMES = [
+    "Začátečník", "Učeň", "Student", "Pokročilý", "Expert", "Mistr", "Legenda"
+]
+
+
+@exercises_bp.context_processor
+def inject_streak():
+    user_id = session.get('user_id')
+    if user_id:
+        streak = get_user_streak(user_id)
+        return dict(user_streak=streak)
+    return dict(user_streak=0)
+
+
+def get_level_name(level):
+    if level <= 1:
+        return LEVEL_NAMES[0]
+    elif level <= 2:
+        return LEVEL_NAMES[1]
+    elif level <= 4:
+        return LEVEL_NAMES[2]
+    elif level <= 6:
+        return LEVEL_NAMES[3]
+    elif level <= 8:
+        return LEVEL_NAMES[4]
+    elif level <= 10:
+        return LEVEL_NAMES[5]
+    else:
+        return LEVEL_NAMES[6]
+
+
+@exercises_bp.context_processor
+def inject_xp_info():
+    user_id = session.get('user_id')
+    if user_id:
+        user_data = get_user_xp_and_level(user_id)
+        xp = user_data.get("xp", 0)
+        level = user_data.get("level", 1)
+        xp_in_level = xp % 50
+        percent = int((xp_in_level / 50) * 100)
+        level_name = get_level_name(level)
+        return dict(
+            user_xp=xp,
+            user_level=level,
+            user_level_name=level_name,
+            user_progress_percent=percent,
+            user_xp_in_level=xp_in_level
+        )
+    return {}
 
 
 @exercises_bp.errorhandler(502)
@@ -300,8 +353,32 @@ def check_answer():
     all_correct = (
             all(x in (True, 'almost') for x in results['missing']) and
             all(x in (True, 'almost') for x in results['translations']) and
-            results['pairs']
+            results['pairs'] and
+            len(results['missing']) == len(stored_missing) and
+            len(results['translations']) == len(stored_translations)
     )
+
+    # --- XP INTEGRACE ---
+    xp_awarded = 0
+    new_xp = None
+    new_level = None
+    new_achievements = []
+    xp_error = None
+    streak_info = None
+    if all_correct and 'user_id' in session:
+        try:
+            xp_result = add_xp_to_user(session['user_id'], 10)
+            streak_info = update_user_streak(session['user_id'])
+            print(streak_info)
+            xp_awarded = 10
+            new_xp = xp_result.get('xp')
+            new_level = xp_result.get('level')
+            new_achievements = xp_result.get('new_achievements', [])
+            print(new_achievements)
+        except Exception as e:
+            xp_error = str(e)
+            print("XP ERROR:", e)
+            print(traceback.format_exc())
 
     return jsonify({
         'results': results,
@@ -311,5 +388,11 @@ def check_answer():
                 'missing': 0.9,
                 'translations': 0.85
             }
-        }
+        },
+        'xp_awarded': xp_awarded,
+        'new_xp': new_xp,
+        'new_level': new_level,
+        'new_achievements': new_achievements,
+        'xp_error': xp_error,
+        'streak_info': streak_info,
     })

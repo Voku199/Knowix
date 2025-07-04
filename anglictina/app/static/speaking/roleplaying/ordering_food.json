@@ -1,0 +1,204 @@
+{
+  "topic": "ordering_food",
+  "characters": [
+    "Alex",
+    "Uživatel"
+  ],
+  "dialogue": [
+    {
+      "speaker": "Alex",
+      "cz": "Dobrý den! Vítejte v naší restauraci. Máte rezervaci?",
+      "en": "Hello! Welcome to our restaurant. Do you have a reservation?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Řekni, že ne a že jsi sám/sama.",
+      "en": [
+        "No, I don’t. I’m alone.",
+        "No, I don’t have a reservation. I am alone.",
+        "No reservation, I’m alone.",
+        "I’m alone. No reservation."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "To nevadí. Tady je stůl pro jednoho. Můžu vám donést jídelní lístek?",
+      "en": "No problem. Here is a table for one. Can I bring you the menu?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Řekni, že ano a poděkuj.",
+      "en": [
+        "Yes, thank you.",
+        "Yes, please. Thank you.",
+        "Sure, thank you.",
+        "Yes, that would be great. Thanks."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Tady to je. Dáte si něco k pití, než si vyberete?",
+      "en": "Here you go. Would you like something to drink while you choose?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Objednej si sklenici vody.",
+      "en": [
+        "A glass of water, please.",
+        "I would like a glass of water.",
+        "Can I have a glass of water?",
+        "Just water, please."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Dobře. Přinesu vám vodu. Řekněte mi, až budete připraven/a objednat.",
+      "en": "Alright. I’ll bring you the water. Let me know when you're ready to order."
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Řekni, že už jsi připraven/a objednat.",
+      "en": [
+        "I’m ready to order.",
+        "Yes, I’m ready to order now.",
+        "I'm ready.",
+        "I know what I want."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Skvělé. Co si dáte?",
+      "en": "Great. What would you like?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Objednej si hamburger a hranolky.",
+      "en": [
+        "I would like a hamburger and fries.",
+        "I’ll have a hamburger and fries.",
+        "Can I get a hamburger with fries?",
+        "A hamburger with fries, please."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Chcete k tomu kečup nebo majonézu?",
+      "en": "Would you like ketchup or mayonnaise with that?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Řekni, že chceš kečup.",
+      "en": [
+        "Ketchup, please.",
+        "Yes, ketchup.",
+        "I want ketchup.",
+        "Only ketchup, please."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Dobře. Chcete si dát také dezert?",
+      "en": "Alright. Would you like a dessert as well?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Řekni, že možná později.",
+      "en": [
+        "Maybe later.",
+        "Not now, maybe later.",
+        "I’m not sure yet. Maybe later.",
+        "Later, maybe."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Dobře, přinesu vaši objednávku za pár minut.",
+      "en": "Okay, I’ll bring your order in a few minutes."
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Poděkuj.",
+      "en": [
+        "Thank you.",
+        "Thanks!",
+        "Thank you very much.",
+        "Thanks a lot."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Tady je váš hamburger, hranolky a voda. Dobrou chuť!",
+      "en": "Here is your hamburger, fries and water. Enjoy your meal!"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Poděkuj a řekni, že to vypadá dobře.",
+      "en": [
+        "Thank you. It looks great!",
+        "Thanks, it looks delicious.",
+        "Thank you, it looks good.",
+        "Thanks! Looks yummy."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Jak vám chutnalo?",
+      "en": "How was your meal?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Řekni, že to bylo velmi dobré.",
+      "en": [
+        "It was very good.",
+        "The food was great.",
+        "I really liked it.",
+        "Very tasty, thank you."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Jsem rád, že vám chutnalo. Chcete účet?",
+      "en": "I’m glad you liked it. Would you like the bill?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Řekni, že ano.",
+      "en": [
+        "Yes, please.",
+        "Yes, I’d like the bill.",
+        "Yes, can I have the bill?",
+        "I’d like to pay, please."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Tady je účet. Můžete zaplatit kartou nebo hotově.",
+      "en": "Here is the bill. You can pay by card or cash."
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Řekni, že zaplatíš kartou a poděkuj.",
+      "en": [
+        "I’ll pay by card. Thank you.",
+        "Card, please. Thanks.",
+        "I’m paying by card. Thank you.",
+        "With card, thanks."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Děkuji. Přeji hezký den!",
+      "en": "Thank you. Have a nice day!"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Rozluč se.",
+      "en": [
+        "Goodbye!",
+        "Thanks, goodbye!",
+        "Bye!",
+        "See you!"
+      ]
+    }
+  ]
+}

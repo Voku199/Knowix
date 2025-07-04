@@ -1,12 +1,64 @@
 import json
 import random
-from flask import Blueprint, render_template, request, flash, redirect, url_for, session, app
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session, app, jsonify
 import os
 import difflib
 import re
+from xp import add_xp_to_user, get_user_xp_and_level
+from streak import update_user_streak, get_user_streak  # <-- Přidáno pro streak
 
 at_on_bp = Blueprint("at_on", __name__, template_folder="templates")
 app.secret_key = os.getenv("SECRET_KEY")
+
+LEVEL_NAMES = [
+    "Začátečník", "Učeň", "Student", "Pokročilý", "Expert", "Mistr", "Legenda"
+]
+
+
+@at_on_bp.context_processor
+def inject_streak():
+    user_id = session.get('user_id')
+    if user_id:
+        streak = get_user_streak(user_id)
+        return dict(user_streak=streak)
+    return dict(user_streak=0)
+
+
+def get_level_name(level):
+    if level <= 1:
+        return LEVEL_NAMES[0]
+    elif level <= 2:
+        return LEVEL_NAMES[1]
+    elif level <= 4:
+        return LEVEL_NAMES[2]
+    elif level <= 6:
+        return LEVEL_NAMES[3]
+    elif level <= 8:
+        return LEVEL_NAMES[4]
+    elif level <= 10:
+        return LEVEL_NAMES[5]
+    else:
+        return LEVEL_NAMES[6]
+
+
+@at_on_bp.context_processor
+def inject_xp_info():
+    user_id = session.get('user_id')
+    if user_id:
+        user_data = get_user_xp_and_level(user_id)
+        xp = user_data.get("xp", 0)
+        level = user_data.get("level", 1)
+        xp_in_level = xp % 50
+        percent = int((xp_in_level / 50) * 100)
+        level_name = get_level_name(level)
+        return dict(
+            user_xp=xp,
+            user_level=level,
+            user_level_name=level_name,
+            user_progress_percent=percent,
+            user_xp_in_level=xp_in_level
+        )
+    return {}
 
 
 @at_on_bp.errorhandler(502)
@@ -16,7 +68,6 @@ app.secret_key = os.getenv("SECRET_KEY")
 @at_on_bp.errorhandler(404)
 @at_on_bp.errorhandler(Exception)
 def server_error(e):
-    # vrátí stránku error.html s informací o výpadku
     return render_template('error.html', error_code=e.code), e.code
 
 
@@ -25,34 +76,24 @@ def load_exercises():
         return json.load(f)
 
 
-# Výběr typu cvičení
 @at_on_bp.route("/at-on", methods=["GET"])
 def select_exercise():
     return render_template("gram/at_on/select_at.html")
 
 
-# Cvičení: poskládej větu ze slova
 def is_reasonable_sentence(sentence):
-    # 1) Délka
     words = sentence.strip().split()
     if len(words) < 4:
         return False
-
-    # 2) Přítomnost předložky
     prepositions = {"at", "on", "in"}
     if not any(p in [w.lower() for w in words] for p in prepositions):
         return False
-
-    # 3) Slova musí být z písmen, čísla nebo pár interpunkčních znaků (čárka, tečka, vykřičník, otazník, apostrof, pomlčka)
     for w in words:
         if not re.match(r"^[a-zA-Z0-9,.!?'-]+$", w):
             return False
-
-    # 4) Minimalní počet smysluplných slov (např. aspoň 2 slova delší než 2 znaky)
     long_words = [w for w in words if len(w) > 2]
     if len(long_words) < 2:
         return False
-
     return True
 
 
@@ -68,8 +109,6 @@ def create_sentence():
 
     if request.method == "POST":
         user_input = request.form["sentence"].strip()
-
-        # Kontrola opakování vět
         for old_sentence in session['sentences']:
             if is_similar(user_input, old_sentence):
                 return render_template("gram/at_on/create_sentence.html",
@@ -77,12 +116,9 @@ def create_sentence():
                                        correct=False,
                                        user_sentence=user_input,
                                        sentences=session['sentences'])
-
-        # Kontrola smysluplnosti věty
         if is_reasonable_sentence(user_input):
             result = "Super, tvoje věta vypadá dobře!"
             correct = True
-            # Uložíme větu do session, pokud je validní a neopakovaná
             session['sentences'].append(user_input)
             session.modified = True
         else:
@@ -95,48 +131,95 @@ def create_sentence():
                                user_sentence=user_input,
                                sentences=session['sentences'])
 
-    # GET request
     return render_template("gram/at_on/create_sentence.html", sentences=session['sentences'])
 
 
-# Cvičení: doplň správnou předložku
 @at_on_bp.route("/at-on/fill-word", methods=["GET", "POST"])
 def fill_word():
     exercises = load_exercises()
 
-    # Při prvním načtení nastavíme náhodných 10 otázek
+    # Při prvním načtení nastavíme náhodných 10 otázek a připravíme strukturu pro odpovědi
     if 'selected_questions' not in session:
         session['selected_questions'] = random.sample(range(len(exercises)), 10)
         session['answered'] = []
+        session['answers_correct'] = {}  # {question_id: True/False}
         session.modified = True
 
     selected = session['selected_questions']
     answered = session['answered']
+    answers_correct = session.get('answers_correct', {})
     remaining = [i for i in selected if i not in answered]
 
     if request.method == "POST":
         if not remaining:
+            if request.accept_mimetypes['application/json']:
+                return jsonify({"done": True})
             return redirect(url_for('at_on.fill_word'))
 
         question_id = int(request.form["question_id"])
         answer = request.form["answer"].strip().lower()
         correct = exercises[question_id]["correct"]
 
-        if answer == correct:
+        is_correct = answer == correct
+        if is_correct:
             flash("✅ Správně!", "success")
         else:
             flash(f"❌ Špatně. Správně je {correct}.", "error")
 
+        streak_info = None
         if question_id not in answered:
             answered.append(question_id)
+            answers_correct[str(question_id)] = is_correct  # <-- klíč jako string!
             session['answered'] = answered
+            session['answers_correct'] = answers_correct
             session.modified = True
 
+        # Pokud uživatel dokončil všechny otázky, přiděluj XP a streak
+        if not [i for i in selected if i not in answered]:
+            user_id = session.get('user_id')
+            correct_count = sum(1 for v in answers_correct.values() if v)
+            if user_id and correct_count > 0:
+                try:
+                    result = add_xp_to_user(user_id, correct_count)
+                    streak_info = update_user_streak(user_id)
+                except Exception:
+                    streak_info = None
+
+        # AJAX odpověď
+        if request.accept_mimetypes['application/json']:
+            return jsonify({
+                "correct": is_correct,
+                "streak_info": streak_info,
+                "flash_message": "✅ Správně!" if is_correct else f"❌ Špatně. Správně je {correct}.",
+                "done": not [i for i in selected if i not in answered]
+            })
+        # Klasický POST
         return redirect(url_for('at_on.fill_word'))
 
     # GET request
     if not remaining:
-        session.pop('_flashes', None)  # smaže všechny flash zprávy
+        user_id = session.get('user_id')
+        correct_count = sum(1 for v in answers_correct.values() if v)
+        streak_info = None  # <-- Přidáno pro streak
+        if user_id:
+            try:
+                if correct_count > 0:
+                    result = add_xp_to_user(user_id, correct_count)
+                    if "error" in result:
+                        flash(f"XP se nepodařilo přidat: {result['error']}", "error")
+                    else:
+                        flash(f"🎉 Získal(a) jsi {correct_count} XP za {correct_count} správných odpovědí!", "success")
+                        # --- Streak logika ---
+                        streak_info = update_user_streak(user_id)
+                        if streak_info and streak_info.get("status") in ("started", "continued"):
+                            flash(f"🔥 Máš streak {streak_info['streak']} dní v řadě!", "streak")
+                else:
+                    flash("Nezískal(a) jsi žádné XP, protože nebyla žádná správná odpověď.", "info")
+            except Exception as e:
+                flash(f"XP se nepodařilo přidat: {e}", "error")
+        else:
+            flash("XP nebylo přidáno, protože nejsi přihlášen(a).", "warning")
+        session.pop('_flashes', None)
         return render_template(
             "gram/at_on/fill_word.html",
             remaining_count=0,
@@ -159,5 +242,6 @@ def fill_word():
 def reset_progress():
     session.pop('answered', None)
     session.pop('selected_questions', None)
+    session.pop('answers_correct', None)
     flash("♻️ Pokrok byl resetován, můžeš začít znovu!", "info")
     return redirect(url_for('at_on.fill_word'))

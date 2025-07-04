@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Obchod – Knowix</title>
+    <link rel="stylesheet" href="/static/style.css">
+
+    <!-- Preconnect zrychlí DNS a spojení -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Font načti až po načtení stránky -->
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    </noscript>
+
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-W1EN990JKP');
+    </script>
+    <style>
+        .shop-container {
+            max-width: 600px;
+            margin: 2.5em auto 2em auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 2.5em 2em 2em 2em;
+        }
+        h1 {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 1.5em;
+            letter-spacing: 0.02em;
+        }
+        .xp-status {
+            text-align: center;
+            font-size: 1.15em;
+            margin-bottom: 2em;
+            background: #eaf6ff;
+            border-radius: 8px;
+            padding: 0.7em 0;
+            font-weight: 500;
+            color: #ecc38d;
+        }
+        .shop-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2em;
+            justify-content: center;
+        }
+        .shop-item {
+            background: #f9fafb;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            padding: 1.5em 1.2em 1.2em 1.2em;
+            flex: 1 1 220px;
+            min-width: 220px;
+            max-width: 270px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: box-shadow 0.2s;
+        }
+        .shop-item:hover {
+            box-shadow: 0 6px 24px rgba(25, 118, 210, 0.10);
+        }
+        .shop-item h2 {
+            margin-top: 0;
+            margin-bottom: 0.5em;
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2474de;
+            letter-spacing: 0.01em;
+        }
+        .shop-item p {
+            margin: 0.5em 0 1em 0;
+            text-align: center;
+            color: #444;
+        }
+        .shop-item form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .shop-item button[type="submit"] {
+            background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 0.7em 1.5em;
+            font-size: 1.08em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 0.7em;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.10);
+        }
+        .shop-item button[type="submit"]:hover:not(:disabled) {
+            background: linear-gradient(90deg, #1565c0 60%, #1976d2 100%);
+            box-shadow: 0 4px 16px rgba(25, 118, 210, 0.18);
+        }
+        .shop-item button[type="submit"]:disabled {
+            background: #bdbdbd;
+            color: #eee;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .shop-item strong {
+            color: #1976d2;
+        }
+        .shop-item .freeze-count {
+            margin-top: 0.2em;
+            font-size: 0.98em;
+            color: #666;
+        }
+        .shop-item .booster-status {
+            margin-top: 0.2em;
+            font-size: 0.98em;
+            color: #666;
+        }
+        a {
+            display: inline-block;
+            margin-top: 2em;
+            text-decoration: none;
+            color: #1976d2;
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+        a:hover {
+            color: #0d47a1;
+            text-decoration: underline;
+        }
+        @media (max-width: 700px) {
+            .shop-container {
+                padding: 1.2em 0.5em 1.5em 0.5em;
+            }
+            .shop-items {
+                flex-direction: column;
+                gap: 1.2em;
+            }
+            .shop-item {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
+<header>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
+    </div>
+    <div class="nav-profile-wrapper">
+        <ul class="nav-right">
+            <li>
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
+            </li>
+        </ul>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
+</header>
+<main class="shop-container">
+    <h1>Obchod</h1>
+    <div class="xp-status">
+        <strong>Tvůj XP stav:</strong> {{ shop_status.xp }} XP
+    </div>
+    <div class="shop-items">
+        <div class="shop-item">
+            <h2>🔥 Freeze</h2>
+            <p>Ochrání tvůj streak, když bys o něj přišel. <br>
+            <strong>Cena:</strong> {{ FREEZE_COST }} XP</p>
+            <form method="POST" action="{{ url_for('obchod.obchod') }}">
+                <input type="hidden" name="item" value="freeze">
+                <button type="submit"
+                    {% if shop_status.freeze_count >= 3 or shop_status.xp < FREEZE_COST %}
+                        disabled
+                    {% endif %}
+                >
+                    {% if shop_status.freeze_count >= 3 %}
+                        Limit 3 freeze dosažen
+                    {% elif shop_status.xp < FREEZE_COST %}
+                        Nedostatek XP
+                    {% else %}
+                        Koupit Freeze
+                    {% endif %}
+                </button>
+            </form>
+            <div class="freeze-count">Máš aktivních freeze: <strong>{{ shop_status.freeze_count }}</strong> / 3</div>
+        </div>
+        <div class="shop-item">
+            <h2>⚡ XP Booster</h2>
+            <p>Zdvojnásobí získané XP na 1 den.<br>
+            <strong>Cena:</strong> {{ XP_BOOSTER_COST }} XP</p>
+            <form method="POST" action="{{ url_for('obchod.obchod') }}">
+                <input type="hidden" name="item" value="xp_booster">
+                <button type="submit"
+                    {% if shop_status.xp < XP_BOOSTER_COST or shop_status.xp_booster_active %}
+                        disabled
+                    {% endif %}
+                >
+                    {% if shop_status.xp_booster_active %}
+                        Booster už je aktivní
+                    {% elif shop_status.xp < XP_BOOSTER_COST %}
+                        Nedostatek XP
+                    {% else %}
+                        Koupit XP Booster
+                    {% endif %}
+                </button>
+            </form>
+            <div class="booster-status">XP Booster je {% if shop_status.xp_booster_active %}<strong>aktivní</strong>{% else %}neaktivní{% endif %}.</div>
+        </div>
+    </div>
+    <a href="{{ url_for('main.index') }}">← Zpět na hlavní stránku</a>
+</main>
+</body>
+</html>

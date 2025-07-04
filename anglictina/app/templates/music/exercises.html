@@ -5,90 +5,203 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Knowix - Cvičení</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <!-- Hlavní logika aplikace -->
-    <script src="{{ url_for('static', filename='music/js/exercise.js') }}"></script>
-        <!-- Preconnect zrychlí DNS a spojení -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Font načti až po načtení stránky -->
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
           media="print" onload="this.media='all'">
     <noscript>
         <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
     </noscript>
-
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
+    <style>
+        .word-box { display: inline-block; margin: 5px; padding: 8px 14px; border: 1px solid #aaa; border-radius: 6px; cursor: pointer; background: #f8f8f8; }
+        .word-box.selected { background: #cce5ff; border-color: #007bff; }
+        .word-box.paired { background: #d4edda; border-color: #28a745; }
+        .popup-container {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
+        .popup-container.active {
+            opacity: 1; pointer-events: all;
+        }
+        .popup-content {
+            background: #fff; padding: 2em 2.5em; border-radius: 18px;
+            box-shadow: 0 8px 48px rgba(0,0,0,0.18);
+            text-align: center;
+            transform: scale(0.85); opacity: 0;
+            animation: popupIn 0.35s cubic-bezier(.68,-0.55,.27,1.55) forwards;
+        }
+        @keyframes popupIn {
+            0% { transform: scale(0.85); opacity: 0; }
+            80% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .popup-buttons { margin-top: 1.5em; }
+        .popup-button { margin: 0 1em; padding: 0.7em 2em; border-radius: 6px; border: none; font-size: 1.1em; cursor: pointer; transition: background 0.2s, color 0.2s; }
+        .popup-button.confirm { background: #28a745; color: #fff; }
+        .popup-button.confirm:hover { background: #218838; }
+        .popup-button.cancel { background: #f8f9fa; color: #333; border: 1px solid #ccc; }
+        .popup-button.cancel:hover { background: #e2e6ea; }
+        /* Review sekce */
+        #reviewSection {
+            display: none;
+            margin: 2em auto;
+            max-width: 700px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+            padding: 2em 2em 1em 2em;
+            animation: fadeInReview 0.5s;
+        }
+        @keyframes fadeInReview {
+            from { opacity: 0; transform: translateY(30px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .review-title { font-size: 1.4em; margin-bottom: 1em; }
+        .review-block { margin-bottom: 1.2em; }
+        .review-block.correct { background: #e6f9ea; border-left: 4px solid #28a745; }
+        .review-block.incorrect { background: #fff0f0; border-left: 4px solid #dc3545; }
+        .review-block.almost { background: #fffbe6; border-left: 4px solid #ffc107; }
+        .review-block { padding: 1em; border-radius: 8px; }
+        .review-label { font-weight: bold; }
+        .review-user { color: #007bff; }
+        .review-correct { color: #28a745; }
+        .review-feedback { font-size: 0.98em; color: #555; margin-top: 0.3em; }
 
-        gtag('js', new Date());
-
-        gtag('config', 'G-W1EN990JKP');
-    </script>
-        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        /* --- STREAK TOAST --- */
+        .streak-toast {
+            position: fixed;
+            top: 80px;
+            right: 30px;
+            background: #fffbe6;
+            color: #d35400;
+            border: 2px solid #ffc107;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+            padding: 1em 2em;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s, transform 0.4s;
+            transform: translateY(-30px);
+        }
+        .streak-toast.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
+        }
+        .streak-fire {
+            height: 2em;
+            margin-right: 0.7em;
+            animation: firePop 0.7s cubic-bezier(.68,-0.55,.27,1.55);
+        }
+        @keyframes firePop {
+            0% { transform: scale(0.7) rotate(-10deg);}
+            60% { transform: scale(1.2) rotate(10deg);}
+            100% { transform: scale(1) rotate(0);}
+        }
+    </style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
-    <div class="logo">
-        <a href="{{ url_for('main.index') }}">
-            <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
-        </a>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
     </div>
-    <nav>
+    <div class="nav-profile-wrapper">
         <ul class="nav-right">
-            <li><a href="/anglictina">Angličtina</a></li>
-            <li><a href="/feedback">Feedback</a></li>
-            <li><a href="/news">Novinky</a></li>
             <li>
-                {% if session['user_name'] %}
-                <div class="user-profile">
-                    <div class="profile-container">
-                        {% if session.get('profile_pic') %}
-                        <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
-                             alt="Profilová fotka" width="64" class="profile-pic">
-                        {% else %}
-                        <img src="{{ url_for('static', filename='pics/default.webp') }}" alt="Defaultní profilovka"
-                             class="profile-pic" id="profileMenuTrigger">
-                        {% endif %}
-                        <div class="profile-menu" id="profileMenu">
-                            <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
-                            <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
-                        </div>
-                    </div>
-                    <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
-                </div>
-                {% else %}
-                <div class="auth-links">
-                    <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
-                    <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
-                </div>
-                {% endif %}
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
             </li>
             <li>
-                <button id="theme-toggle">🌙</button>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
             </li>
         </ul>
-    </nav>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
 </header>
-
-<body data-song="{{ song_title }}">
-</body>
 <main class="exercises-container">
-    <form>
+    <!-- STREAK TOAST -->
+    <div id="streakToast" class="streak-toast" style="display:none;">
+        <img src="/static/fire.svg" alt="Streak" class="streak-fire">
+        <span id="streakToastText"></span>
+    </div>
+    <form id="exerciseForm" autocomplete="off">
         <section class="exercises-section">
             {% for item in missing_exercises %}
             <div class="exercise-card">
                 <h3>{{ loop.index }}. Doplň chybějící slovo:</h3>
                 <p class="blank-sentence">{{ item.with_blank | safe }}</p>
                 <input type="text" name="missing_word_{{ loop.index0 }}" class="exercise-input" placeholder="Napiš chybějící slovo..." data-correct="{{ item.missing_word }}" data-original="{{ item.original }}">
+                <div class="feedback"></div>
             </div>
             {% endfor %}
 
@@ -104,16 +217,16 @@
 
         <section class="word-matching">
             <h3>Spoj slova k sobě:</h3>
-                <div class="word-grid">
-                    {% for word in english_words %}
-                    <div class="word-box en-word" data-word="{{ word }}">{{ word }}</div>
-                    {% endfor %}
-                    {% for word in czech_words %}
-                    <div class="word-box cs-word" data-word="{{ word }}">{{ word }}</div>
-                    {% endfor %}
-                </div>
+            <div class="word-grid">
+                {% for word in english_words %}
+                <div class="word-box en-word" data-word="{{ word }}">{{ word }}</div>
+                {% endfor %}
+                {% for word in czech_words %}
+                <div class="word-box cs-word" data-word="{{ word }}">{{ word }}</div>
+                {% endfor %}
+            </div>
+            <div id="matchedPairs" style="margin-top:1em;"></div>
         </section>
-
 
         <section class="audio-section">
             <h3>Poslechni si audio:</h3>
@@ -125,10 +238,32 @@
             <div id="lyrics" class="lyrics-container"></div>
         </section>
 
-    <button type="button" id="checkButton" class="check-button">Zkontrolovat odpovědi</button>
+        <button type="button" id="checkButton" class="check-button">Zkontrolovat odpovědi</button>
+        <div id="result" class="result-container"></div>
 
-    <div id="result" class="result-container"></div>
-
+        <!-- Pop-up po úspěšném dokončení -->
+        <div id="successPopup" class="popup-container" style="display: none;">
+            <div class="popup-content">
+                <h3>Skvělá práce! 🎉</h3>
+                <p>Chceš pokračovat na další lekci?</p>
+                <div class="popup-buttons">
+                    <button type="button" id="nextLessonBtn" class="popup-button confirm">Ano</button>
+                    <button type="button" id="reviewBtn" class="popup-button cancel">Ne, kouknu se co jsem udělal</button>
+                </div>
+            </div>
+        </div>
+        <!-- NOVÝ MODAL: Přehled správných odpovědí -->
+        <div id="solutionPopup" class="popup-container" style="display: none;">
+            <div class="popup-content" style="max-width: 500px;">
+                <h3>Správné odpovědi</h3>
+                <div id="solutionContent"></div>
+                <div class="popup-buttons">
+                    <button type="button" id="closeSolutionBtn" class="popup-button confirm">Zavřít</button>
+                </div>
+            </div>
+        </div>
+        <!-- Review sekce (už se nebude používat, ale necháme pro případné další rozšíření) -->
+        <div id="reviewSection"></div>
     </form>
 </main>
 
@@ -141,10 +276,14 @@
   </p>
 </footer>
 
-<!-- Převod LRC -->
 <script>
+    // Zabráníme reloadu formuláře
+    document.getElementById('exerciseForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        return false;
+    });
 
-        // theme-toggle.js
+    // Přepínání dark/light režimu
     document.getElementById('theme-toggle').addEventListener('click', () => {
         fetch('/set_theme', {
             method: 'POST',
@@ -154,19 +293,17 @@
             })
         }).then(() => {
             document.body.classList.toggle('dark-mode');
-            session.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
         });
     });
 
+    // LRC lyrics parsing
     const lrcContent = {{ lrc_lyrics | tojson | safe }};
-    console.log(lrcContent);
-
     function parseLrc(lrc) {
         const parsed = lrc.split('\n')
             .map(line => {
                 const match = line.match(/\[(\d+):(\d+(?:\.\d+)?)\](.*)/);
                 if (!match) return null;
-
                 const minutes = parseFloat(match[1]);
                 const seconds = parseFloat(match[2]);
                 return {
@@ -176,8 +313,6 @@
             })
             .filter(line => line !== null)
             .sort((a, b) => a.time - b.time);
-
-        console.log(parsed);
         return parsed;
     }
 
@@ -199,110 +334,244 @@
         function updateLyrics() {
             const currentTime = audio.currentTime;
             let currentLine = parsedLyrics.findLast(line => line.time <= currentTime);
-
             lyricsContainer.innerHTML = currentLine
                 ? `<p class="current-line">${currentLine.text}</p>`
                 : '<p>Začátek skladby...</p>';
         }
     });
 
-        // Přepínání dark/light režimu
-    const themeToggle = document.getElementById('theme-toggle');
-    themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-    });
-
-document.addEventListener('click', (e) => {
-    const profileMenu = document.getElementById('profileMenu');
-    const trigger = document.getElementById('profileMenuTrigger');
-
-    // Zkontrolujeme, jestli elementy existují, než se pokusíme o další operace
-    if (profileMenu && trigger && !trigger.contains(e.target) && !profileMenu.contains(e.target)) {
-        profileMenu.style.opacity = '0';
-        profileMenu.style.visibility = 'hidden';
-        profileMenu.style.transform = 'translateY(10px)';
-    }
-});
-
-
-document.getElementById('checkButton').addEventListener('click', async () => {
-    const inputs = document.querySelectorAll('.exercise-input');
-    const translations = [];
-    const missings = [];
-
-    inputs.forEach((input) => {
-        if (input.classList.contains('translation-input')) {
-            translations.push({ user: input.value });
-        } else {
-            missings.push({ user: input.value });
+    // Profile menu hide on click outside
+    document.addEventListener('click', (e) => {
+        const profileMenu = document.getElementById('profileMenu');
+        const trigger = document.getElementById('profileMenuTrigger');
+        if (profileMenu && trigger && !trigger.contains(e.target) && !profileMenu.contains(e.target)) {
+            profileMenu.style.opacity = '0';
+            profileMenu.style.visibility = 'hidden';
+            profileMenu.style.transform = 'translateY(10px)';
         }
     });
 
-    try {
-        const res = await fetch('/check-answer', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ translations, missing: missings })
-        });
-        const data = await res.json();
+    // Párování slov
+    let selectedWord = null;
+    let matchedPairs = [];
+    const wordBoxes = document.querySelectorAll('.word-box');
+    const matchedPairsDiv = document.getElementById('matchedPairs');
 
-        // Handle translation exercises feedback
-        data.results.details.translations.forEach((result, idx) => {
-            const input = document.querySelectorAll('.translation-input')[idx];
-            const feedbackBox = input.nextElementSibling;
-
-            // Reset classes and feedback
-            input.classList.remove('correct', 'incorrect', 'almost');
-            feedbackBox.textContent = '';
-            feedbackBox.classList.remove('error-feedback');
-
-            // Apply new state
-            if (data.results.translations[idx] === true) {
-                input.classList.add('correct');
-            } else if (data.results.translations[idx] === 'almost') {
-                input.classList.add('almost');
-                feedbackBox.textContent = result.feedback || 'Částečně správně, zkus to vyladit!';
-                feedbackBox.classList.add('error-feedback');
+    wordBoxes.forEach(box => {
+        box.addEventListener('click', function() {
+            if (this.classList.contains('paired')) return;
+            if (!selectedWord) {
+                selectedWord = this;
+                this.classList.add('selected');
+            } else if (selectedWord !== this && selectedWord.classList.contains('en-word') !== this.classList.contains('en-word')) {
+                matchedPairs.push([selectedWord.dataset.word, this.dataset.word]);
+                selectedWord.classList.add('paired');
+                this.classList.add('paired');
+                selectedWord.classList.remove('selected');
+                this.classList.remove('selected');
+                selectedWord = null;
+                renderMatchedPairs();
             } else {
-                input.classList.add('incorrect');
-                feedbackBox.textContent = result.feedback || 'Zkus to znovu!';
-                feedbackBox.classList.add('error-feedback');
+                selectedWord.classList.remove('selected');
+                selectedWord = null;
             }
         });
+    });
 
-        // Handle missing word exercises
-        data.results.details.missing.forEach((result, idx) => {
-            const input = document.querySelectorAll('.exercise-input:not(.translation-input)')[idx];
-            const feedbackBox = input.nextElementSibling;
-
-            input.classList.remove('correct', 'incorrect', 'almost');
-            feedbackBox.textContent = '';
-
-            if (data.results.missing[idx] === true) {
-                input.classList.add('correct');
-            } else if (data.results.missing[idx] === 'almost') {
-                input.classList.add('almost');
-                feedbackBox.textContent = `Téměř správně! Správné slovo: ${result.correct}`;
-            } else {
-                input.classList.add('incorrect');
-                feedbackBox.textContent = `Správná odpověď: ${result.correct}`;
-            }
+    function renderMatchedPairs() {
+        matchedPairsDiv.innerHTML = '';
+        matchedPairs.forEach(pair => {
+            const el = document.createElement('div');
+            el.textContent = pair[0] + ' ↔ ' + pair[1];
+            el.style.marginBottom = '4px';
+            matchedPairsDiv.appendChild(el);
         });
-
-    } catch (error) {
-        console.error('Chyba při kontrole odpovědí:', error);
     }
-});
 
+    // Kontrola odpovědí a pop-up logika
+    let lastCheckData = null; // Uložíme si poslední data pro review
 
-</script>
+    document.getElementById('checkButton').addEventListener('click', async () => {
+        const inputs = document.querySelectorAll('.exercise-input');
+        const translations = [];
+        const missings = [];
 
-<script>
+        inputs.forEach((input) => {
+            if (input.classList.contains('translation-input')) {
+                translations.push({ user: input.value });
+            } else {
+                missings.push({ user: input.value });
+            }
+        });
+
+        const pairs = matchedPairs;
+
+        try {
+            const res = await fetch('/check-answer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ translations, missing: missings, pairs })
+            });
+            const data = await res.json();
+            lastCheckData = data; // Uložíme pro review
+
+            // Feedback pro překlady
+            data.results.details.translations.forEach((result, idx) => {
+                const input = document.querySelectorAll('.translation-input')[idx];
+                const feedbackBox = input.nextElementSibling;
+                input.classList.remove('correct', 'incorrect', 'almost');
+                feedbackBox.textContent = '';
+                feedbackBox.classList.remove('error-feedback');
+                if (data.results.translations[idx] === true) {
+                    input.classList.add('correct');
+                } else if (data.results.translations[idx] === 'almost') {
+                    input.classList.add('almost');
+                    feedbackBox.textContent = result.feedback || 'Částečně správně, zkus to vyladit!';
+                    feedbackBox.classList.add('error-feedback');
+                } else {
+                    input.classList.add('incorrect');
+                    feedbackBox.textContent = result.feedback || 'Zkus to znovu!';
+                    feedbackBox.classList.add('error-feedback');
+                }
+            });
+
+            // Feedback pro missing words
+            data.results.details.missing.forEach((result, idx) => {
+                const input = document.querySelectorAll('.exercise-input:not(.translation-input)')[idx];
+                const feedbackBox = input.nextElementSibling;
+                input.classList.remove('correct', 'incorrect', 'almost');
+                feedbackBox.textContent = '';
+                if (data.results.missing[idx] === true) {
+                    input.classList.add('correct');
+                } else if (data.results.missing[idx] === 'almost') {
+                    input.classList.add('almost');
+                    feedbackBox.textContent = `Téměř správně! Správné slovo: ${result.correct}`;
+                } else {
+                    input.classList.add('incorrect');
+                    feedbackBox.textContent = `Správná odpověď: ${result.correct}`;
+                }
+            });
+
+            // Zobraz pop-up pokud je vše správně
+            if (data.success) {
+                showSuccessPopup();
+
+                // --- ZOBRAZ STREAK TOAST ---
+                if (data.streak_info && (data.streak_info.status === "started" || data.streak_info.status === "continued")) {
+                    showStreakToast(data.streak_info.streak);
+                }
+            }
+
+        } catch (error) {
+            console.error('Chyba při kontrole odpovědí:', error);
+        }
+    });
+
+    // Moderní animace pop-upu
+    function showSuccessPopup() {
+        const popup = document.getElementById('successPopup');
+        popup.style.display = 'flex';
+        setTimeout(() => popup.classList.add('active'), 10);
+    }
+    function hideSuccessPopup() {
+        const popup = document.getElementById('successPopup');
+        popup.classList.remove('active');
+        setTimeout(() => popup.style.display = 'none', 300);
+    }
+
+    // --- STREAK TOAST FUNKCE ---
+    function showStreakToast(streak) {
+        const toast = document.getElementById('streakToast');
+        const text = document.getElementById('streakToastText');
+        text.textContent = `🔥 Máš streak ${streak} dní v řadě!`;
+        toast.classList.add('active');
+        toast.style.display = 'flex';
+        setTimeout(() => {
+            toast.classList.remove('active');
+            setTimeout(() => { toast.style.display = 'none'; }, 400);
+        }, 3500);
+    }
+
+    // NOVÉ: Funkce pro zobrazení správných odpovědí v modalu
+    function showSolutionPopup() {
+        const popup = document.getElementById('solutionPopup');
+        const content = document.getElementById('solutionContent');
+        const config = window.exerciseConfig;
+
+        let html = '';
+
+        // Missing words
+        if (config.missing_exercises && config.missing_exercises.length) {
+            html += `<div style="margin-bottom:1em;"><b>Chybějící slova:</b><ul>`;
+            config.missing_exercises.forEach((word, idx) => {
+                html += `<li>${idx+1}. <span style="color:#28a745;font-weight:bold;">${word}</span></li>`;
+            });
+            html += `</ul></div>`;
+        }
+
+        // Překlady
+        if (config.translation_exercises && config.translation_exercises.length) {
+            html += `<div style="margin-bottom:1em;"><b>Správné překlady:</b><ul>`;
+            config.translation_exercises.forEach((tr, idx) => {
+                html += `<li>${idx+1}. <span style="color:#28a745;font-weight:bold;">${tr}</span></li>`;
+            });
+            html += `</ul></div>`;
+        }
+
+        // Páry slov
+        if (config.word_pairs && Object.keys(config.word_pairs).length) {
+            html += `<div style="margin-bottom:1em;"><b>Správné páry slov:</b><ul>`;
+            let shown = new Set();
+            Object.entries(config.word_pairs).forEach(([en, cs]) => {
+                if (!shown.has(en) && !shown.has(cs)) {
+                    html += `<li><span style="color:#007bff;">${en}</span> &harr; <span style="color:#28a745;">${cs}</span></li>`;
+                    shown.add(en); shown.add(cs);
+                }
+            });
+            html += `</ul></div>`;
+        }
+
+        content.innerHTML = html;
+        popup.style.display = 'flex';
+        setTimeout(() => popup.classList.add('active'), 10);
+    }
+    function hideSolutionPopup() {
+        const popup = document.getElementById('solutionPopup');
+        popup.classList.remove('active');
+        setTimeout(() => popup.style.display = 'none', 300);
+    }
+
+    // Obsluha tlačítek v pop-upech
+    document.getElementById('nextLessonBtn').addEventListener('click', () => {
+        window.location.href = "/song-selection";
+    });
+
+    document.getElementById('reviewBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        hideSuccessPopup();
+        showSolutionPopup();
+    });
+
+    document.getElementById('closeSolutionBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        hideSolutionPopup();
+    });
+
+    // Možnost zavřít kliknutím mimo obsah pro oba modaly
+    document.getElementById('successPopup').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('successPopup')) {
+            hideSuccessPopup();
+        }
+    });
+    document.getElementById('solutionPopup').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('solutionPopup')) {
+            hideSolutionPopup();
+        }
+    });
+
+    // Konfigurace cvičení pro případné další JS
     window.exerciseConfig = {{ config | tojson | safe }};
     console.log('Konfigurace cvičení:', exerciseConfig);
 </script>
-
-
-
-    </body>
+</body>
 </html>

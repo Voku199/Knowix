@@ -1,23 +1,37 @@
-from waitress import serve
-from flask import Flask, current_app, render_template
-
-from auth import auth_bp
-from nepravidelna_slovesa import verbs_bp
-from main_routes import main_bp
-from A1_music import exercises_bp  # Add this import
-from feedback import feedback_bp
-from hangman import hangman_bp
-from theme import theme_bp
-from news import news_bp
-from present_perfect import chat_bp
-from at_on import at_on_bp
-from listening import listening_bp
-from flask import after_this_request
-
 import os
+
 from dotenv import load_dotenv
+from flask import Flask, render_template, session, send_from_directory
+from flask_socketio import SocketIO
+
+from A1_music import exercises_bp  # Add this import
+from ai import ai_bp
+from at_on import at_on_bp
+from auth import auth_bp
+from chat import zpravy_bp
+from feedback import feedback_bp
+# from game import game_bp
+from hangman import hangman_bp
+from listening import listening_bp
+from main_routes import main_bp
+from nepravidelna_slovesa import verbs_bp
+from news import news_bp
+from obchod import obchod_bp
+from present_perfect import chat_bp
+from review import review_bp
+from roleplaying import roleplaying_bp
+from streak import get_user_streak
+from theme import theme_bp
+from pexeso import pexeso_bp, register_socketio_handlers
+# Sekce
+from xp import get_user_xp_and_level
+from xp import xp_bp
+
+socketio = SocketIO()
 
 app = Flask(__name__)
+socketio.init_app(app, cors_allowed_origins="*", async_mode="eventlet")
+
 load_dotenv(dotenv_path=".env")
 app.secret_key = os.getenv("SECRET_KEY")
 
@@ -38,7 +52,29 @@ app.register_blueprint(hangman_bp)
 app.register_blueprint(news_bp)
 app.register_blueprint(chat_bp)
 app.register_blueprint(at_on_bp)
+app.register_blueprint(xp_bp)
 app.register_blueprint(listening_bp)
+app.register_blueprint(review_bp)
+app.register_blueprint(obchod_bp)
+app.register_blueprint(zpravy_bp)
+app.register_blueprint(roleplaying_bp)
+app.register_blueprint(ai_bp)
+# app.register_blueprint(game_bp)
+app.register_blueprint(pexeso_bp)
+
+
+@app.route('/sitemap.xml')
+def sitemap():
+    return send_from_directory('templates', 'sitemap.xml')
+
+
+@app.context_processor
+def inject_streak():
+    user_id = session.get('user_id')
+    if user_id:
+        streak = get_user_streak(user_id)
+        return dict(user_streak=streak)
+    return dict(user_streak=0)
 
 
 @app.errorhandler(502)
@@ -50,6 +86,48 @@ app.register_blueprint(listening_bp)
 def server_error(e):
     # vrátí stránku error.html s informací o výpadku
     return render_template('error.html', error_code=e.code), e.code
+
+
+LEVEL_NAMES = [
+    "Začátečník", "Učeň", "Student", "Pokročilý", "Expert", "Mistr", "Legenda"
+]
+
+
+def get_level_name(level):
+    if level <= 1:
+        return LEVEL_NAMES[0]
+    elif level <= 2:
+        return LEVEL_NAMES[1]
+    elif level <= 4:
+        return LEVEL_NAMES[2]
+    elif level <= 6:
+        return LEVEL_NAMES[3]
+    elif level <= 8:
+        return LEVEL_NAMES[4]
+    elif level <= 10:
+        return LEVEL_NAMES[5]
+    else:
+        return LEVEL_NAMES[6]
+
+
+@app.context_processor
+def inject_xp_info():
+    user_id = session.get('user_id')
+    if user_id:
+        user_data = get_user_xp_and_level(user_id)
+        xp = user_data.get("xp", 0)
+        level = user_data.get("level", 1)
+        xp_in_level = xp % 50
+        percent = int((xp_in_level / 50) * 100)
+        level_name = get_level_name(level)
+        return dict(
+            user_xp=xp,
+            user_level=level,
+            user_level_name=level_name,
+            user_progress_percent=percent,
+            user_xp_in_level=xp_in_level
+        )
+    return {}
 
 
 @app.after_request
@@ -91,6 +169,9 @@ def add_security_headers(response):
 # -------------------!!!SERVER!!!----------------------
 # =====================================================
 # serve(app, host="0.0.0.0", port=8080, threads=32) PRO SERVER
+# socketio.run(app, host="0.0.0.0", port=5000)
+
+register_socketio_handlers(socketio)
 
 if __name__ == "__main__":
-    serve(app, host="0.0.0.0", port=8080, threads=32)
+    socketio.run(app, host="0.0.0.0", port=5000)

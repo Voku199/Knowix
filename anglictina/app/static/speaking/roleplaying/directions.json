@@ -1,0 +1,126 @@
+{
+  "topic": "directions",
+  "characters": [
+    "Alex",
+    "Uživatel"
+  ],
+  "dialogue": [
+    {
+      "speaker": "Alex",
+      "cz": "Ahoj! Vypadáš, že něco hledáš. Potřebuješ pomoct?",
+      "en": "Hi! You look like you're looking for something. Do you need help?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Pozdrav a řekni, že hledáš autobusovou zastávku.",
+      "en": [
+        "Hello! Yes, I'm looking for the bus stop.",
+        "Hi! Do you know where the bus stop is?",
+        "Hello, I need to find a bus stop.",
+        "Hi! I'm trying to get to a bus stop.",
+        "Hey, do you know where I can catch the bus?"
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Jasně, rád pomůžu. Kam přesně chceš jet?",
+      "en": "Sure, I’ll be happy to help. Where exactly do you want to go?"
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Řekni, že jedeš do centra města.",
+      "en": [
+        "I’m going to the city centre.",
+        "I need to get to the city center.",
+        "To the city centre, please.",
+        "I'm heading to the city center.",
+        "I want to go to downtown."
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Rozumím. Do centra jede autobus číslo 24. Zastávka je hned za rohem vedle kavárny.",
+      "en": "Got it. Bus number 24 goes to the city centre. The stop is just around the corner next to the café."
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Zeptej se, kdy jede další autobus.",
+      "en": [
+        "When is the next bus?",
+        "What time does the next bus arrive?",
+        "Do you know when the next bus comes?",
+        "How long until the next bus?",
+        "When does the next bus leave?"
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Další autobus přijede za deset minut. Mívá ale někdy zpoždění, tak doporučuju být tam trochu dřív.",
+      "en": "The next bus will arrive in ten minutes. It’s sometimes a bit late, so I recommend getting there a little early."
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Poděkuj a zeptej se, kde si můžeš koupit jízdenku.",
+      "en": [
+        "Thanks! Where can I buy a ticket?",
+        "Thank you. Where do I get a ticket?",
+        "Thanks a lot! Is there a place to buy a ticket nearby?",
+        "Thank you! How can I get a ticket?",
+        "Where do I purchase a bus ticket?"
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Jízdenku si můžeš koupit v automatu u zastávky nebo přes mobilní aplikaci. Obě možnosti jsou jednoduché.",
+      "en": "You can buy a ticket at the machine by the bus stop or via a mobile app. Both are easy to use."
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Zeptej se, kolik to stojí a jestli se dá platit kartou.",
+      "en": [
+        "How much is it? Can I pay by card?",
+        "What’s the price of the ticket? Can I use a card?",
+        "How much does a ticket cost? And can I pay with a card?",
+        "Is it possible to pay with a card? And how much is the ticket?",
+        "Do you know how much it is and if card payments are accepted?"
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Jedna jízdenka stojí třicet korun. Platba kartou je možná jak v automatu, tak v aplikaci.",
+      "en": "One ticket costs thirty crowns. You can pay by card both at the machine and in the app."
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Zeptej se, jak dlouho platí jízdenka.",
+      "en": [
+        "How long is the ticket valid for?",
+        "How long does the ticket last?",
+        "Is there a time limit on the ticket?",
+        "How long can I use the ticket?",
+        "What’s the ticket’s validity?"
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Platí 45 minut od označení. Můžeš s ní i přestupovat.",
+      "en": "It’s valid for 45 minutes after validation. You can use it to change buses too."
+    },
+    {
+      "speaker": "Uživatel",
+      "cz": "Poděkuj a rozluč se.",
+      "en": [
+        "Thank you so much! Have a nice day!",
+        "Thanks a lot. Goodbye!",
+        "Thank you, I appreciate your help. Bye!",
+        "Thanks, have a great day!",
+        "Thank you very much! See you!"
+      ]
+    },
+    {
+      "speaker": "Alex",
+      "cz": "Není zač! Přeji ti hezký den a ať dobře dorazíš!",
+      "en": "You're welcome! Have a great day and safe travels!"
+    }
+  ]
+}

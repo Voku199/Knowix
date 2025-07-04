@@ -1,9 +1,61 @@
 from flask import Blueprint, session, render_template, request, jsonify
 import json
 import random
-from auth import get_db_connection
+from db import get_db_connection
+from xp import add_xp_to_user, get_user_xp_and_level
+from streak import update_user_streak, get_user_streak  # <-- Přidáno pro streak
 
 hangman_bp = Blueprint("hangman", __name__, template_folder="templates")
+
+LEVEL_NAMES = [
+    "Začátečník", "Učeň", "Student", "Pokročilý", "Expert", "Mistr", "Legenda"
+]
+
+
+@hangman_bp.context_processor
+def inject_streak():
+    user_id = session.get('user_id')
+    if user_id:
+        streak = get_user_streak(user_id)
+        return dict(user_streak=streak)
+    return dict(user_streak=0)
+
+
+def get_level_name(level):
+    if level <= 1:
+        return LEVEL_NAMES[0]
+    elif level <= 2:
+        return LEVEL_NAMES[1]
+    elif level <= 4:
+        return LEVEL_NAMES[2]
+    elif level <= 6:
+        return LEVEL_NAMES[3]
+    elif level <= 8:
+        return LEVEL_NAMES[4]
+    elif level <= 10:
+        return LEVEL_NAMES[5]
+    else:
+        return LEVEL_NAMES[6]
+
+
+@hangman_bp.context_processor
+def inject_xp_info():
+    user_id = session.get('user_id')
+    if user_id:
+        user_data = get_user_xp_and_level(user_id)
+        xp = user_data.get("xp", 0)
+        level = user_data.get("level", 1)
+        xp_in_level = xp % 50
+        percent = int((xp_in_level / 50) * 100)
+        level_name = get_level_name(level)
+        return dict(
+            user_xp=xp,
+            user_level=level,
+            user_level_name=level_name,
+            user_progress_percent=percent,
+            user_xp_in_level=xp_in_level
+        )
+    return {}
 
 
 @hangman_bp.errorhandler(502)
@@ -32,6 +84,27 @@ def get_random_word(used_words, user_level):
         return None
 
     return random.choice(filtered_words)
+
+
+def get_xp_for_level(level):
+    """
+    Vrací počet XP podle úrovně slova.
+    - A1, A2: 5 XP
+    - B1: 6 XP
+    - B2: 10 XP
+    - C1, C2: 15 XP
+    """
+    level = (level or "").upper()
+    if level in ["A1", "A2"]:
+        return 5
+    elif level == "B1":
+        return 6
+    elif level == "B2":
+        return 10
+    elif level in ["C1", "C2"]:
+        return 15
+    else:
+        return 5  # fallback
 
 
 def allowed_levels(level):
@@ -159,11 +232,25 @@ def guess_letter():
 
     masked_word = get_masked_word(word, guessed)
 
+    # --- XP ZA VÝHRU ---
+    xp_awarded = 0
+    streak_info = None  # <-- Přidáno pro streak
+    if status == "win":
+        user_id = session.get("user_id")
+        if user_id and word_data:
+            xp_awarded = get_xp_for_level(word_data.get("level"))
+            add_xp_to_user(user_id, xp_awarded)
+            # --- Streak logika ---
+            streak_info = update_user_streak(user_id)
+            print(streak_info)
+
     return jsonify({
         "masked_word": masked_word,
         "guessed_letters": guessed,
         "remaining_attempts": session["remaining_attempts"],
         "status": status,
         "original_word": word if status != "playing" else None,
-        "translation": word_data["translation"] if word_data and status != "playing" else None
+        "translation": word_data["translation"] if word_data and status != "playing" else None,
+        "xp_awarded": xp_awarded if status == "win" else 0,
+        "streak_info": streak_info  # <-- Přidáno do odpovědi
     })

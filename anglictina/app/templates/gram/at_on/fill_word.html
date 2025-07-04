@@ -1,37 +1,9 @@
-<!-- app/templates/gram/at_on/fill_word.html -->
 <!DOCTYPE html>
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
     <title>Doplň předložku – Knowix</title>
-        <!-- Preconnect zrychlí DNS a spojení -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Font načti až po načtení stránky -->
-    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
-          media="print" onload="this.media='all'">
-    <noscript>
-        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
-    </noscript>
-
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-
-        gtag('js', new Date());
-
-        gtag('config', 'G-W1EN990JKP');
-    </script>
     <link rel="stylesheet" href="/static/style.css">
-        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
         .progress-container {
             width: 100%;
@@ -40,14 +12,12 @@
             border-radius: 10px;
             margin: 20px 0;
         }
-
         .progress-bar {
             height: 100%;
             background-color: #4CAF50;
             border-radius: 10px;
             transition: width 0.3s ease;
         }
-
         .exercise-box {
             background-color: {{ '#2d2d2d' if session.get('theme') == 'dark' else '#ffffff' }};
             padding: 30px;
@@ -56,101 +26,191 @@
             max-width: 600px;
             margin: 20px auto;
         }
-
         .completed-box {
             text-align: center;
             padding: 40px;
         }
+        .streak-toast {
+            position: fixed;
+            top: 80px;
+            right: 30px;
+            background: #fffbe6;
+            color: #d35400;
+            border: 2px solid #ffc107;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+            padding: 1em 2em;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            z-index: 3000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s, transform 0.4s;
+            transform: translateY(-30px);
+        }
+        .streak-toast.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
+        }
+        .streak-fire {
+            height: 2em;
+            margin-right: 0.7em;
+            animation: firePop 0.7s cubic-bezier(.68,-0.55,.27,1.55);
+        }
+        @keyframes firePop {
+            0% { transform: scale(0.7) rotate(-10deg);}
+            60% { transform: scale(1.2) rotate(10deg);}
+            100% { transform: scale(1) rotate(0);}
+        }
+        .alert {
+            margin-bottom: 1em;
+        }
+        .feedback-box {
+            margin-top: 1em;
+            font-size: 1.15em;
+            font-weight: 500;
+            min-height: 1.5em;
+        }
+        .feedback-correct { color: #28a745; }
+        .feedback-incorrect { color: #d32f2f; }
     </style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
-    <div class="logo">
-        <a href="{{ url_for('main.index') }}">
-            <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
-        </a>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
     </div>
-    <nav>
+    <div class="nav-profile-wrapper">
         <ul class="nav-right">
-            <li><a href="/anglictina">Angličtina</a></li>
-            <li><a href="/feedback">Feedback</a></li>
-            <li><a href="/news">Novinky</a></li>
             <li>
-                {% if session['user_name'] %}
-                <div class="user-profile">
-                    <div class="profile-container">
-                        {% if session.get('profile_pic') %}
-                        <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
-                             alt="Profilová fotka" width="64" class="profile-pic">
-                        {% else %}
-                        <img src="{{ url_for('static', filename='pics/default.webp') }}" alt="Defaultní profilovka"
-                             class="profile-pic" id="profileMenuTrigger">
-                        {% endif %}
-                        <div class="profile-menu" id="profileMenu">
-                            <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
-                            <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
-                        </div>
-                    </div>
-                    <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
-                </div>
-                {% else %}
-                <div class="auth-links">
-                    <a href="{{ url_for('auth.login') }}">🔑 Přihlásit se</a>
-                    <a href="{{ url_for('auth.register') }}">📝 Registrovat se</a>
-                </div>
-                {% endif %}
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
             </li>
             <li>
-                <button id="theme-toggle">🌙</button>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
             </li>
         </ul>
-    </nav>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
 </header>
 
+<!-- STREAK TOAST -->
+<div id="streakToast" class="streak-toast" style="display:none;">
+    <img src="/static/fire.svg" alt="Streak" class="streak-fire">
+    <span id="streakToastText"></span>
+</div>
+
 <main>
-    {% if remaining_count > 0 %}
-        <div class="progress-container">
-            <div class="progress-bar" style="width: {{ (answered_count/total_questions)*100 }}%"></div>
-        </div>
-
-        <div class="exercise-box">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-
-            <form method="POST">
-                <p class="question">{{ question }}</p>
-                <input type="hidden" name="question_id" value="{{ question_id }}">
-
-                <div class="options">
-                    <label><input type="radio" name="answer" value="in" required> in</label>
-                    <label><input type="radio" name="answer" value="on"> on</label>
-                    <label><input type="radio" name="answer" value="at"> at</label>
+    <div id="exerciseRoot">
+        {% if remaining_count > 0 %}
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: {{ (answered_count/total_questions)*100 }}%"></div>
+            </div>
+            <div class="exercise-box" id="exerciseBox">
+                <form id="fillWordForm" class="fill-word-form">
+                    <p class="question" id="questionText">{{ question }}</p>
+                    <input type="hidden" name="question_id" id="questionId" value="{{ question_id }}">
+                    <div class="options">
+                        <label class="option-radio">
+                            <input type="radio" name="answer" value="in" required>
+                            <span class="custom-radio"></span>
+                            in
+                        </label>
+                        <label class="option-radio">
+                            <input type="radio" name="answer" value="on">
+                            <span class="custom-radio"></span>
+                            on
+                        </label>
+                        <label class="option-radio">
+                            <input type="radio" name="answer" value="at">
+                            <span class="custom-radio"></span>
+                            at
+                        </label>
+                    </div>
+                    <button type="submit" class="btn-main">Odeslat odpověď</button>
+                </form>
+                <div class="feedback-box" id="feedbackBox"></div>
+                <div class="progress-text" id="progressText">
+                    Dokončeno: <b id="answeredCount">{{ answered_count }}</b>/<b id="totalQuestions">{{ total_questions }}</b>
                 </div>
-
-                <button type="submit">Odeslat odpověď</button>
-            </form>
-
-            <div class="progress-text">
-                Dokončeno: {{ answered_count }}/{{ total_questions }}
             </div>
-        </div>
-    {% else %}
-        <div class="completed-box">
-            <h2>🎉 Všechny otázky dokončeny!</h2>
-            <p>Úspěšně jsi odpověděl(a) na všech {{ total_questions }} otázek!</p>
-            <div class="actions">
-                <a href="{{ url_for('at_on.reset_progress') }}" class="button">⟳ Zkusit znovu</a>
-                <a href="{{ url_for('at_on.select_exercise') }}" class="button">← Zpět na výběr</a>
+        {% else %}
+            <div class="completed-box" id="completedBox">
+                <h2>🎉 Všechny otázky dokončeny!</h2>
+                <p>Úspěšně jsi odpověděl(a) na <b>{{ total_questions }}</b> otázek!</p>
+                <div class="actions">
+                    <a href="{{ url_for('at_on.reset_progress') }}" class="button btn-main">⟳ Zkusit znovu</a>
+                    <a href="/gramatika" class="button btn-secondary">← Zpět na výběr gramatiku</a>
+                </div>
             </div>
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
 </main>
 
 <footer>
@@ -163,14 +223,88 @@
 </footer>
 
 <script>
-    // Automatické skrytí flash zpráv
-    document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        fetch('/set_theme', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark'
+            })
+        }).then(() => {
+            document.body.classList.toggle('dark-mode');
+            sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+    });
+
+    function showStreakToast(streak) {
+        const toast = document.getElementById('streakToast');
+        const text = document.getElementById('streakToastText');
+        text.textContent = `🔥 Máš streak ${streak} dní v řadě!`;
+        toast.classList.add('active');
+        toast.style.display = 'flex';
         setTimeout(() => {
-            document.querySelectorAll('.alert').forEach(alert => {
-                alert.style.opacity = '0';
-                setTimeout(() => alert.remove(), 500);
+            toast.classList.remove('active');
+            setTimeout(() => { toast.style.display = 'none'; }, 400);
+        }, 3500);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('fillWordForm');
+        const feedbackBox = document.getElementById('feedbackBox');
+        if (form) {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                feedbackBox.textContent = '';
+                feedbackBox.className = 'feedback-box';
+
+                const formData = new FormData(form);
+                const response = await fetch(window.location.pathname, {
+                    method: 'POST',
+                    headers: {'Accept': 'application/json'},
+                    body: formData
+                });
+
+                let result;
+                try {
+                    result = await response.json();
+                } catch {
+                    window.location.reload();
+                    return;
+                }
+
+                // Zobraz toast pokud je streak_info
+                if (result.streak_info && (result.streak_info.status === "started" || result.streak_info.status === "continued")) {
+                    showStreakToast(result.streak_info.streak);
+                }
+
+                // Zobraz zpětnou vazbu (flash_message)
+                if (result.flash_message) {
+                    feedbackBox.textContent = result.flash_message;
+                    feedbackBox.classList.add(result.correct ? 'feedback-correct' : 'feedback-incorrect');
+                }
+
+                // Pokud je hotovo, zobraz summary box bez reloadu
+                if (result.done) {
+                    setTimeout(() => {
+                        const exerciseRoot = document.getElementById('exerciseRoot');
+                        exerciseRoot.innerHTML = `
+                            <div class="completed-box" id="completedBox">
+                                <h2>🎉 Všechny otázky dokončeny!</h2>
+                                <p>Úspěšně jsi odpověděl(a) na <b>${document.getElementById('totalQuestions').textContent}</b> otázek!</p>
+                                <div class="actions">
+                                    <a href="{{ url_for('at_on.reset_progress') }}" class="button btn-main">⟳ Zkusit znovu</a>
+                                    <a href="/gramatika" class="button btn-secondary">← Zpět na výběr gramatiku</a>
+                                </div>
+                            </div>
+                        `;
+                    }, 1200);
+                } else {
+                    // Po krátké pauze smaž zpětnou vazbu a reloadni pro další otázku
+                    setTimeout(() => window.location.reload(), 1200);
+                }
             });
-        }, 3000);
+        }
     });
 </script>
 </body>
