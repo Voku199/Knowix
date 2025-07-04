@@ -175,4 +175,4 @@ register_socketio_handlers(socketio)
 
 if __name__ == "__main__":
     # Spuštění aplikace
-    socketio.run(app, host="0.0.0.0", port=8080)
+    socketio.run(app, host="0.0.0.0", port=8080, allow_unsafe_werkzeug=True)
