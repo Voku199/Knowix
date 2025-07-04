@@ -1,5 +1,9 @@
-import os
+# Monkey patch musí být první!
+import eventlet
 
+eventlet.monkey_patch()
+
+import os
 from dotenv import load_dotenv
 from flask import Flask, render_template, session, send_from_directory
 from flask_socketio import SocketIO
@@ -27,10 +31,10 @@ from pexeso import pexeso_bp, register_socketio_handlers
 from xp import get_user_xp_and_level
 from xp import xp_bp
 
-socketio = SocketIO()
-
 app = Flask(__name__)
-socketio.init_app(app, cors_allowed_origins="*", async_mode="eventlet")
+
+socketio = SocketIO(cors_allowed_origins="*")
+socketio.init_app(app)
 
 load_dotenv(dotenv_path=".env")
 app.secret_key = os.getenv("SECRET_KEY")
@@ -174,4 +178,5 @@ def add_security_headers(response):
 register_socketio_handlers(socketio)
 
 if __name__ == "__main__":
+    # Spuštění aplikace
     socketio.run(app, host="0.0.0.0", port=8080)
