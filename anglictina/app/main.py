@@ -1,8 +1,3 @@
-# Monkey patch musí být první!
-import eventlet
-
-eventlet.monkey_patch()
-
 import os
 from dotenv import load_dotenv
 from flask import Flask, render_template, session, send_from_directory
@@ -33,7 +28,8 @@ from xp import xp_bp
 
 app = Flask(__name__)
 
-socketio = SocketIO(cors_allowed_origins="*")
+socketio = SocketIO(app, async_mode="threading", cors_allowed_origins="*")
+
 socketio.init_app(app)
 
 load_dotenv(dotenv_path=".env")
