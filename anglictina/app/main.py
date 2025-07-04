@@ -169,9 +169,9 @@ def add_security_headers(response):
 # -------------------!!!SERVER!!!----------------------
 # =====================================================
 # serve(app, host="0.0.0.0", port=8080, threads=32) PRO SERVER
-# socketio.run(app, host="0.0.0.0", port=5000)
+# socketio.run(app, host="0.0.0.0", port=5000, debug=True)
 
 register_socketio_handlers(socketio)
 
 if __name__ == "__main__":
-    socketio.run(app, host="0.0.0.0", port=5000)
+    socketio.run(app, host="0.0.0.0", port=8080, threads=32)
