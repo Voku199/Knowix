@@ -1,20 +1,34 @@
+# Nejprve importujeme potřebné standardní moduly
+import os
+import sys
+
+# Přidáme distutils do cesty (pro Python 3.12 a vyšší)
+if sys.version_info >= (3, 12):
+    try:
+        import distutils
+    except ImportError:
+        # Pro Python 3.12+ musíme explicitně nainstalovat setuptools
+        import subprocess
+
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "setuptools"])
+        import distutils
+
+# Nyní můžeme bezpečně importovat eventlet
 import eventlet
 
-# Nutné pro eventlet - musí být na začátku!
 eventlet.monkey_patch()
 
-import os
+# Zbytek importů
 from dotenv import load_dotenv
 from flask import Flask, render_template, session, send_from_directory
 from flask_socketio import SocketIO
 
-from A1_music import exercises_bp  # Add this import
+from A1_music import exercises_bp
 from ai import ai_bp
 from at_on import at_on_bp
 from auth import auth_bp
 from chat import zpravy_bp
 from feedback import feedback_bp
-# from game import game_bp
 from hangman import hangman_bp
 from listening import listening_bp
 from main_routes import main_bp
@@ -27,7 +41,6 @@ from roleplaying import roleplaying_bp
 from streak import get_user_streak
 from theme import theme_bp
 from pexeso import pexeso_bp, register_socketio_handlers
-# Sekce
 from xp import get_user_xp_and_level
 from xp import xp_bp
 
@@ -42,14 +55,14 @@ app.secret_key = os.getenv("SECRET_KEY")
 # Konfigurace
 app.config['UPLOAD_FOLDER'] = 'static/profile_pics'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
-app.config['GENIUS_ACCESS_TOKEN'] = os.getenv('GENIUS_ACCESS_TOKEN')  # Add this
-app.config['DEEPL_API_KEY'] = os.getenv('DEEPL_API_KEY')  # Add this
+app.config['GENIUS_ACCESS_TOKEN'] = os.getenv('GENIUS_ACCESS_TOKEN')
+app.config['DEEPL_API_KEY'] = os.getenv('DEEPL_API_KEY')
 
 # Registrace blueprintů
 app.register_blueprint(main_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(verbs_bp)
-app.register_blueprint(exercises_bp)  # Add this line
+app.register_blueprint(exercises_bp)
 app.register_blueprint(feedback_bp)
 app.register_blueprint(theme_bp)
 app.register_blueprint(hangman_bp)
@@ -63,7 +76,6 @@ app.register_blueprint(obchod_bp)
 app.register_blueprint(zpravy_bp)
 app.register_blueprint(roleplaying_bp)
 app.register_blueprint(ai_bp)
-# app.register_blueprint(game_bp)
 app.register_blueprint(pexeso_bp)
 
 
@@ -93,7 +105,6 @@ def inject_streak():
 @app.errorhandler(404)
 @app.errorhandler(Exception)
 def server_error(e):
-    # vrátí stránku error.html s informací o výpadku
     return render_template('error.html', error_code=e.code), e.code
 
 
@@ -141,7 +152,6 @@ def inject_xp_info():
 
 @app.after_request
 def add_security_headers(response):
-    # ✅ Content Security Policy (CSP)
     response.headers['Content-Security-Policy'] = (
         "default-src 'self'; "
         "script-src 'self' 'unsafe-inline'; "
@@ -150,25 +160,12 @@ def add_security_headers(response):
         "img-src 'self' data:; "
         "frame-ancestors 'none';"
     )
-
-    # ✅ HTTP Strict Transport Security (HSTS)
     response.headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload'
-
-    # ✅ X-Frame-Options – ochrana proti clickjackingu
     response.headers['X-Frame-Options'] = 'DENY'
-
-    # ✅ Cross-Origin Opener Policy
     response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
-
-    # ✅ Cross-Origin Resource Policy
     response.headers['Cross-Origin-Resource-Policy'] = 'same-origin'
-
-    # ✅ X-Content-Type-Options
     response.headers['X-Content-Type-Options'] = 'nosniff'
-
-    # ✅ Referrer Policy
     response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
-
     return response
 
 
@@ -196,15 +193,12 @@ def add_security_headers(response):
 #         log_output=debug
 #     ) PRO SERVER
 
-
 # Registrace SocketIO handlerů pro pexeso
 register_socketio_handlers(socketio)
 
 if __name__ == "__main__":
-    # Nastavení pro vývojový režim
     debug = os.getenv("FLASK_DEBUG", "false").lower() in ("true", "1", "yes")
 
-    # Spuštění aplikace s SocketIO
     socketio.run(
         app,
         host="0.0.0.0",
