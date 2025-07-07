@@ -1,3 +1,8 @@
+import eventlet
+
+# Nutné pro eventlet - musí být na začátku!
+eventlet.monkey_patch()
+
 import os
 from dotenv import load_dotenv
 from flask import Flask, render_template, session, send_from_directory
@@ -28,9 +33,8 @@ from xp import xp_bp
 
 app = Flask(__name__)
 
-socketio = SocketIO(app, async_mode="threading", cors_allowed_origins="*")
-
-socketio.init_app(app)
+# Inicializace SocketIO s eventletem
+socketio = SocketIO(app, async_mode="eventlet", cors_allowed_origins="*")
 
 load_dotenv(dotenv_path=".env")
 app.secret_key = os.getenv("SECRET_KEY")
@@ -66,6 +70,11 @@ app.register_blueprint(pexeso_bp)
 @app.route('/sitemap.xml')
 def sitemap():
     return send_from_directory('templates', 'sitemap.xml')
+
+
+@app.route('/robots.txt')
+def robots_txt():
+    return send_from_directory('templates', 'robots.txt')
 
 
 @app.context_processor
@@ -163,16 +172,44 @@ def add_security_headers(response):
     return response
 
 
-# app.run(port=5000) PRO LOCALNÍ SERVER
+# =====================================================
+# -------------------!!!LOCAL!!!-----------------------
+# =====================================================
+# if __name__ == "__main__":
+# socketio.run(app, host="0.0.0.0", port=5000, debug=True)
+
 
 # =====================================================
 # -------------------!!!SERVER!!!----------------------
 # =====================================================
-# serve(app, host="0.0.0.0", port=8080, threads=32) PRO SERVER
-# socketio.run(app, host="0.0.0.0", port=5000, debug=True)
+# if __name__ == "__main__":
+#     # Nastavení pro vývojový režim
+#     debug = os.getenv("FLASK_DEBUG", "false").lower() in ("true", "1", "yes")
+#
+#     # Spuštění aplikace s SocketIO
+#     socketio.run(
+#         app,
+#         host="0.0.0.0",
+#         port=8080,
+#         debug=debug,
+#         use_reloader=debug,
+#         log_output=debug
+#     ) PRO SERVER
 
+
+# Registrace SocketIO handlerů pro pexeso
 register_socketio_handlers(socketio)
 
 if __name__ == "__main__":
-    # Spuštění aplikace
-    socketio.run(app, host="0.0.0.0", port=8080, allow_unsafe_werkzeug=True)
+    # Nastavení pro vývojový režim
+    debug = os.getenv("FLASK_DEBUG", "false").lower() in ("true", "1", "yes")
+
+    # Spuštění aplikace s SocketIO
+    socketio.run(
+        app,
+        host="0.0.0.0",
+        port=8080,
+        debug=debug,
+        use_reloader=debug,
+        log_output=debug
+    )

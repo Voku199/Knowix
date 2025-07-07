@@ -1,310 +1,469 @@
 import pygame
-import pyscroll
 import os
+import pytmx
 from pytmx.util_pygame import load_pygame
 from pygame.locals import *
 import time
+import xml.etree.ElementTree as ET
+
+
+# Monkey patch pro opravu chyby v knihovně pytmx
+def patched_cast_and_set_attributes(self, items):
+    # Bezpečné získání atributu 'types' s fallback na prázdný slovník
+    types = getattr(self.__class__, 'types', {})
+
+    for key, value in items:
+        if key in types:
+            try:
+                # Zkusíme převést na float a poté na int
+                if types[key] is int:
+                    try:
+                        casted_value = int(float(value))
+                    except (ValueError, TypeError):
+                        casted_value = int(value)  # Fallback
+                else:
+                    casted_value = types[key](value)
+            except (ValueError, TypeError):
+                # Pokud selže, použijeme výchozí hodnotu
+                if types[key] is int:
+                    casted_value = 0
+                elif types[key] is float:
+                    casted_value = 0.0
+                else:
+                    casted_value = value
+            setattr(self, key, casted_value)
+        else:
+            # Pokud klíč není v 'types', nastavíme hodnotu jako řetězec
+            setattr(self, key, value)
+
+
+# Aplikujeme patch
+pytmx.pytmx.TiledElement._cast_and_set_attributes_from_node_items = patched_cast_and_set_attributes
+
+
+# Další monkey patch pro opravu chyby s tileset atributy
+def patched_tileset_init(self, parent, node):  # Opraveno: přidán parametr 'parent'
+    # Nejprve zavoláme původní __init__ metodu
+    pytmx.pytmx.TiledElement.__init__(self)
+
+    # Načteme atributy a převedeme je na správné typy
+    self.firstgid = int(node.attrib.get("firstgid", 0))
+    self.source = node.attrib.get("source")
+
+    # Pokud je tileset vestavěný (ne externí)
+    if not self.source:
+        self.name = node.attrib.get("name", "")
+        self.tilewidth = int(node.attrib.get("tilewidth", 0))
+        self.tileheight = int(node.attrib.get("tileheight", 0))
+        self.spacing = int(node.attrib.get("spacing", 0))
+        self.margin = int(node.attrib.get("margin", 0))
+        self.tilecount = int(node.attrib.get("tilecount", 0))
+        self.columns = int(node.attrib.get("columns", 0))
+
+    # Zpracování vlastností
+    self._set_properties(node)
+
+
+# Nahradíme původní __init__ metodu pro TiledTileset
+pytmx.pytmx.TiledTileset.__init__ = patched_tileset_init
+
+# Monkey patch pro metodu reload_images v TiledMap
+original_reload_images = pytmx.pytmx.TiledMap.reload_images
+
+
+def patched_reload_images(self, *args, **kwargs):
+    # Projdeme všechny tilesety a zajistíme, že atributy jsou číselné
+    for ts in self.tilesets:
+        # Pokud je některý atribut řetězec, převedeme ho na int
+        if isinstance(ts.tilewidth, str):
+            ts.tilewidth = int(ts.tilewidth)
+        if isinstance(ts.tileheight, str):
+            ts.tileheight = int(ts.tileheight)
+        if isinstance(ts.spacing, str):
+            ts.spacing = int(ts.spacing)
+        if isinstance(ts.margin, str):
+            ts.margin = int(ts.margin)
+
+    # Zavoláme původní metodu
+    return original_reload_images(self, *args, **kwargs)
+
+
+# Aplikujeme patch
+pytmx.pytmx.TiledMap.reload_images = patched_reload_images
 
 # Constants
 FPS = 60
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
 
-
-class Animation:
-    def __init__(self, frames, speed=0.1, loop=True):
-        self.frames = frames
-        self.speed = speed
-        self.loop = loop
-        self.current_frame = 0
-        self.done = False
-        self.last_update = 0
-
-    def update(self, dt):
-        now = pygame.time.get_ticks() / 1000
-        if now - self.last_update > self.speed:
-            self.last_update = now
-            self.current_frame = (self.current_frame + 1) % len(self.frames)
-            if not self.loop and self.current_frame == 0:
-                self.done = True
-                self.current_frame = len(self.frames) - 1
-        return self.frames[int(self.current_frame)]
-
-    def reset(self):
-        self.current_frame = 0
-        self.done = False
-
-    @property
-    def current_image(self):
-        return self.frames[int(self.current_frame)]
+# Map definitions - s absolutními cestami
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MAP_CHUNKS = {
+    "chill": {"filename": os.path.join(BASE_DIR, "chill.tmx"), "boundary": (0, 0, 480, 320)},
+    "chill2": {"filename": os.path.join(BASE_DIR, "chill2.tmx"), "boundary": (480, 0, 480, 320)},
+    "chill3": {"filename": os.path.join(BASE_DIR, "chill3.tmx"), "boundary": (960, 0, 480, 320)},
+    "chill4": {"filename": os.path.join(BASE_DIR, "chill4.tmx"), "boundary": (1440, 0, 480, 320)},
+    "chill5": {"filename": os.path.join(BASE_DIR, "chill5.tmx"), "boundary": (1920, 0, 480, 320)},
+    "chill6": {"filename": os.path.join(BASE_DIR, "chill6.tmx"), "boundary": (2400, 0, 480, 320)},
+    "obrovky_kamen_1": {"filename": os.path.join(BASE_DIR, "obrovky_kamen_1.tmx"), "boundary": (0, 320, 480, 320)},
+    "obrovky_kamen_2": {"filename": os.path.join(BASE_DIR, "obrovky_kamen_2.tmx"), "boundary": (480, 320, 480, 320)},
+    "skakat_1": {"filename": os.path.join(BASE_DIR, "skakat_1.tmx"), "boundary": (0, 640, 480, 320)},
+    "skakat_2": {"filename": os.path.join(BASE_DIR, "skakat_2.tmx"), "boundary": (480, 640, 480, 320)},
+    "skakat_3": {"filename": os.path.join(BASE_DIR, "skakat_3.tmx"), "boundary": (960, 640, 480, 320)},
+    "skakat_4": {"filename": os.path.join(BASE_DIR, "skakat_4.tmx"), "boundary": (1440, 640, 480, 320)}
+}
 
 
 class MapRenderer:
     def __init__(self, filename):
         self.tmx_data = None
         self.map_surface = None
+        self.width = 0
+        self.height = 0
+        self.filename = filename
         self.load_map(filename)
 
     def load_map(self, filename):
         try:
+            print(f"Trying to load map: {filename}")
+            if not os.path.exists(filename):
+                print(f"Map file not found: {filename}")
+                return False
+
+            # Načtení pomocí standardní funkce
             self.tmx_data = load_pygame(filename)
-            print(f"Map loaded: {filename}")
+            print(f"Map loaded: {os.path.basename(filename)}")
             print(f"Size: {self.tmx_data.width}x{self.tmx_data.height} tiles")
             print(f"Tile size: {self.tmx_data.tilewidth}x{self.tmx_data.tileheight}")
 
-            # Vytvoříme povrch pro mapu
-            self.map_surface = pygame.Surface(
-                (self.tmx_data.width * self.tmx_data.tilewidth,
-                 self.tmx_data.height * self.tmx_data.tileheight)
-            )
+            print(f"TMX data - width: {self.tmx_data.width}, height: {self.tmx_data.height}")
+            print(f"TMX data - tilewidth: {self.tmx_data.tilewidth}, tileheight: {self.tmx_data.tileheight}")
 
-            # Vykreslíme všechny vrstvy na povrch mapy
+            # Explicitní převod na čísla
+            try:
+                map_width = int(self.tmx_data.width)
+                map_height = int(self.tmx_data.height)
+                tile_width = int(self.tmx_data.tilewidth)
+                tile_height = int(self.tmx_data.tileheight)
+            except (ValueError, TypeError) as e:
+                print(f"Conversion error: {e}, using fallback values")
+                map_width = 30
+                map_height = 20
+                tile_width = 16
+                tile_height = 16
+
+            self.width = map_width * tile_width
+            self.height = map_height * tile_height
+
+            print(f"Calculated surface dimensions: {self.width}x{self.height}")
+
+            # Vytvoříme povrch pro mapu s průhledností
+            self.map_surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+
+            # Pro debug: nakreslíme modrý obdélník, abychom viděli, že se mapa vykresluje
+            # pygame.draw.rect(self.map_surface, (0, 0, 255, 128), (0, 0, self.width, self.height))
+            # pygame.draw.rect(self.map_surface, (0, 255, 0), (0, 0, self.width, self.height), 3)
+
+            # Vykreslit všechny vrstvy
             for layer in self.tmx_data.visible_layers:
-                if hasattr(layer, 'data'):
+                if isinstance(layer, pytmx.TiledTileLayer):
                     for x, y, gid in layer:
                         tile = self.tmx_data.get_tile_image_by_gid(gid)
                         if tile:
+                            # Zajištění, že máme pygame.Surface
+                            if isinstance(tile, tuple):
+                                # Pro animované dlaždice vezmeme první snímek
+                                tile_surface = tile[0]
+                            else:
+                                tile_surface = tile
+
+                            # Kontrola typu
+                            if not isinstance(tile_surface, pygame.Surface):
+                                print(f"Warning: tile at ({x}, {y}) is not a Surface")
+                                continue
+
                             self.map_surface.blit(
-                                tile,
-                                (x * self.tmx_data.tilewidth,
-                                 y * self.tmx_data.tileheight)
+                                tile_surface,
+                                (x * tile_width,
+                                 y * tile_height)
                             )
+            print(f"Map surface created: {self.width}x{self.height} pixels")
             return True
 
         except Exception as e:
             print(f"Error loading map: {e}")
             import traceback
             traceback.print_exc()
+            self.width = 1000
+            self.height = 600
+            self.map_surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+            # Červené pozadí pro chybu
+            self.map_surface.fill((255, 0, 0, 200))
+            # Zelený rámeček pro viditelnost
+            pygame.draw.rect(self.map_surface, (0, 255, 0), (0, 0, self.width, self.height), 5)
             return False
 
-    def render(self, screen, camera_offset=(0, 0)):
+    def render(self, screen, offset_x=0, offset_y=0):
         if self.map_surface:
-            # Získáme rozměry obrazovky a mapy
-            screen_width, screen_height = screen.get_size()
-            map_width = self.map_surface.get_width()
-            map_height = self.map_surface.get_height()
-
-            # Vypočítáme poměr škálování
-            scale_x = screen_width / map_width
-            scale_y = screen_height / map_height
-            scale = max(scale_x, scale_y)  # Použijeme větší škálu, aby mapa vyplnila celou obrazovku
-
-            # Vytvoříme škálovaný povrch
-            scaled_surface = pygame.transform.scale(
-                self.map_surface,
-                (int(map_width * scale), int(map_height * scale))
-            )
-
-            # Vykreslíme vycentrovanou mapu
-            screen.blit(
-                scaled_surface,
-                (screen_width // 2 - scaled_surface.get_width() // 2,
-                 screen_height // 2 - scaled_surface.get_height() // 2)
-            )
+            # Pro debug: vykreslíme modrý obdélník kolem mapy
+            pygame.draw.rect(screen, (0, 0, 255), (offset_x, offset_y, self.width, self.height), 2)
+            screen.blit(self.map_surface, (offset_x, offset_y))
+        else:
+            # Červené pozadí pro chybu
+            pygame.draw.rect(screen, (255, 0, 0), (offset_x, offset_y, self.width, self.height))
+            # Zelený rámeček pro viditelnost
+            pygame.draw.rect(screen, (0, 255, 0), (offset_x, offset_y, self.width, self.height), 3)
 
 
-# Inicializace Pygame a vytvoření okna
+class ChunkManager:
+    def __init__(self):
+        self.loaded_chunks = {}
+        self.active_chunk = "chill"
+        # Načteme chill.tmx jako první mapu
+        self.load_chunk(self.active_chunk, initial=True)
+
+    def load_chunk(self, chunk_name, initial=False):
+        if chunk_name in self.loaded_chunks:
+            return
+
+        map_info = MAP_CHUNKS.get(chunk_name)
+        if not map_info:
+            print(f"Chunk {chunk_name} not defined!")
+            return
+
+        try:
+            renderer = MapRenderer(map_info["filename"])
+            if renderer.map_surface:
+                self.loaded_chunks[chunk_name] = {
+                    "renderer": renderer,
+                    "boundary": map_info["boundary"]
+                }
+                print(f"Loaded chunk: {chunk_name}")
+                print(f"  Boundary: {map_info['boundary']}")
+                print(f"  Map size: {renderer.width}x{renderer.height}")
+
+                # Pokud je to počáteční načítání, nastavíme i aktivní chunk
+                if initial:
+                    self.active_chunk = chunk_name
+        except Exception as e:
+            print(f"Failed to load chunk {chunk_name}: {e}")
+
+    def unload_chunk(self, chunk_name):
+        if chunk_name in self.loaded_chunks:
+            del self.loaded_chunks[chunk_name]
+            print(f"Unloaded chunk: {chunk_name}")
+
+    def get_current_chunk(self):
+        return self.active_chunk
+
+    def get_chunk_boundary(self, chunk_name):
+        if chunk_name in self.loaded_chunks:
+            return self.loaded_chunks[chunk_name]["boundary"]
+        return None
+
+    def check_chunk_transition(self, player_pos):
+        current_boundary = self.get_chunk_boundary(self.active_chunk)
+        if not current_boundary:
+            return
+
+        x, y, w, h = current_boundary
+        px, py = player_pos
+
+        # Kontrola, zda hráč opustil aktuální chunk
+        if px < x or px > x + w or py < y or py > y + h:
+            # Hledání nového chunku
+            for chunk_name, chunk_data in MAP_CHUNKS.items():
+                cx, cy, cw, ch = chunk_data["boundary"]
+                if (cx <= px <= cx + cw) and (cy <= py <= cy + ch):
+                    print(f"Player moved from {self.active_chunk} to {chunk_name}")
+                    self.active_chunk = chunk_name
+                    self.load_chunk(chunk_name)
+                    return
+
+    def unload_distant_chunks(self, player_pos):
+        keep_distance = 2000  # Vzdálenost pro udržení chunku
+
+        chunks_to_unload = []
+        for chunk_name in list(self.loaded_chunks.keys()):
+            if chunk_name == self.active_chunk:
+                continue
+
+            boundary = self.get_chunk_boundary(chunk_name)
+            if not boundary:
+                continue
+
+            cx, cy, cw, ch = boundary
+            chunk_center = (cx + cw / 2, cy + ch / 2)
+            distance = ((player_pos[0] - chunk_center[0]) ** 2 +
+                        (player_pos[1] - chunk_center[1]) ** 2) ** 0.5
+
+            if distance > keep_distance:
+                chunks_to_unload.append(chunk_name)
+
+        for chunk_name in chunks_to_unload:
+            self.unload_chunk(chunk_name)
+
+    def render_chunks(self, screen, camera_offset):
+        for chunk_name, chunk_data in self.loaded_chunks.items():
+            boundary = chunk_data["boundary"]
+            renderer = chunk_data["renderer"]
+
+            # Vypočítat pozici pro vykreslení
+            render_x = boundary[0] - camera_offset[0]
+            render_y = boundary[1] - camera_offset[1]
+
+            # Vykreslit chunk pouze pokud je viditelný
+            if (render_x + boundary[2] > 0 and render_x < SCREEN_WIDTH and
+                    render_y + boundary[3] > 0 and render_y < SCREEN_HEIGHT):
+                # print(f"Rendering chunk {chunk_name} at ({render_x}, {render_y})")
+                renderer.render(screen, render_x, render_y)
+
+                # Debug: vykreslit hranice chunku (zelený obdélník)
+                pygame.draw.rect(screen, (0, 255, 0), (render_x, render_y, boundary[2], boundary[3]), 2)
+
+                # Vykreslit název chunku
+                font = pygame.font.Font(None, 24)
+                text = font.render(chunk_name, True, (255, 255, 0))
+                screen.blit(text, (render_x + 10, render_y + 10))
+
+
+# Inicializace Pygame
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("2D Platformer Game")
-
-# Načtení mapy
-map_path = "chill.tmx"
-print(f"Loading map: {os.path.abspath(map_path)}")
-map_renderer = MapRenderer(map_path)
-
-# Výchozí pozice hráče
-start_x, start_y = 15.8182, 287.0
-
-# Pokud máme načtenou mapu, zkusíme najít spawn bod
-if map_renderer.tmx_data:
-    for obj in map_renderer.tmx_data.objects:
-        if obj.name == "spawn":
-            start_x, start_y = obj.x, obj.y
-            print(f"Found spawn point at: {start_x}, {start_y}")
-            break
-
-# Vytvoříme skupinu pro objekty ve hře
-game_objects = pygame.sprite.Group()
+pygame.display.set_caption("2D Platformer Game - Chunk System")
 clock = pygame.time.Clock()
 
+# Vytvoření správce chunku
+chunk_manager = ChunkManager()
 
-# Simple falling image class
-class FallingImage(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+# Startovní pozice hráče
+# Startovní pozice hráče - uprostřed první mapy
+start_x, start_y = 240, 160  # 480/2 = 240, 320/2 = 160
+
+
+# Třída hráče s animacemi (zvětšená postavička)
+class Player(pygame.sprite.Sprite):
+    def __init__(self, x, y, chunk_manager):
         super().__init__()
+        self.chunk_manager = chunk_manager
 
-        # Animation properties
+        # Vlastnosti animací
         self.animations = {}
         self.current_animation = "idle"
         self.frame_index = 0
         self.frame_timer = 0
-        self.animation_direction = 1  # 1 = forward, -1 = backward
-        self.frame_speed = 0.1  # ms per frame (1000ms = 1 FPS)
+        self.animation_speed = 0.1  # sekundy mezi snímky
         self.facing_right = True
-        self.character_scale = 3.0  # Scale factor for the character
+        self.character_scale = 2.0  # Zvětšení postavičky na dvojnásobnou velikost
 
-        # Create a transparent surface for the character
-        # self.image = pygame.Surface((64, 64), pygame.SRCALPHA)
-        # self.rect = self.image.get_rect()
-        # self.rect.midbottom = (x, y)
-
-        # Load all animations
+        # Načtení animací
         self.load_animations()
 
-        # Set initial frame
-        if self.animations and self.animations.get("idle"):
-            self.image = self.animations["idle"][0]
-            self.rect = self.image.get_rect(midbottom=(x, y))
+        # Nastavení počátečního obrázku
+        if self.animations.get(self.current_animation):
+            self.image = self.animations[self.current_animation][0]
+            self.rect = self.image.get_rect(center=(x, y))
+        else:
+            # Záložní obrázek, pokud se animace nenačtou
+            self.image = pygame.Surface((60, 100))  # Zvětšený základní obdélník
+            self.image.fill((0, 255, 0))
+            self.rect = self.image.get_rect(center=(x, y))
 
-        # Movement properties
+        # Vlastnosti pohybu
         self.velocity_x = 0
         self.velocity_y = 0
-        self.speed = 150
-        self.jump_strength = -400
-        self.gravity = 800
+        self.speed = 300
+        self.jump_strength = -500
+        self.gravity = 1500
         self.on_ground = False
-        # Set ground level to a very high value to prevent pushing character down
-        self.ground_level = 575  # Large value to effectively disable ground pushing
+        self.world_pos = [x, y]
 
     def load_animations(self):
-        # Scale factor for the character
         scale = self.character_scale
+        animation_base_path = os.path.join(BASE_DIR, "Samurai")
 
-        # Load and scale your custom images
-        def load_and_scale_image(path):
+        # Funkce pro načítání a škálování obrázků
+        def load_image(path):
             try:
                 img = pygame.image.load(path).convert_alpha()
-                # Scale the image while maintaining aspect ratio
                 new_width = int(img.get_width() * scale)
                 new_height = int(img.get_height() * scale)
                 return pygame.transform.scale(img, (new_width, new_height))
             except pygame.error as e:
                 print(f"Error loading {path}: {e}")
-                # Create a placeholder if image loading fails
+                # Záložní obdélník
                 surf = pygame.Surface((int(64 * scale), int(64 * scale)), pygame.SRCALPHA)
                 pygame.draw.rect(surf, (255, 0, 0), (0, 0, 64 * scale, 64 * scale), 1)
                 return surf
 
-        # Load idle frames
-        self.animations["idle"] = [
-            load_and_scale_image("./Samurai/Idle/idle_01.png"),
-            load_and_scale_image("./Samurai/Idle/idle_02.png"),
-            load_and_scale_image("./Samurai/Idle/idle_03.png"),
-        ]
+        # Načtení animací
+        try:
+            self.animations["idle"] = [
+                load_image(os.path.join(animation_base_path, "Idle", "idle_01.png")),
+                load_image(os.path.join(animation_base_path, "Idle", "idle_02.png")),
+                load_image(os.path.join(animation_base_path, "Idle", "idle_03.png")),
+            ]
+        except Exception:
+            self.animations["idle"] = [pygame.Surface((100, 100))]  # Zvětšený fallback
 
-        # Load run frames (if available)
         try:
             self.animations["run"] = [
-                load_and_scale_image("./Samurai/Run/run_01.png"),
-                load_and_scale_image("./Samurai/Run/run_02.png"),
-                load_and_scale_image("./Samurai/Run/run_03.png"),
-                load_and_scale_image("./Samurai/Run/run_04.png"),
-                load_and_scale_image("./Samurai/Run/run_05.png"),
-                load_and_scale_image("./Samurai/Run/run_06.png"),
+                load_image(os.path.join(animation_base_path, "Run", "run_01.png")),
+                load_image(os.path.join(animation_base_path, "Run", "run_02.png")),
+                load_image(os.path.join(animation_base_path, "Run", "run_03.png")),
+                load_image(os.path.join(animation_base_path, "Run", "run_04.png")),
+                load_image(os.path.join(animation_base_path, "Run", "run_05.png")),
+                load_image(os.path.join(animation_base_path, "Run", "run_06.png")),
             ]
-        except:
-            self.animations["run"] = self.animations["idle"]  # Fallback to idle if run frames not found
+        except Exception:
+            self.animations["run"] = self.animations["idle"]
 
-        # Create a simple jump frame (or load if available)
         try:
             self.animations["jump"] = [
-                load_and_scale_image("./Samurai/Jump/jump_01.png"),
-                load_and_scale_image("./Samurai/Jump/jump_02.png"),
-                load_and_scale_image("./Samurai/Jump/jump_03.png"),
-                load_and_scale_image("./Samurai/Jump/jump_04.png"),
-                load_and_scale_image("./Samurai/Jump/jump_05.png"),
-                load_and_scale_image("./Samurai/Jump/jump_06.png"),
-                load_and_scale_image("./Samurai/Jump/jump_07.png"),
+                load_image(os.path.join(animation_base_path, "Jump", "jump_01.png")),
+                load_image(os.path.join(animation_base_path, "Jump", "jump_02.png")),
+                load_image(os.path.join(animation_base_path, "Jump", "jump_03.png")),
+                load_image(os.path.join(animation_base_path, "Jump", "jump_04.png")),
+                load_image(os.path.join(animation_base_path, "Jump", "jump_05.png")),
             ]
-        except:
-            # Create a simple jump placeholder
-            jump_surf = pygame.Surface((int(64 * scale), int(64 * scale)), pygame.SRCALPHA)
-            pygame.draw.rect(jump_surf, (255, 100, 100), (20 * scale, 10 * scale, 24 * scale, 50 * scale))
-            pygame.draw.circle(jump_surf, (255, 100, 100), (32 * scale, 8 * scale), 12 * scale)
-            self.animations["jump"] = [jump_surf]
-
-    def scale_frame(self, frame, target_width, target_height):
-        """Scale frame to target size while maintaining aspect ratio"""
-        # Get original dimensions
-        original_width = frame.get_width()
-        original_height = frame.get_height()
-
-        # Calculate aspect ratio
-        aspect_ratio = original_width / original_height
-
-        # Calculate new dimensions
-        if original_width > original_height:
-            new_width = target_width
-            new_height = int(target_width / aspect_ratio)
-        else:
-            new_height = target_height
-            new_width = int(target_height * aspect_ratio)
-
-        # Scale the frame
-        scaled_frame = pygame.transform.scale(frame, (new_width, new_height))
-
-        # Create a transparent surface of the target size
-        result = pygame.Surface((target_width, target_height), pygame.SRCALPHA)
-
-        # Center the scaled frame on the result surface
-        x = (target_width - new_width) // 2
-        y = target_height - new_height  # Align to bottom
-
-        # Blit the scaled frame onto the result
-        result.blit(scaled_frame, (x, y))
-        return result
+        except Exception:
+            self.animations["jump"] = self.animations["idle"]
 
     def update_animation(self, dt):
-        """Aktualizuje animaci podle času s ping-pong efektem (0→1→2→1→0)"""
-        frames = self.animations.get(self.current_animation, [])
-        if not frames:
-            print(f"No frames for animation: {self.current_animation}")
+        # Kontrola, zda máme animace pro aktuální stav
+        if self.current_animation not in self.animations:
             return
 
-        # Přidání uplynulého času k časovači
-        self.frame_timer += dt * 1000  # převod na milisekundy
+        frames = self.animations[self.current_animation]
+        if not frames:
+            return
 
-        # Kontrola, zda je čas na další snímek
-        if self.frame_timer >= self.frame_speed:
+        # Aktualizace časovače
+        self.frame_timer += dt
+
+        # Změna snímku, pokud uplynul dostatečný čas
+        if self.frame_timer >= self.animation_speed:
             self.frame_timer = 0
+            self.frame_index = (self.frame_index + 1) % len(frames)
 
-            # Pokud jsme na konci animace, začneme se vracet
-            if self.frame_index >= len(frames) - 1:
-                self.animation_direction = -1  # Jdeme zpět
-            # Pokud jsme na začátku animace, jdeme zase dopředu
-            elif self.frame_index <= 0:
-                self.animation_direction = 1  # Jdeme dopředu
+        # Získání aktuálního snímku
+        frame = frames[self.frame_index]
 
-            # Aktualizace indexu
-            self.frame_index += self.animation_direction
-            # print(f"Updating frame to {self.frame_index} for {self.current_animation}")
-
-        # Vždy aktualizovat aktuální snímek
-        frame = frames[self.frame_index].copy()
-
-        # Otočení obrázku podle směru
+        # Otočení podle směru
         if not self.facing_right:
             frame = pygame.transform.flip(frame, True, False)
 
-        # Uložení aktuální pozice
-        old_bottom = self.rect.bottom if hasattr(self, 'rect') else 0
-        old_centerx = self.rect.centerx if hasattr(self, 'rect') else 0
+        # Uložení staré pozice pro obnovení
+        old_center = self.rect.center
 
         # Aktualizace obrázku
         self.image = frame
         self.rect = self.image.get_rect()
-
-        # Obnovení pozice
-        if hasattr(self, 'rect'):
-            self.rect.bottom = old_bottom
-            self.rect.centerx = old_centerx
+        self.rect.center = old_center
 
     def handle_input(self, keys):
-        # Reset horizontal movement
         self.velocity_x = 0
 
-        # Handle left/right movement
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.velocity_x = -self.speed
             self.facing_right = False
@@ -312,93 +471,90 @@ class FallingImage(pygame.sprite.Sprite):
             self.velocity_x = self.speed
             self.facing_right = True
 
-        # Handle jump
         if (keys[pygame.K_SPACE] or keys[pygame.K_UP] or keys[pygame.K_w]) and self.on_ground:
             self.velocity_y = self.jump_strength
             self.on_ground = False
+            self.current_animation = "jump"
+            self.frame_index = 0
+            self.frame_timer = 0
 
     def update(self, dt):
-        # Zpracování vstupu
         keys = pygame.key.get_pressed()
         self.handle_input(keys)
 
-        # Aplikace gravitace a pohybu
+        # Aplikace gravitace
         self.velocity_y += self.gravity * dt
-        self.rect.x += self.velocity_x * dt
-        self.rect.y += self.velocity_y * dt
 
-        # Nastavení rychlosti animace (v sekundách mezi snímky)
-        if not self.on_ground:
-            self.frame_speed = 140  # 5 FPS pro skok (1/5 = 0.2s)
-        elif abs(self.velocity_x) > 1:
-            self.frame_speed = 85  # ~12.5 FPS pro běh (1/12.5 = 0.08s)
+        # Aktualizace pozice v globálním světě
+        self.world_pos[0] += self.velocity_x * dt
+        self.world_pos[1] += self.velocity_y * dt
+
+        # Aktualizace rect pro vykreslování
+        self.rect.x = self.world_pos[0]
+        self.rect.y = self.world_pos[1]
+
+        # Dynamické určení země na základě aktuálního chunku
+        current_chunk = self.chunk_manager.get_chunk_boundary(self.chunk_manager.active_chunk)
+        if current_chunk:
+            # Zem je na spodku aktuálního chunku
+            ground_level = current_chunk[1] + current_chunk[3] - 10  # 10 pixelů nad spodkem
+
+            if self.world_pos[1] >= ground_level:
+                self.world_pos[1] = ground_level
+                self.rect.y = ground_level
+                self.velocity_y = 0
+                self.on_ground = True
+            else:
+                self.on_ground = False
         else:
-            self.frame_speed = 130  # ~3.3 FPS pro idle (1/3.3 ≈ 0.3s)
+            # Fallback pro případ, že chunk není načten
+            if self.world_pos[1] >= 550:
+                self.world_pos[1] = 550
+                self.rect.y = 550
+                self.velocity_y = 0
+                self.on_ground = True
+            else:
+                self.on_ground = False
 
-        # Kolize se zemí
-        was_on_ground = self.on_ground
-        if self.rect.bottom >= self.ground_level:
-            self.rect.bottom = self.ground_level
-            self.velocity_y = 0
-            self.on_ground = True
-            # Reset jump state only when landing, not every frame
-            if not was_on_ground and self.current_animation == "jump":
-                self.current_animation = "idle"
+        # Aktualizace animace podle pohybu
+        if not self.on_ground:
+            if self.current_animation != "jump":
+                self.current_animation = "jump"
+                self.frame_index = 0
+                self.frame_timer = 0
+        elif abs(self.velocity_x) > 1:
+            if self.current_animation != "run":
+                self.current_animation = "run"
                 self.frame_index = 0
                 self.frame_timer = 0
         else:
-            self.on_ground = False
+            if self.current_animation != "idle":
+                self.current_animation = "idle"
+                self.frame_index = 0
+                self.frame_timer = 0
 
-        # Aktualizace stavu animace
-        if not self.on_ground:
-            new_animation = "jump" if "jump" in self.animations else "idle"
-        elif abs(self.velocity_x) > 1:
-            new_animation = "run"
-        else:
-            new_animation = "idle"
-
-        # Pokud se změnila animace, resetuj čítače
-        if new_animation != self.current_animation:
-            self.current_animation = new_animation
-            self.frame_index = 0
-            self.frame_timer = 0
-            print(f"Animation changed to: {self.current_animation}")
-
-        # Update the animation frames
+        # Aktualizace animace
         self.update_animation(dt)
 
-        # Keep on screen
-        if self.rect.left < 0:
-            self.rect.left = 0
-        elif self.rect.right > screen.get_width():
-            self.rect.right = screen.get_width()
-
-        if self.rect.top < 0:
-            self.rect.top = 0
-            self.velocity_y = 0
-
-        # Debug info
-        print(
-            f"Pos Y: {self.rect.bottom}, Vel Y: {self.velocity_y:.1f}, On ground: {self.on_ground}, Frame: {self.frame_index}, Anim: {self.current_animation}",
-            end='\r')
+        # Omezení pohybu ve světě (volitelné)
+        # self.world_pos[0] = max(0, min(self.world_pos[0], 6000))
+        # self.world_pos[1] = max(0, min(self.world_pos[1], 1800))
 
 
-# Create player and add to game objects
-player = FallingImage(start_x, start_y)
+# Vytvoření hráče
+player = Player(start_x, start_y, chunk_manager)
 game_objects = pygame.sprite.Group()
 game_objects.add(player)
 
-# Hlavní smyčka
+# Hlavní herní smyčka
 running = True
 last_time = pygame.time.get_ticks() / 1000
-
-# Camera offset for following the player
-camera_offset = [5, 5]
 
 while running:
     current_time = pygame.time.get_ticks() / 1000
     dt = current_time - last_time
     last_time = current_time
+    dt = min(dt, 0.033)  # Omezení dt pro stabilitu
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -407,38 +563,70 @@ while running:
             if event.key == K_ESCAPE:
                 running = False
 
-    # Update all game objects
+    # Aktualizace herních objektů
     game_objects.update(dt)
 
-    # Vykreslení
-    screen.fill((0, 0, 0))  # Černé pozadí
+    # Kontrola přechodu mezi chunky
+    chunk_manager.check_chunk_transition(player.world_pos)
 
-    # Vykreslíme mapu s offsetem kamery
-    camera_offset = [0, 0]
-    if map_renderer.tmx_data:
-        camera_offset = [
-            player.rect.centerx - SCREEN_WIDTH // 2,
-            player.rect.centery - SCREEN_HEIGHT // 2
-        ]
+    # Uvolnění vzdálených chunků
+    chunk_manager.unload_distant_chunks(player.world_pos)
 
-        # Omezení kamery na hranice mapy
-        map_width = map_renderer.tmx_data.width * map_renderer.tmx_data.tilewidth
-        map_height = map_renderer.tmx_data.height * map_renderer.tmx_data.tileheight
+    # Vyčištění obrazovky
+    screen.fill((50, 50, 100))  # Tmavě modré pozadí
 
-        camera_offset[0] = max(0, min(camera_offset[0], map_width - SCREEN_WIDTH))
-        camera_offset[1] = max(0, min(camera_offset[1], map_height - SCREEN_HEIGHT))
+    # Výpočet pozice kamery
+    camera_offset = [
+        player.world_pos[0] - SCREEN_WIDTH // 2,
+        player.world_pos[1] - SCREEN_HEIGHT // 2
+    ]
 
-        map_renderer.render(screen, camera_offset)
+    # Pro debug: dočasně fixní kamera
+    # camera_offset = [0, 0]
 
-    # Vykreslíme všechny objekty s přihlédnutím k offsetu kamery
+    # Vykreslení chunků
+    chunk_manager.render_chunks(screen, camera_offset)
+
+    # Vykreslení objektů s korekcí kamery
     for obj in game_objects:
-        screen.blit(obj.image, (obj.rect.x - camera_offset[0], obj.rect.y - camera_offset[1]))
+        # Nakreslíme postavu s červeným rámečkem pro lepší viditelnost
+        screen.blit(
+            obj.image,
+            (obj.rect.x - camera_offset[0], obj.rect.y - camera_offset[1])
+        )
+        # Červený rámeček kolem postavy
+        pygame.draw.rect(
+            screen,
+            (255, 0, 0),
+            (obj.rect.x - camera_offset[0],
+             obj.rect.y - camera_offset[1],
+             obj.rect.width,
+             obj.rect.height),
+            2
+        )
 
-    # Debug info
+    # Vykreslení debug informací
     font = pygame.font.Font(None, 24)
-    debug_text = f"Pozice: {player.rect.x:.1f}, {player.rect.y:.1f} | FPS: {clock.get_fps():.1f}"
-    debug_surface = font.render(debug_text, True, (255, 255, 255), (0, 0, 0))
-    screen.blit(debug_surface, (10, 10))
+    debug_text = [
+        f"Position: {player.world_pos[0]:.1f}, {player.world_pos[1]:.1f}",
+        f"Chunk: {chunk_manager.get_current_chunk()}",
+        f"Loaded chunks: {len(chunk_manager.loaded_chunks)}",
+        f"FPS: {clock.get_fps():.1f}",
+        f"Animation: {player.current_animation}",
+        f"Frame: {player.frame_index}",
+        f"Camera: {camera_offset[0]:.1f}, {camera_offset[1]:.1f}"
+    ]
+
+    for i, text in enumerate(debug_text):
+        text_surface = font.render(text, True, (255, 255, 255))
+        screen.blit(text_surface, (10, 10 + i * 25))
+
+    # Vykreslit osu X a Y pro lepší orientaci
+    pygame.draw.line(screen, (255, 0, 0), (0, SCREEN_HEIGHT // 2), (SCREEN_WIDTH, SCREEN_HEIGHT // 2), 1)
+    pygame.draw.line(screen, (0, 255, 0), (SCREEN_WIDTH // 2, 0), (SCREEN_WIDTH // 2, SCREEN_HEIGHT), 1)
+
+    # Vykreslit střed obrazovky
+    pygame.draw.circle(screen, (255, 255, 0), (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2), 5)
 
     pygame.display.flip()
     clock.tick(FPS)
