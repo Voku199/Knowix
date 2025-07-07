@@ -1,6 +1,6 @@
 # --- Flask and SocketIO imports ---
 from dotenv import load_dotenv
-from flask import Flask, render_template, session, send_from_directory
+from flask import Flask, render_template, session, send_from_directory, request, redirect
 from flask_socketio import SocketIO
 
 import os
@@ -86,6 +86,15 @@ def sitemap():
 @app.route('/robots.txt')
 def robots_txt():
     return send_from_directory('templates', 'robots.txt')
+
+
+@app.before_request
+def redirect_to_main_domain():
+    host = request.host
+    if host == "knowix.cz":
+        return redirect("https://www.knowix.cz" + request.full_path, code=301)
+    if host == "knowix.up.railway.app":
+        return redirect("https://www.knowix.cz" + request.full_path, code=301)
 
 
 @app.context_processor
