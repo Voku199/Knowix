@@ -2,23 +2,21 @@
 import os
 import sys
 
-# Přidáme distutils do cesty (pro Python 3.12 a vyšší)
-if sys.version_info >= (3, 12):
+# Zkuste nastavit async_mode na gevent, pokud jsou dostupné všechny potřebné závislosti, jinak fallback na threading
+async_mode = None
+try:
+    import gevent
+    from gevent import monkey
+    monkey.patch_all()
     try:
-        import distutils
+        import geventwebsocket
+        async_mode = "gevent"
     except ImportError:
-        # Pro Python 3.12+ musíme explicitně nainstalovat setuptools
-        import subprocess
+        async_mode = "threading"
+except ImportError:
+    async_mode = "threading"
 
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "setuptools"])
-        import distutils
-
-# Nyní můžeme bezpečně importovat eventlet
-import eventlet
-
-eventlet.monkey_patch()
-
-# Zbytek importů
+# Nyní můžeme bezpečně importovat Flask a SocketIO
 from dotenv import load_dotenv
 from flask import Flask, render_template, session, send_from_directory
 from flask_socketio import SocketIO
@@ -46,8 +44,8 @@ from xp import xp_bp
 
 app = Flask(__name__)
 
-# Inicializace SocketIO s eventletem
-socketio = SocketIO(app, async_mode="eventlet", cors_allowed_origins="*")
+# Inicializace SocketIO s vybraným async_mode
+socketio = SocketIO(app, async_mode=async_mode, cors_allowed_origins="*")
 
 load_dotenv(dotenv_path=".env")
 app.secret_key = os.getenv("SECRET_KEY")
@@ -105,7 +103,7 @@ def inject_streak():
 @app.errorhandler(404)
 @app.errorhandler(Exception)
 def server_error(e):
-    return render_template('error.html', error_code=e.code), e.code
+    return render_template('error.html', error_code=getattr(e, 'code', 500)), getattr(e, 'code', 500)
 
 
 LEVEL_NAMES = [
@@ -168,30 +166,6 @@ def add_security_headers(response):
     response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
     return response
 
-
-# =====================================================
-# -------------------!!!LOCAL!!!-----------------------
-# =====================================================
-# if __name__ == "__main__":
-# socketio.run(app, host="0.0.0.0", port=5000, debug=True)
-
-
-# =====================================================
-# -------------------!!!SERVER!!!----------------------
-# =====================================================
-# if __name__ == "__main__":
-#     # Nastavení pro vývojový režim
-#     debug = os.getenv("FLASK_DEBUG", "false").lower() in ("true", "1", "yes")
-#
-#     # Spuštění aplikace s SocketIO
-#     socketio.run(
-#         app,
-#         host="0.0.0.0",
-#         port=8080,
-#         debug=debug,
-#         use_reloader=debug,
-#         log_output=debug
-#     ) PRO SERVER
 
 # Registrace SocketIO handlerů pro pexeso
 register_socketio_handlers(socketio)
