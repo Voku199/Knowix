@@ -1,3 +1,6 @@
+from gevent import monkey
+
+monkey.patch_all()
 # --- Flask and SocketIO imports ---
 from dotenv import load_dotenv
 from flask import Flask, render_template, session, send_from_directory, request, redirect
@@ -5,8 +8,6 @@ from flask_socketio import SocketIO
 
 import os
 import sys
-import gevent
-from gevent import monkey
 
 # Import všech blueprintů
 from A1_music import exercises_bp
@@ -204,14 +205,22 @@ def add_security_headers(response):
 register_socketio_handlers(socketio)
 
 if __name__ == "__main__":
-    debug = os.getenv("FLASK_DEBUG", "false").lower() in ("true", "1", "yes")
+    # Získání portu z environment proměnné (Railway ho poskytuje)
+    port = int(os.environ.get("PORT", 8080))
 
+    # Detekce prostředí
+    is_production = os.environ.get("RAILWAY_ENVIRONMENT") == "production"
+
+    # Konfigurace podle prostředí
+    debug = not is_production
+    use_reloader = not is_production
+
+    # Spuštění serveru
     socketio.run(
         app,
         host="0.0.0.0",
-        port=8080,
+        port=port,
         debug=debug,
-        use_reloader=debug,
-        log_output=debug,
-        allow_unsafe_werkzeug=True
+        use_reloader=use_reloader,
+        server="gevent"  # Jen když máš nainstalovaný gevent
     )
