@@ -1,22 +1,3 @@
-# --- async_mode setup for gevent or fallback to threading ---
-import os
-import sys
-
-async_mode = None
-try:
-    import gevent
-    from gevent import monkey
-
-    monkey.patch_all()
-    try:
-        import geventwebsocket
-
-        async_mode = "gevent"
-    except ImportError:
-        async_mode = "threading"
-except ImportError:
-    async_mode = "threading"
-
 # --- Flask and SocketIO imports ---
 from dotenv import load_dotenv
 from flask import Flask, render_template, session, send_from_directory
