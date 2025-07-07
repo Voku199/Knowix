@@ -148,7 +148,7 @@ def roleplaying_next():
                 best_similarity = sim
                 best_match = ans
         similarity = best_similarity
-        correct = similarity >= 0.8
+        correct = similarity >= 0.70
         if correct and 'user_id' in session:
             try:
                 xp_result = add_xp_to_user(session['user_id'], 10)

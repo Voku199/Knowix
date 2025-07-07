@@ -612,11 +612,11 @@ document.addEventListener('DOMContentLoaded', function () {
             null,
             isFirstAlex,
             topic,
-            0,  // index prvního audio souboru
+            0,  // index prvého audio souboru
             true // vždy zobrazit obě jazykové verze pro první zprávu
         );
 
-        // Pokud je první mluvčí Alex, přehrajeme audio okamžitě
+        // Pokud je prvé mluvčí Alex, přehrajeme audio okamžitě
         if (isFirstAlex) {
             // Malé zpoždění pro lepší UX
             setTimeout(() => {
@@ -735,5 +735,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     });
 </script>
+<script src="/static/script.js"></script>
 </body>
 </html>

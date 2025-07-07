@@ -27,6 +27,13 @@
         gtag('config', 'G-W1EN990JKP');
     </script>
     <style>
+        body {
+            background: #f6fafd;
+            font-family: 'League Spartan', Arial, sans-serif;
+        }
+        body.dark-mode {
+            background: #181c23;
+        }
         .shop-container {
             max-width: 600px;
             margin: 2.5em auto 2em auto;
@@ -35,11 +42,9 @@
             box-shadow: 0 4px 24px rgba(0,0,0,0.08);
             padding: 2.5em 2em 2em 2em;
         }
-        h1 {
-            text-align: center;
-            font-weight: 600;
-            margin-bottom: 1.5em;
-            letter-spacing: 0.02em;
+        body.dark-mode .shop-container {
+            background: #000000;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.32);
         }
         .xp-status {
             text-align: center;
@@ -50,6 +55,10 @@
             padding: 0.7em 0;
             font-weight: 500;
             color: #ecc38d;
+        }
+        body.dark-mode .xp-status {
+            background: #232b36;
+            color: #ffe082;
         }
         .shop-items {
             display: flex;
@@ -70,6 +79,10 @@
             align-items: center;
             transition: box-shadow 0.2s;
         }
+        body.dark-mode .shop-item {
+            background: #000000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+        }
         .shop-item:hover {
             box-shadow: 0 6px 24px rgba(25, 118, 210, 0.10);
         }
@@ -81,10 +94,16 @@
             color: #2474de;
             letter-spacing: 0.01em;
         }
+        body.dark-mode .shop-item h2 {
+            color: #b2ff59;
+        }
         .shop-item p {
             margin: 0.5em 0 1em 0;
             text-align: center;
             color: #444;
+        }
+        body.dark-mode .shop-item p {
+            color: #e0e0e0;
         }
         .shop-item form {
             width: 100%;
@@ -105,9 +124,17 @@
             transition: background 0.2s, box-shadow 0.2s;
             box-shadow: 0 2px 8px rgba(25, 118, 210, 0.10);
         }
+        body.dark-mode .shop-item button[type="submit"] {
+            background: #000000;
+            color: #b2ff59;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.32);
+        }
         .shop-item button[type="submit"]:hover:not(:disabled) {
             background: linear-gradient(90deg, #1565c0 60%, #1976d2 100%);
             box-shadow: 0 4px 16px rgba(25, 118, 210, 0.18);
+        }
+        body.dark-mode .shop-item button[type="submit"]:hover:not(:disabled) {
+            background: #232b36;
         }
         .shop-item button[type="submit"]:disabled {
             background: #bdbdbd;
@@ -115,18 +142,23 @@
             cursor: not-allowed;
             box-shadow: none;
         }
+        body.dark-mode .shop-item button[type="submit"]:disabled {
+            background: #232b36;
+            color: #888;
+        }
         .shop-item strong {
             color: #1976d2;
         }
-        .shop-item .freeze-count {
+        body.dark-mode .shop-item strong {
+            color: #b2ff59;
+        }
+        .shop-item .freeze-count, .shop-item .booster-status {
             margin-top: 0.2em;
             font-size: 0.98em;
             color: #666;
         }
-        .shop-item .booster-status {
-            margin-top: 0.2em;
-            font-size: 0.98em;
-            color: #666;
+        body.dark-mode .shop-item .freeze-count, body.dark-mode .shop-item .booster-status {
+            color: #e0e0e0;
         }
         a {
             display: inline-block;
@@ -136,9 +168,15 @@
             font-weight: 500;
             transition: color 0.15s;
         }
+        body.dark-mode a {
+            color: #b2ff59;
+        }
         a:hover {
             color: #0d47a1;
             text-decoration: underline;
+        }
+        body.dark-mode a:hover {
+            color: #fff;
         }
         @media (max-width: 700px) {
             .shop-container {

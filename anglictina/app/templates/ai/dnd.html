@@ -191,7 +191,7 @@
 
     </style>
 </head>
-<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}"></body>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
     <div class="logo-streak-wrapper">
         <div class="logo">
@@ -275,7 +275,9 @@
 </header>
 <body>
 <div class="chat-container">
-    <div class="chat-header">D&D Adventure</div>
+    <div class="chat-header">D&D Adventure
+        <button id="restart-btn" style="float:right;font-size:0.85em;padding:4px 14px;border-radius:8px;border:none;background:#f44336;color:#fff;cursor:pointer;margin-left:16px;">Restartovat příběh</button>
+    </div>
     <div class="inventory-bar">
         <strong>Inventory:</strong>
         {% if inventory and inventory|length > 0 %}
@@ -291,7 +293,7 @@
             <img class="avatar" src="{{ url_for('static', filename='pic/default.webp') }}" alt="User">
             <div class="bubble">{{ msg.content }}</div>
             {% else %}
-            <img class="avatar" src="{{ url_for('static', filename='pic/ai_avatar.png') }}" alt="AI">
+            <img class="avatar" src="{{ url_for('static', filename='pic/danndas.png') }}" alt="AI">
             <div class="bubble">{{ msg.content|safe }}</div>
             {% endif %}
         </div>
@@ -307,6 +309,7 @@
     const chatForm = document.getElementById('chat-form');
     const userInput = document.getElementById('user_input');
     const inventoryBar = document.querySelector('.inventory-bar');
+    const restartBtn = document.getElementById('restart-btn');
 
     chatForm.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -348,6 +351,16 @@
                 aiDiv.querySelector('.bubble').textContent = 'Error!';
                 console.error(error);
             });
+    });
+
+    restartBtn.addEventListener('click', function() {
+        if (!confirm('Opravdu chceš restartovat příběh? Všechny zprávy budou smazány.')) return;
+        fetch('{{ url_for("ai_bp.dnd") }}', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'restart=1'
+        })
+        .then(() => window.location.reload());
     });
 </script>
 </body>

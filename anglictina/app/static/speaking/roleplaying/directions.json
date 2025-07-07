@@ -18,7 +18,16 @@
         "Hi! Do you know where the bus stop is?",
         "Hello, I need to find a bus stop.",
         "Hi! I'm trying to get to a bus stop.",
-        "Hey, do you know where I can catch the bus?"
+        "Hey, do you know where I can catch the bus?",
+        "Hi, could you tell me where the nearest bus stop is?",
+        "Hello, I’m looking for a place to catch the bus.",
+        "Excuse me, do you know where the bus stop is?",
+        "Hi, I’m trying to find the bus stop in this area.",
+        "Hello, is there a bus stop nearby?",
+        "Hi, where can I get the bus from here?",
+        "Excuse me, I need directions to the bus stop.",
+        "Hi, could you help me find the bus stop?",
+        "Hello, I’m searching for the bus stop. Can you help me?"
       ]
     },
     {
@@ -34,7 +43,12 @@
         "I need to get to the city center.",
         "To the city centre, please.",
         "I'm heading to the city center.",
-        "I want to go to downtown."
+        "I want to go to downtown.",
+        "I’m trying to get to the center of town.",
+        "I’d like to go to the city centre.",
+        "I’m looking to get to downtown.",
+        "I want to go to the main part of the city.",
+        "I need to go to the city centre area."
       ]
     },
     {
@@ -47,10 +61,16 @@
       "cz": "Zeptej se, kdy jede další autobus.",
       "en": [
         "When is the next bus?",
+        "when is the next bus arriving",
         "What time does the next bus arrive?",
         "Do you know when the next bus comes?",
         "How long until the next bus?",
-        "When does the next bus leave?"
+        "When does the next bus leave?",
+        "Could you tell me when the next bus is?",
+        "Excuse me, when does the next bus get here?",
+        "Do you know how soon the next bus comes?",
+        "How much time until the next bus arrives?",
+        "Can you tell me when the next bus will be here?"
       ]
     },
     {
@@ -66,7 +86,12 @@
         "Thank you. Where do I get a ticket?",
         "Thanks a lot! Is there a place to buy a ticket nearby?",
         "Thank you! How can I get a ticket?",
-        "Where do I purchase a bus ticket?"
+        "Where do I purchase a bus ticket?",
+        "Excuse me, where can I buy a ticket for the bus?",
+        "Hi, could you tell me where I can buy a ticket?",
+        "Thanks, where is the ticket office?",
+        "I need to buy a ticket, where can I do that?",
+        "Can you tell me where to buy a ticket for the bus?"
       ]
     },
     {
@@ -82,7 +107,13 @@
         "What’s the price of the ticket? Can I use a card?",
         "How much does a ticket cost? And can I pay with a card?",
         "Is it possible to pay with a card? And how much is the ticket?",
-        "Do you know how much it is and if card payments are accepted?"
+        "Do you know how much it is and if card payments are accepted?",
+        "Excuse me, how much is the ticket and can I pay by card?",
+        "Hi, could you tell me the price of the ticket and if I can pay with a card?",
+        "Thanks, how much is the ticket and can I pay with my card?",
+        "I need to know the price of the ticket and if I can pay with a card.",
+        "Can you tell me the price of the ticket and if card payments are accepted?",
+        "thank you and where can i buy a tickets"
       ]
     },
     {
@@ -98,7 +129,12 @@
         "How long does the ticket last?",
         "Is there a time limit on the ticket?",
         "How long can I use the ticket?",
-        "What’s the ticket’s validity?"
+        "What’s the ticket’s validity?",
+        "Excuse me, how long is the ticket valid?",
+        "Hi, could you tell me how long the ticket is valid for?",
+        "Thanks, how long does the ticket last?",
+        "I need to know how long the ticket is valid.",
+        "Can you tell me the ticket’s validity period?"
       ]
     },
     {
@@ -114,7 +150,12 @@
         "Thanks a lot. Goodbye!",
         "Thank you, I appreciate your help. Bye!",
         "Thanks, have a great day!",
-        "Thank you very much! See you!"
+        "Thank you very much! See you!",
+        "Thanks for your help! Have a good one!",
+        "I appreciate your help. Goodbye!",
+        "Thanks a lot! Have a nice day!",
+        "Thank you so much for your help!",
+        "You’re welcome! Have a great day!"
       ]
     },
     {

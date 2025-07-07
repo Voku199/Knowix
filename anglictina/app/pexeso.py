@@ -132,29 +132,29 @@ def register_socketio_handlers(socketio):
             }
             print(f"Created new room {room_id}")
         room = ROOMS[room_id]
-        
+
         if len(room['players']) >= 2:
             socketio.emit('room_error', "Místnost je plná.", room=sid)
             return
-            
+
         if sid in PLAYER_ROOM:
             from flask_socketio import leave_room
             leave_room(PLAYER_ROOM[sid])
-            
+
         from flask_socketio import join_room
         join_room(room_id)
-        
+
         player_num = len(room['players']) + 1
         room['players'].append(sid)
         PLAYER_ROOM[sid] = room_id
-        
+
         # Notify the player they've joined
         socketio.emit('room_joined', {
             'player': player_num,
             'room': room_id,
             'is_host': player_num == 1  # First player is host
         }, room=sid)
-        
+
         # If both players have joined, prepare the game
         if len(room['players']) == 2 and not room.get('game_started', False):
             print(f"Starting game in room {room_id} with players: {room['players']}")
@@ -168,11 +168,11 @@ def register_socketio_handlers(socketio):
                 room['mapping'] = mapping
                 room['scores'] = [0, 0]
                 room['matched'] = set()
-                
+
                 # Randomly select who starts first (1 or 2)
                 room['turn'] = random.randint(1, 2)
                 print(f"Player {room['turn']} will start the game in room {room_id}")
-                
+
                 # Notify both players the game is starting
                 for idx, player_sid in enumerate(room['players']):
                     player_num = idx + 1
@@ -184,13 +184,13 @@ def register_socketio_handlers(socketio):
                         'player_turn': room['turn'],
                         'your_turn': your_turn
                     }, room=player_sid)
-                    
+
                 # Notify who's turn it is
                 print(f"Sending turn_update for room {room_id}, player {room['turn']}'s turn")
                 socketio.emit('turn_update', {
                     'player_turn': room['turn']
                 }, room=room_id)
-                
+
             except Exception as e:
                 print(f"Error starting game in room {room_id}: {str(e)}")
                 import traceback
@@ -216,40 +216,40 @@ def register_socketio_handlers(socketio):
         room = ROOMS.get(room_id)
         if not room or sid not in room['players']:
             return
-            
+
         if len(idxs) != 2:
             return
-            
+
         i1, i2 = idxs
         if i1 == i2 or i1 >= len(room['cards']) or i2 >= len(room['cards']):
             return
-            
+
         # Get the card data
         card1 = room['cards'][i1]
         card2 = room['cards'][i2]
-        
+
         # Check if cards form a valid pair (same pair ID but different languages)
-        is_valid_pair = (card1['pair'] == card2['pair'] and 
-                        card1['lang'] != card2['lang'] and
-                        'en' in [card1['lang'], card2['lang']] and
-                        'cz' in [card1['lang'], card2['lang']])
-        
+        is_valid_pair = (card1['pair'] == card2['pair'] and
+                         card1['lang'] != card2['lang'] and
+                         'en' in [card1['lang'], card2['lang']] and
+                         'cz' in [card1['lang'], card2['lang']])
+
         pidx = room['players'].index(sid)
-        
+
         if is_valid_pair:
             # Mark both cards as matched
             room['cards'][i1]['matched'] = True
             room['cards'][i2]['matched'] = True
             room['matched'].add(i1)
             room['matched'].add(i2)
-            
+
             # Update score for the current player
             room['scores'][pidx] += 1
-            
+
             # Notify all clients about the match
             socketio.emit('set_matched', idxs, room=room_id)
             socketio.emit('update_scores', {'scores': room['scores']}, room=room_id)
-            
+
             # Check if game is over
             if len(room['matched']) == len(room['cards']):
                 if room['scores'][0] > room['scores'][1]:

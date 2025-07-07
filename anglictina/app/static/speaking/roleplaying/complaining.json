@@ -16,7 +16,14 @@
       "en": [
         "Hi, I don't have a reservation, but I’d like a table for one.",
         "Hello, no reservation, but is there a table for one person?",
-        "Hi! Just me, do you have a free table?"
+        "Hi! Just me, do you have a free table?",
+        "Good afternoon, I would like a table for one, please.",
+        "Hello, is it possible to get a table for one without a reservation?",
+        "Hi, could I get a table for just myself?",
+        "Hi, I hope it's okay that I don't have a reservation. Is there a table for one?",
+        "Hello, I’m alone. Do you have any free tables?",
+        "Hi, I’m looking for a table for one, no reservation.",
+        "Hello, do you have a spot for just one person?"
       ]
     },
     {
@@ -31,7 +38,13 @@
         "Excuse me, my food is cold.",
         "Sorry, but my meal isn't hot.",
         "Can I say something? My dish is cold.",
-        "I'm sorry, but my food is not warm enough."
+        "I'm sorry, but my food is not warm enough.",
+        "Excuse me, could you please warm up my food? It's a bit cold.",
+        "Sorry to bother you, but my meal is cold.",
+        "I think my food was served cold.",
+        "Could you please check my dish? It's not hot.",
+        "My meal is not as warm as I expected.",
+        "Excuse me, this food is not hot."
       ]
     },
     {
@@ -45,7 +58,14 @@
       "en": [
         "Thank you. Everything else is fine.",
         "Thanks. Apart from that, everything's okay.",
-        "Thank you, the rest is good."
+        "Thank you, the rest is good.",
+        "Thank you so much, everything else is perfect.",
+        "Thanks, I appreciate your help. Everything else is alright.",
+        "Thank you, I’m happy with everything else.",
+        "Thanks, the rest of the meal was great.",
+        "Thank you, I have no other complaints.",
+        "Thanks for your help, everything else is nice.",
+        "Thank you, the service has been good otherwise."
       ]
     },
     {
@@ -59,7 +79,14 @@
       "en": [
         "Can I have the bill, please?",
         "Could you bring me the check, please?",
-        "I'd like to pay, can I get the bill?"
+        "I'd like to pay, could I get the bill?",
+        "Excuse me, could I have the bill?",
+        "Could I settle my bill, please?",
+        "Can you bring me the bill?",
+        "May I have the check, please?",
+        "Could I pay now, please?",
+        "Could you please give me the bill?",
+        "I’d like to pay, could I have the check?"
       ]
     },
     {
@@ -73,7 +100,14 @@
       "en": [
         "Goodbye! I might come back again.",
         "Thanks, see you next time maybe!",
-        "Bye, I’ll give it another try next time."
+        "Bye, I’ll give it another try next time.",
+        "Goodbye, I hope to come back soon.",
+        "Thanks, I might come back another time.",
+        "Bye, I hope to see you again.",
+        "Goodbye, I’ll think about coming back.",
+        "Thanks, maybe I’ll come back next time.",
+        "Bye, I hope everything will be better next time.",
+        "Goodbye, I might give it another try."
       ]
     },
     {
@@ -92,7 +126,14 @@
       "en": [
         "Hi, I bought this shirt yesterday but it has a defect.",
         "Hello, I bought this yesterday and noticed a flaw.",
-        "Excuse me, this has a tear and I just bought it."
+        "Excuse me, this has a tear and I just bought it.",
+        "Hi, I purchased this item yesterday, but it's damaged.",
+        "Hello, I bought this shirt yesterday, but it's not in good condition.",
+        "Hi, I need to return this item, it's faulty.",
+        "Hello, I bought this yesterday, but it's not what I expected.",
+        "Hi, I have a problem with this item, it's defective.",
+        "Hello, I bought this shirt yesterday, but it's not right.",
+        "Hi, I need to exchange this item, it's not in good condition."
       ]
     },
     {
@@ -106,7 +147,14 @@
       "en": [
         "Yes, I have it here.",
         "Sure, here's the receipt.",
-        "Yes, I kept it. Here you go."
+        "Yes, I kept it. Here you go.",
+        "Of course, I have the receipt right here.",
+        "Yes, I have it with me. Let me show you.",
+        "Here is the receipt.",
+        "I have the receipt, let me get it.",
+        "Yes, I kept the receipt. Here it is.",
+        "Of course, I have the receipt. Here you are.",
+        "Yes, I have it. Let me show it to you."
       ]
     },
     {
@@ -120,7 +168,14 @@
       "en": [
         "I'd prefer a refund, please.",
         "I’d like my money back, if that’s okay.",
-        "A refund would be better for me."
+        "A refund would be better for me.",
+        "I would prefer a refund, thank you.",
+        "I’d rather have a refund, please.",
+        "A refund is what I would prefer.",
+        "I would like a refund, if possible.",
+        "I’d like to get a refund, please.",
+        "A refund would be great, thank you.",
+        "I would prefer to get a refund."
       ]
     },
     {
@@ -134,7 +189,14 @@
       "en": [
         "Thank you, I appreciate it.",
         "Thanks a lot, that’s very helpful.",
-        "Thank you, that means a lot."
+        "Thank you, that means a lot.",
+        "I appreciate your help, thank you.",
+        "Thanks, I really appreciate it.",
+        "Thank you, that's very kind of you.",
+        "I'm grateful for your help, thank you.",
+        "Thanks, I appreciate your assistance.",
+        "Thank you, you've been very helpful.",
+        "I appreciate your time, thank you."
       ]
     },
     {

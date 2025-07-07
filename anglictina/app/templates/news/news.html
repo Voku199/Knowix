@@ -35,52 +35,70 @@
         gtag('config', 'G-W1EN990JKP');
     </script>
     <style>
+        body {
+            background: #f6fafd;
+            font-family: 'League Spartan', Arial, sans-serif;
+        }
+        body.dark-mode {
+            background: #181c23;
+        }
         .news-container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
-
         .news-h1 {
-    text-align: center;
-    margin-top: 40px;
-    font-size: 2.5em;
-    color: #222;
-}
-
+            text-align: center;
+            margin-top: 40px;
+            font-size: 2.5em;
+            color: #222;
+        }
+        body.dark-mode .news-h1 {
+            color: #b2ff59;
+        }
         .news-form {
-            background: white;
+            background: #fff;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 30px;
         }
-
+        body.dark-mode .news-form {
+            background: #232b36;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        }
         .news-item {
-            background: white;
+            background: #fff;
             padding: 20px;
             margin-bottom: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
+        body.dark-mode .news-item {
+            background: #232b36;
+            color: #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        }
         .news-title {
             font-size: 1.5em;
             margin-bottom: 10px;
             color: #333;
         }
-
+        body.dark-mode .news-title {
+            color: #b2ff59;
+        }
         .news-content {
             white-space: pre-wrap;
             line-height: 1.6;
         }
-
         .news-meta {
             margin-top: 15px;
             font-size: 0.9em;
             color: #666;
         }
-
+        body.dark-mode .news-meta {
+            color: #bdbdbd;
+        }
         #newsTitle, #newsContent {
             width: 100%;
             padding: 10px;
@@ -88,10 +106,56 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
-
+        body.dark-mode #newsTitle, body.dark-mode #newsContent {
+            background: #000000;
+            color: #fff;
+            border: 1px solid #38405a;
+        }
         #newsContent {
             height: 150px;
             resize: vertical;
+        }
+        .submit-btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 0.7em 1.4em;
+            font-size: 1.08em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        body.dark-mode .submit-btn {
+            background: #000000;
+            color: #b2ff59;
+        }
+        .submit-btn:hover {
+            background: #1256a0;
+        }
+        body.dark-mode .submit-btn:hover {
+            background: #232b36;
+        }
+        .news-actions button {
+            margin-right: 0.5em;
+            padding: 0.4em 1em;
+            border-radius: 6px;
+            border: none;
+            background: #f6fafd;
+            color: #1976d2;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        body.dark-mode .news-actions button {
+            background: #232b36;
+            color: #b2ff59;
+        }
+        .news-actions button:hover {
+            background: #e3eaf2;
+        }
+        body.dark-mode .news-actions button:hover {
+            background: #181c23;
         }
     </style>
 </head>

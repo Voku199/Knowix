@@ -304,6 +304,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 2200);
     }
 
+    function updateStreakBadge(streak) {
+        const badge = document.querySelector('.streak-badge');
+        if (badge) badge.textContent = streak;
+    }
+
     const conversationHistory = document.getElementById('conversationHistory');
     const inputArea = document.getElementById('inputArea');
     const resultContainer = document.getElementById('resultContainer');
@@ -371,8 +376,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 addToHistory('Uživatel', document.getElementById('czText').textContent, data.correct_answer, translation, data.correct, false);
                 if (data.correct) {
                     showResult("Správně! ✅", true);
+                    // Zobraz toast se streakem pouze pokud streak == 1
+                    if (data.streak_info && typeof data.streak_info.streak === "number") {
+                        updateStreakBadge(data.streak_info.streak);
+                        if (data.streak_info.streak === 1) {
+                            showStreakToast(`🔥 Streak: 1 den!`);
+                        }
+                    }
                     if (data.xp_awarded && data.xp_awarded > 0) showStreakToast(`+${data.xp_awarded} XP!`);
-                    if (data.streak_info && data.streak_info.streak) showStreakToast(`🔥 Streak: ${data.streak_info.streak} dní!`);
                 } else {
                     showResult(`Nesprávně. Správná odpověď: "${data.correct_answer}"`, false);
                 }

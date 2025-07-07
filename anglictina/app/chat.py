@@ -78,10 +78,19 @@ def zpravy_poslat():
     if contains_banned_word(zprava):
         return jsonify({'error': 'Zpráva obsahuje nevhodný obsah.'}), 400
 
+    # Kontrola prázdné zprávy (text i obrázek)
     if not zprava and 'image' not in request.files:
         return jsonify({'error': 'Zpráva je prázdná.'}), 400
     if len(zprava) > 500:
         return jsonify({'error': 'Zpráva je příliš dlouhá.'}), 400
+
+    # --- ANTI-SPAM ochrana ---
+    # Uživatel může poslat max 1 zprávu za 2 sekundy
+    last_sent = session.get('last_msg_sent')
+    now = datetime.now().timestamp()
+    if last_sent and now - last_sent < 2:
+        return jsonify({'error': 'Zprávy nelze posílat tak rychle za sebou.'}), 429
+    session['last_msg_sent'] = now
 
     # Zpracování obrázku
     image_path = None

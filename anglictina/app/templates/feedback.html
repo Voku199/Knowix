@@ -151,6 +151,12 @@
 </footer>
 
 <script>
+
+    function updateStreakBadge(streak) {
+        const badge = document.querySelector('.streak-badge');
+        if (badge) badge.textContent = streak;
+    }
+
     // Theme toggle
     document.getElementById('theme-toggle').addEventListener('click', () => {
         fetch('/set_theme', {

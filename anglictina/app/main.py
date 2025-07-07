@@ -1,25 +1,31 @@
-# Nejprve importujeme potřebné standardní moduly
+# --- async_mode setup for gevent or fallback to threading ---
 import os
 import sys
 
-# Zkuste nastavit async_mode na gevent, pokud jsou dostupné všechny potřebné závislosti, jinak fallback na threading
 async_mode = None
 try:
     import gevent
     from gevent import monkey
+
     monkey.patch_all()
     try:
         import geventwebsocket
+
         async_mode = "gevent"
     except ImportError:
         async_mode = "threading"
 except ImportError:
     async_mode = "threading"
 
-# Nyní můžeme bezpečně importovat Flask a SocketIO
+# --- Flask and SocketIO imports ---
 from dotenv import load_dotenv
 from flask import Flask, render_template, session, send_from_directory
 from flask_socketio import SocketIO
+
+import os
+import sys
+import gevent
+from gevent import monkey
 
 from A1_music import exercises_bp
 from ai import ai_bp
@@ -44,8 +50,24 @@ from xp import xp_bp
 
 app = Flask(__name__)
 
-# Inicializace SocketIO s vybraným async_mode
-socketio = SocketIO(app, async_mode=async_mode, cors_allowed_origins="*")
+# Jednoduchá lokální inicializace SocketIO
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+# --- SocketIO initialization for local and server ---
+redis_url = os.environ.get("REDIS_URL")
+if redis_url:
+    socketio = SocketIO(
+        app,
+        async_mode=async_mode,
+        cors_allowed_origins="*",
+        message_queue=redis_url
+    )
+else:
+    socketio = SocketIO(
+        app,
+        async_mode=async_mode,
+        cors_allowed_origins="*"
+    )
 
 load_dotenv(dotenv_path=".env")
 app.secret_key = os.getenv("SECRET_KEY")
@@ -166,6 +188,29 @@ def add_security_headers(response):
     response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
     return response
 
+
+# =====================================================
+# -------------------!!!LOCAL!!!-----------------------
+# =====================================================
+# if __name__ == "__main__":
+# socketio.run(app, host="localhost", port=5000, debug=True)
+
+
+# =====================================================
+# -------------------!!!SERVER!!!----------------------
+# =====================================================
+
+# if __name__ == "__main__":
+#     debug = os.getenv("FLASK_DEBUG", "false").lower() in ("true", "1", "yes")
+#
+#     socketio.run(
+#         app,
+#         host="0.0.0.0",
+#         port=8080,
+#         debug=debug,
+#         use_reloader=debug,
+#         log_output=debug
+#     )
 
 # Registrace SocketIO handlerů pro pexeso
 register_socketio_handlers(socketio)

@@ -33,6 +33,13 @@
     </script>
         <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <style>
+    body {
+      background: #f6fafd;
+      font-family: 'League Spartan', Arial, sans-serif;
+    }
+    body.dark-mode {
+      background: #181c23;
+    }
     .alpha-badge {
       font-size: 1.2em;
       font-weight: bold;
@@ -45,22 +52,75 @@
       border-radius: 20px;
       background: rgba(255,0,0,0.1);
     }
-
+    body.dark-mode .alpha-badge {
+      background: rgba(255,0,0,0.22);
+      color: #ffb3b3;
+    }
     .footer-signature {
       font-size: 1em;
       font-weight: bold;
       color: #666;
       margin-top: 10px;
     }
-
+    body.dark-mode .footer-signature {
+      color: #bdbdbd;
+    }
     .logo-name {
       font-size: 4rem;
       color: #2c3e50;
       text-transform: lowercase;
       margin-bottom: 15px;
-      letter-spacing: -2px;
     }
-
+    body.dark-mode .logo-name {
+      color: #ffffff;
+    }
+    .main-content {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      padding: 2.5em 2em 2em 2em;
+      max-width: 540px;
+      margin: 2.5em auto 2em auto;
+    }
+    body.dark-mode .main-content {
+      background: #232b36;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.32);
+    }
+    input[type="text"], select {
+      background: #f6fafd;
+      border: 1.5px solid #b3c6e0;
+      border-radius: 7px;
+      padding: 0.7em;
+      font-size: 1.08em;
+      margin-bottom: 1em;
+      color: #222;
+    }
+    body.dark-mode input[type="text"], body.dark-mode select {
+      background: #000000;
+      color: #fff;
+      border: 1.5px solid #38405a;
+    }
+    button, .btn {
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 0.7em 1.4em;
+      font-size: 1.08em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    body.dark-mode button, body.dark-mode .btn {
+      background: #000000;
+      color: #b2ff59;
+    }
+    button:hover, .btn:hover {
+      background: #1256a0;
+    }
+    body.dark-mode button:hover, body.dark-mode .btn:hover {
+      background: #232b36;
+    }
     /* Styly pro výběr sloves */
     .verb-section {
       max-width: 600px;
@@ -70,13 +130,15 @@
       border-radius: 15px;
       box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
-
+    body.dark-mode .verb-section {
+      background: #232b36;
+      box-shadow: 0 0 20px rgba(0,0,0,0.32);
+    }
     .verb-form {
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
     }
-
     .verb-form input {
       padding: 12px 20px;
       border: 2px solid #e2e8f0;
@@ -84,12 +146,11 @@
       font-size: 1.1rem;
       transition: all 0.3s ease;
     }
-
-    .verb-form input:focus {
-      border-color: #2c3e50;
-      outline: none;
+    body.dark-mode .verb-form input {
+      background: #000000;
+      color: #fff;
+      border: 2px solid #38405a;
     }
-
     .verb-form button {
       background: #2c3e50;
       color: white;
@@ -100,12 +161,17 @@
       font-size: 1.1rem;
       transition: transform 0.2s ease;
     }
-
+    body.dark-mode .verb-form button {
+      background: #000000;
+      color: #b2ff59;
+    }
     .verb-form button:hover {
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
-
+    body.dark-mode .verb-form button:hover {
+      background: #232b36;
+    }
     /* Dropdown s možností scrollování */
     datalist {
       position: absolute;
@@ -117,20 +183,24 @@
       border-radius: 0 0 5px 5px;
       z-index: 1000;
     }
-
+    body.dark-mode datalist {
+      background-color: #232b36;
+      border: 1px solid #38405a;
+    }
     .dropdown-list {
       list-style: none;
       margin: 0;
       padding: 0;
     }
-
     .dropdown-list li {
       padding: 8px;
       cursor: pointer;
     }
-
     .dropdown-list li:hover {
       background-color: #f0f0f0;
+    }
+    body.dark-mode .dropdown-list li:hover {
+      background-color: #333;
     }
   </style>
 </head>
@@ -218,9 +288,9 @@
 </header>
 
   <main>
-    <section class="intro">
-      <h1 class="logo-name">Knowix</h1>
-    </section>
+<!--    <section class="intro">-->
+<!--      <h1 class="logo-name">Knowix</h1>-->
+<!--    </section>-->
 
     <section class="verb-section">
       <h2 class="motto">Trénuj nepravidelná slovesa</h2>

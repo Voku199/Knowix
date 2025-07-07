@@ -17,7 +17,14 @@
       "en": [
         "What's going on? You can trust me.",
         "Tell me, what happened? You know you can talk to me.",
-        "What is it? I won’t judge, I promise."
+        "What is it? I won’t judge, I promise.",
+        "Is everything alright? You can tell me anything.",
+        "What’s up? I’m here for you.",
+        "You can trust me, what’s happening?",
+        "Feel free to share, I won’t tell anyone.",
+        "You know you can rely on me. What’s wrong?",
+        "I’m listening, just tell me what’s on your mind.",
+        "Don’t worry, whatever it is, I’ll understand."
       ]
     },
     {
@@ -31,7 +38,14 @@
       "en": [
         "Start by talking to him more often. Just be natural.",
         "Try to spend more time around him and talk casually.",
-        "Just start a conversation and see how he reacts."
+        "Just start a conversation and see how he reacts.",
+        "Maybe try to chat with him whenever you get a chance.",
+        "Just be yourself and talk to him whenever you can.",
+        "Try to get to know him better by talking more.",
+        "Initiate small talk and see where it goes.",
+        "Try to make him feel comfortable around you.",
+        "Be friendly and approachable when you see him.",
+        "Just try to talk to him like you would with any friend."
       ]
     },
     {
@@ -45,7 +59,14 @@
       "en": [
         "Give him subtle signs – smile more, ask about his hobbies, maybe some light touches.",
         "Try to show interest in what he likes and compliment him now and then.",
-        "Flirt just a little – enough to make him wonder."
+        "Flirt just a little – enough to make him wonder.",
+        "Smile at him and ask about his day.",
+        "Show him you care about what he likes.",
+        "Give him compliments and make him feel special.",
+        "Try to make eye contact and smile often.",
+        "Ask him about his interests and listen closely.",
+        "Find common topics to talk about and laugh together.",
+        "Be playful and friendly to show you’re interested."
       ]
     },
     {
@@ -58,8 +79,15 @@
       "cz": "Porad podle situace – pokud je plachý, možná zprávu; jinak osobně je lepší.",
       "en": [
         "If he's shy, maybe text him first. But in person is always better.",
-        "Depends on the moment – but face to face makes it more real.",
-        "If you have a chance, tell him in person. It shows confidence."
+        "It depends – if he’s nervous, a message might be easier. Otherwise, talk to him face to face.",
+        "If you feel comfortable, say it in person. If not, texting is fine.",
+        "Try texting him if you’re unsure, but face to face is more personal.",
+        "If you think he’s shy, start with a message. Otherwise, talk to him directly.",
+        "Go with what feels right – sometimes a message is easier.",
+        "If you see him often, try to talk in person. If not, send him a message.",
+        "Texting is okay, but in person is more sincere.",
+        "If you’re nervous, start with a message. When you’re ready, talk to him in person.",
+        "Do what feels most comfortable for you."
       ]
     },
     {
@@ -97,7 +125,7 @@
     },
     {
       "speaker": "Uživatel",
-      "cz": "Zasměj se a odpověz s nadšením.",
+      "cz": "Prostě poděkuj.",
       "en": [
         "Okay, but nothing stupid okay?",
         "Thats sounds great! I’ll wait \uD83D\uDE0F",

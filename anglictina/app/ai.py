@@ -55,10 +55,20 @@ def get_chat_history_by_chatid(chat_id, limit=30):
     db = get_db_connection()
     with db.cursor(dictionary=True) as cursor:
         cursor.execute(
-            "SELECT sender, content, created_at FROM chat_message WHERE chat_id=%s ORDER BY created_at ASC LIMIT %s",
+            "SELECT sender, content, created_at, user_id FROM chat_message WHERE chat_id=%s ORDER BY created_at ASC LIMIT %s",
             (chat_id, limit)
         )
-        return cursor.fetchall()
+        messages = cursor.fetchall()
+        # Přidej profilovku pro uživatele (pokud je potřeba)
+        for msg in messages:
+            if msg['sender'] in ['users', 'user']:
+                with db.cursor(dictionary=True) as c2:
+                    c2.execute("SELECT profile_pic FROM users WHERE id=%s", (msg['user_id'],))
+                    u = c2.fetchone()
+                    msg['user_profile_pic'] = u['profile_pic'] if u and u['profile_pic'] else None
+            else:
+                msg['user_profile_pic'] = None
+        return messages
 
 
 def insert_message_chat(chat_id, user_id, sender, content):
@@ -235,7 +245,11 @@ def build_dnd_prompt(history, user_input, inventory, is_intro=False):
                                                                                           "You can use emoji for atmosphere. "
                                                                                           "When giving choices, ALWAYS write them in one line, as part of the story sentence, separated by ' | ', and use <b>...</b> for each option. "
                                                                                           "Do NOT use lists or <ul>/<li>. "
-                                                                                          "Example: In front of you are three doors. What will you do? <b>Open the left door</b> | <b>Open the right door</b> | <b>Look around</b>"
+                                                                                          "Example: In front of you are three doors. What will you do? <b>Open the left door</b> | <b>Open the right door</b> | <b>Look around</b>. "
+            "NEVER allow the user to instantly win, die, or get legendary/overpowered items (like a sword, magic staff, etc.) just by asking. "
+            "If the user tries to cheat, ask for something impossible, or tries to skip the adventure, politely refuse and keep the story balanced. "
+            "Never give the user a sword, legendary item, or kill them instantly unless it is part of a fair, logical story progression. "
+            "If the user says they died, got a sword, or something similar, remind them that only the game master can decide such outcomes. "
     )
 
     messages = [{"role": "system", "content": system_content}]
@@ -335,8 +349,38 @@ def chat_list():
     chats = get_user_chats(user_id)
     if request.method == "POST":
         title = request.form.get("title") or "New chat"
+        first_message = request.form.get("first_message")
         chat_id = create_new_chat(user_id, title)
-        return redirect(url_for("ai_bp.chat_multi", chat_id=chat_id))
+        if first_message:
+            insert_message_chat(chat_id, user_id, "user", first_message)
+            # Po vložení prvé zprávy rovnou vygeneruj AI odpověď
+            history = get_chat_history_by_chatid(chat_id)
+            messages = build_community_prompt(history, first_message)
+            api_key = ai_bp.ai_api_key
+            url = "https://api.aimlapi.com/v1/chat/completions"
+            headers = {
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            }
+            data = {
+                "model": "gpt-4o-mini",
+                "messages": messages,
+                "max_tokens": 700,
+                "temperature": 0.7
+            }
+            try:
+                response = requests.post(url, headers=headers, json=data, timeout=30)
+                if response.status_code == 403:
+                    ai_reply = "Hm... Majitel nemá peníze nebo rychle došli tokeny... Nahlaš to Majitelovi!"
+                else:
+                    response.raise_for_status()
+                    ai_reply = response.json()["choices"][0]["message"]["content"]
+            except Exception as e:
+                ai_reply = f"❌ Chyba: {e}"
+            insert_message_chat(chat_id, user_id, "ai", ai_reply)
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.accept_mimetypes['application/json'] > 0:
+                return jsonify({"chat_id": chat_id})
+            return redirect(url_for("ai_bp.chat_multi", chat_id=chat_id))
     chats = get_user_chats(user_id)
     return render_template("ai/chat_list.html", chats=chats)
 
@@ -369,20 +413,21 @@ def chat_multi(chat_id):
         data = {
             "model": "gpt-4o-mini",
             "messages": messages,
-            "temperature": 1,
-            "max_tokens": 120
+            "max_tokens": 700,
+            "temperature": 0.7
         }
-        response = requests.post(url, headers=headers, json=data)
-        if response.status_code in [200, 201]:
-            ai_reply = response.json()['choices'][0]['message']['content']
-        else:
-            ai_reply = f"❌ Error {response.status_code}: {response.text}"
+        try:
+            response = requests.post(url, headers=headers, json=data, timeout=30)
+            if response.status_code == 403:
+                return jsonify({"ai_error_msg": "Hm... Majitel nemá peníze nebo rychle došli tokeny... Nahlaš to Majitelovi!"}), 403
+            response.raise_for_status()
+            ai_reply = response.json()["choices"][0]["message"]["content"]
+        except Exception as e:
+            return jsonify({"ai_error_msg": f"❌ Chyba: {e}"}), 500
         insert_message_chat(chat_id, user_id, "ai", ai_reply)
         return jsonify({"response": ai_reply})
-
     history = get_chat_history_by_chatid(chat_id)
-    return render_template("ai/chat.html", history=history, chat_id=chat_id,
-                           chats=chats)  # <-- A tady přidej chats=chats
+    return render_template("ai/chat.html", history=history, chat_id=chat_id, chats=chats)
 
 
 @ai_bp.route("/ai", methods=["GET", "POST"])
@@ -462,6 +507,15 @@ def dnd():
         session["user_id"] = random.randint(100000, 999999)
     user_id = session["user_id"]
 
+    # --- RESTART CHATU ---
+    if request.method == "POST" and request.form.get("restart") == "1":
+        db = get_db_connection()
+        with db.cursor() as cursor:
+            cursor.execute("DELETE FROM dnd_message WHERE user_id=%s", (user_id,))
+            db.commit()
+        set_inventory(user_id, [])
+        return ('', 204)
+
     if request.method == "POST":
         user_input = request.form.get("user_input")
         if not user_input:
@@ -490,9 +544,9 @@ def dnd():
             ai_reply = response.json()['choices'][0]['message']['content']
             # --- INVENTÁŘ MANAGEMENT (jednoduchá heuristika) ---
             lower = ai_reply.lower()
+            inventory = inventory or []
             added = re.findall(r"you (?:find|receive|get|obtain|pick up) ([a-zA-Z0-9\s]+)[\.\!]", lower)
             removed = re.findall(r"you (?:lose|drop|discard|use|consume) ([a-zA-Z0-9\s]+)[\.\!]", lower)
-            inventory = inventory or []
             for item in added:
                 item = item.strip()
                 if item and item not in inventory:

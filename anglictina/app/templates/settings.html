@@ -13,7 +13,201 @@
     </noscript>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
-
+        body {
+            background: #f6fafd;
+            font-family: 'League Spartan', Arial, sans-serif;
+        }
+        body.dark-mode {
+            background: #181c23;
+        }
+        .settings-container {
+            max-width: 620px;
+            margin: 2.5em auto 2em auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 2.5em 2em 2em 2em;
+        }
+        body.dark-mode .settings-container {
+            background: #000000;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.32);
+        }
+        h1 {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 1.5em;
+            letter-spacing: 0.02em;
+        }
+        .profile-pic-section, .settings-section {
+            background: #f6fafd;
+            border-radius: 12px;
+            padding: 1.3em 1em 1.2em 1em;
+            margin-bottom: 1.5em;
+        }
+        body.dark-mode .profile-pic-section, body.dark-mode .settings-section {
+            background: #232b36;
+        }
+        .profile-pic-wrapper {
+            text-align: center;
+            margin-bottom: 1em;
+        }
+        .current-profile-pic {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 2px solid #1976d2;
+            object-fit: cover;
+            background: #eee;
+        }
+        body.dark-mode .current-profile-pic {
+            background: #2d3748;
+            border: 2px solid #b2ff59;
+        }
+        .upload-form label {
+            display: inline-block;
+            margin-bottom: 0.7em;
+            cursor: pointer;
+            color: #1976d2;
+        }
+        body.dark-mode .upload-form label {
+            color: #b2ff59;
+        }
+        .upload-form input[type="file"] {
+            display: none;
+        }
+        .upload-form button {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 0.7em 1.5em;
+            font-size: 1.08em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        body.dark-mode .upload-form button {
+            background: #000000;
+            color: #b2ff59;
+        }
+        .upload-form button:hover {
+            background: #1256a0;
+        }
+        body.dark-mode .upload-form button:hover {
+            background: #232b36;
+        }
+        .english-level-select {
+            display: flex;
+            gap: 0.7em;
+            align-items: center;
+        }
+        .form-select {
+            padding: 0.7em;
+            border-radius: 7px;
+            border: 1.5px solid #b3c6e0;
+            font-size: 1.08em;
+        }
+        body.dark-mode .form-select {
+            background: #000000;
+            color: #fff;
+            border: 1.5px solid #38405a;
+        }
+        .btn-save {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 0.7em 1.4em;
+            font-size: 1.08em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        body.dark-mode .btn-save {
+            background: #000000;
+            color: #b2ff59;
+        }
+        .btn-save:hover {
+            background: #1256a0;
+        }
+        body.dark-mode .btn-save:hover {
+            background: #232b36;
+        }
+        .achievements-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1em;
+            margin-top: 1em;
+        }
+        .achievement-item {
+            flex: 1 1 180px;
+            min-width: 160px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 1em;
+            margin-bottom: 0.5em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        body.dark-mode .achievement-item {
+            background: #232b36;
+            color: #e0e0e0;
+        }
+        .achievement-item.unlocked strong {
+            color: #1976d2;
+        }
+        body.dark-mode .achievement-item.unlocked strong {
+            color: #b2ff59;
+        }
+        .achievement-item.locked strong {
+            color: #aaa;
+        }
+        .badge {
+            margin-top: 0.4em;
+            font-size: 0.95em;
+            padding: 0.2em 0.7em;
+            border-radius: 6px;
+            background: #e0e0e0;
+            color: #1976d2;
+        }
+        body.dark-mode .badge {
+            background: #38405a;
+            color: #b2ff59;
+        }
+        .top-users-list {
+            margin: 1.2em 0 0 0;
+            padding: 0;
+            list-style: none;
+        }
+        .top-users-list li {
+            background: #f6fafd;
+            border-radius: 7px;
+            padding: 0.7em 1em;
+            margin-bottom: 0.7em;
+            font-size: 1.08em;
+            display: flex;
+            align-items: center;
+        }
+        body.dark-mode .top-users-list li {
+            background: #232b36;
+            color: #fff;
+        }
+        .top1 .medal { color: gold; }
+        .top2 .medal { color: silver; }
+        .top3 .medal { color: #cd7f32; }
+        @media (max-width: 700px) {
+            .settings-container {
+                padding: 1.2em 0.5em 1.5em 0.5em;
+            }
+            .profile-pic-section, .settings-section {
+                padding: 1em 0.5em 1em 0.5em;
+            }
+            .achievement-item {
+                min-width: 100%;
+            }
+        }
     </style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
@@ -203,6 +397,12 @@
         })
         .catch(() => alert('Chyba při ukládání tématu.'));
     });
+
+        function updateStreakBadge(streak) {
+        const badge = document.querySelector('.streak-badge');
+        if (badge) badge.textContent = streak;
+    }
+
 
     function updateEnglishLevel() {
         const select = document.getElementById('englishLevelSelect');

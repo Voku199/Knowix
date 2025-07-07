@@ -354,7 +354,7 @@
                     <img class="avatar" src="{{ url_for('static', filename='pic/default.webp') }}" alt="User">
                     <div class="bubble">{{ msg.content }}</div>
                     {% else %}
-                    <img class="avatar" src="{{ url_for('static', filename='pic/ai_avatar.png') }}" alt="AI">
+                    <img class="avatar" src="{{ url_for('static', filename='pic/danndas.png') }}" alt="AI">
                     <div class="bubble">{{ msg.content }}</div>
                     {% endif %}
                 </div>
@@ -392,23 +392,18 @@ document.getElementById('start-chat-form').addEventListener('submit', function(e
     e.preventDefault();
     const msg = document.getElementById('first_message').value.trim();
     if (!msg) return;
-    // AJAX vytvoření nového chatu a odeslání první zprávy
     fetch("{{ url_for('ai_bp.chat_list') }}", {
         method: "POST",
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: "title="
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: new URLSearchParams({title: 'Nový chat', first_message: msg}).toString()
     })
-    .then(response => response.redirected ? window.location.href = response.url : response.text())
+    .then(response => response.json())
     .then(data => {
-        // Pokud jsme přesměrováni do nového chatu, počkej na načtení a odešli první zprávu
-        if (window.location.href.includes('/ai/chat/')) {
-            setTimeout(function() {
-                const input = document.getElementById('user_input');
-                if (input) {
-                    input.value = msg;
-                    document.getElementById('chat-form').dispatchEvent(new Event('submit'));
-                }
-            }, 700);
+        if (data.chat_id) {
+            window.location.href = `/ai/chat/${data.chat_id}`;
         }
     });
 });
@@ -423,7 +418,7 @@ document.getElementById('start-chat-form').addEventListener('submit', function(e
 
     // Nastav cesty k avatarům
     const userAvatar = "{{ url_for('static', filename='pic/default.webp') }}";
-    const aiAvatar = "{{ url_for('static', filename='pic/ai_avatar.png') }}";
+    const aiAvatar = "{{ url_for('static', filename='pic/danndas.png') }}";
 
     // Backend předává historii jako JSON (jinak prázdné pole)
     const initialHistory = {{ history|default([])|tojson|safe }};

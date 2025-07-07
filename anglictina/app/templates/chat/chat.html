@@ -5,6 +5,13 @@
     <title>Veřejný chat – Zprávy</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
+        body {
+            background: #f6fafd;
+            font-family: 'League Spartan', Arial, sans-serif;
+        }
+        body.dark-mode {
+            background: #181c23;
+        }
         .zpravy-container {
             max-width: 540px;
             margin: 2.5em auto 2em auto;
@@ -13,7 +20,10 @@
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
             padding: 2em 1.2em 1.2em 1.2em;
         }
-
+        body.dark-mode .zpravy-container {
+            background: #000000;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.32);
+        }
         .zpravy-seznam {
             background: #f6fafd;
             border-radius: 12px;
@@ -24,34 +34,40 @@
             margin-bottom: 1.2em;
             font-size: 1.08em;
         }
-
+        body.dark-mode .zpravy-seznam {
+            background: #000000;
+        }
         .zprava-item {
             margin-bottom: 0.7em;
             padding-bottom: 0.3em;
             border-bottom: 1px solid #e3eaf2;
         }
-
+        body.dark-mode .zprava-item {
+            border-bottom: 1px solid #000000;
+        }
         .zprava-item:last-child {
             border-bottom: none;
         }
-
         .zprava-user {
             font-weight: 600;
             color: #1976d2;
             margin-right: 0.5em;
         }
-
+        body.dark-mode .zprava-user {
+            color: #b2ff59;
+        }
         .zprava-time {
             color: #aaa;
             font-size: 0.93em;
             margin-left: 0.5em;
         }
-
+        body.dark-mode .zprava-time {
+            color: #7b8fa6;
+        }
         .zprava-form {
             display: flex;
             gap: 0.7em;
         }
-
         .zprava-form input[type="text"] {
             flex: 1;
             padding: 0.7em;
@@ -59,23 +75,32 @@
             border: 1.5px solid #b3c6e0;
             font-size: 1.08em;
         }
-
+        body.dark-mode .zprava-form input[type="text"] {
+            background: #000000;
+            color: #fff;
+            border: 1.5px solid #38405a;
+        }
         .zprava-form button {
+            padding: 0.7em 1.4em;
+            border-radius: 7px;
+            border: none;
             background: #1976d2;
             color: #fff;
-            border: none;
-            border-radius: 7px;
-            padding: 0.7em 1.5em;
-            font-size: 1.08em;
             font-weight: 600;
+            font-size: 1.08em;
             cursor: pointer;
             transition: background 0.2s;
         }
-
         .zprava-form button:hover {
-            background: #1256a0;
+            background: #0d47a1;
         }
-
+        body.dark-mode .zprava-form button {
+            background: #000000;
+            color: #b2ff59;
+        }
+        body.dark-mode .zprava-form button:hover {
+            background: #232b36;
+        }
         /* Styly pro obrázky */
         .zprava-image {
             max-width: 200px;
@@ -379,6 +404,14 @@ if (zprava.image_url) {
     // Odesílání formuláře
     document.getElementById('zpravaForm').addEventListener('submit', function(e) {
         e.preventDefault();
+        const zpravaInput = document.getElementById('zpravaInput');
+        const imageUpload = document.getElementById('imageUpload');
+        const zpravaText = zpravaInput.value.trim();
+        const hasImage = imageUpload.files && imageUpload.files.length > 0;
+        if (!zpravaText && !hasImage) {
+            alert('Nelze odeslat prázdnou zprávu.');
+            return;
+        }
         const formData = new FormData(this);
 
         fetch('{{ url_for("zpravy.zpravy_poslat") }}', {
@@ -386,7 +419,7 @@ if (zprava.image_url) {
             body: formData
         }).then(res => res.json()).then(data => {
             if (data.success) {
-                document.getElementById('zpravaInput').value = '';
+                zpravaInput.value = '';
                 imageUpload.value = '';
                 imagePreview.style.display = 'none';
                 fetchZpravy();
