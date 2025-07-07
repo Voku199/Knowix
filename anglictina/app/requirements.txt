@@ -23,3 +23,4 @@ python-engineio==4.8.2
 eventlet==0.33.3
 gevent==25.5.1
 gevent-websocket==0.10.1
+redis==6.2.0
