@@ -8,6 +8,7 @@ import sys
 import gevent
 from gevent import monkey
 
+# Import všech blueprintů
 from A1_music import exercises_bp
 from ai import ai_bp
 from at_on import at_on_bp
@@ -31,22 +32,19 @@ from xp import xp_bp
 
 app = Flask(__name__)
 
-# Jednoduchá lokální inicializace SocketIO
-socketio = SocketIO(app, cors_allowed_origins="*")
-
-# --- SocketIO initialization for local and server ---
+# --- SocketIO initialization with threading async_mode ---
 redis_url = os.environ.get("REDIS_URL")
 if redis_url:
     socketio = SocketIO(
         app,
-        async_mode="threading",
+        async_mode="threading",  # Explicitně nastavujeme threading režim
         cors_allowed_origins="*",
         message_queue=redis_url
     )
 else:
     socketio = SocketIO(
         app,
-        async_mode="threading",
+        async_mode="threading",  # Explicitně nastavujeme threading režim
         cors_allowed_origins="*"
     )
 
