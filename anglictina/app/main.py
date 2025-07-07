@@ -1,10 +1,6 @@
-from gevent import monkey
-
-monkey.patch_all()
 # --- Flask and SocketIO imports ---
 from dotenv import load_dotenv
 from flask import Flask, render_template, session, send_from_directory, request, redirect
-from flask_socketio import SocketIO
 
 import os
 import sys
@@ -34,20 +30,6 @@ from xp import xp_bp
 app = Flask(__name__)
 
 # --- SocketIO initialization with threading async_mode ---
-redis_url = os.environ.get("REDIS_URL")
-if redis_url:
-    socketio = SocketIO(
-        app,
-        async_mode="threading",  # Explicitně nastavujeme threading režim
-        cors_allowed_origins="*",
-        message_queue=redis_url
-    )
-else:
-    socketio = SocketIO(
-        app,
-        async_mode="threading",  # Explicitně nastavujeme threading režim
-        cors_allowed_origins="*"
-    )
 
 load_dotenv(dotenv_path=".env")
 app.secret_key = os.getenv("SECRET_KEY")
@@ -181,46 +163,19 @@ def add_security_headers(response):
 # =====================================================
 # -------------------!!!LOCAL!!!-----------------------
 # =====================================================
-# if __name__ == "__main__":
-# socketio.run(app, host="localhost", port=5000, debug=True)
+# app.run(host="localhost", port=8080)
 
 
 # =====================================================
 # -------------------!!!SERVER!!!----------------------
 # =====================================================
-
-# if __name__ == "__main__":
-#     debug = os.getenv("FLASK_DEBUG", "false").lower() in ("true", "1", "yes")
-#
-#     socketio.run(
-#         app,
-#         host="0.0.0.0",
-#         port=8080,
-#         debug=debug,
-#         use_reloader=debug,
-#         log_output=debug
-#     )
+#     from waitress import serve
+#     serve(app, host="0.0.0.0", port=8080)
 
 # Registrace SocketIO handlerů pro pexeso
-register_socketio_handlers(socketio)
+
 
 if __name__ == "__main__":
-    # Získání portu z environment proměnné (Railway ho poskytuje)
-    port = int(os.environ.get("PORT", 8080))
+    from waitress import serve
 
-    # Detekce prostředí
-    is_production = os.environ.get("RAILWAY_ENVIRONMENT") == "production"
-
-    # Konfigurace podle prostředí
-    debug = not is_production
-    use_reloader = not is_production
-
-    # Spuštění serveru
-    socketio.run(
-        app,
-        host="0.0.0.0",
-        port=port,
-        debug=debug,
-        use_reloader=use_reloader,
-        server="gevent"  # Jen když máš nainstalovaný gevent
-    )
+    serve(app, host="0.0.0.0", port=8080)
