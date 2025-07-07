@@ -58,14 +58,14 @@ redis_url = os.environ.get("REDIS_URL")
 if redis_url:
     socketio = SocketIO(
         app,
-        async_mode=async_mode,
+        async_mode="threading",
         cors_allowed_origins="*",
         message_queue=redis_url
     )
 else:
     socketio = SocketIO(
         app,
-        async_mode=async_mode,
+        async_mode="threading",
         cors_allowed_origins="*"
     )
 
