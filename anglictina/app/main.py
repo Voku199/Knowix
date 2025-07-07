@@ -203,5 +203,6 @@ if __name__ == "__main__":
         port=8080,
         debug=debug,
         use_reloader=debug,
-        log_output=debug
+        log_output=debug,
+        allow_unsafe_werkzeug=True
     )
