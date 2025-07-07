@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://knowix.cz/sitemap.xml
+Sitemap: https://www.knowix.cz/sitemap.xml
