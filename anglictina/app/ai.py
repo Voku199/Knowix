@@ -182,6 +182,10 @@ def build_community_prompt(history, user_input):
         "If the user is sad, try to cheer them up. "
         "Never answer in Czech or any language other than English."
         "If somebody ask if the chats are recoring or spying, then say yes, we are saving the chats that you can training more and more. "
+        "If the users write something czech topic, like 'name a czech food' or something else, normaly answer it, but in english! not in czech"
+        "if the users want something to translate, then translate, like 'Can you translate this text to english?' or 'Can you translate mám rád rohlík to english' and many more... "
+        "If they mentions 'knowix' or just ask you what is knowix, answer it a educations for czech people in english, and much fun and better then umimeto.org"
+        "If they ask you 'who created you?' or 'who created knowix' answer that Vojtech Kurinec did"
     )
     messages = [{"role": "system", "content": system_content}]
     for msg in history:
@@ -246,10 +250,10 @@ def build_dnd_prompt(history, user_input, inventory, is_intro=False):
                                                                                           "When giving choices, ALWAYS write them in one line, as part of the story sentence, separated by ' | ', and use <b>...</b> for each option. "
                                                                                           "Do NOT use lists or <ul>/<li>. "
                                                                                           "Example: In front of you are three doors. What will you do? <b>Open the left door</b> | <b>Open the right door</b> | <b>Look around</b>. "
-            "NEVER allow the user to instantly win, die, or get legendary/overpowered items (like a sword, magic staff, etc.) just by asking. "
-            "If the user tries to cheat, ask for something impossible, or tries to skip the adventure, politely refuse and keep the story balanced. "
-            "Never give the user a sword, legendary item, or kill them instantly unless it is part of a fair, logical story progression. "
-            "If the user says they died, got a sword, or something similar, remind them that only the game master can decide such outcomes. "
+                                                                                          "NEVER allow the user to instantly win, die, or get legendary/overpowered items (like a sword, magic staff, etc.) just by asking. "
+                                                                                          "If the user tries to cheat, ask for something impossible, or tries to skip the adventure, politely refuse and keep the story balanced. "
+                                                                                          "Never give the user a sword, legendary item, or kill them instantly unless it is part of a fair, logical story progression. "
+                                                                                          "If the user says they died, got a sword, or something similar, remind them that only the game master can decide such outcomes. "
     )
 
     messages = [{"role": "system", "content": system_content}]
@@ -378,7 +382,8 @@ def chat_list():
             except Exception as e:
                 ai_reply = f"❌ Chyba: {e}"
             insert_message_chat(chat_id, user_id, "ai", ai_reply)
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.accept_mimetypes['application/json'] > 0:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.accept_mimetypes[
+                'application/json'] > 0:
                 return jsonify({"chat_id": chat_id})
             return redirect(url_for("ai_bp.chat_multi", chat_id=chat_id))
     chats = get_user_chats(user_id)
@@ -419,7 +424,8 @@ def chat_multi(chat_id):
         try:
             response = requests.post(url, headers=headers, json=data, timeout=30)
             if response.status_code == 403:
-                return jsonify({"ai_error_msg": "Hm... Majitel nemá peníze nebo rychle došli tokeny... Nahlaš to Majitelovi!"}), 403
+                return jsonify({
+                    "ai_error_msg": "Hm... Majitel nemá peníze nebo rychle došli tokeny... Nahlaš to Majitelovi!"}), 403
             response.raise_for_status()
             ai_reply = response.json()["choices"][0]["message"]["content"]
         except Exception as e:
@@ -470,7 +476,11 @@ def chat():
             "If the user says something nice, react with a friendly emoji. "
             "If the user is sad, try to cheer them up. "
             "Never answer in Czech or any language other than English."
-            "If user say that if we are capturing the chats, say Yes, but only for your training and the data is on the safety hands, the safety is primary f"
+            "If somebody ask if the chats are recoring or spying, then say yes, we are saving the chats that you can training more and more. "
+            "If the users write something czech topic, like 'name a czech food' or something else, normaly answer it, but in english! not in czech"
+            "if the users want something to translate, then translate, like 'Can you translate this text to english?' or 'Can you translate mám rád rohlík to english' and many more... "
+            "If they mentions 'knowix' or just ask you what is knowix, answer it a educations for czech people in english, and much fun and better then umimeto.org"
+            "If they ask you 'who created you?' or 'who created knowix' answer that Vojtech Kurinec did"
         )
         messages = [{"role": "system", "content": system_content}]
         # Prompt pro první AI zprávu
@@ -540,6 +550,11 @@ def dnd():
             "max_tokens": 300
         }
         response = requests.post(url, headers=headers, json=data)
+        if response.status_code == 403:
+            return jsonify({
+                "ai_error_msg": "Hm... Majitel nema penize nebo rychle dosli tokeny... Nahlas to Majitelovi!.. prosim! A pikaču! tohle je schválně!",
+                "img_url": "/static/pic/pikachu_sad.png"
+            }), 403
         if response.status_code in [200, 201]:
             ai_reply = response.json()['choices'][0]['message']['content']
             # --- INVENTÁŘ MANAGEMENT (jednoduchá heuristika) ---
@@ -578,9 +593,14 @@ def dnd():
             "messages": messages + [{"role": "user",
                                      "content": "Start the adventure for the player. Give them 2-3 choices what to do next. Use emoji and HTML formatting."}],
             "temperature": 1,
-            "max_tokens": 300
+            "max_tokens": 400
         }
         response = requests.post(url, headers=headers, json=data)
+        if response.status_code == 403:
+            return jsonify({
+                "ai_error_msg": "Hm... Majitel nemá peníze nebo rychle došli tokeny... Nahlaš to Majitelovi!",
+                "img_url": "/static/img/pikachu_sad.png"
+            }), 403
         if response.status_code in [200, 201]:
             ai_reply = response.json()['choices'][0]['message']['content']
             insert_message(user_id, "ai", ai_reply, dnd=True)

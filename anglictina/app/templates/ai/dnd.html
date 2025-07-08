@@ -31,12 +31,7 @@
   gtag('config', 'G-W1EN990JKP');
 </script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f6f8fa;
-            margin: 0;
-            padding: 0;
-        }
+
 
         .chat-container {
             max-width: 600px;
@@ -306,30 +301,46 @@
     </form>
 </div>
 <script>
+    window.currentUserProfilePic = "{{ session.get('profile_pic', 'default.webp') }}";
+    window.userAvatarUrl = window.currentUserProfilePic === 'default.webp'
+        ? "{{ url_for('static', filename='pic/default.webp') }}"
+        : "{{ url_for('static', filename='profile_pics/') }}" + window.currentUserProfilePic;
+    window.aiAvatarUrl = "{{ url_for('static', filename='pic/danndas.png') }}";
+
     const chatHistory = document.getElementById('chat-history');
     const chatForm = document.getElementById('chat-form');
     const userInput = document.getElementById('user_input');
     const inventoryBar = document.querySelector('.inventory-bar');
     const restartBtn = document.getElementById('restart-btn');
 
+    function addMessage(role, content) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message ' + (role === 'user' ? 'user' : 'ai');
+        const avatar = document.createElement('img');
+        avatar.className = 'avatar';
+        avatar.src = role === 'user' ? window.userAvatarUrl : window.aiAvatarUrl;
+        avatar.alt = role === 'user' ? 'Uživatel' : 'AI';
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.textContent = content;
+        if (role === 'user') {
+            msgDiv.appendChild(bubble);
+            msgDiv.appendChild(avatar);
+        } else {
+            msgDiv.appendChild(avatar);
+            msgDiv.appendChild(bubble);
+        }
+        chatHistory.appendChild(msgDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+
     chatForm.addEventListener('submit', function (e) {
         e.preventDefault();
         const text = userInput.value.trim();
         if (!text) return;
-        // Add user message to chat
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'message user';
-        msgDiv.innerHTML = `<img class="avatar" src="{{ url_for('static', filename='pic/default.webp') }}" alt="User"><div class="bubble"></div>`;
-        msgDiv.querySelector('.bubble').textContent = text;
-        chatHistory.appendChild(msgDiv);
-        chatHistory.scrollTop = chatHistory.scrollHeight;
+        addMessage('user', text);
         userInput.value = '';
-        // Add loading AI message
-        const aiDiv = document.createElement('div');
-        aiDiv.className = 'message ai';
-        aiDiv.innerHTML = `<img class="avatar" src="{{ url_for('static', filename='pic/ai_avatar.png') }}" alt="AI"><div class="bubble">...</div>`;
-        chatHistory.appendChild(aiDiv);
-        chatHistory.scrollTop = chatHistory.scrollHeight;
+        addMessage('ai', '...');
         fetch('{{ url_for("ai_bp.dnd") }}', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
@@ -337,7 +348,8 @@
         })
             .then(response => response.json())
             .then(data => {
-                aiDiv.querySelector('.bubble').textContent = data.response || 'Error!';
+                const aiMessage = chatHistory.children[chatHistory.children.length - 1];
+                aiMessage.querySelector('.bubble').textContent = data.response || 'Error!';
                 // Aktualizace inventáře v horním panelu
                 if (data.inventory !== undefined) {
                     let inv = data.inventory;
@@ -349,7 +361,8 @@
                 }
             })
             .catch(error => {
-                aiDiv.querySelector('.bubble').textContent = 'Error!';
+                const aiMessage = chatHistory.children[chatHistory.children.length - 1];
+                aiMessage.querySelector('.bubble').textContent = 'Error!';
                 console.error(error);
             });
     });

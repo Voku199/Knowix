@@ -379,6 +379,12 @@
     </div>
 </div>
 <script>
+    window.currentUserProfilePic = "{{ session.get('profile_pic', 'default.webp') }}";
+    window.userAvatarUrl = window.currentUserProfilePic === 'default.webp'
+        ? "{{ url_for('static', filename='pic/default.webp') }}"
+        : "{{ url_for('static', filename='profile_pics/') }}" + window.currentUserProfilePic;
+</script>
+<script>
     // Přepínání chatů AJAXem
     document.querySelectorAll('.chat-list-item').forEach(item => {
         item.addEventListener('click', function() {
@@ -410,7 +416,7 @@
         // Přidej zprávu uživatele
         const msgDiv = document.createElement('div');
         msgDiv.className = 'message user';
-        msgDiv.innerHTML = `<img class="avatar" src="{{ url_for('static', filename='pic/default.webp') }}" alt="User"><div class="bubble"></div>`;
+        msgDiv.innerHTML = `<img class="avatar" src="${window.userAvatarUrl}" alt="User"><div class="bubble"></div>`;
         msgDiv.querySelector('.bubble').textContent = text;
         chatHistory.appendChild(msgDiv);
         chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -418,7 +424,7 @@
         // Přidej loading AI zprávu
         const aiDiv = document.createElement('div');
         aiDiv.className = 'message ai';
-        aiDiv.innerHTML = `<img class="avatar" src="{{ url_for('static', filename='pic/ai_avatar.png') }}" alt="AI"><div class="bubble">...</div>`;
+        aiDiv.innerHTML = `<img class="avatar" src="{{ url_for('static', filename='pic/danndas.png') }}" alt="AI"><div class="bubble">...</div>`;
         chatHistory.appendChild(aiDiv);
         chatHistory.scrollTop = chatHistory.scrollHeight;
         fetch('{{ url_for("ai_bp.chat_multi", chat_id=chat_id) }}', {
