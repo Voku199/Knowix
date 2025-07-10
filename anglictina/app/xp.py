@@ -44,7 +44,7 @@ def get_user_xp_and_level(user_id):
 
 def get_all_achievements():
     """
-    Vrátí všechny achievementy jako seznam slovníků.
+    Vrátí všechna achievementy jako seznam slovníků.
     """
     conn = get_db_connection()
     cur = conn.cursor(dictionary=True)
@@ -310,12 +310,12 @@ def is_xp_booster_active(user_id):
 
 def get_top_users(limit=10):
     """
-    Vrátí seznam top uživatelů podle XP.
+    Vrátí seznam top uživatelů podle XP, včetně streaku.
     """
     conn = get_db_connection()
     cur = conn.cursor(dictionary=True)
     cur.execute("""
-        SELECT id, first_name, last_name, xp, level, profile_pic
+        SELECT id, first_name, last_name, xp, level, profile_pic, streak
         FROM users
         ORDER BY xp DESC, id ASC
         LIMIT %s
@@ -379,7 +379,7 @@ def api_get_achievements():
 @xp_bp.route('/api/achievements', methods=['GET'])
 def api_all_achievements():
     """
-    Vrátí všechny achievementy v systému.
+    Vrátí všechna achievementy v systému.
     """
     return jsonify({"achievements": get_all_achievements()})
 

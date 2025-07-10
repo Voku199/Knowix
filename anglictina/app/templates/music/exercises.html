@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Knowix - Cvičení</title>
+    <title>Cvičení | Knowix</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,6 +17,7 @@
         .word-box { display: inline-block; margin: 5px; padding: 8px 14px; border: 1px solid #aaa; border-radius: 6px; cursor: pointer; background: #f8f8f8; }
         .word-box.selected { background: #cce5ff; border-color: #007bff; }
         .word-box.paired { background: #d4edda; border-color: #28a745; }
+        .word-box.wrong { background: #f8d7da; border-color: #dc3545; }
         .popup-container {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000;
@@ -217,15 +218,7 @@
 
         <section class="word-matching">
             <h3>Spoj slova k sobě:</h3>
-            <div class="word-grid">
-                {% for word in english_words %}
-                <div class="word-box en-word" data-word="{{ word }}">{{ word }}</div>
-                {% endfor %}
-                {% for word in czech_words %}
-                <div class="word-box cs-word" data-word="{{ word }}">{{ word }}</div>
-                {% endfor %}
-            </div>
-            <div id="matchedPairs" style="margin-top:1em;"></div>
+            <div id="matchingExerciseContainer"></div>
         </section>
 
         <section class="audio-section">
@@ -351,43 +344,6 @@
         }
     });
 
-    // Párování slov
-    let selectedWord = null;
-    let matchedPairs = [];
-    const wordBoxes = document.querySelectorAll('.word-box');
-    const matchedPairsDiv = document.getElementById('matchedPairs');
-
-    wordBoxes.forEach(box => {
-        box.addEventListener('click', function() {
-            if (this.classList.contains('paired')) return;
-            if (!selectedWord) {
-                selectedWord = this;
-                this.classList.add('selected');
-            } else if (selectedWord !== this && selectedWord.classList.contains('en-word') !== this.classList.contains('en-word')) {
-                matchedPairs.push([selectedWord.dataset.word, this.dataset.word]);
-                selectedWord.classList.add('paired');
-                this.classList.add('paired');
-                selectedWord.classList.remove('selected');
-                this.classList.remove('selected');
-                selectedWord = null;
-                renderMatchedPairs();
-            } else {
-                selectedWord.classList.remove('selected');
-                selectedWord = null;
-            }
-        });
-    });
-
-    function renderMatchedPairs() {
-        matchedPairsDiv.innerHTML = '';
-        matchedPairs.forEach(pair => {
-            const el = document.createElement('div');
-            el.textContent = pair[0] + ' ↔ ' + pair[1];
-            el.style.marginBottom = '4px';
-            matchedPairsDiv.appendChild(el);
-        });
-    }
-
     // Kontrola odpovědí a pop-up logika
     let lastCheckData = null; // Uložíme si poslední data pro review
 
@@ -404,13 +360,11 @@
             }
         });
 
-        const pairs = matchedPairs;
-
         try {
             const res = await fetch('/check-answer', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ translations, missing: missings, pairs })
+                body: JSON.stringify({ translations, missing: missings })
             });
             const data = await res.json();
             lastCheckData = data; // Uložíme pro review
@@ -518,19 +472,6 @@
             html += `</ul></div>`;
         }
 
-        // Páry slov
-        if (config.word_pairs && Object.keys(config.word_pairs).length) {
-            html += `<div style="margin-bottom:1em;"><b>Správné páry slov:</b><ul>`;
-            let shown = new Set();
-            Object.entries(config.word_pairs).forEach(([en, cs]) => {
-                if (!shown.has(en) && !shown.has(cs)) {
-                    html += `<li><span style="color:#007bff;">${en}</span> &harr; <span style="color:#28a745;">${cs}</span></li>`;
-                    shown.add(en); shown.add(cs);
-                }
-            });
-            html += `</ul></div>`;
-        }
-
         content.innerHTML = html;
         popup.style.display = 'flex';
         setTimeout(() => popup.classList.add('active'), 10);
@@ -572,6 +513,139 @@
     // Konfigurace cvičení pro případné další JS
     window.exerciseConfig = {{ config | tojson | safe }};
     console.log('Konfigurace cvičení:', exerciseConfig);
+
+    // ===== SPOJOVAČKA SLOV - KLIKACÍ, DVĚ KOLONY POD SEBOU, DARK MODE READY =====
+    function showMatchingExerciseMusic(pairs) {
+        const container = document.getElementById('matchingExerciseContainer');
+        container.innerHTML = `
+            <div style="font-size:1.2em;margin-bottom:10px;">Spoj anglická slova s českými:</div>
+            <div id="matchingExerciseColumns" style="display:flex;gap:40px;justify-content:center;align-items:flex-start;margin-bottom:10px;">
+                <div id="enCol" style="display:flex;flex-direction:column;gap:10px;"></div>
+                <div id="czCol" style="display:flex;flex-direction:column;gap:10px;"></div>
+            </div>
+            <div id="matchingResult" style="margin-top:8px;font-size:1.1em;"></div>
+        `;
+
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        // EN a CZ slova pod sebou ve dvou sloupcích
+        const enArr = pairs.map(p => p.en);
+        const czArr = pairs.map(p => p.cz);
+        shuffle(enArr);
+        shuffle(czArr);
+        const enCol = document.getElementById('enCol');
+        const czCol = document.getElementById('czCol');
+        enArr.forEach(word => {
+            const div = document.createElement('div');
+            div.className = 'word-box en-word';
+            div.textContent = word;
+            div.dataset.word = word;
+            enCol.appendChild(div);
+        });
+        czArr.forEach(word => {
+            const div = document.createElement('div');
+            div.className = 'word-box cs-word';
+            div.textContent = word;
+            div.dataset.word = word;
+            czCol.appendChild(div);
+        });
+
+        let selectedWord = null;
+        let matchedPairs = [];
+        const wordBoxes = container.querySelectorAll('.word-box');
+
+        function isAlreadyPaired(word) {
+            return matchedPairs.some(pair => pair[0] === word || pair[1] === word);
+        }
+
+        wordBoxes.forEach(box => {
+            box.addEventListener('click', function() {
+                if (this.classList.contains('paired')) return;
+                if (isAlreadyPaired(this.dataset.word)) return;
+                this.classList.remove('wrong');
+                if (!selectedWord) {
+                    selectedWord = this;
+                    this.classList.add('selected');
+                } else if (
+                    selectedWord !== this &&
+                    selectedWord.classList.contains('en-word') !== this.classList.contains('en-word') &&
+                    !isAlreadyPaired(selectedWord.dataset.word) &&
+                    !isAlreadyPaired(this.dataset.word)
+                ) {
+                    let en, cs;
+                    if (selectedWord.classList.contains('en-word')) {
+                        en = selectedWord.dataset.word;
+                        cs = this.dataset.word;
+                    } else {
+                        en = this.dataset.word;
+                        cs = selectedWord.dataset.word;
+                    }
+                    const pair = pairs.find(p => p.en === en && p.cz === cs);
+                    if (pair) {
+                        matchedPairs.push([en, cs]);
+                        selectedWord.classList.add('paired');
+                        this.classList.add('paired');
+                        selectedWord.classList.remove('selected');
+                        this.classList.remove('selected');
+                        selectedWord = null;
+                        // Okamžitě vyhodnoť výsledek
+                        if (matchedPairs.length === pairs.length) {
+                            document.getElementById('matchingResult').innerHTML = `<span style=\"color:#27ae60;\">🎉 Vše správně! Výborně!</span>`;
+                        }
+                    } else {
+                        selectedWord.classList.add('wrong');
+                        this.classList.add('wrong');
+                        setTimeout(() => {
+                            selectedWord.classList.remove('wrong', 'selected');
+                            this.classList.remove('wrong');
+                        }, 400);
+                        selectedWord = null;
+                    }
+                } else {
+                    if (selectedWord) selectedWord.classList.remove('selected');
+                    selectedWord = null;
+                }
+            });
+        });
+    }
+
+    // --- DARK MODE STYLY pro spojovačku ---
+    const style = document.createElement('style');
+    style.innerHTML = `
+    .word-box { display:inline-block; margin:2px; padding:8px 14px; border:1.5px solid #aaa; border-radius:6px; cursor:pointer; background:#f8f8f8; transition:background 0.15s,border 0.15s; }
+    .word-box.selected { background:#cce5ff; border-color:#007bff; }
+    .word-box.paired { background:#d4edda; border-color:#28a745; }
+    .word-box.wrong { background:#f8d7da; border-color:#dc3545; }
+    body.dark-mode .word-box { background:#23272e; color:#fff; border-color:#444; }
+    body.dark-mode .word-box.selected { background:#184b7b; border-color:#3399ff; }
+    body.dark-mode .word-box.paired { background:#245a3a; border-color:#36c36c; }
+    body.dark-mode .word-box.wrong { background:#7b2323; border-color:#dc3545; }
+    `;
+    document.head.appendChild(style);
+
+    // --- Inicializace spojovačky na stránce ---
+    if (window.exerciseConfig && window.exerciseConfig.word_pairs) {
+        const pairs = Object.entries(window.exerciseConfig.word_pairs)
+            .filter(([en, cz], i, arr) => arr.findIndex(([e, c]) => e === en && c === cz) === i)
+            .map(([en, cz]) => ({en, cz}));
+        const uniquePairs = [];
+        pairs.forEach(p => {
+            if (!uniquePairs.find(u => (u.en === p.en && u.cz === p.cz) || (u.en === p.cz && u.cz === p.en))) {
+                uniquePairs.push(p);
+            }
+        });
+        if (!document.getElementById('matchingExerciseContainer')) {
+            const container = document.createElement('div');
+            container.id = 'matchingExerciseContainer';
+            document.querySelector('.exercise-section')?.appendChild(container);
+        }
+        showMatchingExerciseMusic(uniquePairs);
+    }
 </script>
 </body>
 </html>

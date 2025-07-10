@@ -21,7 +21,7 @@ from obchod import obchod_bp
 from present_perfect import chat_bp
 from review import review_bp
 from roleplaying import roleplaying_bp
-from streak import get_user_streak
+from streak import get_user_streak, update_user_streak
 from theme import theme_bp
 from pexeso import pexeso_bp, register_socketio_handlers
 from xp import get_user_xp_and_level
@@ -78,12 +78,15 @@ def redirect_to_main_domain():
         return redirect("https://www.knowix.cz" + request.full_path, code=301)
     if host == "knowix.up.railway.app":
         return redirect("https://www.knowix.cz" + request.full_path, code=301)
+    if host == "http://knowix.cz/":
+        return redirect("https://www.knowix.cz" + request.full_path, code=301)
 
 
 @app.context_processor
 def inject_streak():
     user_id = session.get('user_id')
     if user_id:
+        update_user_streak(user_id)
         streak = get_user_streak(user_id)
         return dict(user_streak=streak)
     return dict(user_streak=0)
@@ -100,7 +103,7 @@ def server_error(e):
 
 
 LEVEL_NAMES = [
-    "Začátečník", "Učeň", "Student", "Pokročilý", "Expert", "Mistr", "Legenda"
+    "Začátečník", "Učeň", "Student", "Pokročilý", "Expert Knowixu", "Mistr", "Legenda", "Volax", "Král Knowixu"
 ]
 
 
@@ -111,14 +114,20 @@ def get_level_name(level):
         return LEVEL_NAMES[1]
     elif level <= 4:
         return LEVEL_NAMES[2]
-    elif level <= 6:
+    elif level <= 5:
         return LEVEL_NAMES[3]
-    elif level <= 8:
+    elif level <= 6:
         return LEVEL_NAMES[4]
-    elif level <= 10:
+    elif level <= 8:
         return LEVEL_NAMES[5]
-    else:
+    elif level <= 10:
         return LEVEL_NAMES[6]
+    elif level <= 12:
+        return LEVEL_NAMES[7]
+    elif level <= 15:
+        return LEVEL_NAMES[8]
+    else:
+        return LEVEL_NAMES[-1]
 
 
 @app.context_processor

@@ -345,9 +345,12 @@ def check_answer():
             results['translations'].append(False)
         results['details']['translations'].append(detail_result)
 
+    def normalize_pair(pair):
+        return tuple(normalize(w) for w in pair)
+
     correct_pairs = session.get('current_exercise_pairs', {})
-    user_pairs = set(tuple(pair) for pair in data.get('pairs', []))
-    valid_pairs = set((en, cs) for en, cs in correct_pairs.items()) | set((cs, en) for en, cs in correct_pairs.items())
+    user_pairs = set(normalize_pair(pair) for pair in data.get('pairs', []))
+    valid_pairs = set(normalize_pair((en, cs)) for en, cs in correct_pairs.items()) | set(normalize_pair((cs, en)) for en, cs in correct_pairs.items())
     results['pairs'] = all(pair in valid_pairs for pair in user_pairs) and len(user_pairs) == len(correct_pairs)
 
     all_correct = (

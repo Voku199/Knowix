@@ -72,7 +72,7 @@ def update_user_streak(user_id):
                 status = "freeze_used"
             else:
                 # Vynechal den, streak začíná znovu
-                new_streak = 1
+                new_streak = 0
                 status = "reset"
 
     # Uložení do DB pouze pokud se streak změnil nebo je první lekce nebo freeze použit

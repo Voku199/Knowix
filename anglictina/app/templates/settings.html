@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Nastavení – Knowix</title>
+    <title>Nastavení | Knowix</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -354,9 +354,10 @@
                 <span class="medal">🥉</span>
                 {% endif %}
                 <img src="{{ url_for('static', filename='profile_pics/' + (user.profile_pic or 'default.jpg')) }}">
-                <strong>{{ user.display_name }}</strong>
+                <strong>{{ user.first_name }}</strong>
                 <span>XP: {{ user.xp }}</span>
                 <span>Level: {{ user.level }}</span>
+                <span>🔥 Streak: {{ user.streak }} dní</span>
             </li>
             {% endfor %}
         </ol>

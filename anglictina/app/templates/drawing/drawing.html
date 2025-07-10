@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="cs">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description"
+              content="Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam.">
+        <meta name="keywords"
+              content="angličtina, procvičování, písničky, testy, chat, výuka, zdarma, knowix, zábava, škola">
+        <meta name="robots" content="index, follow">
+        <meta property="og:title" content="Knowix – Procvičování angličtiny zdarma">
+        <meta property="og:description"
+              content="Procvičuj angličtinu zábavně pomocí písniček, chatu a testů. Bez reklam, zdarma.">
+        <meta property="og:url" content="https://www.knowix.cz">
+        <meta property="og:type" content="website">
+        <meta property="og:image" content="https://www.knowix.cz/static/og-banner.png">
+
+        <link rel="canonical" href="https://www.knowix.cz">
+
+
+        <title>Kreslení | Knowix</title>
+        <link rel="stylesheet" href="/static/style.css">
+
+        <!-- Preconnect zrychlí DNS a spojení -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+        <!-- Font načti až po načtení stránky -->
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+              media="print" onload="this.media='all'">
+        <noscript>
+            <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap"
+                  rel="stylesheet">
+        </noscript>
+
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+
+            gtag('js', new Date());
+
+            gtag('config', 'G-W1EN990JKP');
+        </script>
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "Knowix",
+                "url": "https://www.knowix.cz",
+                "description": "Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam."
+            }
+        </script>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+        }
+        #drawing-container {
+            position: relative;
+            margin: 20px 0;
+        }
+        #drawing-canvas {
+            background-color: white;
+            border: 2px solid #333;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            cursor: crosshair;
+        }
+        .panel {
+            position: absolute;
+            border: 3px solid #000;
+            cursor: move;
+            box-sizing: border-box;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+            justify-content: center;
+        }
+        .tool-btn {
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .tool-btn.active {
+            background: #4CAF50;
+            color: white;
+        }
+        .layout-options {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .layout-btn {
+            padding: 5px 10px;
+            background: #e0e0e0;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+    </head>
+    <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}"></body>
+<header>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
+    </div>
+    <div class="nav-profile-wrapper">
+        <ul class="nav-right">
+            <li>
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
+            </li>
+        </ul>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
+</header>
+<body>
+    <div class="container">
+        <h1>Vytvořte svůj komiks</h1>
+
+        <div class="controls">
+            <div class="tool-btn active" id="btn-panel">Kreslit rámečky</div>
+            <div class="tool-btn" id="btn-draw">Kreslit obsah</div>
+            <div class="tool-btn" id="btn-clear">Vymazat vše</div>
+            <div class="tool-btn" id="btn-save">Uložit komiks</div>
+        </div>
+
+        <div id="drawing-container">
+            <canvas
+                id="drawing-canvas"
+                width="794"
+                height="1123"
+            >Váš prohlížeč nepodporuje Canvas</canvas>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('drawing-canvas');
+        const ctx = canvas.getContext('2d');
+        const panelBtn = document.getElementById('btn-panel');
+        const drawBtn = document.getElementById('btn-draw');
+        const clearBtn = document.getElementById('btn-clear');
+        const saveBtn = document.getElementById('btn-save');
+
+        // Stav aplikace
+        let currentMode = 'panel'; // 'panel' nebo 'draw'
+        let isDrawing = false;
+        let startX = 0;
+        let startY = 0;
+        let panels = [];
+        let contentPaths = [];
+        let currentPath = [];
+
+        // Inicializace
+        function initCanvas() {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+        }
+
+        // Funkce pro změnu režimu
+        function setMode(mode) {
+            currentMode = mode;
+            panelBtn.classList.toggle('active', mode === 'panel');
+            drawBtn.classList.toggle('active', mode === 'draw');
+            canvas.style.cursor = mode === 'draw' ? 'crosshair' : 'default';
+        }
+
+        // Překreslení celé scény
+        function redrawScene() {
+            // Vymazat plátno
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Nakreslit bílé pozadí
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Nakreslit obsah (kresby)
+            contentPaths.forEach(path => {
+                if (path.length > 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(path[0].x, path[0].y);
+                    for (let i = 1; i < path.length; i++) {
+                        ctx.lineTo(path[i].x, path[i].y);
+                    }
+                    ctx.stroke();
+                }
+            });
+
+            // Nakreslit panely (rámečky)
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
+            panels.forEach(panel => {
+                ctx.strokeRect(panel.x, panel.y, panel.width, panel.height);
+            });
+        }
+
+        // Event listeners
+        canvas.addEventListener('mousedown', (e) => {
+            if (currentMode === 'panel') {
+                isDrawing = true;
+                startX = e.offsetX;
+                startY = e.offsetY;
+            } else if (currentMode === 'draw') {
+                isDrawing = true;
+                currentPath = [{x: e.offsetX, y: e.offsetY}];
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+
+            if (currentMode === 'panel') {
+                // Dynamické zobrazení panelu při kreslení
+                redrawScene();
+                const width = e.offsetX - startX;
+                const height = e.offsetY - startY;
+                ctx.strokeRect(startX, startY, width, height);
+            } else if (currentMode === 'draw') {
+                // Kreslení obsahu
+                currentPath.push({x: e.offsetX, y: e.offsetY});
+
+                ctx.beginPath();
+                ctx.moveTo(currentPath[currentPath.length - 2].x, currentPath[currentPath.length - 2].y);
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+            }
+        });
+
+        canvas.addEventListener('mouseup', (e) => {
+            if (!isDrawing) return;
+            isDrawing = false;
+
+            if (currentMode === 'panel') {
+                // Přidání nového panelu
+                const endX = e.offsetX;
+                const endY = e.offsetY;
+                const width = endX - startX;
+                const height = endY - startY;
+
+                // Přidat pouze pokud má smysluplnou velikost
+                if (Math.abs(width) > 10 && Math.abs(height) > 10) {
+                    panels.push({
+                        x: startX,
+                        y: startY,
+                        width: width,
+                        height: height
+                    });
+                }
+
+                redrawScene();
+            } else if (currentMode === 'draw') {
+                // Uložit kreslenou cestu
+                if (currentPath.length > 1) {
+                    contentPaths.push([...currentPath]);
+                }
+                currentPath = [];
+            }
+        });
+
+        canvas.addEventListener('mouseout', () => {
+            isDrawing = false;
+            if (currentMode === 'panel') {
+                redrawScene();
+            }
+        });
+
+        // Ovládací prvky
+        panelBtn.addEventListener('click', () => setMode('panel'));
+        drawBtn.addEventListener('click', () => setMode('draw'));
+
+        clearBtn.addEventListener('click', () => {
+            panels = [];
+            contentPaths = [];
+            initCanvas();
+        });
+
+        saveBtn.addEventListener('click', () => {
+            const dataUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = 'komiks.png';
+            link.href = dataUrl;
+            link.click();
+        });
+
+        // Inicializace
+        initCanvas();
+        setMode('panel');
+    </script>
+    </body>
+</html>

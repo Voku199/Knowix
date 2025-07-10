@@ -437,6 +437,52 @@ body.dark-mode .audio-player {
         margin: 1rem;
         padding: 1rem;
     }
-
-
 }
+
+/* --- DARK MODE OVERRIDES FOR WORD MATCHING --- */
+body.dark-mode .word-matching {
+    background: #23272a;
+    border-color: #374151;
+}
+body.dark-mode .word-matching h3 {
+    color: #f1c40f;
+}
+body.dark-mode .word-grid {
+    background: none;
+}
+body.dark-mode .word-box {
+    background: #23272a;
+    color: #f1f1f1;
+    border: 2px solid #374151;
+}
+body.dark-mode .word-box.selected {
+    background: #1565c0 !important;
+    border-color: #2196F3 !important;
+    color: #fff !important;
+}
+body.dark-mode .word-box.paired {
+    background: #388e3c !important;
+    border-color: #43a047 !important;
+    color: #fff !important;
+}
+body.dark-mode .en-word {
+    background: #4d3d1d;
+    color: #ffeaa7;
+    border-color: #a67c52;
+}
+body.dark-mode .cs-word {
+    background: #1d3d4d;
+    color: #a8d8ea;
+    border-color: #3c8dad;
+}
+body.dark-mode .word-box.wrong {
+    background: #b71c1c !important;
+    border-color: #f44336 !important;
+    color: #fff !important;
+}
+body.dark-mode .word-box.correct {
+    background: #2e7d32 !important;
+    border-color: #66bb6a !important;
+    color: #fff !important;
+}
+/* --- END DARK MODE OVERRIDES FOR WORD MATCHING --- */

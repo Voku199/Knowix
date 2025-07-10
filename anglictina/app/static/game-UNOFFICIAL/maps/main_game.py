@@ -125,83 +125,70 @@ class MapRenderer:
 
     def load_map(self, filename):
         try:
-            print(f"Trying to load map: {filename}")
+            print(f"Loading map: {filename}")
+            # Zkontrolujeme existenci souboru
             if not os.path.exists(filename):
                 print(f"Map file not found: {filename}")
-                return False
+                # Vytvoříme náhradní plochu s chybovou zprávou
+                self.map_surface = pygame.Surface((480, 320), pygame.SRCALPHA)
+                self.map_surface.fill((255, 0, 0, 128))
+                font = pygame.font.Font(None, 24)
+                text = font.render(f"File not found: {os.path.basename(filename)}", True, (255, 255, 255))
+                self.map_surface.blit(text, (10, 150))
+                self.width = 480
+                self.height = 320
+                return True
 
-            # Načtení pomocí standardní funkce
+            # Načtení mapy
             self.tmx_data = load_pygame(filename)
-            print(f"Map loaded: {os.path.basename(filename)}")
-            print(f"Size: {self.tmx_data.width}x{self.tmx_data.height} tiles")
-            print(f"Tile size: {self.tmx_data.tilewidth}x{self.tmx_data.tileheight}")
 
-            print(f"TMX data - width: {self.tmx_data.width}, height: {self.tmx_data.height}")
-            print(f"TMX data - tilewidth: {self.tmx_data.tilewidth}, tileheight: {self.tmx_data.tileheight}")
-
-            # Explicitní převod na čísla
-            try:
-                map_width = int(self.tmx_data.width)
-                map_height = int(self.tmx_data.height)
-                tile_width = int(self.tmx_data.tilewidth)
-                tile_height = int(self.tmx_data.tileheight)
-            except (ValueError, TypeError) as e:
-                print(f"Conversion error: {e}, using fallback values")
-                map_width = 30
-                map_height = 20
-                tile_width = 16
-                tile_height = 16
+            # Kontrola platnosti rozměrů
+            map_width = max(30, int(self.tmx_data.width))
+            map_height = max(20, int(self.tmx_data.height))
+            tile_width = max(16, int(self.tmx_data.tilewidth))
+            tile_height = max(16, int(self.tmx_data.tileheight))
 
             self.width = map_width * tile_width
             self.height = map_height * tile_height
 
-            print(f"Calculated surface dimensions: {self.width}x{self.height}")
-
-            # Vytvoříme povrch pro mapu s průhledností
+            # Vytvoření plochy pro mapu
             self.map_surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
 
-            # Pro debug: nakreslíme modrý obdélník, abychom viděli, že se mapa vykresluje
-            # pygame.draw.rect(self.map_surface, (0, 0, 255, 128), (0, 0, self.width, self.height))
-            # pygame.draw.rect(self.map_surface, (0, 255, 0), (0, 0, self.width, self.height), 3)
-
-            # Vykreslit všechny vrstvy
+            # Vykreslení všech vrstev
             for layer in self.tmx_data.visible_layers:
                 if isinstance(layer, pytmx.TiledTileLayer):
                     for x, y, gid in layer:
                         tile = self.tmx_data.get_tile_image_by_gid(gid)
                         if tile:
-                            # Zajištění, že máme pygame.Surface
-                            if isinstance(tile, tuple):
-                                # Pro animované dlaždice vezmeme první snímek
-                                tile_surface = tile[0]
-                            else:
-                                tile_surface = tile
+                            # Pro animované dlaždice vezmeme první snímek
+                            tile_surface = tile[0] if isinstance(tile, tuple) else tile
 
-                            # Kontrola typu
                             if not isinstance(tile_surface, pygame.Surface):
-                                print(f"Warning: tile at ({x}, {y}) is not a Surface")
-                                continue
+                                # Vytvoření náhradního dlaždice pro chybějící obrázek
+                                tile_surface = pygame.Surface((tile_width, tile_height))
+                                tile_surface.fill((255, 0, 255))
+                                pygame.draw.rect(tile_surface, (0, 0, 0), (0, 0, tile_width, tile_height), 1)
 
                             self.map_surface.blit(
                                 tile_surface,
-                                (x * tile_width,
-                                 y * tile_height)
+                                (x * tile_width, y * tile_height)
                             )
-            print(f"Map surface created: {self.width}x{self.height} pixels")
-            return True
 
+            print(f"Map successfully loaded: {os.path.basename(filename)}")
+            return True
         except Exception as e:
-            print(f"Error loading map: {e}")
+            print(f"Critical error loading map: {e}")
             import traceback
             traceback.print_exc()
-            self.width = 1000
-            self.height = 600
-            self.map_surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-            # Červené pozadí pro chybu
+            # Vytvoření chybové plochy
+            self.map_surface = pygame.Surface((480, 320), pygame.SRCALPHA)
             self.map_surface.fill((255, 0, 0, 200))
-            # Zelený rámeček pro viditelnost
-            pygame.draw.rect(self.map_surface, (0, 255, 0), (0, 0, self.width, self.height), 5)
-            return False
+            font = pygame.font.Font(None, 24)
+            text = font.render(f"Error: {str(e)}", True, (255, 255, 255))
+            self.map_surface.blit(text, (10, 150))
+            self.width = 480
+            self.height = 320
+            return True
 
     def render(self, screen, offset_x=0, offset_y=0):
         if self.map_surface:
@@ -269,16 +256,20 @@ class ChunkManager:
         x, y, w, h = current_boundary
         px, py = player_pos
 
-        # Kontrola, zda hráč opustil aktuální chunk
-        if px < x or px > x + w or py < y or py > y + h:
-            # Hledání nového chunku
-            for chunk_name, chunk_data in MAP_CHUNKS.items():
-                cx, cy, cw, ch = chunk_data["boundary"]
-                if (cx <= px <= cx + cw) and (cy <= py <= cy + ch):
-                    print(f"Player moved from {self.active_chunk} to {chunk_name}")
-                    self.active_chunk = chunk_name
-                    self.load_chunk(chunk_name)
-                    return
+        # Kontrola přechodu do nového chunku
+        for chunk_name, chunk_data in MAP_CHUNKS.items():
+            # Přeskočit aktuální chunk
+            if chunk_name == self.active_chunk:
+                continue
+
+            cx, cy, cw, ch = chunk_data["boundary"]
+
+            # Kontrola, zda je hráč uvnitř tohoto chunku
+            if (cx <= px <= cx + cw) and (cy <= py <= cy + ch):
+                print(f"Player moved to {chunk_name}")
+                self.active_chunk = chunk_name
+                self.load_chunk(chunk_name)
+                return
 
     def unload_distant_chunks(self, player_pos):
         keep_distance = 2000  # Vzdálenost pro udržení chunku
@@ -304,26 +295,46 @@ class ChunkManager:
             self.unload_chunk(chunk_name)
 
     def render_chunks(self, screen, camera_offset):
-        for chunk_name, chunk_data in self.loaded_chunks.items():
+        # Nejprve vykreslit aktivní chunk
+        if self.active_chunk in self.loaded_chunks:
+            chunk_data = self.loaded_chunks[self.active_chunk]
             boundary = chunk_data["boundary"]
             renderer = chunk_data["renderer"]
 
-            # Vypočítat pozici pro vykreslení
             render_x = boundary[0] - camera_offset[0]
             render_y = boundary[1] - camera_offset[1]
 
-            # Vykreslit chunk pouze pokud je viditelný
+            # Vykreslit s zvýrazněním
+            renderer.render(screen, render_x, render_y)
+            pygame.draw.rect(screen, (0, 255, 255),
+                             (render_x, render_y, boundary[2], boundary[3]), 3)
+
+            # Text s označením aktivního chunku
+            font = pygame.font.Font(None, 28)
+            text = font.render(f"ACTIVE: {self.active_chunk}", True, (0, 255, 255))
+            screen.blit(text, (render_x + 10, render_y + 10))
+
+        # Pak vykreslit ostatní načtené chunky
+        for chunk_name, chunk_data in self.loaded_chunks.items():
+            if chunk_name == self.active_chunk:
+                continue
+
+            boundary = chunk_data["boundary"]
+            renderer = chunk_data["renderer"]
+
+            render_x = boundary[0] - camera_offset[0]
+            render_y = boundary[1] - camera_offset[1]
+
             if (render_x + boundary[2] > 0 and render_x < SCREEN_WIDTH and
                     render_y + boundary[3] > 0 and render_y < SCREEN_HEIGHT):
-                # print(f"Rendering chunk {chunk_name} at ({render_x}, {render_y})")
                 renderer.render(screen, render_x, render_y)
 
-                # Debug: vykreslit hranice chunku (zelený obdélník)
-                pygame.draw.rect(screen, (0, 255, 0), (render_x, render_y, boundary[2], boundary[3]), 2)
+                # Rámeček a text pro neaktivní chunky
+                pygame.draw.rect(screen, (0, 200, 0),
+                                 (render_x, render_y, boundary[2], boundary[3]), 1)
 
-                # Vykreslit název chunku
                 font = pygame.font.Font(None, 24)
-                text = font.render(chunk_name, True, (255, 255, 0))
+                text = font.render(chunk_name, True, (150, 150, 150))
                 screen.blit(text, (render_x + 10, render_y + 10))
 
 
