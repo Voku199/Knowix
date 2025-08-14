@@ -98,6 +98,11 @@ def robots_txt():
 @app.before_request
 def redirect_to_main_domain():
     host = request.host
+    # Na serveru sjednotíme doménu cookie na .knowix.cz, aby fungovala pro www i bez www
+    if host.endswith('knowix.cz'):
+        app.config['SESSION_COOKIE_DOMAIN'] = '.knowix.cz'
+        app.config['SESSION_COOKIE_SECURE'] = True
+        app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
     if host == "knowix.cz":
         return redirect("https://www.knowix.cz" + request.full_path, code=301)
     if host == "knowix.up.railway.app":
@@ -229,6 +234,4 @@ def add_security_headers(response):
 
 
 if __name__ == "__main__":
-    from waitress import serve
-
-    serve(app, host="0.0.0.0", port=8080)
+    app.run(host="localhost", port=5000)
