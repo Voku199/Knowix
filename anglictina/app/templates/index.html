@@ -208,7 +208,8 @@
             <div class="profile-container">
                 {% if session.get('profile_pic') %}
                 <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
-                     alt="Profilová fotka" width="64" class="profile-pic">
+                     alt="Profilová fotka" width="64" class="profile-pic"
+                     onerror="this.onerror=null; this.src='{{ url_for('static', filename='pic/default.webp') }}';">
                 {% else %}
                 <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
                      class="profile-pic" id="profileMenuTrigger">

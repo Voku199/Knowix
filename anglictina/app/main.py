@@ -162,6 +162,18 @@ def redirect_to_main_domain():
     # Vynucení permanentních session pro přihlášené
     if 'user_id' in session:
         session.permanent = True
+        # Force session refresh to ensure cookies are sent
+        session.modified = True
+
+
+@app.route('/static/profile_pics/<path:filename>')
+def serve_profile_pic(filename):
+    """Slouží profile obrázky s fallbackem na default obrázek"""
+    try:
+        return send_from_directory('static/profile_pics', filename)
+    except:
+        # Fallback na default avatar pokud obrázek neexistuje
+        return send_from_directory('static/pic', 'default_avatar.png')
 
 
 @app.context_processor
@@ -264,15 +276,40 @@ def add_security_headers(response):
         except Exception:
             pass
 
+    # Vylepšená CSP politika s podporou pro Google Analytics a další služby
     response.headers['Content-Security-Policy'] = (
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdn.jsdelivr.net https://www.youtube.com https://s.ytimg.com; "
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.quilljs.com; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' "
+        "https://cdn.quilljs.com https://cdn.jsdelivr.net "
+        "https://www.youtube.com https://s.ytimg.com "
+        "https://www.googletagmanager.com https://www.google-analytics.com "
+        "https://ssl.google-analytics.com https://connect.facebook.net; "
+        "style-src 'self' 'unsafe-inline' "
+        "https://fonts.googleapis.com https://cdn.quilljs.com; "
         "font-src 'self' https://fonts.gstatic.com; "
-        "img-src 'self' data:; "
-        "frame-src https://open.spotify.com https://*.spotify.com https://www.youtube-nocookie.com https://www.youtube.com https://*.youtube.com; "
+        "img-src 'self' data: https: blob: "
+        "https://www.google-analytics.com https://ssl.google-analytics.com "
+        "https://www.googletagmanager.com https://stats.g.doubleclick.net; "
+        "connect-src 'self' "
+        "https://www.google-analytics.com https://region1.google-analytics.com "
+        "https://analytics.google.com https://stats.g.doubleclick.net; "
+        "frame-src https://open.spotify.com https://*.spotify.com "
+        "https://www.youtube-nocookie.com https://www.youtube.com https://*.youtube.com; "
         "frame-ancestors 'none';"
     )
+
+    # Ensure cookies are properly set for authenticated users
+    if 'user_id' in session and request.path in ('/login', '/register'):
+        response.set_cookie(
+            app.config.get('SESSION_COOKIE_NAME', 'knowix_session'),
+            value=session.get('_id', ''),
+            domain=app.config.get('SESSION_COOKIE_DOMAIN'),
+            secure=app.config.get('SESSION_COOKIE_SECURE', True),
+            httponly=app.config.get('SESSION_COOKIE_HTTPONLY', True),
+            samesite=app.config.get('SESSION_COOKIE_SAMESITE', 'Lax'),
+            max_age=app.config.get('PERMANENT_SESSION_LIFETIME', 60 * 60 * 24 * 30)
+        )
+
     response.headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload'
     response.headers['X-Frame-Options'] = 'DENY'
     response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
