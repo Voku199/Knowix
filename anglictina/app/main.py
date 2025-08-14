@@ -53,6 +53,11 @@ Session(app)
 
 load_dotenv(dotenv_path=".env")
 app.secret_key = os.getenv("SECRET_KEY")
+if not app.secret_key:
+    # Kritické: bez stabilního SECRET_KEY budou session rozbité mezi instancemi
+    print("[main] ERROR: SECRET_KEY is not set in environment! Session will not persist correctly.")
+    # Zvedni chybu, ať to vidíme hned po startu na serveru
+    raise RuntimeError("SECRET_KEY is missing. Set SECRET_KEY in environment for stable sessions.")
 
 # Konfigurace
 app.config['UPLOAD_FOLDER'] = 'static/profile_pics'
@@ -108,6 +113,12 @@ def robots_txt():
 @app.before_request
 def redirect_to_main_domain():
     host = request.host
+    # Debug vstupních requestů kolem loginu/registrace/indexu
+    if request.path in ('/login', '/register', '/'):
+        try:
+            print(f"[before_request] host={host} path={request.path} method={request.method} session_keys={list(session.keys())}")
+        except Exception:
+            pass
     # Na serveru sjednotíme doménu cookie na .knowix.cz, aby fungovala pro www i bez www
     if host.endswith('knowix.cz'):
         app.config['SESSION_COOKIE_DOMAIN'] = '.knowix.cz'
@@ -210,6 +221,13 @@ def inject_xp_info():
 
 @app.after_request
 def add_security_headers(response):
+    # Debug odchozí odpovědi pro login/registraci/index
+    if request.path in ('/login', '/register', '/'):
+        try:
+            has_set_cookie = any(h.lower() == 'set-cookie' for h in response.headers.keys())
+            print(f"[after_request] host={request.host} path={request.path} status={response.status_code} set_cookie={has_set_cookie} cookie_domain={app.config.get('SESSION_COOKIE_DOMAIN')} samesite={app.config.get('SESSION_COOKIE_SAMESITE')} secure={app.config.get('SESSION_COOKIE_SECURE')}")
+        except Exception:
+            pass
     response.headers['Content-Security-Policy'] = (
         "default-src 'self'; "
         "script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdn.jsdelivr.net https://www.youtube.com https://s.ytimg.com; "
