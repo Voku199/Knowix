@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (missingInputs.length) {
             console.groupCollapsed('[DEBUG] Missing – correct answers');
             missingInputs.forEach((inp, i) => {
-                console.log(`#${i + 1}:`, inp.getAttribute('data-correct') || '');
+                // console.log(`#${i + 1}:`, inp.getAttribute('data-correct') || '');
             });
             console.groupEnd();
         }
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (enButtons.length) {
             console.groupCollapsed('[DEBUG] Matching pairs EN -> CS');
             enButtons.forEach((btn, i) => {
-                console.log(`#${i + 1}:`, btn.getAttribute('data-en') || '', '=>', btn.getAttribute('data-cs') || '');
+                // console.log(`#${i + 1}:`, btn.getAttribute('data-en') || '', '=>', btn.getAttribute('data-cs') || '');
             });
             console.groupEnd();
         }

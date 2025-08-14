@@ -28,35 +28,34 @@
   gtag('config', 'G-W1EN990JKP');
 </script>
     <style>
-
         body.dark-mode {
-            background: #181c23;
+            background: #f5f1e8;
         }
         .shop-container {
             max-width: 600px;
             margin: 2.5em auto 2em auto;
-            background: #fff;
+            background: #f9f7f4;
             border-radius: 18px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 24px rgba(139,122,96,0.15);
             padding: 2.5em 2em 2em 2em;
         }
         body.dark-mode .shop-container {
-            background: #000000;
+            background: #2d2922;
             box-shadow: 0 4px 24px rgba(0,0,0,0.32);
         }
-        /*.xp-status {*/
-        /*    text-align: center;*/
-        /*    font-size: 1.15em;*/
-        /*    margin-bottom: 2em;*/
-        /*    background: #eaf6ff;*/
-        /*    border-radius: 8px;*/
-        /*    padding: 0.7em 0;*/
-        /*    font-weight: 500;*/
-        /*    color: #ecc38d;*/
-        /*}*/
+        .xp-status {
+            text-align: center;
+            font-size: 1.15em;
+            margin-bottom: 2em;
+            background: #f0eee9;
+            border-radius: 8px;
+            padding: 0.7em 0;
+            font-weight: 500;
+            color: #8b7a60;
+        }
         body.dark-mode .xp-status {
-            background: #232b36;
-            color: #ffe082;
+            background: #3a342a;
+            color: #d4c4a8;
         }
         .shop-items {
             display: flex;
@@ -65,9 +64,9 @@
             justify-content: center;
         }
         .shop-item {
-            background: #f9fafb;
+            background: #f5f3f0;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 8px rgba(139,122,96,0.08);
             padding: 1.5em 1.2em 1.2em 1.2em;
             flex: 1 1 220px;
             min-width: 220px;
@@ -78,30 +77,30 @@
             transition: box-shadow 0.2s;
         }
         body.dark-mode .shop-item {
-            background: #000000;
+            background: #3a342a;
             box-shadow: 0 2px 8px rgba(0,0,0,0.18);
         }
         .shop-item:hover {
-            box-shadow: 0 6px 24px rgba(25, 118, 210, 0.10);
+            box-shadow: 0 6px 24px rgba(139,122,96,0.20);
         }
         .shop-item h2 {
             margin-top: 0;
             margin-bottom: 0.5em;
             font-size: 1.3em;
             font-weight: 600;
-            color: #2474de;
+            color: #8b7a60;
             letter-spacing: 0.01em;
         }
         body.dark-mode .shop-item h2 {
-            color: #b2ff59;
+            color: #d4c4a8;
         }
         .shop-item p {
             margin: 0.5em 0 1em 0;
             text-align: center;
-            color: #444;
+            color: #6b5d4f;
         }
         body.dark-mode .shop-item p {
-            color: #e0e0e0;
+            color: #c4b49a;
         }
         .shop-item form {
             width: 100%;
@@ -110,7 +109,7 @@
             align-items: center;
         }
         .shop-item button[type="submit"] {
-            background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
+            background: linear-gradient(90deg, #8b7a60 60%, #a69080 100%);
             color: #fff;
             border: none;
             border-radius: 6px;
@@ -120,19 +119,19 @@
             cursor: pointer;
             margin-bottom: 0.7em;
             transition: background 0.2s, box-shadow 0.2s;
-            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.10);
+            box-shadow: 0 2px 8px rgba(139,122,96,0.15);
         }
         body.dark-mode .shop-item button[type="submit"] {
-            background: #000000;
-            color: #b2ff59;
+            background: linear-gradient(90deg, #5a4f3e 60%, #6b5d4f 100%);
+            color: #d4c4a8;
             box-shadow: 0 2px 8px rgba(0,0,0,0.32);
         }
         .shop-item button[type="submit"]:hover:not(:disabled) {
-            background: linear-gradient(90deg, #1565c0 60%, #1976d2 100%);
-            box-shadow: 0 4px 16px rgba(25, 118, 210, 0.18);
+            background: linear-gradient(90deg, #7a6b55 60%, #8b7a60 100%);
+            box-shadow: 0 4px 16px rgba(139,122,96,0.25);
         }
         body.dark-mode .shop-item button[type="submit"]:hover:not(:disabled) {
-            background: #232b36;
+            background: linear-gradient(90deg, #6b5d4f 60%, #7a6b55 100%);
         }
         .shop-item button[type="submit"]:disabled {
             background: #bdbdbd;
@@ -141,40 +140,40 @@
             box-shadow: none;
         }
         body.dark-mode .shop-item button[type="submit"]:disabled {
-            background: #232b36;
+            background: #4a443a;
             color: #888;
         }
         .shop-item strong {
-            color: #1976d2;
+            color: #8b7a60;
         }
         body.dark-mode .shop-item strong {
-            color: #b2ff59;
+            color: #d4c4a8;
         }
         .shop-item .freeze-count, .shop-item .booster-status {
             margin-top: 0.2em;
             font-size: 0.98em;
-            color: #666;
+            color: #6b5d4f;
         }
         body.dark-mode .shop-item .freeze-count, body.dark-mode .shop-item .booster-status {
-            color: #e0e0e0;
+            color: #c4b49a;
         }
         a {
             display: inline-block;
             margin-top: 2em;
             text-decoration: none;
-            color: #1976d2;
+            color: #8b7a60;
             font-weight: 500;
             transition: color 0.15s;
         }
         body.dark-mode a {
-            color: #b2ff59;
+            color: #d4c4a8;
         }
         a:hover {
-            color: #0d47a1;
+            color: #6b5d4f;
             text-decoration: underline;
         }
         body.dark-mode a:hover {
-            color: #fff;
+            color: #f0eee9;
         }
         @media (max-width: 700px) {
             .shop-container {
@@ -276,7 +275,7 @@
 <main class="shop-container">
     <h1>Obchod</h1>
     <div class="xp-status">
-        <strong>Tvůj XP stav:</strong> {{ shop_status.xp }} XP
+        <strong>Tvůj XP stav:</strong> {{ shop_status['xp'] }} XP
     </div>
     <div class="shop-items">
         <div class="shop-item">
@@ -286,20 +285,20 @@
             <form method="POST" action="{{ url_for('obchod.obchod') }}">
                 <input type="hidden" name="item" value="freeze">
                 <button type="submit"
-                    {% if shop_status.freeze_count >= 3 or shop_status.xp < FREEZE_COST %}
+                    {% if shop_status['freeze_count'] >= 3 or shop_status['xp'] < FREEZE_COST %}
                         disabled
                     {% endif %}
                 >
-                    {% if shop_status.freeze_count >= 3 %}
+                    {% if shop_status['freeze_count'] >= 3 %}
                         Limit 3 freeze dosažen
-                    {% elif shop_status.xp < FREEZE_COST %}
+                    {% elif shop_status['xp'] < FREEZE_COST %}
                         Nedostatek XP
                     {% else %}
                         Koupit Freeze
                     {% endif %}
                 </button>
             </form>
-            <div class="freeze-count">Máš aktivních freeze: <strong>{{ shop_status.freeze_count }}</strong> / 3</div>
+            <div class="freeze-count">Máš aktivních freeze: <strong>{{ shop_status['freeze_count'] }}</strong> / 3</div>
         </div>
         <div class="shop-item">
             <h2>⚡ XP Booster</h2>
@@ -308,20 +307,20 @@
             <form method="POST" action="{{ url_for('obchod.obchod') }}">
                 <input type="hidden" name="item" value="xp_booster">
                 <button type="submit"
-                    {% if shop_status.xp < XP_BOOSTER_COST or shop_status.xp_booster_active %}
+                    {% if shop_status['xp'] < XP_BOOSTER_COST or shop_status['xp_booster_active'] %}
                         disabled
                     {% endif %}
                 >
-                    {% if shop_status.xp_booster_active %}
+                    {% if shop_status['xp_booster_active'] %}
                         Booster už je aktivní
-                    {% elif shop_status.xp < XP_BOOSTER_COST %}
+                    {% elif shop_status['xp'] < XP_BOOSTER_COST %}
                         Nedostatek XP
                     {% else %}
                         Koupit XP Booster
                     {% endif %}
                 </button>
             </form>
-            <div class="booster-status">XP Booster je {% if shop_status.xp_booster_active %}<strong>aktivní</strong>{% else %}neaktivní{% endif %}.</div>
+            <div class="booster-status">XP Booster je {% if shop_status['xp_booster_active'] %}<strong>aktivní</strong>{% else %}neaktivní{% endif %}.</div>
         </div>
     </div>
     <a href="{{ url_for('main.index') }}">← Zpět na hlavní stránku</a>

@@ -122,15 +122,10 @@ class News:
 
 # Helper funkce
 def validate_owner(user_id):
-    """Ověření identity majitele"""
-    user = User.get_by_id(user_id)
-    if user:
-        return (
-                user['first_name'] == "Vojtěch" and
-                user['last_name'] == "Kurinec" and
-                user['email'] == "vojta.kurinec@gmail.com"
-        )
-    return False
+    """Ověření identity majitele podle user_id"""
+    # Zde nastavte správné user_id majitele
+    OWNER_USER_ID = 1  # Změňte na správné ID majitele
+    return user_id == OWNER_USER_ID
 
 
 # Routy
@@ -161,20 +156,28 @@ def get_news():
         return jsonify({'error': 'Internal server error'}), 500
 
 
-@news_bp.route('/news', methods=['POST'])
+@news_bp.route('/add_news', methods=['POST'])
 def add_news():
+    """Route pro přidávání novinek - pouze pro majitele"""
     if 'user_id' not in session:
         return jsonify({'status': 'error', 'message': 'Nejste přihlášen'}), 401
 
     if not validate_owner(session['user_id']):
-        return jsonify({'status': 'error', 'message': 'Neoprávněný přístup'}), 403
+        return jsonify({'status': 'error', 'message': 'Neoprávněný přístup - pouze majitel může přidávat novinky'}), 403
 
-    data = request.get_json()
-    if News.create(
-            title=data.get('title'),
-            content=data.get('content'),
-            author_id=session['user_id']
-    ):
-        return jsonify({'status': 'success'})
+    try:
+        data = request.get_json()
+        title = data.get('title', '').strip()
+        content = data.get('content', '').strip()
 
-    return jsonify({'status': 'error', 'message': 'Chyba při ukládání'}), 500
+        if not title or not content:
+            return jsonify({'status': 'error', 'message': 'Název i obsah musí být vyplněny'}), 400
+
+        if News.create(title=title, content=content, author_id=session['user_id']):
+            return jsonify({'status': 'success', 'message': 'Novinka byla úspěšně přidána'})
+        else:
+            return jsonify({'status': 'error', 'message': 'Chyba při ukládání do databáze'}), 500
+
+    except Exception as e:
+        print("Chyba v add_news route:", str(e))
+        return jsonify({'status': 'error', 'message': 'Nastala chyba při zpracování požadavku'}), 500
