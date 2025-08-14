@@ -4,6 +4,8 @@ from flask import Flask, render_template, session, send_from_directory, request,
 from flask_session import Session
 from streak import get_user_streak, update_user_streak
 import traceback
+import redis
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 import os
 import sys
@@ -38,7 +40,15 @@ from proc import proc_bp
 # from linkify import auto_linkify
 
 app = Flask(__name__)
-app.config['SESSION_TYPE'] = 'filesystem'
+# Session storage do Redis (odolné vůči více instancím)
+app.config['SESSION_TYPE'] = 'redis'
+if os.getenv('REDIS_URL'):
+    app.config['SESSION_REDIS'] = redis.from_url(os.getenv('REDIS_URL'))
+# zabezpečení cookies – default, lze překrýt v before_request podle hostu
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = True
+# respektuj proxy hlavičky (https) – důležité pro secure cookies a správné přesměrování
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 Session(app)
 
 load_dotenv(dotenv_path=".env")
@@ -103,12 +113,12 @@ def redirect_to_main_domain():
         app.config['SESSION_COOKIE_DOMAIN'] = '.knowix.cz'
         app.config['SESSION_COOKIE_SECURE'] = True
         app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-    if host == "knowix.cz":
-        return redirect("https://www.knowix.cz" + request.full_path, code=301)
-    if host == "knowix.up.railway.app":
-        return redirect("https://www.knowix.cz" + request.full_path, code=301)
-    if host == "http://knowix.cz/":
-        return redirect("https://www.knowix.cz" + request.full_path, code=301)
+    redirect_hosts = ("knowix.cz", "knowix.up.railway.app")
+    if host in redirect_hosts:
+        target = "https://www.knowix.cz" + request.full_path
+        # Zachovej metodu a body u POST/PUT/PATCH (308), u GET/HEAD stačí 301
+        code = 308 if request.method not in ("GET", "HEAD", "OPTIONS") else 301
+        return redirect(target, code=code)
 
 
 @app.context_processor
