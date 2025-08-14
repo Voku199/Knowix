@@ -211,7 +211,10 @@ def my_stats():
 @auth_bp.route('/settings', methods=['GET'])
 def settings():
     user = session.get('user_id')
+    print(
+        f"[auth.settings] host={request.host} path={request.path} method={request.method} user_id={user} session_keys={list(session.keys())}")
     if not user:
+        print("[auth.settings] user_id missing in session -> redirect to login")
         return redirect(url_for('auth.login'))
 
     db = get_db_connection()
@@ -340,17 +343,22 @@ def set_theme():
 
 @auth_bp.route('/upload_profile_pic', methods=['POST'])
 def upload_profile_pic():
+    print(
+        f"[auth.upload_profile_pic] host={request.host} path={request.path} method={request.method} session_keys={list(session.keys())}")
     if 'user_name' not in session or 'user_id' not in session:
+        print(f"[auth.upload_profile_pic] Missing user in session -> redirect login")
         flash("Nejdříve se musíte přihlásit.", "warning")
         return redirect(url_for('auth.login'))
 
     if 'file' not in request.files:
+        print("[auth.upload_profile_pic] No file in request")
         flash("Žádný soubor nebyl vybrán.", "error")
         return redirect(url_for('auth.settings'))
 
     file = request.files['file']
 
     if file and allowed_file(file.filename):
+        print(f"[auth.upload_profile_pic] Allowed file filename={file.filename}")
         # Vytvoř cíl a unikátní název (ignorujeme původní název uživatele)
         upload_dir = os.path.join(current_app.root_path, current_app.config['UPLOAD_FOLDER'])
         os.makedirs(upload_dir, exist_ok=True)
@@ -367,7 +375,8 @@ def upload_profile_pic():
                 img = img.convert('RGB')
             img = img.resize((128, 128))
             img.save(filepath, format='WEBP', quality=85, method=6)
-        except Exception:
+        except Exception as ex:
+            print(f"[auth.upload_profile_pic] Pillow error: {ex}")
             # Pokud selže Pillow, ulož soubor bezpečně bez konverze (méně preferované)
             file.seek(0)
             file.save(filepath)
@@ -379,8 +388,9 @@ def upload_profile_pic():
                 old_path = os.path.join(upload_dir, old_pic)
                 if os.path.isfile(old_path):
                     os.remove(old_path)
-            except Exception:
-                pass
+                    print(f"[auth.upload_profile_pic] Removed old pic {old_pic}")
+            except Exception as ex:
+                print(f"[auth.upload_profile_pic] Remove old pic error: {ex}")
 
         # Aktualizuj session a DB s novým systémovým názvem
         session['profile_pic'] = unique_name
@@ -388,10 +398,12 @@ def upload_profile_pic():
             cursor = conn.cursor()
             cursor.execute("UPDATE users SET profile_pic = %s WHERE id = %s", (unique_name, session["user_id"]))
             conn.commit()
+        print(f"[auth.upload_profile_pic] Stored as {unique_name}")
 
         flash("Profilová fotka byla úspěšně nahrána.", "success")
         return redirect(url_for('auth.settings'))
     else:
+        print(f"[auth.upload_profile_pic] Disallowed file: {file.filename if file else None}")
         flash("Podporované formáty jsou pouze PNG, JPG, JPEG nebo GIF.", "error")
         return redirect(url_for('auth.settings'))
 
@@ -567,6 +579,7 @@ def add_student():
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        print(f"[auth.register] POST host={request.host} path={request.path} ip={request.remote_addr}")
         first_name = request.form['first_name'].strip()
         last_name = request.form['last_name'].strip()
         email = request.form['email'].strip().lower()
@@ -594,6 +607,7 @@ def register():
             # 1. Najdi školu podle jména
             cursor.execute("SELECT id FROM schools WHERE name = %s", (school_name,))
             school_row = cursor.fetchone()
+            print(f"[auth.register] school exists={bool(school_row)}")
             if school_row:
                 school_id = school_row[0]
             else:
@@ -603,9 +617,11 @@ def register():
                 # 3. Znovu najdi školu podle jména (pro jistotu správného ID)
                 cursor.execute("SELECT id FROM schools WHERE name = %s", (school_name,))
                 school_row = cursor.fetchone()
+                print(f"[auth.register] school created, id_found={bool(school_row)}")
                 if school_row:
                     school_id = school_row[0]
                 else:
+                    print("[auth.register] ERROR: school not found after insert")
                     flash("Chyba při ukládání školy.", "error")
                     return redirect(url_for('auth.register'))
 
@@ -619,9 +635,11 @@ def register():
                     (first_name, last_name, email, hashed_password, birthdate, english_level, school_id)
                 )
                 conn.commit()
+                print(f"[auth.register] user insert ok email={email}")
                 flash("Registrace úspěšná! Nyní se můžete přihlásit.", "success")
                 return redirect(url_for('auth.login'))
             except mysql.connector.IntegrityError:
+                print(f"[auth.register] IntegrityError for email={email}")
                 flash("Tento e-mail je již zaregistrován!", "error")
                 return redirect(url_for('auth.register'))
 
@@ -637,6 +655,7 @@ def register():
 def login():
     if request.method == 'POST':
         email = request.form['email']
+        print(f"[auth.login] POST from host={request.host} path={request.path} email={email}")
         password = request.form['password']
 
         with get_db_connection() as conn:
@@ -644,13 +663,16 @@ def login():
             cursor.execute("SELECT id, first_name, last_name, password, profile_pic FROM users WHERE email = %s",
                            (email,))
             user = cursor.fetchone()
+            print(f"[auth.login] DB user found={bool(user)}")
 
             if user and check_password_hash(user[3], password):
                 session["user_id"] = user[0]
                 session["user_name"] = f"{user[1]} {user[2]}"
                 session["profile_pic"] = user[4] if user[4] else 'default.jpg'  # Přidej roli uživatele do session
+                print(f"[auth.login] session set user_id={session.get('user_id')} session_keys={list(session.keys())}")
                 return redirect(url_for('main.index'))
             else:
+                print("[auth.login] Bad credentials")
                 flash("Nesprávný e-mail nebo heslo!", "error")
 
     return render_template('login.html')
