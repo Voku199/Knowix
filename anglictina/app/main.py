@@ -37,23 +37,37 @@ from admin import admin_bp
 from vlastni_music import vlastni_music_bp
 from proc import proc_bp
 
-# from linkify import auto_linkify
-
 app = Flask(__name__)
-# Session storage do Redis (odolné vůči více instancím)
+
+# NEJDŘÍVE načti proměnné prostředí a nastav SECRET_KEY
+load_dotenv(dotenv_path=".env")
+app.secret_key = os.getenv("SECRET_KEY")
+if not app.secret_key:
+    print("[main] ERROR: SECRET_KEY is not set in environment! Session will not persist correctly.")
+    raise RuntimeError("SECRET_KEY is missing. Set SECRET_KEY in environment for stable sessions.")
+
+# Session/cookie konfigurace (bezpečná a stabilní)
 app.config['SESSION_TYPE'] = 'redis'
 if os.getenv('REDIS_URL'):
     app.config['SESSION_REDIS'] = redis.from_url(os.getenv('REDIS_URL'))
-# zabezpečení cookies – default, lze překrýt v before_request podle hostu
+
+# Cookie základní nastavení – upraví se v before_request podle hostu
+app.config['SESSION_COOKIE_NAME'] = os.getenv('SESSION_COOKIE_NAME', 'knowix_session')
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = True
-# respektuj proxy hlavičky (https) – důležité pro secure cookies a správné přesměrování
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_USE_SIGNER'] = True
+app.config['PERMANENT_SESSION_LIFETIME'] = 60 * 60 * 24 * 30  # 30 dní
+app.config['SESSION_REFRESH_EACH_REQUEST'] = True  # DŮLEŽITÉ: vynuť refresh cookies
+
+# Respektuj proxy hlavičky (https, host, port) – důležité pro secure cookies
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 
 # Fallback: pokud Redis není dostupný, přepnout na filesystem sessions
 use_redis = False
+force_fs = os.getenv('SESSION_FORCE_FILESYSTEM', '').strip() == '1'
 redis_url = os.getenv('REDIS_URL')
-if redis_url and app.config.get('SESSION_REDIS') is not None:
+if not force_fs and redis_url and app.config.get('SESSION_REDIS') is not None:
     try:
         app.config['SESSION_REDIS'].ping()
         use_redis = True
@@ -67,15 +81,8 @@ if not use_redis:
         app.config.pop('SESSION_REDIS', None)
     print("[main] Session backend: filesystem")
 
+# TEPRVE NYNÍ inicializuj Flask-Session (s už nastaveným SECRET_KEY)
 Session(app)
-
-load_dotenv(dotenv_path=".env")
-app.secret_key = os.getenv("SECRET_KEY")
-if not app.secret_key:
-    # Kritické: bez stabilního SECRET_KEY budou session rozbité mezi instancemi
-    print("[main] ERROR: SECRET_KEY is not set in environment! Session will not persist correctly.")
-    # Zvedni chybu, ať to vidíme hned po startu na serveru
-    raise RuntimeError("SECRET_KEY is missing. Set SECRET_KEY in environment for stable sessions.")
 
 # Konfigurace
 app.config['UPLOAD_FOLDER'] = 'static/profile_pics'
@@ -110,14 +117,6 @@ app.register_blueprint(vlastni_music_bp)
 app.register_blueprint(proc_bp)
 
 
-# app.jinja_env.filters['linkify'] = auto_linkify
-#
-#
-# @app.template_filter('linkify')
-# def linkify_filter(s):
-#     return auto_linkify(s)
-
-
 @app.route('/sitemap.xml')
 def sitemap():
     return send_from_directory('templates', 'sitemap.xml')
@@ -130,31 +129,45 @@ def robots_txt():
 
 @app.before_request
 def redirect_to_main_domain():
-    host = request.host
+    host = request.host.split(':')[0]
+
     # Debug vstupních requestů kolem loginu/registrace/indexu
     if request.path in ('/login', '/register', '/'):
         try:
-            print(f"[before_request] host={host} path={request.path} method={request.method} session_keys={list(session.keys())}")
+            cookie_name = app.config.get('SESSION_COOKIE_NAME', 'session')
+            sid = request.cookies.get(cookie_name)
+            print(
+                f"[before_request] host={host} path={request.path} method={request.method} session_keys={list(session.keys())} sid={sid}")
         except Exception:
             pass
-    # Na serveru sjednotíme doménu cookie na .knowix.cz, aby fungovala pro www i bez www
+
+    # Nastav cookie doménu a secure podle hostu
     if host.endswith('knowix.cz'):
         app.config['SESSION_COOKIE_DOMAIN'] = '.knowix.cz'
         app.config['SESSION_COOKIE_SECURE'] = True
         app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    elif host in ('localhost', '127.0.0.1'):
+        # Lokální vývoj: nepoužívej Secure, žádná doména
+        app.config['SESSION_COOKIE_DOMAIN'] = None
+        app.config['SESSION_COOKIE_SECURE'] = False
+        app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+
+    # Preferovaný host – přesměrování na www
     redirect_hosts = ("knowix.cz", "knowix.up.railway.app")
     if host in redirect_hosts:
         target = "https://www.knowix.cz" + request.full_path
-        # Zachovej metodu a body u POST/PUT/PATCH (308), u GET/HEAD stačí 301
         code = 308 if request.method not in ("GET", "HEAD", "OPTIONS") else 301
         return redirect(target, code=code)
+
+    # Vynucení permanentních session pro přihlášené
+    if 'user_id' in session:
+        session.permanent = True
 
 
 @app.context_processor
 def inject_streak():
     user_id = session.get('user_id')
     if user_id:
-        # update_user_streak(user_id)  # Konečně dopiči
         streak = get_user_streak(user_id)
         return dict(user_streak=streak)
     return dict(user_streak=0)
@@ -242,10 +255,15 @@ def add_security_headers(response):
     # Debug odchozí odpovědi pro login/registraci/index
     if request.path in ('/login', '/register', '/'):
         try:
+            cookie_name = app.config.get('SESSION_COOKIE_NAME', 'session')
             has_set_cookie = any(h.lower() == 'set-cookie' for h in response.headers.keys())
-            print(f"[after_request] host={request.host} path={request.path} status={response.status_code} set_cookie={has_set_cookie} cookie_domain={app.config.get('SESSION_COOKIE_DOMAIN')} samesite={app.config.get('SESSION_COOKIE_SAMESITE')} secure={app.config.get('SESSION_COOKIE_SECURE')}")
+            set_cookie_header = response.headers.get('Set-Cookie')
+            sid_req = request.cookies.get(cookie_name)
+            print(
+                f"[after_request] host={request.host} path={request.path} status={response.status_code} set_cookie={has_set_cookie} sid_req={sid_req} cookie_domain={app.config.get('SESSION_COOKIE_DOMAIN')} samesite={app.config.get('SESSION_COOKIE_SAMESITE')} secure={app.config.get('SESSION_COOKIE_SECURE')} set_cookie_header={set_cookie_header[:160] if set_cookie_header else None}")
         except Exception:
             pass
+
     response.headers['Content-Security-Policy'] = (
         "default-src 'self'; "
         "script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdn.jsdelivr.net https://www.youtube.com https://s.ytimg.com; "
@@ -262,21 +280,6 @@ def add_security_headers(response):
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
     return response
-
-
-# =====================================================
-# -------------------!!!LOCAL!!!-----------------------
-# =====================================================
-# app.run(host="localhost", port=8080)
-
-
-# =====================================================
-# -------------------!!!SERVER!!!----------------------
-# =====================================================
-#     from waitress import serve
-#     serve(app, host="0.0.0.0", port=8080)
-
-# Registrace SocketIO handlerů pro pexeso
 
 
 if __name__ == "__main__":
