@@ -58,58 +58,34 @@
             }
         </script>
     <style>
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
-        }
-        #drawing-container {
-            position: relative;
-            margin: 20px 0;
-        }
-        #drawing-canvas {
-            background-color: white;
-            border: 2px solid #333;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
-            cursor: crosshair;
-        }
-        .panel {
-            position: absolute;
-            border: 3px solid #000;
-            cursor: move;
-            box-sizing: border-box;
-        }
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 15px 0;
-            justify-content: center;
-        }
-        .tool-btn {
-            padding: 8px 15px;
-            background: #f0f0f0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .tool-btn.active {
-            background: #4CAF50;
-            color: white;
-        }
-        .layout-options {
-            display: flex;
-            gap: 10px;
-            margin: 10px 0;
-        }
-        .layout-btn {
-            padding: 5px 10px;
-            background: #e0e0e0;
-            border: 1px solid #aaa;
-            border-radius: 3px;
-            cursor: pointer;
-        }
+      .resize-handle {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: #4285f4;
+        border: 1px solid white;
+        cursor: nwse-resize;
+        display: none;
+        z-index: 100;
+      }
+
+      .context-menu {
+        position: absolute;
+        background: white;
+        border: 1px solid #ccc;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        z-index: 1000;
+        display: none;
+      }
+
+      .context-menu-item {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+
+      .context-menu-item:hover {
+        background: #f0f0f0;
+      }
     </style>
     </head>
     <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}"></body>
@@ -201,173 +177,800 @@
         <div class="controls">
             <div class="tool-btn active" id="btn-panel">Kreslit rámečky</div>
             <div class="tool-btn" id="btn-draw">Kreslit obsah</div>
+            <div class="tool-btn" id="btn-line">Rovná čára</div>
+            <div class="tool-btn" id="btn-text">Přidat text</div>
+            <div class="tool-btn" id="btn-image">Přidat obrázek</div>
+            <div class="tool-btn" id="btn-select">Vybrat</div>
             <div class="tool-btn" id="btn-clear">Vymazat vše</div>
             <div class="tool-btn" id="btn-save">Uložit komiks</div>
+            <input type="file" id="image-upload" accept="image/*" style="display:none">
         </div>
 
+        <!-- Textový editor -->
+        <div id="text-editor" class="text-editor">
+            <input type="text" id="text-input" class="text-input" placeholder="Napište text...">
+            <div class="font-controls">
+                <input type="number" id="font-size" class="font-size-input" min="10" max="72" value="20">
+                <select id="font-family">
+                    <option value="Arial">Arial</option>
+                    <option value="Times New Roman">Times</option>
+                    <option value="Courier New">Courier</option>
+                </select>
+                <input type="color" id="font-color" value="#000000">
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="tool-btn" id="btn-delete">Smazat</div>
+            <div class="tool-btn" id="btn-forward">Dopředu</div>
+            <div class="tool-btn" id="btn-backward">Dozadu</div>
+        </div>
+        <div id="resize-handle" class="resize-handle"></div>
+
         <div id="drawing-container">
-            <canvas
-                id="drawing-canvas"
-                width="794"
-                height="1123"
-            >Váš prohlížeč nepodporuje Canvas</canvas>
+            <canvas id="drawing-canvas" width="794" height="1123">
+                Váš prohlížeč nepodporuje Canvas (knihovna pro kreslení).
+            </canvas>
         </div>
     </div>
     <script>
-        const canvas = document.getElementById('drawing-canvas');
-        const ctx = canvas.getContext('2d');
-        const panelBtn = document.getElementById('btn-panel');
-        const drawBtn = document.getElementById('btn-draw');
-        const clearBtn = document.getElementById('btn-clear');
-        const saveBtn = document.getElementById('btn-save');
+// Rozšířený stav aplikace
+const canvas = document.getElementById('drawing-canvas');
+const ctx = canvas.getContext('2d');
+const panelBtn = document.getElementById('btn-panel');
+const drawBtn = document.getElementById('btn-draw');
+const lineBtn = document.getElementById('btn-line');
+const textBtn = document.getElementById('btn-text');
+const imageBtn = document.getElementById('btn-image');
+const selectBtn = document.getElementById('btn-select');
+const clearBtn = document.getElementById('btn-clear');
+const saveBtn = document.getElementById('btn-save');
+const textEditor = document.getElementById('text-editor');
+const textInput = document.getElementById('text-input');
+const fontSizeInput = document.getElementById('font-size');
+const fontFamilySelect = document.getElementById('font-family');
+const fontColorInput = document.getElementById('font-color');
+const imageUpload = document.getElementById('image-upload');
+const resizeHandle = document.getElementById('resize-handle');
+const contextMenu = document.getElementById('context-menu');
+const menuDelete = document.getElementById('menu-delete');
+const menuBringForward = document.getElementById('menu-bring-forward');
+const menuSendBackward = document.getElementById('menu-send-backward');
+const btnDelete = document.getElementById('btn-delete');
+const btnForward = document.getElementById('btn-forward');
+const btnBackward = document.getElementById('btn-backward');
 
-        // Stav aplikace
-        let currentMode = 'panel'; // 'panel' nebo 'draw'
-        let isDrawing = false;
-        let startX = 0;
-        let startY = 0;
-        let panels = [];
-        let contentPaths = [];
-        let currentPath = [];
+// Stav aplikace
+let currentMode = 'panel';
+let isDrawing = false;
+let startX = 0;
+let startY = 0;
+let panels = [];
+let contentPaths = [];
+let currentPath = [];
+let lines = [];
+let currentLine = null;
+let texts = [];
+let images = [];
+let textStartX = 0;
+let textStartY = 0;
+let selectedItem = null;
+let isDragging = false;
+let isResizing = false;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+let originalAspectRatio = 1; // Uložení původního poměru stran obrázku
 
-        // Inicializace
-        function initCanvas() {
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 3;
-            ctx.lineJoin = 'round';
-            ctx.lineCap = 'round';
+// Inicializace plátna
+function initCanvas() {
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+}
+
+// Funkce pro změnu režimu
+function setMode(mode) {
+    currentMode = mode;
+    panelBtn.classList.toggle('active', mode === 'panel');
+    drawBtn.classList.toggle('active', mode === 'draw');
+    lineBtn.classList.toggle('active', mode === 'line');
+    textBtn.classList.toggle('active', mode === 'text');
+    imageBtn.classList.toggle('active', mode === 'image');
+    selectBtn.classList.toggle('active', mode === 'select');
+
+    if (mode === 'select') {
+        canvas.style.cursor = 'default';
+    } else if (mode === 'draw' || mode === 'line') {
+        canvas.style.cursor = 'crosshair';
+    } else if (mode === 'text') {
+        canvas.style.cursor = 'text';
+    } else {
+        canvas.style.cursor = 'default';
+    }
+
+    // Skrýt resize handle při změně režimu
+    resizeHandle.style.display = 'none';
+    selectedItem = null;
+}
+
+// Překreslení celé scény
+function redrawScene() {
+    // Vymazat plátno
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Nakreslit bílé pozadí
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Nakreslit panely (rámečky) - dozadu
+    panels.forEach(panel => {
+        ctx.strokeRect(panel.x, panel.y, panel.width, panel.height);
+    });
+
+    // Nakreslit obsah (kresby)
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 3;
+    contentPaths.forEach(path => {
+        if (path.length > 0) {
+            ctx.beginPath();
+            ctx.moveTo(path[0].x, path[0].y);
+            for (let i = 1; i < path.length; i++) {
+                ctx.lineTo(path[i].x, path[i].y);
+            }
+            ctx.stroke();
         }
+    });
 
-        // Funkce pro změnu režimu
-        function setMode(mode) {
-            currentMode = mode;
-            panelBtn.classList.toggle('active', mode === 'panel');
-            drawBtn.classList.toggle('active', mode === 'draw');
-            canvas.style.cursor = mode === 'draw' ? 'crosshair' : 'default';
-        }
+    // Nakreslit čáry
+    lines.forEach(line => {
+        ctx.beginPath();
+        ctx.moveTo(line.startX, line.startY);
+        ctx.lineTo(line.endX, line.endY);
+        ctx.stroke();
+    });
 
-        // Překreslení celé scény
-        function redrawScene() {
-            // Vymazat plátno
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Nakreslit obrázky
+    images.forEach(img => {
+        ctx.drawImage(img.image, img.x, img.y, img.width, img.height);
+    });
 
-            // Nakreslit bílé pozadí
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Nakreslit texty
+    ctx.textBaseline = 'top';
+    texts.forEach(text => {
+        ctx.font = `${text.size}px ${text.font}`;
+        ctx.fillStyle = text.color;
+        ctx.fillText(text.content, text.x, text.y);
+    });
 
-            // Nakreslit obsah (kresby)
-            contentPaths.forEach(path => {
-                if (path.length > 0) {
-                    ctx.beginPath();
-                    ctx.moveTo(path[0].x, path[0].y);
-                    for (let i = 1; i < path.length; i++) {
-                        ctx.lineTo(path[i].x, path[i].y);
-                    }
-                    ctx.stroke();
+    // Zvýraznit vybraný prvek
+    if (selectedItem) {
+        ctx.strokeStyle = '#4285f4';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 3]);
+
+        if (selectedItem.type === 'image') {
+            const img = images[selectedItem.index];
+            ctx.strokeRect(img.x, img.y, img.width, img.height);
+        } else if (selectedItem.type === 'drawing') {
+            const path = contentPaths[selectedItem.index];
+            if (path.length > 0) {
+                let minX = path[0].x, minY = path[0].y, maxX = path[0].x, maxY = path[0].y;
+                for (const point of path) {
+                    minX = Math.min(minX, point.x);
+                    minY = Math.min(minY, point.y);
+                    maxX = Math.max(maxX, point.x);
+                    maxY = Math.max(maxY, point.y);
                 }
+                ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
+            }
+        } else if (selectedItem.type === 'text') {
+            const text = texts[selectedItem.index];
+            const textWidth = ctx.measureText(text.content).width;
+            ctx.strokeRect(text.x, text.y, textWidth, text.size);
+        } else if (selectedItem.type === 'panel') {
+            const panel = panels[selectedItem.index];
+            ctx.strokeRect(panel.x, panel.y, panel.width, panel.height);
+        } else if (selectedItem.type === 'line') {
+            const line = lines[selectedItem.index];
+            ctx.beginPath();
+            ctx.moveTo(line.startX, line.startY);
+            ctx.lineTo(line.endX, line.endY);
+            ctx.stroke();
+        }
+
+        ctx.setLineDash([]);
+    }
+}
+
+// Funkce pro zobrazení resize handle
+function showResizeHandle(x, y) {
+    resizeHandle.style.display = 'block';
+    resizeHandle.style.left = (x - 5) + 'px';
+    resizeHandle.style.top = (y - 5) + 'px';
+}
+
+// Funkce pro skrytí resize handle
+function hideResizeHandle() {
+    resizeHandle.style.display = 'none';
+}
+
+// Funkce pro zobrazení kontextového menu
+function showContextMenu(x, y) {
+    contextMenu.style.display = 'block';
+    contextMenu.style.left = x + 'px';
+    contextMenu.style.top = y + 'px';
+}
+
+// Funkce pro skrytí kontextového menu
+function hideContextMenu() {
+    contextMenu.style.display = 'none';
+}
+
+// Funkce pro vybrání prvku
+function selectItem(item) {
+    selectedItem = item;
+
+    if (selectedItem) {
+        if (selectedItem.type === 'image') {
+            const img = images[selectedItem.index];
+            const canvasRect = canvas.getBoundingClientRect();
+            showResizeHandle(canvasRect.left + img.x + img.width, canvasRect.top + img.y + img.height);
+        } else {
+            hideResizeHandle();
+        }
+    } else {
+        hideResizeHandle();
+    }
+
+    redrawScene();
+}
+
+// Funkce pro kontrolu, zda je bod uvnitř obrázku
+function isPointInImage(x, y, img) {
+    return x >= img.x && x <= img.x + img.width &&
+           y >= img.y && y <= img.y + img.height;
+}
+
+// Funkce pro kontrolu, zda je bod uvnitř kresby
+function isPointInDrawing(x, y, path) {
+    // Zjednodušená kontrola - projde všechny body a hledá blízký
+    for (const point of path) {
+        const distance = Math.sqrt(Math.pow(point.x - x, 2) + Math.pow(point.y - y, 2));
+        if (distance < 10) return true;
+    }
+    return false;
+}
+
+// Funkce pro kontrolu, zda je bod uvnitř textu
+function isPointInText(x, y, text, ctx) {
+    const textWidth = ctx.measureText(text.content).width;
+    return x >= text.x && x <= text.x + textWidth &&
+           y >= text.y && y <= text.y + text.size;
+}
+
+// Funkce pro kontrolu, zda je bod uvnitř panelu
+function isPointInPanel(x, y, panel) {
+    return x >= panel.x && x <= panel.x + panel.width &&
+           y >= panel.y && y <= panel.y + panel.height;
+}
+
+// Funkce pro kontrolu, zda je bod na čáře
+function isPointOnLine(x, y, line, tolerance = 5) {
+    // Vzdálenost od bodu k úsečce
+    const A = {x: line.startX, y: line.startY};
+    const B = {x: line.endX, y: line.endY};
+    const P = {x, y};
+
+    // Pokud je úsečka jen bod
+    if (A.x === B.x && A.y === B.y) {
+        return Math.sqrt(Math.pow(A.x - P.x, 2) + Math.pow(A.y - P.y, 2)) <= tolerance;
+    }
+
+    // Vektor AB
+    const AB = {x: B.x - A.x, y: B.y - A.y};
+    // Vektor AP
+    const AP = {x: P.x - A.x, y: P.y - A.y};
+
+    // Skalární součin
+    const dot = AP.x * AB.x + AP.y * AB.y;
+    // Délka AB na druhou
+    const lenAB = AB.x * AB.x + AB.y * AB.y;
+
+    // Normalizovaná vzdálenost podél úsečky
+    const t = Math.max(0, Math.min(1, dot / lenAB));
+
+    // Projekce P na AB
+    const proj = {
+        x: A.x + t * AB.x,
+        y: A.y + t * AB.y
+    };
+
+    // Vzdálenost P od projekce
+    const dist = Math.sqrt(Math.pow(P.x - proj.x, 2) + Math.pow(P.y - proj.y, 2));
+
+    return dist <= tolerance;
+}
+
+// Funkce pro smazání vybraného prvku
+function deleteSelectedItem() {
+    if (!selectedItem) return;
+
+    if (selectedItem.type === 'image') {
+        images.splice(selectedItem.index, 1);
+    } else if (selectedItem.type === 'drawing') {
+        contentPaths.splice(selectedItem.index, 1);
+    } else if (selectedItem.type === 'text') {
+        texts.splice(selectedItem.index, 1);
+    } else if (selectedItem.type === 'panel') {
+        panels.splice(selectedItem.index, 1);
+    } else if (selectedItem.type === 'line') {
+        lines.splice(selectedItem.index, 1);
+    }
+
+    selectItem(null);
+    redrawScene();
+}
+
+// Funkce pro přesun dopředu
+function bringSelectedItemForward() {
+    if (!selectedItem) return;
+
+    let array;
+    switch (selectedItem.type) {
+        case 'image': array = images; break;
+        case 'drawing': array = contentPaths; break;
+        case 'text': array = texts; break;
+        case 'panel': array = panels; break;
+        case 'line': array = lines; break;
+        default: return;
+    }
+
+    if (selectedItem.index >= array.length - 1) return;
+
+    const nextIndex = selectedItem.index + 1;
+    [array[selectedItem.index], array[nextIndex]] = [array[nextIndex], array[selectedItem.index]];
+    selectedItem.index = nextIndex;
+    redrawScene();
+}
+
+// Funkce pro přesun dozadu
+function sendSelectedItemBackward() {
+    if (!selectedItem) return;
+
+    let array;
+    switch (selectedItem.type) {
+        case 'image': array = images; break;
+        case 'drawing': array = contentPaths; break;
+        case 'text': array = texts; break;
+        case 'panel': array = panels; break;
+        case 'line': array = lines; break;
+        default: return;
+    }
+
+    if (selectedItem.index <= 0) return;
+
+    const prevIndex = selectedItem.index - 1;
+    [array[selectedItem.index], array[prevIndex]] = [array[prevIndex], array[selectedItem.index]];
+    selectedItem.index = prevIndex;
+    redrawScene();
+}
+
+// Event listeners pro tlačítka
+panelBtn.addEventListener('click', () => setMode('panel'));
+drawBtn.addEventListener('click', () => setMode('draw'));
+lineBtn.addEventListener('click', () => setMode('line'));
+textBtn.addEventListener('click', () => setMode('text'));
+imageBtn.addEventListener('click', () => {
+    setMode('image');
+    imageUpload.click();
+});
+selectBtn.addEventListener('click', () => setMode('select'));
+btnDelete.addEventListener('click', deleteSelectedItem);
+btnForward.addEventListener('click', bringSelectedItemForward);
+btnBackward.addEventListener('click', sendSelectedItemBackward);
+
+// Nahrání obrázku
+imageUpload.addEventListener('change', function(e) {
+    if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                // Uložíme původní poměr stran
+                originalAspectRatio = img.width / img.height;
+
+                // Přidáme obrázek do pole s výchozí pozicí
+                images.push({
+                    image: img,
+                    x: canvas.width/2 - img.width/2,
+                    y: canvas.height/2 - img.height/2,
+                    width: img.width,
+                    height: img.height,
+                    originalWidth: img.width,
+                    originalHeight: img.height
+                });
+                redrawScene();
+            };
+            img.src = event.target.result;
+        };
+
+        reader.readAsDataURL(e.target.files[0]);
+    }
+});
+
+clearBtn.addEventListener('click', () => {
+    panels = [];
+    contentPaths = [];
+    lines = [];
+    texts = [];
+    images = [];
+    selectedItem = null;
+    hideResizeHandle();
+    initCanvas();
+});
+
+saveBtn.addEventListener('click', () => {
+    const dataUrl = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.download = 'komiks.png';
+    link.href = dataUrl;
+    link.click();
+});
+
+// Event listeners pro plátno
+canvas.addEventListener('mousedown', (e) => {
+    const mouseX = e.offsetX;
+    const mouseY = e.offsetY;
+
+    if (currentMode === 'select') {
+        // 1. Kontrola, zda kliknuto na resize handle
+        const handleRect = resizeHandle.getBoundingClientRect();
+        const canvasRect = canvas.getBoundingClientRect();
+        const handleX = handleRect.left - canvasRect.left;
+        const handleY = handleRect.top - canvasRect.top;
+
+        if (Math.abs(mouseX - handleX - 5) < 10 && Math.abs(mouseY - handleY - 5) < 10) {
+            isResizing = true;
+            return;
+        }
+
+        // 2. Kontrola, zda kliknuto na nějaký prvek
+        let clickedItem = null;
+
+        // Obrázky (od konce, protože poslední je nahoře)
+        for (let i = images.length - 1; i >= 0; i--) {
+            if (isPointInImage(mouseX, mouseY, images[i])) {
+                clickedItem = { type: 'image', index: i };
+                break;
+            }
+        }
+
+        // Kresby
+        if (!clickedItem) {
+            for (let i = contentPaths.length - 1; i >= 0; i--) {
+                if (isPointInDrawing(mouseX, mouseY, contentPaths[i])) {
+                    clickedItem = { type: 'drawing', index: i };
+                    break;
+                }
+            }
+        }
+
+        // Texty
+        if (!clickedItem) {
+            for (let i = texts.length - 1; i >= 0; i--) {
+                if (isPointInText(mouseX, mouseY, texts[i], ctx)) {
+                    clickedItem = { type: 'text', index: i };
+                    break;
+                }
+            }
+        }
+
+        // Panely
+        if (!clickedItem) {
+            for (let i = panels.length - 1; i >= 0; i--) {
+                if (isPointInPanel(mouseX, mouseY, panels[i])) {
+                    clickedItem = { type: 'panel', index: i };
+                    break;
+                }
+            }
+        }
+
+        // Čáry
+        if (!clickedItem) {
+            for (let i = lines.length - 1; i >= 0; i--) {
+                if (isPointOnLine(mouseX, mouseY, lines[i])) {
+                    clickedItem = { type: 'line', index: i };
+                    break;
+                }
+            }
+        }
+
+        if (clickedItem) {
+            // Pokud držíme Ctrl, přidáme k výběru, jinak nový výběr
+            if (e.ctrlKey || e.metaKey) {
+                // Pro jednoduchost jen jeden výběr
+            } else {
+                selectItem(clickedItem);
+            }
+
+            // Příprava pro přesun
+            isDragging = true;
+            dragOffsetX = mouseX;
+            dragOffsetY = mouseY;
+
+            // Kontextové menu na pravý klik
+            if (e.button === 2) {
+                const canvasRect = canvas.getBoundingClientRect();
+                showContextMenu(e.clientX, e.clientY);
+            }
+        } else {
+            selectItem(null);
+        }
+    }
+    else if (currentMode === 'panel') {
+        isDrawing = true;
+        startX = e.offsetX;
+        startY = e.offsetY;
+    }
+    else if (currentMode === 'draw') {
+        isDrawing = true;
+        currentPath = [{x: e.offsetX, y: e.offsetY}];
+    }
+    else if (currentMode === 'line') {
+        isDrawing = true;
+        startX = e.offsetX;
+        startY = e.offsetY;
+        currentLine = {
+            startX: startX,
+            startY: startY,
+            endX: startX,
+            endY: startY
+        };
+    }
+    else if (currentMode === 'text') {
+        textStartX = e.offsetX;
+        textStartY = e.offsetY;
+
+        // Zobrazit textový editor na správné pozici
+        const canvasRect = canvas.getBoundingClientRect();
+        textEditor.style.display = 'block';
+        textEditor.style.left = (canvasRect.left + textStartX + 10) + 'px';
+        textEditor.style.top = (canvasRect.top + textStartY + 10) + 'px';
+        textInput.focus();
+    }
+});
+
+canvas.addEventListener('mousemove', (e) => {
+    const mouseX = e.offsetX;
+    const mouseY = e.offsetY;
+
+    if (currentMode === 'select') {
+        if (isDragging && selectedItem) {
+            // Přesun vybraného prvku
+            const diffX = mouseX - dragOffsetX;
+            const diffY = mouseY - dragOffsetY;
+            dragOffsetX = mouseX;
+            dragOffsetY = mouseY;
+
+            if (selectedItem.type === 'image') {
+                const img = images[selectedItem.index];
+                img.x += diffX;
+                img.y += diffY;
+
+                // Aktualizace resize handle
+                const canvasRect = canvas.getBoundingClientRect();
+                showResizeHandle(canvasRect.left + img.x + img.width, canvasRect.top + img.y + img.height);
+            }
+            else if (selectedItem.type === 'drawing') {
+                const path = contentPaths[selectedItem.index];
+                for (const point of path) {
+                    point.x += diffX;
+                    point.y += diffY;
+                }
+            }
+            else if (selectedItem.type === 'text') {
+                const text = texts[selectedItem.index];
+                text.x += diffX;
+                text.y += diffY;
+            }
+            else if (selectedItem.type === 'panel') {
+                const panel = panels[selectedItem.index];
+                panel.x += diffX;
+                panel.y += diffY;
+            }
+            else if (selectedItem.type === 'line') {
+                const line = lines[selectedItem.index];
+                line.startX += diffX;
+                line.startY += diffY;
+                line.endX += diffX;
+                line.endY += diffY;
+            }
+
+            redrawScene();
+        }
+        else if (isResizing && selectedItem && selectedItem.type === 'image') {
+            // Změna velikosti obrázku
+            const img = images[selectedItem.index];
+            const newWidth = mouseX - img.x;
+
+            // Zachování poměru stran
+            if (newWidth > 10) {
+                img.width = newWidth;
+                img.height = newWidth / originalAspectRatio;
+
+                // Aktualizace resize handle
+                const canvasRect = canvas.getBoundingClientRect();
+                showResizeHandle(canvasRect.left + img.x + img.width, canvasRect.top + img.y + img.height);
+                redrawScene();
+            }
+        }
+    }
+    else if (!isDrawing) return;
+
+    if (currentMode === 'panel') {
+        redrawScene();
+        const width = e.offsetX - startX;
+        const height = e.offsetY - startY;
+        ctx.strokeRect(startX, startY, width, height);
+    }
+    else if (currentMode === 'draw') {
+        currentPath.push({x: e.offsetX, y: e.offsetY});
+        redrawScene();
+
+        // Překreslit aktuální cestu
+        ctx.beginPath();
+        ctx.moveTo(currentPath[0].x, currentPath[0].y);
+        for (let i = 1; i < currentPath.length; i++) {
+            ctx.lineTo(currentPath[i].x, currentPath[i].y);
+        }
+        ctx.stroke();
+    }
+    else if (currentMode === 'line') {
+        currentLine.endX = e.offsetX;
+        currentLine.endY = e.offsetY;
+        redrawScene();
+
+        ctx.beginPath();
+        ctx.moveTo(currentLine.startX, currentLine.startY);
+        ctx.lineTo(currentLine.endX, currentLine.endY);
+        ctx.stroke();
+    }
+});
+
+canvas.addEventListener('mouseup', (e) => {
+    if (currentMode === 'select') {
+        isDragging = false;
+        isResizing = false;
+        return;
+    }
+
+    if (!isDrawing) return;
+    isDrawing = false;
+
+    if (currentMode === 'panel') {
+        const endX = e.offsetX;
+        const endY = e.offsetY;
+        const width = endX - startX;
+        const height = endY - startY;
+
+        if (Math.abs(width) > 10 && Math.abs(height) > 10) {
+            panels.push({
+                x: startX,
+                y: startY,
+                width: width,
+                height: height
             });
-
-            // Nakreslit panely (rámečky)
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 3;
-            panels.forEach(panel => {
-                ctx.strokeRect(panel.x, panel.y, panel.width, panel.height);
+        }
+        redrawScene();
+    }
+    else if (currentMode === 'draw') {
+        if (currentPath.length > 1) {
+            contentPaths.push([...currentPath]);
+        }
+        currentPath = [];
+        redrawScene();
+    }
+    else if (currentMode === 'line') {
+        const endX = e.offsetX;
+        const endY = e.offsetY;
+        const dx = endX - startX;
+        const dy = endY - startY;
+        const length = Math.sqrt(dx*dx + dy*dy);
+        if (length > 10) {
+            lines.push({
+                startX: startX,
+                startY: startY,
+                endX: endX,
+                endY: endY
             });
         }
+        currentLine = null;
+        redrawScene();
+    }
+});
 
-        // Event listeners
-        canvas.addEventListener('mousedown', (e) => {
-            if (currentMode === 'panel') {
-                isDrawing = true;
-                startX = e.offsetX;
-                startY = e.offsetY;
-            } else if (currentMode === 'draw') {
-                isDrawing = true;
-                currentPath = [{x: e.offsetX, y: e.offsetY}];
-            }
+canvas.addEventListener('mouseout', () => {
+    isDrawing = false;
+    if (currentMode === 'panel' || currentMode === 'line') {
+        redrawScene();
+    }
+});
+
+// Zakázat výchozí kontextové menu
+canvas.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+});
+
+// Kliknutí mimo kontextové menu
+document.addEventListener('click', (e) => {
+    if (!contextMenu.contains(e.target)) {
+        hideContextMenu();
+    }
+});
+
+// Akce kontextového menu
+menuDelete.addEventListener('click', () => {
+    deleteSelectedItem();
+    hideContextMenu();
+});
+
+menuBringForward.addEventListener('click', () => {
+    bringSelectedItemForward();
+    hideContextMenu();
+});
+
+menuSendBackward.addEventListener('click', () => {
+    sendSelectedItemBackward();
+    hideContextMenu();
+});
+
+// Textový editor
+textInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        saveText();
+    } else if (e.key === 'Escape') {
+        cancelText();
+    }
+});
+
+function saveText() {
+    const text = textInput.value.trim();
+    if (text) {
+        texts.push({
+            x: textStartX,
+            y: textStartY,
+            content: text,
+            size: parseInt(fontSizeInput.value),
+            font: fontFamilySelect.value,
+            color: fontColorInput.value
         });
+        redrawScene();
+    }
+    textEditor.style.display = 'none';
+    textInput.value = '';
+}
 
-        canvas.addEventListener('mousemove', (e) => {
-            if (!isDrawing) return;
+function cancelText() {
+    textEditor.style.display = 'none';
+    textInput.value = '';
+}
 
-            if (currentMode === 'panel') {
-                // Dynamické zobrazení panelu při kreslení
-                redrawScene();
-                const width = e.offsetX - startX;
-                const height = e.offsetY - startY;
-                ctx.strokeRect(startX, startY, width, height);
-            } else if (currentMode === 'draw') {
-                // Kreslení obsahu
-                currentPath.push({x: e.offsetX, y: e.offsetY});
+// Přesunutí textového editoru při scrollování
+window.addEventListener('scroll', () => {
+    if (textEditor.style.display === 'block') {
+        const canvasRect = canvas.getBoundingClientRect();
+        textEditor.style.left = (canvasRect.left + textStartX + 10) + 'px';
+        textEditor.style.top = (canvasRect.top + textStartY + window.scrollY + 10) + 'px';
+    }
+});
 
-                ctx.beginPath();
-                ctx.moveTo(currentPath[currentPath.length - 2].x, currentPath[currentPath.length - 2].y);
-                ctx.lineTo(e.offsetX, e.offsetY);
-                ctx.stroke();
-            }
-        });
-
-        canvas.addEventListener('mouseup', (e) => {
-            if (!isDrawing) return;
-            isDrawing = false;
-
-            if (currentMode === 'panel') {
-                // Přidání nového panelu
-                const endX = e.offsetX;
-                const endY = e.offsetY;
-                const width = endX - startX;
-                const height = endY - startY;
-
-                // Přidat pouze pokud má smysluplnou velikost
-                if (Math.abs(width) > 10 && Math.abs(height) > 10) {
-                    panels.push({
-                        x: startX,
-                        y: startY,
-                        width: width,
-                        height: height
-                    });
-                }
-
-                redrawScene();
-            } else if (currentMode === 'draw') {
-                // Uložit kreslenou cestu
-                if (currentPath.length > 1) {
-                    contentPaths.push([...currentPath]);
-                }
-                currentPath = [];
-            }
-        });
-
-        canvas.addEventListener('mouseout', () => {
-            isDrawing = false;
-            if (currentMode === 'panel') {
-                redrawScene();
-            }
-        });
-
-        // Ovládací prvky
-        panelBtn.addEventListener('click', () => setMode('panel'));
-        drawBtn.addEventListener('click', () => setMode('draw'));
-
-        clearBtn.addEventListener('click', () => {
-            panels = [];
-            contentPaths = [];
-            initCanvas();
-        });
-
-        saveBtn.addEventListener('click', () => {
-            const dataUrl = canvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.download = 'komiks.png';
-            link.href = dataUrl;
-            link.click();
-        });
-
-        // Inicializace
-        initCanvas();
-        setMode('panel');
+// Inicializace
+initCanvas();
+setMode('panel');
     </script>
     </body>
 </html>

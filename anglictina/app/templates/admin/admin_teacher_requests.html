@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Schvalování učitelů | Admin</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2em 0;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 0.7em;
+            text-align: left;
+        }
+
+        th {
+            background: #f6fafd;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        button {
+            padding: 0.5em 1.2em;
+            margin-right: 0.5em;
+        }
+    </style>
+</head>
+<body>
+<h1>Žádosti o roli učitele</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Uživatel</th>
+        <th>Email</th>
+        <th>Škola</th>
+        <th>Předmět</th>
+        <th>Titul</th>
+        <th>Akce</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for req in requests %}
+    <tr>
+        <td>{{ req.first_name }} {{ req.last_name }} (ID: {{ req.user_id }})</td>
+        <td>{{ req.email }}</td>
+        <td>{{ req.school }}</td>
+        <td>{{ req.subject }}</td>
+        <td>{{ req.title }}</td>
+        <td>
+            <form style="display:inline;" method="post"
+                  action="{{ url_for('admin.approve_teacher_request', request_id=req.id) }}"
+                  onsubmit="return confirm('Opravdu schválit?');">
+                <button type="submit">Přijmout</button>
+            </form>
+            <form style="display:inline;" method="post"
+                  action="{{ url_for('admin.reject_teacher_request', request_id=req.id) }}"
+                  onsubmit="return confirm('Opravdu zamítnout?');">
+                <button type="submit">Zamítnout</button>
+            </form>
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="6">Žádné čekající žádosti.</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</body>
+</html>

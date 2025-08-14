@@ -7,6 +7,7 @@ import re
 import os
 from xp import add_xp_to_user
 from streak import update_user_streak, get_user_streak
+from user_stats import update_user_stats
 
 chat_bp = Blueprint("chat_bp", __name__)
 
@@ -63,6 +64,12 @@ def sl_chat():
 def chat():
     lesson_id = request.args.get('lesson_id', '')
 
+    # --- Nastavení first_activity a začátek měření času při vstupu do lekce ---
+    user_id = session.get('user_id')
+    if user_id:
+        update_user_stats(user_id, set_first_activity=True)
+    session['pp_training_start'] = time.time()
+
     # Náhodný výběr pro lekci 'relationship_path'
     if lesson_id == "relationship_path":
         selected_filename = random.choice([
@@ -71,7 +78,6 @@ def chat():
             "love_ending_weird.json"
         ])
     elif lesson_id == "social_media":
-        # Tohle si můžeš přizpůsobit podle potřeby – tady ponechávám 50/48/2%
         roll = random.randint(1, 100)
         if roll <= 33:
             selected_filename = "media.json"
@@ -81,7 +87,6 @@ def chat():
             selected_filename = "media3.json"
 
     elif lesson_id == "mental_health":
-        # Tohle si můžeš přizpůsobit podle potřeby – tady ponechávám 50/48/2%
         roll = random.randint(1, 100)
         if roll <= 33:
             selected_filename = "mental_chat.json"
@@ -91,7 +96,6 @@ def chat():
             selected_filename = "mental_chat3.json"
 
     elif lesson_id == "vr_gaming":
-        # Tohle si můžeš přizpůsobit podle potřeby – tady ponechávám 50/48/2%
         roll = random.randint(1, 100)
         if roll <= 33:
             selected_filename = "vr_world.json"
@@ -101,7 +105,6 @@ def chat():
             selected_filename = "vr_world3.json"
 
     elif lesson_id == "school_future":
-        # Tohle si můžeš přizpůsobit podle potřeby – tady ponechávám 50/48/2%
         roll = random.randint(1, 100)
         if roll <= 33:
             selected_filename = "school.json"
@@ -111,7 +114,6 @@ def chat():
             selected_filename = "school3.json"
 
     else:
-        # Pro ostatní lekce normálně přidáme _chat.json
         if lesson_id.endswith(".json"):
             selected_filename = lesson_id
         else:
@@ -146,8 +148,6 @@ def chat():
         print(f"Error loading lessons: {str(e)}")
         chat_lessons = []
 
-    # Session
-    # Session
     session.pop('chat_data', None)
     session.pop('chat_index', None)
     session.pop('current_lesson', None)
@@ -188,10 +188,21 @@ def next_step():
         xp_awarded = 10  # nebo jiná logika
         xp_result = None
         streak_info = None
-        if session.get('user_id'):
-            xp_result = add_xp_to_user(session['user_id'], xp_awarded)
-            streak_info = update_user_streak(session['user_id'])
-        # Nastavíme index na konec, aby session reflektovala dokončení
+        user_id = session.get('user_id')
+        learning_time = None
+        if user_id:
+            # Výpočet learning_time
+            if session.get('pp_training_start'):
+                try:
+                    start = float(session.pop('pp_training_start', None))
+                    duration = max(1, int(time.time() - start))
+                    learning_time = duration
+                except Exception as e:
+                    print("Chyba při ukládání času tréninku:", e)
+            # lesson_done + learning_time + first_activity
+            update_user_stats(user_id, lesson_done=True, learning_time=learning_time, set_first_activity=True)
+            xp_result = add_xp_to_user(user_id, xp_awarded)
+            streak_info = update_user_streak(user_id)
         session['chat_index'] = len(chat_data)
         return jsonify({
             "correct": True,
@@ -207,9 +218,21 @@ def next_step():
         xp_awarded = 10  # nebo jiná logika
         xp_result = None
         streak_info = None
-        if session.get('user_id'):
-            xp_result = add_xp_to_user(session['user_id'], xp_awarded)
-            streak_info = update_user_streak(session['user_id'])
+        user_id = session.get('user_id')
+        learning_time = None
+        if user_id:
+            # Výpočet learning_time
+            if session.get('pp_training_start'):
+                try:
+                    start = float(session.pop('pp_training_start', None))
+                    duration = max(1, int(time.time() - start))
+                    learning_time = duration
+                except Exception as e:
+                    print("Chyba při ukládání času tréninku:", e)
+            # lesson_done + learning_time + first_activity
+            update_user_stats(user_id, lesson_done=True, learning_time=learning_time, set_first_activity=True)
+            xp_result = add_xp_to_user(user_id, xp_awarded)
+            streak_info = update_user_streak(user_id)
         return jsonify({
             "done": True,
             "xp": xp_awarded,
@@ -229,8 +252,12 @@ def next_step():
             best_similarity = sim
             best_match = correct
 
+    user_id = session.get('user_id')
+
     if best_similarity >= 1.0:
         # 100% správná odpověď
+        if user_id:
+            update_user_stats(user_id, pp_correct=1)
         current_index += 1
         session['chat_index'] = current_index
         if current_index < len(chat_data):
@@ -245,9 +272,18 @@ def next_step():
             xp_awarded = 10
             xp_result = None
             streak_info = None
-            if session.get('user_id'):
-                xp_result = add_xp_to_user(session['user_id'], xp_awarded)
-                streak_info = update_user_streak(session['user_id'])
+            learning_time = None
+            if user_id:
+                if session.get('pp_training_start'):
+                    try:
+                        start = float(session.pop('pp_training_start', None))
+                        duration = max(1, int(time.time() - start))
+                        learning_time = duration
+                    except Exception as e:
+                        print("Chyba při ukládání času tréninku:", e)
+                update_user_stats(user_id, lesson_done=True, learning_time=learning_time, set_first_activity=True)
+                xp_result = add_xp_to_user(user_id, xp_awarded)
+                streak_info = update_user_streak(user_id)
             return jsonify({
                 "correct": True,
                 "done": True,
@@ -258,6 +294,8 @@ def next_step():
 
     elif best_similarity >= 0.8:
         # Skoro správně – uznáme, ale upozorníme na chybu
+        if user_id:
+            update_user_stats(user_id, pp_maybe=1)
         current_index += 1
         session['chat_index'] = current_index
         if current_index < len(chat_data):
@@ -273,9 +311,18 @@ def next_step():
             xp_awarded = 10
             xp_result = None
             streak_info = None
-            if session.get('user_id'):
-                xp_result = add_xp_to_user(session['user_id'], xp_awarded)
-                streak_info = update_user_streak(session['user_id'])
+            learning_time = None
+            if user_id:
+                if session.get('pp_training_start'):
+                    try:
+                        start = float(session.pop('pp_training_start', None))
+                        duration = max(1, int(time.time() - start))
+                        learning_time = duration
+                    except Exception as e:
+                        print("Chyba při ukládání času tréninku:", e)
+                update_user_stats(user_id, lesson_done=True, learning_time=learning_time, set_first_activity=True)
+                xp_result = add_xp_to_user(user_id, xp_awarded)
+                streak_info = update_user_streak(user_id)
             return jsonify({
                 "correct": True,
                 "almost": True,
@@ -288,4 +335,6 @@ def next_step():
 
     else:
         # Špatně
+        if user_id:
+            update_user_stats(user_id, pp_wrong=1)
         return jsonify({"correct": False})

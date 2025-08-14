@@ -4,8 +4,10 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 import os
 import difflib
 import re
+import time
 from xp import add_xp_to_user, get_user_xp_and_level
 from streak import update_user_streak, get_user_streak  # <-- Přidáno pro streak
+from user_stats import update_user_stats  # <-- Přidáno pro statistiky
 
 at_on_bp = Blueprint("at_on", __name__, template_folder="templates")
 app.secret_key = os.getenv("SECRET_KEY")
@@ -68,7 +70,8 @@ def inject_xp_info():
 @at_on_bp.errorhandler(404)
 @at_on_bp.errorhandler(Exception)
 def server_error(e):
-    return render_template('error.html', error_code=e.code), e.code
+    code = getattr(e, 'code', 500)
+    return render_template('error.html', error_code=code), code
 
 
 def load_exercises():
@@ -138,6 +141,14 @@ def create_sentence():
 def fill_word():
     exercises = load_exercises()
 
+    # --- Uložení času vstupu na stránku a nastavení first_activity ---
+    user_id = session.get('user_id')
+    if request.method == "GET":
+        # Při vstupu na stránku uložíme čas začátku lekce
+        session['at_on_training_start'] = time.time()
+        if user_id:
+            update_user_stats(user_id, set_first_activity=True)
+
     # Při prvním načtení nastavíme náhodných 10 otázek a připravíme strukturu pro odpovědi
     if 'selected_questions' not in session:
         session['selected_questions'] = random.sample(range(len(exercises)), 10)
@@ -161,6 +172,14 @@ def fill_word():
         correct = exercises[question_id]["correct"]
 
         is_correct = answer == correct
+
+        # --- STATISTIKY: Uložení správné/špatné odpovědi ---
+        if user_id and question_id not in answered:
+            if is_correct:
+                update_user_stats(user_id, at_cor=1)
+            else:
+                update_user_stats(user_id, at_wr=1)
+
         if is_correct:
             flash("✅ Správně!", "success")
         else:
@@ -174,11 +193,30 @@ def fill_word():
             session['answers_correct'] = answers_correct
             session.modified = True
 
-        # Pokud uživatel dokončil všechny otázky, přiděluj XP a streak
+        # Pokud uživatel dokončil všechny otázky, přiděluj XP, streak a statistiky za celou lekci
         if not [i for i in selected if i not in answered]:
-            user_id = session.get('user_id')
             correct_count = sum(1 for v in answers_correct.values() if v)
-            if user_id and correct_count > 0:
+            wrong_count = len(answers_correct) - correct_count
+
+            # --- Výpočet a zápis learning_time ---
+            learning_time = None
+            if user_id and session.get('at_on_training_start'):
+                try:
+                    start = float(session.pop('at_on_training_start', None))
+                    duration = max(1, int(time.time() - start))  # min. 1 sekunda
+                    learning_time = duration
+                except Exception as e:
+                    print("Chyba při ukládání času tréninku:", e)
+
+            if user_id and (correct_count > 0 or wrong_count > 0):
+                # Zaznamenej celkový počet správných a špatných odpovědí za lekci + learning_time + lesson_done
+                update_user_stats(
+                    user_id,
+                    at_cor=correct_count,
+                    at_wr=wrong_count,
+                    lesson_done=True,
+                    learning_time=learning_time
+                )
                 try:
                     result = add_xp_to_user(user_id, correct_count)
                     streak_info = update_user_streak(user_id)
@@ -198,11 +236,31 @@ def fill_word():
 
     # GET request
     if not remaining:
-        user_id = session.get('user_id')
         correct_count = sum(1 for v in answers_correct.values() if v)
+        wrong_count = len(answers_correct) - correct_count
         streak_info = None  # <-- Přidáno pro streak
+
+        # --- Výpočet a zápis learning_time i při GETu, pokud nebyl zapsán ---
+        learning_time = None
+        if user_id and session.get('at_on_training_start'):
+            try:
+                start = float(session.pop('at_on_training_start', None))
+                duration = max(1, int(time.time() - start))  # min. 1 sekunda
+                learning_time = duration
+            except Exception as e:
+                print("Chyba při ukládání času tréninku:", e)
+
         if user_id:
             try:
+                if correct_count > 0 or wrong_count > 0:
+                    # Zaznamenej celkový počet správných a špatných odpovědí za lekci (pro jistotu i zde)
+                    update_user_stats(
+                        user_id,
+                        at_cor=correct_count,
+                        at_wr=wrong_count,
+                        lesson_done=True,
+                        learning_time=learning_time
+                    )
                 if correct_count > 0:
                     result = add_xp_to_user(user_id, correct_count)
                     if "error" in result:
@@ -243,5 +301,6 @@ def reset_progress():
     session.pop('answered', None)
     session.pop('selected_questions', None)
     session.pop('answers_correct', None)
+    session.pop('at_on_training_start', None)
     flash("♻️ Pokrok byl resetován, můžeš začít znovu!", "info")
     return redirect(url_for('at_on.fill_word'))

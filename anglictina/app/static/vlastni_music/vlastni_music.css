@@ -1,0 +1,411 @@
+/* Popup a review styly převzaté z music/exercises.html */
+.popup-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s;
+}
+
+.popup-container.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.popup-content {
+    background: #fff;
+    padding: 2em 2.5em;
+    border-radius: 18px;
+    box-shadow: 0 8px 48px rgba(0, 0, 0, .18);
+    text-align: center;
+    transform: scale(.85);
+    opacity: 0;
+    animation: popupIn .35s cubic-bezier(.68, -0.55, .27, 1.55) forwards;
+    max-width: 420px;
+}
+
+@keyframes popupIn {
+    0% {
+        transform: scale(.85);
+        opacity: 0;
+    }
+    80% {
+        transform: scale(1.05);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.popup-buttons {
+    margin-top: 1.5em;
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+    flex-wrap: wrap;
+}
+
+.popup-button {
+    padding: .7em 2em;
+    border-radius: 10px;
+    border: none;
+    font-size: 1.05em;
+    cursor: pointer;
+    font-weight: 600;
+    transition: .2s;
+}
+
+.popup-button.confirm {
+    background: #28a745;
+    color: #fff;
+}
+
+.popup-button.confirm:hover {
+    background: #218838;
+}
+
+.popup-button.cancel {
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+.popup-button.cancel:hover {
+    background: #e2e6ea;
+}
+
+.solution-list {
+    text-align: left;
+    margin: 0;
+    padding: 0 0 0 1.1em;
+    max-height: 260px;
+    overflow: auto;
+}
+
+.solution-list li {
+    margin: .3em 0;
+}
+
+.result-container {
+    margin-top: 1.2em;
+    font-weight: 600;
+}
+
+.near-miss-note {
+    color: #c90;
+    font-size: .95em;
+    margin-top: .4em;
+}
+
+/* Rozložení dvou sloupců pro cvičení */
+.exercises-section {
+    margin-top: 32px;
+}
+
+.exercises-grid {
+    display: grid;
+    gap: 32px;
+    grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));
+    align-items: start;
+}
+
+.exercise-col > h2 {
+    margin: 0 0 8px;
+    font-size: 1.35rem;
+}
+
+.exercise-card {
+    background: var(--card-bg, #fff);
+    border: 1px solid rgba(0, 0, 0, .08);
+    padding: 18px 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 18px -6px rgba(0, 0, 0, .08);
+    position: relative;
+}
+
+.exercise-card h3 {
+    margin-top: 0;
+    font-size: 1.05rem;
+    letter-spacing: .2px;
+}
+
+.exercise-input {
+    width: 100%;
+    margin-top: 6px;
+}
+
+@media (max-width: 760px) {
+    .exercises-grid {
+        grid-template-columns:1fr;
+    }
+}
+
+/* Vylepšení spojovačky */
+.word-matching {
+    margin-top: 48px;
+    background: linear-gradient(135deg, var(--card-bg, #fff), var(--card-alt, #f7f9fb));
+    padding: 28px 28px 34px;
+    border-radius: 22px;
+    border: 1px solid rgba(0, 0, 0, .08);
+    box-shadow: 0 8px 32px -10px rgba(0, 0, 0, .12);
+    position: relative;
+    overflow: hidden;
+}
+
+.word-matching:before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 85% 15%, rgba(120, 170, 255, .28), transparent 55%);
+    pointer-events: none;
+}
+
+.word-matching h3 {
+    margin-top: 0;
+    font-size: 1.35rem;
+}
+
+#matching-root {
+    gap: 40px !important;
+}
+
+#matching-root > div {
+    background: rgba(255, 255, 255, .55);
+    backdrop-filter: blur(6px);
+    padding: 14px 18px 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(0, 0, 0, .06);
+    min-width: 200px;
+}
+
+#matching-root h3 {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    opacity: .7;
+}
+
+#matching-root ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#matching-root button {
+    width: 100%;
+    text-align: left;
+    padding: 10px 14px;
+    font-size: .95rem;
+    background: #fff;
+    border: 1px solid #d6dde5;
+    border-radius: 12px;
+    cursor: pointer;
+    line-height: 1.25;
+    position: relative;
+    font-weight: 500;
+    transition: .15s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .04);
+}
+
+#matching-root button:hover {
+    background: #f2f7ff;
+    border-color: #b5c7dd;
+}
+
+#matching-root button.active {
+    background: #2554ff;
+    color: #fff;
+    border-color: #2554ff;
+    box-shadow: 0 4px 16px -4px rgba(37, 84, 255, .45);
+}
+
+#matching-root button.matched {
+    background: #20b871;
+    color: #fff;
+    border-color: #20b871;
+    box-shadow: 0 4px 14px -4px rgba(32, 184, 113, .55);
+}
+
+#matching-root button.matched:after {
+    content: '✔';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: .9rem;
+}
+
+#match-status {
+    font-weight: 500;
+}
+
+body.dark-mode .exercise-card {
+    background: #1e2531;
+    border-color: #2a3442;
+}
+
+body.dark-mode .word-matching {
+    background: linear-gradient(135deg, #1d2530, #151b23);
+    border-color: #283343;
+}
+
+body.dark-mode #matching-root > div {
+    background: rgba(34, 44, 56, .6);
+    border-color: #2e3a48;
+}
+
+body.dark-mode #matching-root button {
+    background: #273140;
+    border-color: #364657;
+    color: #e3edf7;
+}
+
+body.dark-mode #matching-root button:hover {
+    background: #314055;
+}
+
+body.dark-mode #matching-root button.active {
+    background: #2554ff;
+    border-color: #2554ff;
+    color: #fff;
+}
+
+body.dark-mode #matching-root button.matched {
+    background: #15925b;
+    border-color: #15925b;
+}
+
+/* === Béžové (světlé) téma – overrides === */
+body:not(.dark-mode) {
+    --beige-bg: #f9f5ee;
+    --beige-bg-alt: #f4ede2;
+    --beige-card: #fcf9f3;
+    --beige-border: #e2d9cc;
+    --beige-accent: #c07a26;
+    --beige-accent-hover: #a96412;
+    --beige-accent-soft: #e6c89d;
+    --beige-green: #1f8858;
+}
+
+body:not(.dark-mode) .exercise-card {
+    background: var(--beige-card);
+    border: 1px solid var(--beige-border);
+    box-shadow: 0 4px 18px -6px rgba(120, 90, 40, .15);
+}
+
+body:not(.dark-mode) .exercise-card h3 {
+    color: #5a462f;
+}
+
+body:not(.dark-mode) .exercise-card .blank-sentence, body:not(.dark-mode) .exercise-card .original-sentence {
+    color: #4c3b27;
+}
+
+body:not(.dark-mode) .word-matching {
+    background: linear-gradient(135deg, var(--beige-bg), var(--beige-bg-alt));
+    border: 1px solid var(--beige-border);
+    box-shadow: 0 8px 28px -10px rgba(120, 90, 40, .25);
+}
+
+body:not(.dark-mode) .word-matching:before {
+    background: radial-gradient(circle at 82% 18%, rgba(192, 122, 38, .28), transparent 58%);
+}
+
+body:not(.dark-mode) #matching-root > div {
+    background: rgba(252, 249, 243, .72);
+    backdrop-filter: blur(5px);
+    border: 1px solid var(--beige-border);
+}
+
+body:not(.dark-mode) #matching-root h3 {
+    color: #7a5a31;
+    opacity: .85;
+}
+
+body:not(.dark-mode) #matching-root button {
+    background: #fffaf3;
+    border: 1px solid var(--beige-border);
+    color: #553f26;
+}
+
+body:not(.dark-mode) #matching-root button:hover {
+    background: #f5ecdf;
+    border-color: #d2c2af;
+}
+
+body:not(.dark-mode) #matching-root button.active {
+    background: var(--beige-accent);
+    color: #fff;
+    border-color: var(--beige-accent);
+    box-shadow: 0 4px 14px -4px rgba(192, 122, 38, .55);
+}
+
+body:not(.dark-mode) #matching-root button.matched {
+    background: var(--beige-green);
+    border-color: var(--beige-green);
+    box-shadow: 0 4px 14px -4px rgba(31, 136, 88, .55);
+}
+
+body:not(.dark-mode) #matching-root button.matched:after {
+    color: #fff;
+}
+
+body:not(.dark-mode) #match-status {
+    color: #5a462f;
+}
+
+body:not(.dark-mode) #submit-answers.check-button {
+    background: var(--beige-accent);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 16px -4px rgba(192, 122, 38, .5);
+}
+
+body:not(.dark-mode) #submit-answers.check-button:hover {
+    background: var(--beige-accent-hover);
+}
+
+body:not(.dark-mode) #submit-answers.check-button:active {
+    transform: translateY(1px);
+}
+
+body:not(.dark-mode) .popup-content {
+    background: var(--beige-card);
+    border: 1px solid var(--beige-border);
+}
+
+body:not(.dark-mode) .popup-button.confirm {
+    background: var(--beige-green);
+}
+
+body:not(.dark-mode) .popup-button.confirm:hover {
+    background: #187049;
+}
+
+body:not(.dark-mode) .popup-button.cancel {
+    background: #fffaf3;
+    border: 1px solid var(--beige-border);
+}
+
+body:not(.dark-mode) .popup-button.cancel:hover {
+    background: #f2e7d7;
+}
+
+body:not(.dark-mode) footer {
+    color: #6a563e;
+}

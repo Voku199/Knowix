@@ -15,7 +15,7 @@
     <link rel="canonical" href="https://www.knowix.cz">
 
 
-    <title>Knowix</title>
+    <title>knowix</title>
     <link rel="stylesheet" href="/static/style.css">
 
     <!-- Preconnect zrychlí DNS a spojení -->
@@ -248,35 +248,26 @@
     </section>
 
     <section class="info">
+
+        <div class="bubble support-bubble" onclick="window.open('/anglictina', '_blank')">
+            <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="angličtina">
+            <div class="bubble-text">
+                <h3>Angličtina</h3>
+                <p>Zábavné cvičení na téma Angličtina</p>
+            </div>
+        </div>
+        <div class="bubble support-bubble" onclick="window.open('/proc_jit_s_nama', '_blank')">
+            <img src="{{ url_for('static', filename='pic/why.png') }}" alt="Podpora">
+            <div class="bubble-text">
+                <h3>Proč jít s náma?</h3>
+                <p>Klikni na to, a dozvíte se proč jít s náma.</p>
+            </div>
+        </div>
         <div class="bubble">
-            <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            <img src="{{ url_for('static', filename='pic/logo1.png') }}" alt="Knowix Logo">
             <div class="bubble-text">
                 <h3>Kdo vytvořil Knowix?</h3>
                 <p>Vytvořil žák Vojtěch Kurinec</p>
-            </div>
-        </div>
-        <div class="bubble">
-            <img src="{{ url_for('static', filename='pic/introicon-hra.webp') }}" alt="Knowix Logo">
-            <div class="bubble-text">
-                <h3>Proč jsem to udělal?</h3>
-                <p>Inspiroval jsem se od táty.</p>
-                <p>Táta jednou udělal PocitejSam, kde byly příklady a trénoval jsi počítání.</p>
-                <p>Takže jsem šel a udělal jsem Angličtinu.</p>
-            </div>
-        </div>
-        <div class="bubble">
-            <img src="{{ url_for('static', filename='pic/proc.webp') }}" alt="Knowix Logo">
-            <div class="bubble-text">
-                <h3>Efektivita</h3>
-                <p>Jsou zde nepravidelná slovesa, která se učí ve škole.</p>
-                <p>Zároveň se zde budou přidávat další sekce, jak pro Angličtinu, tak i pro něco nového.</p>
-            </div>
-        </div>
-        <div class="bubble">
-            <img src="{{ url_for('static', filename='pic/introicon-skola.webp') }}" alt="Knowix Logo">
-            <div class="bubble-text">
-                <h3>Zdarma</h3>
-                <p>Všechno by bylo zdarma... Zbytečnost kupovat licence...</p>
             </div>
         </div>
         <div class="bubble support-bubble" onclick="window.open('https://ko-fi.com/voku199', '_blank')">

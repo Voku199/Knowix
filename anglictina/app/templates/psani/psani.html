@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psaní | Knowix</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap"
+              rel="stylesheet">
+    </noscript>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+    h1 {
+        margin-top: 10px;
+        text-align: center;
+    }
+/* Formulář psaní */
+form#psani-form {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    padding: 32px 24px 24px 24px;
+    max-width: 700px;
+    margin: 32px auto 24px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+}
+#toolbar {
+    width: 100%;
+    margin-bottom: 8px;
+}
+#editor {
+    width: 100%;
+    min-height: 300px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 8px;
+}
+.ql-container {
+    min-height: 300px;
+    font-size: 1.1em;
+}
+#char-count, #limit-msg {
+    width: 100%;
+    text-align: center;
+    font-size: 1em;
+    margin-bottom: 4px;
+}
+#limit-msg {
+    color: #d32f2f;
+    display: none;
+}
+.form-actions {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-top: 10px;
+}
+.form-actions button,
+.form-actions .community-link {
+    padding: 10px 28px;
+    font-size: 1.08em;
+    font-family: inherit;
+    text-decoration: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    margin-top: 0;
+}
+.form-actions button {
+    background: #3b82f6;
+    color: #fff;
+    font-weight: 600;
+}
+.form-actions button:hover {
+    background: #2563eb;
+}
+.form-actions .community-link {
+    background: #f3f4f6;
+    color: #222;
+    border: 1px solid #e5e7eb;
+}
+.form-actions .community-link:hover {
+    background: #e0e7ef;
+    color: #3b82f6;
+}
+input[type="checkbox"] {
+    accent-color: #3b82f6;
+    margin-right: 6px;
+}
+
+/* Flash zprávy */
+.alert {
+    width: 100%;
+    max-width: 700px;
+    margin: 12px auto;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 1.08em;
+    text-align: center;
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+.alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+}
+.alert-error {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+/* Výpis příběhů */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto 32px auto;
+    max-width: 700px;
+}
+li {
+    margin-bottom: 18px;
+}
+.no-psani {
+    text-align: center;
+    color: #888;
+    font-size: 1.13em;
+    padding: 30px 0;
+}
+.pribeh-actions {
+    margin-bottom: 8px;
+}
+.pribeh-actions form,
+.pribeh-actions a {
+    display: inline-block;
+    margin-right: 8px;
+}
+.public-label {
+    font-size: 0.98em;
+    font-weight: 600;
+    color: #22c55e;
+    margin-left: 8px;
+}
+.private-label {
+    font-size: 0.98em;
+    font-weight: 600;
+    color: #888;
+    margin-left: 8px;
+}
+.dropdown-trigger {
+    cursor: pointer;
+    font-size: 1.5em;
+    padding: 0 8px;
+    user-select: none;
+    vertical-align: middle;
+}
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 10px;
+    top: 25px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    min-width: 120px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    z-index: 10;
+    padding: 8px 0;
+}
+.dropdown-menu form,
+.dropdown-menu a {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 8px 16px;
+    color: #222;
+    font-size: 1em;
+    cursor: pointer;
+    text-decoration: none;
+}
+.dropdown-menu form button {
+    background: none;
+    border: none;
+    color: #d32f2f;
+    width: 100%;
+    text-align: left;
+    padding: 0;
+    font-size: 1em;
+    cursor: pointer;
+}
+.dropdown-menu a:hover,
+.dropdown-menu form button:hover {
+    background: #f3f4f6;
+}
+
+/* Quill velikosti písma */
+.ql-size-8   { font-size: 8px; }
+.ql-size-10  { font-size: 10px; }
+.ql-size-12  { font-size: 12px; }
+.ql-size-14  { font-size: 14px; }
+.ql-size-18  { font-size: 18px; }
+.ql-size-24  { font-size: 24px; }
+.ql-size-36  { font-size: 36px; }
+</style>
+</head>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
+<header>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
+    </div>
+    <div class="nav-profile-wrapper">
+        <ul class="nav-right">
+            <li>
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
+            </li>
+        </ul>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
+</header>
+
+<h1>Napiš svůj příběh</h1>
+
+<!-- Flash zprávy -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<form method="POST" id="psani-form">
+    <div id="toolbar">
+      <span class="ql-formats">
+        <select class="ql-size">
+          <option value="8">8</option>
+          <option value="10">10</option>
+          <option value="12" selected>12</option>
+          <option value="14">14</option>
+          <option value="18">18</option>
+          <option value="24">24</option>
+          <option value="36">36</option>
+        </select>
+      </span>
+      <span class="ql-formats">
+        <button class="ql-bold"></button>
+        <button class="ql-italic"></button>
+        <button class="ql-underline"></button>
+        <button class="ql-strike"></button>
+      </span>
+      <span class="ql-formats">
+        <select class="ql-header">
+          <option selected></option>
+          <option value="1"></option>
+          <option value="2"></option>
+        </select>
+        <button class="ql-blockquote"></button>
+        <button class="ql-code-block"></button>
+      </span>
+      <span class="ql-formats">
+        <button class="ql-list" value="ordered"></button>
+        <button class="ql-list" value="bullet"></button>
+        <button class="ql-indent" value="-1"></button>
+        <button class="ql-indent" value="+1"></button>
+      </span>
+      <span class="ql-formats">
+        <button class="ql-clean"></button>
+      </span>
+    </div>
+    <div id="editor" style="height: 300px; margin: 25px auto;"></div>
+    <input type="hidden" name="obsah" id="obsah-input">
+    <label style="margin: 10px 0;">
+        <input type="checkbox" name="public" value="1"> Veřejný příběh
+    </label>
+    <div id="char-count">Zbývá znaků: 2500</div>
+    <div id="limit-msg">Dosáhl jsi limitu 2500 znaků. Nemůžeš psát dále.</div>
+    <div class="form-actions">
+        <button type="submit">Zkontrolovat</button>
+        <a class="community-link" href="{{ url_for('psani.verejne_psani') }}">Komunitivní psaní</a>
+    </div>
+</form>
+
+<h2>Moje uložené příběhy</h2>
+<ul>
+  {% for pribeh in vsechna_psani %}
+    <li style="position: relative;">
+      <div>
+        <strong>{{ pribeh.created_at.strftime('%d.%m.%Y %H:%M') }}</strong>
+        {% if pribeh.public %}
+          <span class="public-label">(veřejný)</span>
+        {% else %}
+          <span class="private-label">(soukromý)</span>
+        {% endif %}
+        <!-- Tři tečky pro menu -->
+        <span class="dropdown-trigger" tabindex="0" aria-label="Možnosti" data-pribeh-id="{{ pribeh.id }}">&#x22EE;</span>
+        <div class="dropdown-menu" id="dropdown-{{ pribeh.id }}">
+          <form method="POST" action="{{ url_for('psani.smazat_psani', pribeh_id=pribeh.id) }}">
+            <button type="submit" onclick="return confirm('Opravdu smazat tento příběh?')">Smazat</button>
+          </form>
+          <a href="{{ url_for('psani.upravit_psani', pribeh_id=pribeh.id) }}">Upravit</a>
+        </div>
+      </div>
+      <div style="border:1px solid #ccc; padding:8px; margin-bottom:10px;">
+        {{ pribeh.obsah|safe }}
+      </div>
+    </li>
+  {% else %}
+    <li class="no-psani">Nemáš zatím žádné uložené příběhy.</li>
+  {% endfor %}
+</ul>
+
+<footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p class="footer-signature">
+        Made with ❤️ by
+        <a href="https://ko-fi.com/voku199" target="_blank"
+           style="color: inherit; text-decoration: underline;">Voku</a>
+        and lot of ☕
+    </p>
+</footer>
+
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<script>
+    // theme-toggle.js
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        fetch('/set_theme', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark'
+            })
+        }).then(() => {
+            document.body.classList.toggle('dark-mode');
+            session.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+    });
+
+    // Inicializace Quill
+    var Size = Quill.import('attributors/class/size');
+    Size.whitelist = ['8', '10', '12', '14', '18', '24', '36'];
+    Quill.register(Size, true);
+
+    var quill = new Quill('#editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: '#toolbar'
+        }
+    });
+
+    {% if obsah %}
+        quill.root.innerHTML = {{ obsah|tojson|safe }};
+    {% endif %}
+
+    // Počítání znaků
+    const countDiv = document.getElementById('char-count');
+    const limitMsg = document.getElementById('limit-msg');
+    const LIMIT = 2500;
+
+    quill.on('text-change', function() {
+        const text = quill.getText().trim();
+        const remaining = LIMIT - text.length;
+        countDiv.textContent = `Zbývá znaků: ${remaining}`;
+        if (remaining < 0) {
+            limitMsg.style.display = 'block';
+            quill.deleteText(LIMIT, quill.getLength());
+        } else {
+            limitMsg.style.display = 'none';
+        }
+    });
+
+    // Při odeslání formuláře vlož obsah Quillu do hidden inputu
+    var form = document.getElementById('psani-form');
+    form.onsubmit = function() {
+        document.getElementById('obsah-input').value = quill.root.innerHTML;
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.dropdown-trigger').forEach(function(trigger) {
+    trigger.addEventListener('click', function(e) {
+      e.stopPropagation();
+      // Zavři všechny ostatní menu
+      document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
+        menu.style.display = 'none';
+      });
+      // Otevři aktuální menu
+      var id = trigger.getAttribute('data-pribeh-id');
+      var menu = document.getElementById('dropdown-' + id);
+      if (menu) {
+        menu.style.display = 'block';
+      }
+    });
+    // Klávesová zkratka (Enter/Space)
+    trigger.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        trigger.click();
+      }
+    });
+  });
+  // Kliknutí mimo menu zavře všechna menu
+  document.addEventListener('click', function() {
+    document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
+      menu.style.display = 'none';
+    });
+  });
+});
+</script>
+</body>
+</html>

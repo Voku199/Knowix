@@ -1,9 +1,11 @@
 from flask import Blueprint, session, render_template, request, jsonify
 import json
 import random
+import time
 from db import get_db_connection
 from xp import add_xp_to_user, get_user_xp_and_level
-from streak import update_user_streak, get_user_streak  # <-- Přidáno pro streak
+from streak import update_user_streak, get_user_streak
+from user_stats import update_user_stats
 
 hangman_bp = Blueprint("hangman", __name__, template_folder="templates")
 
@@ -66,7 +68,7 @@ def inject_xp_info():
 @hangman_bp.errorhandler(Exception)
 def server_error(e):
     # vrátí stránku error.html s informací o výpadku
-    return render_template('error.html', error_code=e.code), e.code
+    return render_template('error.html', error_code=getattr(e, "code", 500)), getattr(e, "code", 500)
 
 
 def load_words():
@@ -130,6 +132,13 @@ def allowed_levels(level):
 @hangman_bp.route("/hangman")
 def hangman_game():
     session.setdefault("used_words", [])
+    # --- Uložení času vstupu na stránku a nastavení first_activity ---
+    user_id = session.get("user_id")
+    if user_id:
+        # Nastavíme first_activity pokud ještě není
+        update_user_stats(user_id, set_first_activity=True)
+    # Ulož čas začátku lekce
+    session['hangman_training_start'] = time.time()
     return render_template("hangman/hangman.html")
 
 
@@ -195,6 +204,7 @@ def reset_game():
     session.pop("current_word", None)
     session.pop("guessed_letters", None)
     session.pop("remaining_attempts", None)
+    session.pop("hangman_training_start", None)
     return jsonify({"status": "reset_ok"})
 
 
@@ -214,7 +224,6 @@ def guess_letter():
     if letter not in word.lower():
         session["remaining_attempts"] -= 1
 
-    # Funkce na porovnání výhry – ignoruje znaky, co nejsou písmena
     def has_won(word, guessed_letters):
         return all(
             c.lower() in guessed_letters or not c.isalpha()
@@ -232,15 +241,33 @@ def guess_letter():
 
     masked_word = get_masked_word(word, guessed)
 
-    # --- XP ZA VÝHRU ---
     xp_awarded = 0
-    streak_info = None  # <-- Přidáno pro streak
+    streak_info = None
+    user_id = session.get("user_id")
+    learning_time = None
+
+    # --- Pokud uživatel vyhrál nebo prohrál, započítej lesson_done a learning_time ---
+    if status in ("win", "lose") and user_id:
+        # Výpočet learning_time
+        if session.get('hangman_training_start'):
+            try:
+                start = float(session.pop('hangman_training_start', None))
+                duration = max(1, int(time.time() - start))  # min. 1 sekunda
+                learning_time = duration
+            except Exception as e:
+                print("Chyba při ukládání času tréninku:", e)
+        # lesson_done = True, learning_time, hangman_words_guessed
+        update_user_stats(
+            user_id,
+            hangman_words_guessed=1 if status == "win" else 0,
+            lesson_done=True,
+            learning_time=learning_time
+        )
+
     if status == "win":
-        user_id = session.get("user_id")
         if user_id and word_data:
             xp_awarded = get_xp_for_level(word_data.get("level"))
             add_xp_to_user(user_id, xp_awarded)
-            # --- Streak logika ---
             streak_info = update_user_streak(user_id)
             print(streak_info)
 
@@ -252,5 +279,5 @@ def guess_letter():
         "original_word": word if status != "playing" else None,
         "translation": word_data["translation"] if word_data and status != "playing" else None,
         "xp_awarded": xp_awarded if status == "win" else 0,
-        "streak_info": streak_info  # <-- Přidáno do odpovědi
+        "streak_info": streak_info
     })

@@ -13,198 +13,132 @@
     </noscript>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
+    /* Učitelství – vylepšení vzhledu tlačítek a studentů */
+    .teacher-section .btn-action {
+        background: linear-gradient(135deg, #4f46e5, #3b82f6);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+        cursor: pointer;
+        box-shadow: 0 6px 18px rgba(59, 130, 246, 0.25);
+        transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s;
+    }
+    .teacher-section .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(59, 130, 246, 0.35);
+        opacity: 0.95;
+    }
 
-        body.dark-mode {
-            background: #181c23;
-        }
-        .settings-container {
-            max-width: 620px;
-            margin: 2.5em auto 2em auto;
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-            padding: 2.5em 2em 2em 2em;
-        }
-        body.dark-mode .settings-container {
-            background: #000000;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.32);
-        }
-        h1 {
-            text-align: center;
-            font-weight: 600;
-            margin-bottom: 1.5em;
-            letter-spacing: 0.02em;
-        }
-        .profile-pic-section, .settings-section {
-            background: #f6fafd;
-            border-radius: 12px;
-            padding: 1.3em 1em 1.2em 1em;
-            margin-bottom: 1.5em;
-        }
-        body.dark-mode .profile-pic-section, body.dark-mode .settings-section {
-            background: #232b36;
-        }
-        .profile-pic-wrapper {
-            text-align: center;
-            margin-bottom: 1em;
-        }
-        .current-profile-pic {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            border: 2px solid #1976d2;
-            object-fit: cover;
-            background: #eee;
-        }
-        body.dark-mode .current-profile-pic {
-            background: #2d3748;
-            border: 2px solid #b2ff59;
-        }
-        .upload-form label {
-            display: inline-block;
-            margin-bottom: 0.7em;
-            cursor: pointer;
-            color: #1976d2;
-        }
-        body.dark-mode .upload-form label {
-            color: #b2ff59;
-        }
-        .upload-form input[type="file"] {
-            display: none;
-        }
-        .upload-form button {
-            background: #1976d2;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            padding: 0.7em 1.5em;
-            font-size: 1.08em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        body.dark-mode .upload-form button {
-            background: #000000;
-            color: #b2ff59;
-        }
-        .upload-form button:hover {
-            background: #1256a0;
-        }
-        body.dark-mode .upload-form button:hover {
-            background: #232b36;
-        }
-        .english-level-select {
-            display: flex;
-            gap: 0.7em;
-            align-items: center;
-        }
-        .form-select {
-            padding: 0.7em;
-            border-radius: 7px;
-            border: 1.5px solid #b3c6e0;
-            font-size: 1.08em;
-        }
-        body.dark-mode .form-select {
-            background: #000000;
-            color: #fff;
-            border: 1.5px solid #38405a;
-        }
-        .btn-save {
-            background: #1976d2;
-            color: #fff;
-            border: none;
-            border-radius: 7px;
-            padding: 0.7em 1.4em;
-            font-size: 1.08em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        body.dark-mode .btn-save {
-            background: #000000;
-            color: #b2ff59;
-        }
-        .btn-save:hover {
-            background: #1256a0;
-        }
-        body.dark-mode .btn-save:hover {
-            background: #232b36;
-        }
-        .achievements-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1em;
-            margin-top: 1em;
-        }
-        .achievement-item {
-            flex: 1 1 180px;
-            min-width: 160px;
-            background: #fff;
-            border-radius: 8px;
-            padding: 1em;
-            margin-bottom: 0.5em;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        body.dark-mode .achievement-item {
-            background: #232b36;
-            color: #e0e0e0;
-        }
-        .achievement-item.unlocked strong {
-            color: #1976d2;
-        }
-        body.dark-mode .achievement-item.unlocked strong {
-            color: #b2ff59;
-        }
-        .achievement-item.locked strong {
-            color: #aaa;
-        }
-        .badge {
-            margin-top: 0.4em;
-            font-size: 0.95em;
-            padding: 0.2em 0.7em;
-            border-radius: 6px;
-            background: #e0e0e0;
-            color: #1976d2;
-        }
-        body.dark-mode .badge {
-            background: #38405a;
-            color: #b2ff59;
-        }
-        .top-users-list {
-            margin: 1.2em 0 0 0;
-            padding: 0;
-            list-style: none;
-        }
-        .top-users-list li {
-            background: #f6fafd;
-            border-radius: 7px;
-            padding: 0.7em 1em;
-            margin-bottom: 0.7em;
-            font-size: 1.08em;
-            display: flex;
-            align-items: center;
-        }
-        body.dark-mode .top-users-list li {
-            background: #232b36;
-            color: #fff;
-        }
-        .top1 .medal { color: gold; }
-        .top2 .medal { color: silver; }
-        .top3 .medal { color: #cd7f32; }
-        @media (max-width: 700px) {
-            .settings-container {
-                padding: 1.2em 0.5em 1.5em 0.5em;
-            }
-            .profile-pic-section, .settings-section {
-                padding: 1em 0.5em 1em 0.5em;
-            }
-            .achievement-item {
-                min-width: 100%;
-            }
-        }
+    .students-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 10px;
+    }
+
+    .student-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 14px;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    }
+    body.dark-mode .student-card {
+        background: #1f2937; /* slate-800 */
+        border-color: #374151; /* slate-700 */
+        box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+    }
+
+    .student-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex: 0 0 56px;
+        border: 2px solid #e5e7eb;
+        background: #f8fafc;
+    }
+    body.dark-mode .student-avatar {
+        border-color: #475569;
+        background: #0f172a;
+    }
+
+    .student-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+        min-width: 0;
+    }
+    .student-info strong {
+        font-size: 1.05rem;
+        color: #111827;
+    }
+    .student-info span {
+        font-size: 0.95rem;
+        color: #555;
+        line-height: 1.35;
+        word-break: break-word;
+    }
+    body.dark-mode .student-info strong { color: #e5e7eb; }
+    body.dark-mode .student-info span { color: #cbd5e1; }
+
+    .student-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .btn-small {
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s;
+    }
+    .btn-small:hover { transform: translateY(-2px); opacity: 0.95; }
+
+    .btn-view-stats {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(16,185,129,0.25);
+    }
+    .btn-remove-student {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(239,68,68,0.25);
+    }
+
+    /* „Zobrazit statistiky“ jako pěkné tlačítko */
+    .stats-section .stats-link {
+        display: inline-block;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+        box-shadow: 0 6px 18px rgba(99, 102, 241, 0.28);
+        transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+    .stats-section .stats-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(99, 102, 241, 0.35);
+    }
+
+    /* Responsivní úpravy pro menší obrazovky */
+    @media (max-width: 600px) {
+        .student-card { align-items: flex-start; }
+        .student-avatar { width: 48px; height: 48px; flex-basis: 48px; }
+        .student-actions { width: 100%; justify-content: flex-end; }
+    }
     </style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
@@ -323,6 +257,122 @@
             <button onclick="updateEnglishLevel()" class="btn-save">Uložit změny</button>
         </div>
     </div>
+{% if not is_teacher %}
+<div class="settings-section">
+    <h2>Moje skupiny</h2>
+    {% if student_groups %}
+        <div class="student-group-info">
+            <p>Jste členem těchto skupin:</p>
+            <ul>
+                {% for group in student_groups %}
+                <li><b>{{ group.nazev }}</b></li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% else %}
+        <div class="student-group-info">
+            Nejste přiřazen(a) k žádné skupině.
+        </div>
+    {% endif %}
+</div>
+<div class="settings-section">
+    <h2>Moje úkoly</h2>
+    <div class="student-tasks-info" id="student-tasks-list">
+        <em>Načítám úkoly...</em>
+    </div>
+</div>
+{% endif %}
+
+    {% if is_teacher %}
+    <div class="settings-section teacher-section">
+        <h2>Moje učitelé nástroje</h2>
+        <div id="active-group-info" style="margin:1em 0;text-align:center;">
+            {% if active_group_name %}
+                <b>Aktivní skupina:</b> {{ active_group_name }}
+            {% else %}
+                <b>Aktivní skupina:</b> Default
+            {% endif %}
+        </div>
+        <div class="teacher-tools">
+            <h3>Moji studenti</h3>
+            <div class="students-list">
+                {% for student in teacher_group_members %}
+                <div class="student-card">
+                    <img src="{{ url_for('static', filename='profile_pics/' + (student.profile_pic or 'default.webp')) }}"
+                         alt="{{ student.first_name }}" class="student-avatar">
+                    <div class="student-info">
+                        <strong>{{ student.first_name }} {{ student.last_name }}</strong>
+                        <span>Level {{ student.level }} ({{ student.xp }} XP)</span>
+                        <span>{{ student.email }}</span>
+                    </div>
+                    <div class="student-actions">
+                        <button class="btn-small btn-view-stats" data-student-id="{{ student.id }}">Statistiky</button>
+                        <button class="btn-small btn-remove-student" data-student-id="{{ student.id }}">Odebrat</button>
+                    </div>
+                </div>
+                {% else %}
+                <p>Zatím nemáte žádné studenty ve skupině.</p>
+                {% endfor %}
+            </div>
+
+            <h3 style="margin-top: 1.5em;">Přidat studenta</h3>
+            <form id="add-student-form" class="teacher-form">
+                <div class="form-group">
+                    <label for="student-email">E-mail studenta:</label>
+                    <input type="email" id="student-email" required placeholder="student@example.com">
+                </div>
+                <button type="submit" class="btn-save">Přidat do skupiny</button>
+            </form>
+            <div id="add-student-result"></div>
+        </div>
+
+        <div class="teacher-actions" style="margin-top: 2em;">
+            <h3>Akce</h3>
+            <button id="create-assignment" class="btn-action">Vytvořit úkol</button>
+            <button id="create-group-btn" class="btn-action">Vytvořit skupinu</button>
+            <button id="show-groups-btn" class="btn-action">Skupiny</button>
+        </div>
+        <!-- Modální okno pro vytvoření úkolu -->
+        <div id="create-assignment-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0008;z-index:1000;align-items:center;justify-content:center;">
+            <div style="background:#fff;padding:2em;border-radius:10px;max-width:350px;margin:auto;">
+                <h3>Vytvořit úkol</h3>
+                <textarea id="assignment-text" placeholder="Zadání úkolu" style="width:100%;height:80px;margin-bottom:1em;"></textarea>
+                <button id="submit-assignment-btn" class="btn-save">Vytvořit úkol</button>
+                <button id="close-assignment-modal" class="btn-action" style="margin-left:1em;">Zavřít</button>
+                <div id="create-assignment-result"></div>
+            </div>
+        </div>
+        <!-- Modální okno pro vytvoření skupiny -->
+        <div id="create-group-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0008;z-index:1000;align-items:center;justify-content:center;">
+            <div style="background:#fff;padding:2em;border-radius:10px;max-width:350px;margin:auto;">
+                <h3>Vytvořit skupinu</h3>
+                <input type="text" id="group-name-input" placeholder="Název skupiny" style="width:100%;margin-bottom:1em;">
+                <button id="submit-group-btn" class="btn-save">Vytvořit</button>
+                <button id="close-group-modal" class="btn-action" style="margin-left:1em;">Zavřít</button>
+                <div id="create-group-result"></div>
+            </div>
+        </div>
+        <!-- Seznam skupin -->
+        <div id="groups-list-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0008;z-index:1000;align-items:center;justify-content:center;">
+            <div style="background:#fff;padding:2em;border-radius:10px;max-width:400px;margin:auto;max-height:80vh;overflow:auto;">
+                <h3>Moje skupiny</h3>
+                <div id="groups-list"></div>
+                <button id="close-groups-modal" class="btn-action" style="margin-top:1em;">Zavřít</button>
+            </div>
+        </div>
+    </div>
+    <div class="settings-section">
+        <h2>Úkoly této skupiny</h2>
+        <div id="teacher-assignments-list"><em>Načítám úkoly...</em></div>
+    </div>
+    {% endif %}
+
+    <div class="settings-section stats-section">
+        <h2>Moje statistiky</h2>
+        <div class="english-level-select">
+            <a href="/my_stats" class="stats-link" title="Vidět statistiky">Zobrazit statistiky &rarr;</a>
+        </div>
+    </div>
 
     <div class="settings-section">
         <h2>Moje achievementy</h2>
@@ -362,6 +412,13 @@
             {% endfor %}
         </ol>
     </div>
+
+    {% if not is_teacher %}
+    <div style="text-align:center; margin:2em 0;">
+        <h2>Žádost o roli učitele</h2>
+        <button id="teacher-request-btn" class="btn-save">Chci být učitel</button>
+    </div>
+    {% endif %}
 </main>
 
 <footer>
@@ -369,60 +426,397 @@
     <p class="footer-signature">
         Made with ❤️ by
         <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
-        and lot of ☕
     </p>
 </footer>
 
 <script>
-    const themeToggle = document.getElementById('theme-toggle');
-    const isDark = document.body.classList.contains('dark-mode');
-    themeToggle.textContent = isDark ? '☀️' : '🌙';
+// ======================== SPOLEČNÝ KÓD PRO VŠECHNY UŽIVATELE ========================
 
-    themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        const newTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
-        themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-        fetch('/set_theme', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({theme: newTheme}),
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (!data.success) {
-                alert('Nepodařilo se uložit téma.');
-            }
-        })
-        .catch(() => alert('Chyba při ukládání tématu.'));
+// Funkce pro aktualizaci úrovně angličtiny
+function updateEnglishLevel() {
+    const levelSelect = document.getElementById('englishLevelSelect');
+    const selectedLevel = levelSelect.value;
+
+    fetch('/set_english_level', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ level: selectedLevel })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            alert('Úroveň angličtiny byla úspěšně aktualizována!');
+        } else {
+            alert('Chyba při aktualizaci úrovně angličtiny: ' + (data.error || 'Neznámá chyba'));
+        }
+    })
+    .catch(error => {
+        console.error('Chyba:', error);
+        alert('Došlo k chybě při komunikaci se serverem.');
     });
+}
 
-        function updateStreakBadge(streak) {
-        const badge = document.querySelector('.streak-badge');
-        if (badge) badge.textContent = streak;
-    }
+// ======================== KÓD PRO STUDENTY ========================
 
-
-    function updateEnglishLevel() {
-        const select = document.getElementById('englishLevelSelect');
-        const level = select.value;
-        fetch('/set_english_level', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({level: level})
+// Načtení úkolů pro studenta - pouze pokud existuje kontejner
+const studentTasksEl = document.getElementById('student-tasks-list');
+if (studentTasksEl) {
+    fetch('/student/group_assignments')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Chyba při načítání úkolů');
+            }
+            return response.json();
         })
-        .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                alert('Úroveň angličtiny byla úspěšně aktualizována!');
+            if (data.success && data.assignments && data.assignments.length > 0) {
+                studentTasksEl.innerHTML = data.assignments.map(a => {
+                    const date = new Date(a.created_at);
+                    const formattedDate = `${date.getDate()}. ${date.getMonth() + 1}. ${date.getFullYear()}`;
+
+                    return `
+                    <div class='student-task'>
+                        <b>Úkol:</b> ${a.zadani}<br>
+                        <small>Zadáno: ${formattedDate}</small><br>
+                        <small>Skupina: ${a.group_name || 'Neznámá skupina'}</small>
+                    </div>`;
+                }).join('');
             } else {
-                alert('Chyba při ukládání: ' + (data.error || 'Neznámá chyba'));
+                studentTasksEl.innerHTML = '<em>Zatím zde nejsou žádné úkoly.</em>';
             }
         })
         .catch(error => {
             console.error('Chyba:', error);
-            alert('Nastala chyba při komunikaci se serverem.');
+            studentTasksEl.innerHTML = '<em>Chyba při načítání úkolů. Zkuste obnovit stránku.</em>';
         });
-    }
+}
+
+// ======================== KÓD PRO UČITELE ========================
+
+// Načtení úkolů pro učitele
+function loadTeacherAssignments() {
+    const teacherAssignmentsEl = document.getElementById('teacher-assignments-list');
+    if (!teacherAssignmentsEl) return;
+
+    fetch('/teacher/group_assignments')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Chyba při načítání úkolů');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success && data.assignments.length > 0) {
+                teacherAssignmentsEl.innerHTML = data.assignments.map(a => {
+                    const date = new Date(a.created_at);
+                    const formattedDate = `${date.getDate()}. ${date.getMonth() + 1}. ${date.getFullYear()}`;
+
+                    return `<div class='student-task' data-id='${a.id}'>
+                        <b>Úkol:</b> <span class='zadani'>${a.zadani}</span><br>
+                        <small>Zadáno: ${formattedDate}</small><br>
+                        <button onclick="editAssignment(${a.id})">Upravit</button>
+                        <button onclick="deleteAssignment(${a.id})">Smazat</button>
+                    </div>`;
+                }).join('');
+            } else {
+                teacherAssignmentsEl.innerHTML = '<em>Zatím zde nejsou žádné úkoly.</em>';
+            }
+        })
+        .catch(error => {
+            console.error('Chyba:', error);
+            teacherAssignmentsEl.innerHTML = '<em>Chyba při načítání úkolů</em>';
+        });
+}
+
+// Mazání úkolu
+function deleteAssignment(id) {
+    if (!confirm('Opravdu chcete tento úkol smazat?')) return;
+
+    fetch(`/teacher/delete_assignment/${id}`, { method: 'DELETE' })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Chyba při mazání úkolu');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                loadTeacherAssignments();
+            } else {
+                alert(data.error || 'Chyba při mazání úkolu');
+            }
+        })
+        .catch(error => {
+            console.error('Chyba:', error);
+            alert('Chyba při mazání úkolu');
+        });
+}
+
+// Editace úkolu
+function editAssignment(id) {
+    const newText = prompt("Zadejte nové zadání úkolu:");
+    if (newText === null || newText.trim() === "") return;
+
+    fetch(`/teacher/update_assignment/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ zadani: newText })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Chyba při úpravě úkolu');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            loadTeacherAssignments();
+        } else {
+            alert(data.error || 'Chyba při úpravě úkolu');
+        }
+    })
+    .catch(error => {
+        console.error('Chyba:', error);
+        alert('Chyba při úpravě úkolu');
+    });
+}
+
+// Načíst úkoly pro učitele při načtení stránky
+loadTeacherAssignments();
+
+// ======================== SPOLEČNÝ KÓD PRO UČITELE ========================
+
+// Otevření modálního okna pro vytvoření úkolu
+const createAssignmentBtn = document.getElementById('create-assignment');
+const createAssignmentModal = document.getElementById('create-assignment-modal');
+const closeAssignmentModal = document.getElementById('close-assignment-modal');
+if (createAssignmentBtn && createAssignmentModal && closeAssignmentModal) {
+    createAssignmentBtn.onclick = () => { createAssignmentModal.style.display = 'flex'; };
+    closeAssignmentModal.onclick = () => { createAssignmentModal.style.display = 'none'; };
+}
+
+// Odeslání úkolu AJAXem
+const submitAssignmentBtn = document.getElementById('submit-assignment-btn');
+if (submitAssignmentBtn) {
+    submitAssignmentBtn.onclick = function() {
+        const zadani = document.getElementById('assignment-text').value.trim();
+        const resultDiv = document.getElementById('create-assignment-result');
+        if (!zadani) {
+            resultDiv.textContent = 'Zadejte zadání úkolu!';
+            return;
+        }
+        fetch('/teacher/create_assignment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ zadani })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                resultDiv.textContent = 'Úkol byl vytvořen!';
+                document.getElementById('assignment-text').value = '';
+                loadTeacherAssignments(); // Aktualizovat seznam úkolů
+            } else {
+                resultDiv.textContent = data.error || 'Chyba při vytváření úkolu.';
+            }
+        });
+    };
+}
+
+// Otevření modálního okna pro vytvoření skupiny
+const createGroupBtn = document.getElementById('create-group-btn');
+const createGroupModal = document.getElementById('create-group-modal');
+const closeGroupModal = document.getElementById('close-group-modal');
+if (createGroupBtn && createGroupModal && closeGroupModal) {
+    createGroupBtn.onclick = () => { createGroupModal.style.display = 'flex'; };
+    closeGroupModal.onclick = () => { createGroupModal.style.display = 'none'; };
+}
+
+// Otevření modálního okna se seznamem skupin
+const showGroupsBtn = document.getElementById('show-groups-btn');
+const groupsListModal = document.getElementById('groups-list-modal');
+const closeGroupsModal = document.getElementById('close-groups-modal');
+if (showGroupsBtn && groupsListModal && closeGroupsModal) {
+    showGroupsBtn.onclick = () => {
+        groupsListModal.style.display = 'flex';
+        // Načti skupiny AJAXem
+        fetch('/teacher/groups')
+            .then(r => r.json())
+            .then(data => {
+                const listDiv = document.getElementById('groups-list');
+                if (data.success && data.groups.length > 0) {
+                    listDiv.innerHTML = data.groups.map(g =>
+                        `<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5em;'>
+                            <span>${g.nazev}</span>
+                            <button class='btn-save' onclick='setActiveGroup(${g.id}, "${g.nazev}")'>Jít na tu skupinu</button>
+                        </div>`
+                    ).join('');
+                } else {
+                    listDiv.innerHTML = '<em>Žádné skupiny</em>';
+                }
+            });
+    };
+    closeGroupsModal.onclick = () => { groupsListModal.style.display = 'none'; };
+}
+
+// Vytvoření skupiny AJAXem
+const submitGroupBtn = document.getElementById('submit-group-btn');
+if (submitGroupBtn) {
+    submitGroupBtn.onclick = function() {
+        const name = document.getElementById('group-name-input').value.trim();
+        const resultDiv = document.getElementById('create-group-result');
+        if (!name) {
+            resultDiv.textContent = 'Zadejte název skupiny!';
+            return;
+        }
+        fetch('/teacher/create_group', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nazev: name })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                resultDiv.textContent = 'Skupina vytvořena!';
+                document.getElementById('group-name-input').value = '';
+            } else {
+                resultDiv.textContent = data.error || 'Chyba při vytváření skupiny.';
+            }
+        });
+    };
+}
+
+// Nastavení aktivní skupiny
+function setActiveGroup(id, nazev) {
+    fetch('/teacher/set_group', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ group_id: id })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            // Po změně skupiny reloadni stránku, aby se načetli správní studenti
+            window.location.reload();
+        }
+    });
+}
+
+// Žádost o roli učitele
+const teacherRequestBtn = document.getElementById('teacher-request-btn');
+if (teacherRequestBtn) {
+    teacherRequestBtn.onclick = function() {
+        teacherRequestBtn.disabled = true;
+        teacherRequestBtn.textContent = 'Odesílám...';
+        fetch('/request_teacher', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ school: '---', subject: '---', title: '---' })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                teacherRequestBtn.textContent = 'Žádost odeslána!';
+            } else {
+                teacherRequestBtn.textContent = 'Chci být učitel';
+                alert(data.error || 'Chyba při odesílání žádosti.');
+                teacherRequestBtn.disabled = false;
+            }
+        })
+        .catch(() => {
+            teacherRequestBtn.textContent = 'Chci být učitel';
+            alert('Chyba při odesílání žádosti.');
+            teacherRequestBtn.disabled = false;
+        });
+    };
+}
+
+// Přidání studenta AJAXem (zabráníme reloadu stránky)
+const addStudentForm = document.getElementById('add-student-form');
+if (addStudentForm) {
+    addStudentForm.onsubmit = function(e) {
+        e.preventDefault(); // Zabráníme reloadu stránky
+        const emailInput = document.getElementById('student-email');
+        const resultDiv = document.getElementById('add-student-result');
+        const email = emailInput.value.trim();
+        if (!email) {
+            resultDiv.textContent = 'Zadejte e-mail studenta!';
+            return;
+        }
+        fetch('/add_student', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ student_email: email })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                resultDiv.textContent = 'Student úspěšně přidán!';
+                emailInput.value = '';
+                // Volitelně: reloadni studenty AJAXem nebo reloadni stránku
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                resultDiv.textContent = data.error || 'Chyba při přidávání studenta.';
+            }
+        })
+        .catch(() => {
+            resultDiv.textContent = 'Chyba při přidávání studenta.';
+        });
+    };
+}
+
+// ======================== KÓD PRO UČITELE ========================
+// Přidáno: Funkce pro zobrazení statistik studenta
+function viewStudentStats(studentId) {
+    window.location.href = `/teacher/student_stats/${studentId}`;
+}
+
+// Přidáno: Funkce pro odebrání studenta
+function removeStudent(studentId) {
+    if (!confirm('Opravdu chcete tohoto studenta odebrat ze skupiny?')) return;
+
+    fetch('/remove_student', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student_id: studentId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Najdeme a odstraníme odpovídající studentovu kartu
+            const studentCard = document.querySelector(`.student-card [data-student-id="${studentId}"]`).closest('.student-card');
+            if (studentCard) {
+                studentCard.remove();
+                alert('Student byl úspěšně odebrán!');
+            }
+        } else {
+            alert('Chyba při odebírání studenta: ' + (data.error || ''));
+        }
+    })
+    .catch(error => {
+        console.error('Chyba:', error);
+        alert('Došlo k chybě při odebírání studenta.');
+    });
+}
+
+// Přidáno: Delegování událostí pro tlačítka
+document.addEventListener('DOMContentLoaded', function() {
+    // Pro tlačítko "Statistiky"
+    document.body.addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-view-stats')) {
+            const studentId = e.target.getAttribute('data-student-id');
+            viewStudentStats(studentId);
+        }
+    });
+
+    // Pro tlačítko "Odebrat"
+    document.body.addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-remove-student')) {
+            const studentId = e.target.getAttribute('data-student-id');
+            removeStudent(studentId);
+        }
+    });
+});
 </script>
 </body>
 </html>

@@ -87,7 +87,7 @@ body.dark-mode .word-box.correct {
     margin-bottom: 20px;
 }
 
-.card {
+#board .card {
     width: 80px;
     height: 100px;
     perspective: 600px;
@@ -95,7 +95,7 @@ body.dark-mode .word-box.correct {
     display: inline-block;
 }
 
-.card-inner {
+#board .card-inner {
     position: relative;
     width: 100%;
     height: 100%;
@@ -103,11 +103,11 @@ body.dark-mode .word-box.correct {
     transform-style: preserve-3d;
 }
 
-.card.flipped .card-inner {
+#board .card.flipped .card-inner {
     transform: rotateY(180deg);
 }
 
-.card-front, .card-back {
+#board .card-front, #board .card-back {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -120,20 +120,20 @@ body.dark-mode .word-box.correct {
     font-weight: bold;
 }
 
-.card-front {
+#board .card-front {
     background: #fff;
     border: 2px solid #0074d9;
     color: #0074d9;
     transform: rotateY(180deg);
 }
 
-.card-back {
+#board .card-back {
     background: #0074d9;
     color: #fff;
     border: 2px solid #0074d9;
 }
 
-.card.matched .card-front {
+#board .card.matched .card-front {
     background: #2ecc40;
     color: #fff;
     border-color: #2ecc40;

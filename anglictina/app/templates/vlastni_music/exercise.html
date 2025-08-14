@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cvičení | Knowix</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vlastni_music/vlastni_music.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    </noscript>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        /* === READABILITY IMPROVEMENTS (bez body / header) === */
+    </style>
+</head>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
+<header>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
+    </div>
+    <div class="nav-profile-wrapper">
+        <ul class="nav-right">
+            <li>
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
+            </li>
+        </ul>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
+</header>
+<main>
+
+    <!-- Video sekce využije vzhled .audio-section pro jednotný box -->
+    <section class="audio-section">
+        <h3>Video</h3>
+        {% if youtube_url %}
+        <div style="max-width: 800px; aspect-ratio: 16 / 9; margin: 0 auto;">
+            <iframe
+                    id="ytplayer"
+                    style="width: 100%; height: 100%; border: 0; border-radius: 12px;"
+                    src="{{ youtube_url }}&enablejsapi=1"
+                    title="YouTube video player"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen">
+            </iframe>
+            <script>
+                (function loadYT() {
+                    var tag = document.createElement('script');
+                    tag.src = "https://www.youtube.com/iframe_api";
+                    var firstScriptTag = document.getElementsByTagName('script')[0];
+                    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+                })();
+
+                var player;
+
+                function forceDisableCaptions() {
+                    try {
+                        if (player && typeof player.setOption === 'function') {
+                            player.setOption('captions', 'track', {});
+                        }
+                    } catch (e) {
+                    }
+                }
+
+                function onPlayerReady() {
+                    forceDisableCaptions();
+                    setInterval(forceDisableCaptions, 1500);
+                }
+
+                function onPlayerApiChange() {
+                    forceDisableCaptions();
+                }
+
+                function onYouTubeIframeAPIReady() {
+                    player = new YT.Player('ytplayer', {
+                        events: {'onReady': onPlayerReady, 'onApiChange': onPlayerApiChange}
+                    });
+                }
+
+                window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+            </script>
+            <noscript>Pro přehrání videa je potřeba povolit JavaScript.</noscript>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 8px;">Ovládání zapnuto (seek/volume), titulky jsou ve
+                výchozím stavu vypnuté.</p>
+        </div>
+        {% else %}
+        <p>Video není dostupné.</p>
+        {% endif %}
+    </section>
+
+    <!-- Cvičení: dvě kolony (doplňování / překlady) -->
+    <section class="exercises-section">
+        <div class="exercises-grid">
+            <div class="exercise-col">
+                <h2>Doplň chybějící slovo</h2>
+                {% for exercise in missing_exercises %}
+                <div class="exercise-card">
+                    <h3>{{ loop.index }}. Věta:</h3>
+                    <p class="blank-sentence">{{ exercise.with_blank | safe }}</p>
+                    <input type="text" name="missing_word_{{ loop.index0 }}" class="exercise-input" placeholder="Napiš chybějící slovo..." data-correct="{{ exercise.answer }}">
+                    <div class="feedback" aria-live="polite"></div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="exercise-col">
+                <h2>Přelož větu</h2>
+                {% set offset = (missing_exercises | length) %}
+                {% for exercise in translation_exercises %}
+                <div class="exercise-card">
+                    <h3>{{ loop.index + offset }}. Věta:</h3>
+                    <p class="original-sentence"><em>"{{ exercise.original }}"</em></p>
+                    <input type="text" name="translation_{{ loop.index0 }}" class="exercise-input translation-input" placeholder="Tvůj překlad..." data-correct="{{ exercise.translated }}" data-original="{{ exercise.original }}">
+                    <div class="feedback" aria-live="polite"></div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Spojovačka: použijeme .word-matching + vnořený #matchingExerciseContainer pro vzhled -->
+    <section class="word-matching">
+        <h3>Spoj slova k sobě:</h3>
+        <div id="matchingExerciseContainer">
+            {% if matching_pairs %}
+            <div id="matching-root" style="display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;">
+                <div>
+                    <h3>EN</h3>
+                    <ol id="match-en">
+                        {% for p in matching_pairs %}
+                        <li>
+                            <button type="button" class="match-en" data-en="{{ p.en }}" data-cs="{{ p.cs }}">{{ p.en
+                                }}
+                            </button>
+                        </li>
+                        {% endfor %}
+                    </ol>
+                </div>
+                <div>
+                    <h3>CS (promíchané)</h3>
+                    <ol id="match-cs">
+                        {% for cs in matching_cs_shuffled %}
+                        <li>
+                            <button type="button" class="match-cs" data-cs="{{ cs }}">{{ cs }}</button>
+                        </li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+            <p id="match-status" style="font-size:0.95rem; margin-top:6px; color:#444;"></p>
+            {% else %}
+            <p>Nepodařilo se vygenerovat slovíčka.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Tlačítko vizuálně jako v music/exercises.html (ponecháme původní ID kvůli JS, přidáme třídu pro styl)
+         NOVĚ: data-endpoint ukazuje na backend kontrolu pro vlastní music -->
+    <button
+            type="button"
+            id="submit-answers"
+            class="check-button"
+            data-endpoint="{{ url_for('vlastni_music_bp.check_answer') }}"
+    >Zkontrolovat odpovědi
+    </button>
+
+    <!-- Volitelný kontejner pro souhrn výsledků (vizuál ze style.css) -->
+    <div id="result" class="result-container" aria-live="polite"></div>
+
+    <!-- POPUP: úspěch / téměř -->
+    <div id="successPopup" class="popup-container" style="display:none;">
+        <div class="popup-content">
+            <h3 id="successHeading">Skvělá práce! 🎉</h3>
+            <p id="successSub"></p>
+            <div class="popup-buttons">
+                <button type="button" id="nextLessonBtn" class="popup-button confirm">Další / nová píseň</button>
+                <button type="button" id="reviewBtn" class="popup-button cancel">Ukázat řešení</button>
+            </div>
+        </div>
+    </div>
+    <!-- POPUP: řešení -->
+    <div id="solutionPopup" class="popup-container" style="display:none;">
+        <div class="popup-content" style="max-width:520px;">
+            <h3>Správné odpovědi</h3>
+            <div id="solutionContent" style="text-align:left; font-size:.95em; line-height:1.4;"></div>
+            <div class="popup-buttons">
+                <button type="button" id="closeSolutionBtn" class="popup-button confirm">Zavřít</button>
+            </div>
+        </div>
+    </div>
+</main>
+<footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+</footer>
+
+<!-- External JS (no inline) -->
+<script>window.exerciseConfig = {{ config|tojson|safe }};</script>
+<script src="{{ url_for('static', filename='js/exercise.js') }}" defer></script>
+<script>
+// Vlastní posluchače pro popup akce
+document.addEventListener('DOMContentLoaded', ()=>{
+    const successPopup=document.getElementById('successPopup');
+    const solutionPopup=document.getElementById('solutionPopup');
+    function showPopup(el){el.style.display='flex'; setTimeout(()=>el.classList.add('active'),10);}
+    function hidePopup(el){el.classList.remove('active'); setTimeout(()=>el.style.display='none',300);}
+    window._vm_showSuccess=(score,perfect)=>{showPopup(successPopup); const h=document.getElementById('successHeading'); const sub=document.getElementById('successSub'); if(perfect){h.textContent='Perfektní! 🎯'; sub.textContent='Máš vše správně.';} else if(score>=0.8){h.textContent='Skoro správně! Nevadí 🎉'; sub.textContent='Splnil jsi limit (>=80%). Jen pár detailů chybělo.';} else {h.textContent='Hotovo'; sub.textContent='Podívej se na řešení a zkus zlepšit výsledek.';}};
+    window._vm_showSolutions=()=>{if(!window.exerciseConfig) return; const wrap=document.getElementById('solutionContent'); let html=''; const cfg=window.exerciseConfig; if(cfg.missing_exercises){html+='<h4>Chybějící slova</h4><ul class="solution-list">'+cfg.missing_exercises.map((w,i)=>`<li>${i+1}. <b>${w}</b></li>`).join('')+'</ul>'; } if(cfg.translation_exercises){html+='<h4>Překlady</h4><ul class="solution-list">'+cfg.translation_exercises.map((w,i)=>`<li>${i+1}. <b>${w}</b></li>`).join('')+'</ul>'; } wrap.innerHTML=html; showPopup(solutionPopup);};
+    document.getElementById('reviewBtn').addEventListener('click',e=>{e.preventDefault(); hidePopup(successPopup); window._vm_showSolutions();});
+    document.getElementById('nextLessonBtn').addEventListener('click',()=>{window.location.href='/vlastni_music';});
+    document.getElementById('closeSolutionBtn').addEventListener('click',()=>hidePopup(solutionPopup));
+    solutionPopup.addEventListener('click',e=>{if(e.target===solutionPopup) hidePopup(solutionPopup);});
+    successPopup.addEventListener('click',e=>{if(e.target===successPopup) hidePopup(successPopup);});
+});
+</script>
+</body>
+</html>

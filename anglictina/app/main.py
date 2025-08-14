@@ -1,6 +1,9 @@
 # --- Flask and SocketIO imports ---
 from dotenv import load_dotenv
-from flask import Flask, render_template, session, send_from_directory, request, redirect
+from flask import Flask, render_template, session, send_from_directory, request, redirect, jsonify
+from flask_session import Session
+from streak import get_user_streak, update_user_streak
+import traceback
 
 import os
 import sys
@@ -21,15 +24,22 @@ from obchod import obchod_bp
 from present_perfect import chat_bp
 from review import review_bp
 from roleplaying import roleplaying_bp
-from streak import get_user_streak, update_user_streak
 from theme import theme_bp
 from pexeso import pexeso_bp, register_socketio_handlers
 from xp import get_user_xp_and_level
 from xp import xp_bp
+from drawing import drawing_bp
+from psani import psani_bp
+from stats import user_stats_bp
+from admin import admin_bp
+from vlastni_music import vlastni_music_bp
+from proc import proc_bp
+
+# from linkify import auto_linkify
 
 app = Flask(__name__)
-
-# --- SocketIO initialization with threading async_mode ---
+app.config['SESSION_TYPE'] = 'filesystem'
+Session(app)
 
 load_dotenv(dotenv_path=".env")
 app.secret_key = os.getenv("SECRET_KEY")
@@ -59,6 +69,20 @@ app.register_blueprint(zpravy_bp)
 app.register_blueprint(roleplaying_bp)
 app.register_blueprint(ai_bp)
 app.register_blueprint(pexeso_bp)
+app.register_blueprint(drawing_bp)
+app.register_blueprint(psani_bp)
+app.register_blueprint(user_stats_bp)
+app.register_blueprint(admin_bp)
+app.register_blueprint(vlastni_music_bp)
+app.register_blueprint(proc_bp)
+
+
+# app.jinja_env.filters['linkify'] = auto_linkify
+#
+#
+# @app.template_filter('linkify')
+# def linkify_filter(s):
+#     return auto_linkify(s)
 
 
 @app.route('/sitemap.xml')
@@ -86,7 +110,7 @@ def redirect_to_main_domain():
 def inject_streak():
     user_id = session.get('user_id')
     if user_id:
-        update_user_streak(user_id)
+        # update_user_streak(user_id)  # Konečně dopiči
         streak = get_user_streak(user_id)
         return dict(user_streak=streak)
     return dict(user_streak=0)
@@ -99,7 +123,26 @@ def inject_streak():
 @app.errorhandler(404)
 @app.errorhandler(Exception)
 def server_error(e):
-    return render_template('error.html', error_code=getattr(e, 'code', 500)), getattr(e, 'code', 500)
+    code = getattr(e, 'code', 500)
+    tb = traceback.format_exc()
+
+    # Pokud klient očekává JSON (AJAX fetch na JSON endpoint), vrať JSON místo HTML
+    wants_json = ('application/json' in request.headers.get('Accept', '')) or \
+                 ('application/json' in request.headers.get('Content-Type', '')) or \
+                 request.path.endswith('/check-answer')
+    if wants_json:
+        return jsonify({
+            'error': str(e),
+            'code': code,
+            'traceback': tb
+        }), code
+
+    return render_template(
+        'error.html',
+        error_code=code,
+        error_message=str(e),
+        error_traceback=tb
+    ), code
 
 
 LEVEL_NAMES = [
@@ -154,10 +197,11 @@ def inject_xp_info():
 def add_security_headers(response):
     response.headers['Content-Security-Policy'] = (
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline'; "
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+        "script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://cdn.jsdelivr.net https://www.youtube.com https://s.ytimg.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.quilljs.com; "
         "font-src 'self' https://fonts.gstatic.com; "
         "img-src 'self' data:; "
+        "frame-src https://open.spotify.com https://*.spotify.com https://www.youtube-nocookie.com https://www.youtube.com https://*.youtube.com; "
         "frame-ancestors 'none';"
     )
     response.headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload'

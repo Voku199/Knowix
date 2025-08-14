@@ -3,18 +3,18 @@ import json
 import os
 import traceback
 import random
+import time
 
 from xp import add_xp_to_user
 from streak import update_user_streak, get_user_streak
+from user_stats import update_user_stats
 
 roleplaying_bp = Blueprint('roleplaying', __name__, template_folder='templates')
 
-# Cesta ke složce s konverzačními scénáři
 SCENARIOS_DIR = os.path.join(os.path.dirname(__file__), 'static/speaking/roleplaying')
 
 
 def load_scenario(filename):
-    """Načte JSON scénář podle názvu souboru."""
     path = os.path.join(SCENARIOS_DIR, filename)
     if not os.path.exists(path):
         return None
@@ -36,7 +36,6 @@ def normalize(s):
 
 
 def levenshtein_similarity(a, b):
-    # Simple Levenshtein similarity (normalized)
     if not a or not b:
         return 0.0
     len_a, len_b = len(a), len(b)
@@ -62,6 +61,11 @@ def levenshtein_similarity(a, b):
 @roleplaying_bp.route('/roleplaying', methods=['GET'])
 def select_topic():
     topic = request.args.get('topic')
+    user_id = session.get('user_id')
+    if user_id:
+        # Nastavíme first_activity pokud ještě není a uložíme čas začátku lekce
+        update_user_stats(user_id, set_first_activity=True)
+        session['roleplaying_training_start'] = time.time()
     if not topic:
         topics = [
             {
@@ -92,11 +96,8 @@ def select_topic():
                 "img": "pic/advice.png",
                 "filename": "giving_advice.json"
             },
-
-            # ... další témata
         ]
         return render_template('speaking/roleplaying/select_topic.html', topics=topics)
-    # Začátek konverzace
     scenario = load_scenario(topic)
     if not scenario:
         return "Téma nenalezeno.", 404
@@ -114,6 +115,7 @@ def select_topic():
 @roleplaying_bp.route('/roleplaying/next', methods=['POST'])
 def roleplaying_next():
     """Zpracuje odpověď uživatele a posune konverzaci dál."""
+    import time as _time
     data = request.get_json()
     user_translation = data.get('preklad', '').strip()
     index = session.get('roleplaying_index', 0)
@@ -137,6 +139,11 @@ def roleplaying_next():
     best_match = None
     best_similarity = 0.0
 
+    # --- STATISTIKY: počítání správných/špatných/blízkých odpovědí ---
+    roleplaying_cr = 0
+    roleplaying_wr = 0
+    roleplaying_mb = 0
+
     if is_user_turn:
         correct_answers = current['en']
         if isinstance(correct_answers, str):
@@ -148,7 +155,28 @@ def roleplaying_next():
                 best_similarity = sim
                 best_match = ans
         similarity = best_similarity
-        correct = similarity >= 0.70
+
+        # Rozhodnutí o typu odpovědi
+        if similarity >= 0.90:
+            correct = True
+            roleplaying_cr = 1
+        elif similarity >= 0.65:
+            correct = True
+            roleplaying_mb = 1  # "blízko"
+        else:
+            correct = False
+            roleplaying_wr = 1
+
+        # --- Ukládání statistik ---
+        if 'user_id' in session:
+            update_user_stats(
+                session['user_id'],
+                roleplaying_cr=roleplaying_cr,
+                roleplaying_wr=roleplaying_wr,
+                roleplaying_mb=roleplaying_mb,
+                lesson_done=False
+            )
+
         if correct and 'user_id' in session:
             try:
                 xp_result = add_xp_to_user(session['user_id'], 10)
@@ -165,6 +193,27 @@ def roleplaying_next():
     # Posuň index na další repliku
     next_index = index + 1
     session['roleplaying_index'] = next_index
+
+    # --- Pokud je to poslední replika, spočítej lesson_done a learning_time ---
+    end_of_dialogue = next_index >= len(dialogue)
+    if end_of_dialogue and 'user_id' in session:
+        learning_time = None
+        if session.get('roleplaying_training_start'):
+            try:
+                start = float(session.pop('roleplaying_training_start', None))
+                duration = max(1, int(_time.time() - start))
+                learning_time = duration
+            except Exception as e:
+                print("Chyba při ukládání času tréninku:", e)
+        update_user_stats(
+            session['user_id'],
+            roleplaying_cr=0,
+            roleplaying_wr=0,
+            roleplaying_mb=0,
+            lesson_done=True,
+            learning_time=learning_time,
+            set_first_activity=True  # pro jistotu
+        )
 
     if next_index < len(dialogue):
         next_line = dialogue[next_index]
@@ -186,7 +235,6 @@ def roleplaying_next():
             'end': False
         })
     else:
-        # Přidání matching_pairs do odpovědi po skončení konverzace - pouze 5 náhodných dvojic
         matching_pairs = []
         for line in dialogue:
             if line['speaker'].lower() == 'alex':
@@ -196,7 +244,6 @@ def roleplaying_next():
                     en = line['en']
                 matching_pairs.append({'en': en, 'cz': line['cz']})
 
-        # Vyber náhodných 5 (nebo méně, pokud je méně replik)
         if len(matching_pairs) > 5:
             matching_pairs = random.sample(matching_pairs, 5)
 

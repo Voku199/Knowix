@@ -2,8 +2,10 @@ from flask import Blueprint, session, request, render_template, redirect, url_fo
 from db import get_db_connection
 import json
 import random
-from xp import get_user_xp_and_level, add_xp_to_user  # Přidán import add_xp_to_user
-from streak import update_user_streak, get_user_streak  # <-- Přidán import streak systému
+import time
+from xp import get_user_xp_and_level, add_xp_to_user
+from streak import update_user_streak, get_user_streak
+from user_stats import update_user_stats
 
 verbs_bp = Blueprint('verbs', __name__)
 
@@ -70,7 +72,7 @@ def inject_xp_info():
 @verbs_bp.errorhandler(Exception)
 def server_error(e):
     # vrátí stránku error.html s informací o výpadku
-    return render_template('error.html', error_code=e.code), e.code
+    return render_template('error.html', error_code=getattr(e, "code", 500)), getattr(e, "code", 500)
 
 
 # Pomocné funkce
@@ -162,6 +164,13 @@ def test():
 
     is_guest = 'user_id' not in session
 
+    # --- Nastavení first_activity a začátek měření času při vstupu do lekce (GET nebo první POST) ---
+    if not is_guest and (request.method == 'GET' or (request.method == 'POST' and 'verb' in request.form)):
+        # Nastavíme first_activity pokud ještě není
+        update_user_stats(session['user_id'], set_first_activity=True)
+        # Ulož čas začátku lekce
+        session['irregular_training_start'] = time.time()
+
     if request.method == 'POST':
         # 1) VÝBĚR SLOVESA
         if 'verb' in request.form or 'continue' in request.form:
@@ -236,37 +245,60 @@ def test():
 
         correct_answer = verb_entry[current_tense]
         is_correct = user_answer.strip().lower() == correct_answer.lower()
+        session['correct_answers_for_verb'] = session.get('correct_answers_for_verb', 0) + 1
+
         feedback = "✅ Správně!" if is_correct else f"❌ Špatně! Správná odpověď byla: {correct_answer}"
 
-        if is_correct:
-            session['correct_answers_for_verb'] = session.get('correct_answers_for_verb', 0) + 1
+        # --- ZAZNAMENÁNÍ ODPOVĚDI DO STATISTIK ---
+        if not is_guest:
+            if is_correct:
+                update_user_stats(session['user_id'], correct=1, irregular_verbs_guessed=1)
+            else:
+                update_user_stats(session['user_id'], wrong=1, irregular_verbs_wrong=1)
 
-            # --- XP ZA KAŽDOU SPRÁVNOU ODPOVĚĎ ---
-            if not is_guest:
-                result = add_xp_to_user(session['user_id'], 2)
-                if "error" in result:
-                    flash(f"XP se nepodařilo přidat: {result['error']}", "error")
-                else:
-                    flash(f"Získáváš 2 XP za správnou odpověď!", "success")
-                    # --- STREAK LOGIKA ---
-                    streak_info = update_user_streak(session['user_id'])
-                    if streak_info and streak_info.get("status") in ("started", "continued"):
-                        flash(f"🔥 Máš streak {streak_info['streak']} dní v řadě!", "streak")
+        # --- XP ZA KAŽDOU SPRÁVNOU ODPOVĚĎ ---
+        if is_correct and not is_guest:
+            result = add_xp_to_user(session['user_id'], 2)
+            if "error" in result:
+                flash(f"XP se nepodařilo přidat: {result['error']}", "error")
+            else:
+                flash(f"Získáváš 2 XP za správnou odpověď!", "success")
+                # --- STREAK LOGIKA ---
+                streak_info = update_user_streak(session['user_id'])
+                if streak_info and streak_info.get("status") in ("started", "continued"):
+                    flash(f"🔥 Máš streak {streak_info['streak']} dní v řadě!", "streak")
 
-            if session['correct_answers_for_verb'] >= 6 and not is_guest:
-                with get_db_connection() as conn:
-                    cursor = conn.cursor()
-                    cursor.execute("""
+        # --- Pokud uživatel dokončil 6 správných odpovědí pro sloveso, zapiš lesson_done, total_learning_time ---
+        if session['correct_answers_for_verb'] >= 6 and not is_guest:
+            # Výpočet learning_time
+            learning_time = None
+            if session.get('irregular_training_start'):
+                try:
+                    start = float(session.pop('irregular_training_start', None))
+                    duration = max(1, int(time.time() - start))  # min. 1 sekunda
+                    learning_time = duration
+                except Exception as e:
+                    print("Chyba při ukládání času tréninku:", e)
+            # Zaznamenej lesson_done a learning_time
+            update_user_stats(
+                session['user_id'],
+                lesson_done=True,
+                learning_time=learning_time,
+                set_first_activity=True  # pro jistotu, pokud by někdo šel rovnou na POST
+            )
+            with get_db_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
                         INSERT INTO lesson_progress (user_id, lesson_id, verb, completed)
                         VALUES (%s, %s, %s, TRUE)
                         ON DUPLICATE KEY UPDATE completed = TRUE
                     """, (session['user_id'], LESSON_ID, verb))
-                    conn.commit()
+                conn.commit()
 
-                session['correct_answers_for_verb'] = 0
-                session['used_sentences'] = []
-                flash(f"Sloveso '{verb}' bylo úspěšně dokončeno! ✅", "success")
-                return redirect(url_for('verbs.test'))
+            session['correct_answers_for_verb'] = 0
+            session['used_sentences'] = []
+            flash(f"Sloveso '{verb}' bylo úspěšně dokončeno! ✅", "success")
+            return redirect(url_for('verbs.test'))
 
         # Update verbs_done count
         verbs_done = 0
@@ -348,4 +380,4 @@ def continue_lesson():
     session.pop('current_verb', None)
     session.pop('current_sentence', None)
     session.pop('current_tense', None)
-    session.pop('verbs_done', None)  # Reset progress counter
+    session.pop('verbs_done', None)

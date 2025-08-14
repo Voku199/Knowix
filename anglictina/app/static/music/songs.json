@@ -16,11 +16,11 @@
     "level": "A1"
   },
   {
-    "title": "Stand By Me",
-    "artist": "Ben E. King",
-    "audio_file": "Stand_By_Me.mp3",
-    "lyrics_file": "Stand_By_Me.lrc",
-    "image": "Stand_By_Me.jpeg",
+    "title": "My Kind of Woman",
+    "artist": "Mac DeMarco",
+    "audio_file": "My_kind_of_woman.mp3",
+    "lyrics_file": "My_kind_of_woman.lrc",
+    "image": "My_kind_of_woman.jpeg",
     "level": "A1"
   },
   {
@@ -64,19 +64,19 @@
     "level": "B1"
   },
   {
-    "title": "Greedy",
-    "artist": "Tate McRae",
-    "audio_file": "Greedy.mp3",
-    "lyrics_file": "Greedy.lrc",
-    "image": "Greedy.jpeg",
+    "title": "No Surprises",
+    "artist": "Radiohead",
+    "audio_file": "No_surprises.mp3",
+    "lyrics_file": "No_suprises.lrc",
+    "image": "No_suprises.jpeg",
     "level": "B1"
   },
   {
-    "title": "Alright",
-    "artist": "Kendrick Lamar",
-    "audio_file": "Alright.mp3",
-    "lyrics_file": "Alright.lrc",
-    "image": "Alright.jpeg",
+    "title": "Runaway",
+    "artist": "Kanye West",
+    "audio_file": "Runaway.mp3",
+    "lyrics_file": "Runaway.lrc",
+    "image": "Runaway.jpeg",
     "level": "B2"
   },
   {

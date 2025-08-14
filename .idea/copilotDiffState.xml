@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/anglictina/app/templates/student_stats_chart.html">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/anglictina/app/templates/student_stats_chart.html" />
+              <option name="updatedContent" value="{% extends 'base.html' %}&#10;{% block content %}&#10;&lt;div class=&quot;container&quot;&gt;&#10;    &lt;h2&gt;Statistiky studenta: {{ student.first_name }} {{ student.last_name }}&lt;/h2&gt;&#10;    &lt;div class=&quot;profile&quot;&gt;&#10;        &lt;img src=&quot;{{ url_for('static', filename='profile_pics/' + (student.profile_pic or 'default.jpg')) }}&quot; width=&quot;80&quot; height=&quot;80&quot; style=&quot;border-radius:50%&quot;&gt;&#10;        &lt;p&gt;Email: {{ student.email }}&lt;/p&gt;&#10;        &lt;p&gt;Úroveň: {{ student.english_level }}&lt;/p&gt;&#10;        &lt;p&gt;XP: {{ student.xp }}&lt;/p&gt;&#10;        &lt;p&gt;Level: {{ student.level }}&lt;/p&gt;&#10;        &lt;p&gt;Streak: {{ student.streak }}&lt;/p&gt;&#10;    &lt;/div&gt;&#10;    &lt;hr&gt;&#10;    &lt;h3&gt;Přehled statistik&lt;/h3&gt;&#10;    &lt;canvas id=&quot;statsChart&quot; width=&quot;400&quot; height=&quot;200&quot;&gt;&lt;/canvas&gt;&#10;&lt;/div&gt;&#10;&lt;script src=&quot;https://cdn.jsdelivr.net/npm/chart.js&quot;&gt;&lt;/script&gt;&#10;&lt;script&gt;&#10;    // Připrav data z user_stats&#10;    const stats = {{ stats|tojson }};&#10;    // Předpokládáme, že user_stats má sloupce: id, user_id, stat_name, stat_value&#10;    const labels = stats.map(s =&gt; s.stat_name);&#10;    const values = stats.map(s =&gt; s.stat_value);&#10;    const ctx = document.getElementById('statsChart').getContext('2d');&#10;    new Chart(ctx, {&#10;        type: 'bar',&#10;        data: {&#10;            labels: labels,&#10;            datasets: [{&#10;                label: 'Hodnota',&#10;                data: values,&#10;                backgroundColor: 'rgba(54, 162, 235, 0.5)',&#10;                borderColor: 'rgba(54, 162, 235, 1)',&#10;                borderWidth: 1&#10;            }]&#10;        },&#10;        options: {&#10;            responsive: true,&#10;            scales: {&#10;                y: {&#10;                    beginAtZero: true&#10;                }&#10;            }&#10;        }&#10;    });&#10;&lt;/script&gt;&#10;{% endblock %}&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

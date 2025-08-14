@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, make_response, session
 from xp import get_user_xp_and_level, add_xp_to_user
-from streak import update_user_streak, get_user_streak  # <-- Přidáno pro streak
+from streak import update_user_streak, get_user_streak
+from user_stats import add_learning_time, update_user_stats
 import json
 import os
+import time
 
 listening_bp = Blueprint('listening_bp', __name__, template_folder='templates', static_folder='static')
 
@@ -67,7 +69,7 @@ def inject_xp_info():
 @listening_bp.errorhandler(Exception)
 def server_error(e):
     # vrátí stránku error.html s informací o výpadku
-    return render_template('error.html', error_code=e.code), e.code
+    return render_template('error.html', error_code=getattr(e, "code", 500)), getattr(e, "code", 500)
 
 
 @listening_bp.route('/listening')
@@ -82,6 +84,13 @@ def lesson(level, lesson_id):
     with open(DATA_FILE, 'r', encoding='utf-8') as f:
         lessons = json.load(f)
     lesson_data = next((l for l in lessons[level] if l['id'] == lesson_id), None)
+    # --- Uložení času vstupu na stránku a nastavení first_activity ---
+    user_id = session.get('user_id')
+    if user_id:
+        # Nastavíme first_activity pokud ještě není
+        update_user_stats(user_id, set_first_activity=True)
+    # Ulož čas začátku lekce
+    session['training_start'] = time.time()
     rendered = render_template('listening/lesson.html', lesson=lesson_data, level=level)
     response = make_response(rendered)
     response.headers['Content-Type'] = 'text/html; charset=utf-8'
@@ -136,13 +145,37 @@ def validate_quiz():
     )
     total = len(correct_answers)
 
+    # --- STATISTIKY UŽIVATELE ---
+    if 'user_id' in session:
+        lis_cor = score
+        lis_wr = total - score
+        learning_time = None
+        # Pokud chceš měřit čas, použij session['training_start'] jako v A1_music.py
+        if session.get('training_start'):
+            try:
+                start = float(session.pop('training_start', None))
+                duration = max(1, int(time.time() - start))
+                learning_time = duration
+            except Exception as e:
+                print("Chyba při ukládání času tréninku:", e)
+        # Ulož správné/špatné odpovědi a případně dokončenou lekci
+        all_correct = (score == total and total > 0)
+        update_user_stats(
+            session['user_id'],
+            lis_cor=lis_cor,
+            lis_wr=lis_wr,
+            lesson_done=all_correct,
+            learning_time=learning_time,
+            set_first_activity=True  # pro jistotu, pokud by někdo šel rovnou na POST
+        )
+
     # --- XP & STREAK INTEGRACE ---
     xp_awarded = 0
     new_xp = None
     new_level = None
     new_achievements = []
     xp_error = None
-    streak_info = None  # <-- Přidáno pro streak
+    streak_info = None
     all_correct = (score == total and total > 0)
     if all_correct and 'user_id' in session:
         try:
@@ -167,5 +200,5 @@ def validate_quiz():
         'new_level': new_level,
         'new_achievements': new_achievements,
         'xp_error': xp_error,
-        'streak_info': streak_info  # <-- Přidáno do odpovědi
+        'streak_info': streak_info
     })

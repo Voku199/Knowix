@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cvičení | Knowix</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    </noscript>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        /* Béžové téma – pouze světlý režim */
+        body:not(.dark-mode){
+            --beige-bg:#f9f5ee; --beige-bg-alt:#f4ede2; --beige-card:#fcfaf6; --beige-border:#e3d7c7; --beige-accent:#c37b27; --beige-accent-hover:#a86415; --beige-text:#4e3d27; --beige-soft:#eadac7; --beige-green:#1f8858;
+        }
+        /* Kontejner */
+        .vmusic-wrapper{max-width:960px;margin:32px auto 60px;padding:38px 42px 46px;border:1px solid var(--beige-border);border-radius:28px;background:linear-gradient(140deg,var(--beige-card),var(--beige-bg-alt));box-shadow:0 10px 42px -16px rgba(90,60,20,.28),0 2px 0 rgba(255,255,255,.5) inset;position:relative;overflow:hidden;text-align:center;}
+        .vmusic-wrapper:before{content:"";position:absolute;top:-80px;right:-60px;width:320px;height:320px;background:radial-gradient(circle at 30% 40%,rgba(195,123,39,.25),transparent 70%);filter:blur(2px);pointer-events:none;}
+        body.dark-mode .vmusic-wrapper{background:#1f2530;border:1px solid #2b3746;box-shadow:0 10px 42px -18px rgba(0,0,0,.55);}
+        .vmusic-wrapper h1{margin-top:0;font-size:clamp(1.9rem,3.2vw,2.4rem);letter-spacing:.5px;background:linear-gradient(95deg,var(--beige-accent),#e2a04f);-webkit-background-clip:text;color:transparent;filter:drop-shadow(0 2px 6px rgba(195,123,39,.25));}
+        body.dark-mode .vmusic-wrapper h1{background:linear-gradient(95deg,#ffb764,#d8872f);-webkit-background-clip:text;color:transparent;}
+        /* Form */
+        .vmusic-search{display:flex;flex-wrap:wrap;gap:14px;margin:18px 0 8px;justify-content:center;}
+        .vmusic-search input[type=text]{flex:1 1 260px;padding:14px 18px;border:1.5px solid var(--beige-border);border-radius:16px;font-size:1.05rem;background:#fff;box-shadow:0 2px 4px rgba(90,60,20,.08) inset,0 1px 2px rgba(90,60,20,.12);color:var(--beige-text);transition:border .25s,box-shadow .25s,background .25s;max-width:420px;}
+        .vmusic-search input[type=text]:focus{outline:none;border-color:var(--beige-accent);box-shadow:0 0 0 4px rgba(195,123,39,.25);}
+        .vmusic-search button{padding:14px 28px;border:none;border-radius:18px;background:linear-gradient(125deg,var(--beige-accent),var(--beige-accent-hover));color:#fff;font-size:1.05rem;font-weight:600;letter-spacing:.4px;cursor:pointer;box-shadow:0 6px 18px -6px rgba(195,123,39,.55),0 2px 0 rgba(255,255,255,.3) inset;transition:transform .25s,box-shadow .25s,filter .25s;}
+        .vmusic-search button:hover{transform:translateY(-3px);box-shadow:0 10px 26px -10px rgba(195,123,39,.65);}
+        .vmusic-search button:active{transform:translateY(-1px);}
+        body.dark-mode .vmusic-search input[type=text]{background:#233041;border-color:#314153;color:#e6eef5;}
+        body.dark-mode .vmusic-search input[type=text]:focus{box-shadow:0 0 0 4px rgba(255,184,118,.25);border-color:#ffb974;}
+        body.dark-mode .vmusic-search button{background:linear-gradient(125deg,#ffb567,#d78129);box-shadow:0 6px 18px -6px rgba(0,0,0,.55);}
+        body.dark-mode .vmusic-search button:hover{box-shadow:0 10px 28px -10px rgba(0,0,0,.7);}
+        /* Video rámeček */
+        .video-shell{margin-top:30px;border:1px solid var(--beige-border);padding:14px;border-radius:22px;background:linear-gradient(120deg,#fff,#fff9f0);box-shadow:0 4px 22px -10px rgba(90,60,20,.25);}
+        body.dark-mode .video-shell{background:#222d3a;border-color:#2d3a48;}
+        .video-note{font-size:.82rem;margin:10px 4px 0;color:var(--beige-text);opacity:.75;}
+        body.dark-mode .video-note{color:#b8c7d6;}
+        .vmusic-tip{margin:10px 0 4px;font-size:.9rem;color:var(--beige-text,#5a4630);opacity:.85;}
+        body.dark-mode .vmusic-tip{color:#c7d5e2;}
+        .vmusic-error{margin:10px auto 0;max-width:560px;background:#ffe9e6;border:1px solid #ffb7ac;color:#9d1f00;padding:12px 18px;border-radius:14px;font-weight:600;font-size:.95rem;box-shadow:0 4px 14px -6px rgba(160,50,10,.25);}
+        body.dark-mode .vmusic-error{background:#3a1e1c;border-color:#8c3d32;color:#ffb7ac;}
+        /* Responsivita */
+        @media (max-width:640px){.vmusic-wrapper{padding:28px 24px 34px;border-radius:22px;} .vmusic-search input[type=text]{padding:12px 16px;font-size:1rem;} .vmusic-search button{padding:12px 22px;font-size:1rem;border-radius:16px;} }
+        /* VYLEPŠENÍ STYLŮ (bez změny body / header) */
+        .vmusic-wrapper{--vm-accent:var(--beige-accent,#c37b27);--vm-accent-soft:var(--beige-accent-hover,#a86415);--vm-bg-card:var(--beige-card,#fcfaf6);}
+        .vmusic-wrapper{animation:vmFadeIn .6s ease;}
+        @keyframes vmFadeIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+        .vmusic-search input[type=text]{transition:border-color .25s,box-shadow .25s,background .35s,transform .25s;}
+        .vmusic-search input[type=text]:hover{background:#fffefb;}
+        .vmusic-search button{position:relative;overflow:hidden;}
+        .vmusic-search button:before{content:"";position:absolute;inset:0;opacity:0;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.5),transparent 60%);transition:opacity .4s;}
+        .vmusic-search button:hover:before{opacity:.9;}
+        .vmusic-search button:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+        .vmusic-tip{display:inline-flex;gap:.45em;align-items:center;}
+        .vmusic-tip:before{content:"💡";}
+        .vmusic-samples{margin:14px auto 4px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:680px;}
+        .vmusic-badge{background:linear-gradient(120deg,#fff,#fffaf4);border:1px solid var(--beige-border,#e3d7c7);padding:6px 14px;font-size:.74rem;font-weight:600;border-radius:40px;letter-spacing:.5px;text-transform:uppercase;color:var(--beige-text,#4e3d27);box-shadow:0 2px 6px -2px rgba(90,60,20,.18);cursor:pointer;transition:.25s;}
+        .vmusic-badge:hover{transform:translateY(-3px);box-shadow:0 6px 16px -6px rgba(90,60,20,.4);}
+        body.dark-mode .vmusic-badge{background:#263445;color:#dcdfe3;border-color:#2f4559;box-shadow:0 2px 10px -4px rgba(0,0,0,.6);}
+        body.dark-mode .vmusic-badge:hover{box-shadow:0 8px 20px -8px rgba(0,0,0,.8);}
+        .vmusic-error{position:relative;animation:vmSlideIn .5s cubic-bezier(.55,.18,.32,1.25);}
+        @keyframes vmSlideIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+        .vmusic-error:before{content:"⚠";position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.05rem;}
+        .vmusic-error{padding-left:46px;}
+        .vmusic-wrapper hr.vmusic-divider{margin:28px auto 14px;border:none;height:1px;width:72%;background:linear-gradient(90deg,transparent,var(--beige-border,#e3d7c7),transparent);}
+        body.dark-mode .vmusic-wrapper hr.vmusic-divider{background:linear-gradient(90deg,transparent,#314153,transparent);}
+        .video-shell{transition:box-shadow .4s,transform .4s,border-color .4s;}
+        .video-shell:hover{transform:translateY(-4px);box-shadow:0 10px 34px -12px rgba(90,60,20,.38);}
+        body.dark-mode .video-shell:hover{box-shadow:0 14px 38px -14px rgba(0,0,0,.9);}
+        .vmusic-meta{margin-top:18px;font-size:.85rem;opacity:.75;color:var(--beige-text,#4e3d27);}
+        body.dark-mode .vmusic-meta{color:#b6c6d4;}
+        .vmusic-meta strong{color:var(--vm-accent);}
+        body.dark-mode .vmusic-meta strong{color:#ffb764;}
+        /* Utility */
+        .hidden{display:none !important;}
+    </style>
+</head>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
+<header>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
+    </div>
+    <div class="nav-profile-wrapper">
+        <ul class="nav-right">
+            <li>
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
+            </li>
+        </ul>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
+</header>
+
+<div class="vmusic-wrapper">
+    <h1>Najdi a přehraj písničku</h1>
+    <form method="post" class="vmusic-search">
+        <input type="text" name="song" placeholder="Napiš název písničky" required>
+        <button type="submit">Hledat</button>
+    </form>
+    <p class="vmusic-tip">Tip: Zadej celý název písně + jméno interpreta (např. "Someone Like You Adele") pro přesnější výběr a lepší obrázky.</p>
+    <div class="vmusic-samples" aria-label="Ukázkové dotazy">
+        <button type="button" class="vmusic-badge" onclick="document.querySelector('[name=song]').value='Shape of You Ed Sheeran'">Shape of You</button>
+        <button type="button" class="vmusic-badge" onclick="document.querySelector('[name=song]').value='Someone Like You Adele'">Someone Like You</button>
+        <button type="button" class="vmusic-badge" onclick="document.querySelector('[name=song]').value='Perfect Ed Sheeran'">Perfect</button>
+        <button type="button" class="vmusic-badge" onclick="document.querySelector('[name=song]').value='Counting Stars OneRepublic'">Counting Stars</button>
+    </div>
+    {% if error %}<div class="vmusic-error" role="alert">{{ error }}</div>{% endif %}
+
+    {% if video_id %}
+    <div class="video-shell">
+        <div style="max-width: 800px; aspect-ratio: 16 / 9; margin:0 auto;">
+            <iframe
+                id="ytplayer"
+                style="width: 100%; height: 100%; border: 0; border-radius: 12px;"
+                src="https://www.youtube-nocookie.com/embed/{{ video_id }}?cc_load_policy=0&iv_load_policy=3&modestbranding=1&rel=0&controls=1&fs=1&playsinline=1&disablekb=0&enablejsapi=1"
+                title="YouTube video player"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+                allowfullscreen>
+            </iframe>
+            <script>
+                // Load YouTube IFrame API
+                (function loadYT() {
+                    var tag = document.createElement('script');
+                    tag.src = "https://www.youtube.com/iframe_api";
+                    var firstScriptTag = document.getElementsByTagName('script')[0];
+                    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+                })();
+
+                var player;
+                function forceDisableCaptions() {
+                    try {
+                        if (player && typeof player.setOption === 'function') {
+                            // Clear captions track to effectively keep captions off
+                            player.setOption('captions', 'track', {});
+                        }
+                    } catch (e) {
+                        // no-op
+                    }
+                }
+
+                function onPlayerReady() {
+                    forceDisableCaptions();
+                    // Periodically enforce caption off in case user toggles
+                    setInterval(forceDisableCaptions, 1500);
+                }
+
+                function onPlayerApiChange() {
+                    forceDisableCaptions();
+                }
+
+                // Called by the YouTube IFrame API once it's loaded
+                function onYouTubeIframeAPIReady() {
+                    player = new YT.Player('ytplayer', {
+                        events: {
+                            'onReady': onPlayerReady,
+                            'onApiChange': onPlayerApiChange
+                        }
+                    });
+                }
+                window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+            </script>
+        </div>
+        <p class="video-note">Ovládání zapnuto (seek/volume), titulky jsou ve výchozím stavu vypnuté.</p>
+    </div>
+    {% endif %}
+    <hr class="vmusic-divider">
+    <p class="vmusic-meta">Nejlepších výsledků dosáhneš, když zadáš <strong>celý název</strong> + <strong>interpreta</strong>. Tím se zvýší šance na správný text i kvalitní náhled videa.</p>
+</div>
+</body>
+</html>

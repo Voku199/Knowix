@@ -27,6 +27,43 @@
 </script>
 
     <style>
+        /* Hezké tlačítko a popover u "Klikni na mě" */
+        .nice-btn {
+            display: inline-block;
+            background: linear-gradient(135deg,#10b981,#06b6d4);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 6px 16px rgba(6, 182, 212, 0.25);
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
+            white-space: nowrap;
+        }
+        .nice-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(6, 182, 212, 0.35); }
+
+        .popover {
+            position: absolute;
+            right: 0;
+            top: 110%;
+            min-width: 280px;
+            max-width: 360px;
+            background: #fff;
+            color: #111827;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            padding: 12px 14px;
+            display: none;
+            z-index: 100;
+        }
+        .popover strong { display:block; margin-bottom: 6px; }
+        .popover .popover-close {
+            position: absolute; top: 4px; right: 8px; border: none; background: transparent; font-size: 20px; cursor: pointer; color: #6b7280;
+        }
+        body.dark-mode .popover { background:#111827; color:#e5e7eb; border-color:#374151; }
+        body.dark-mode .nice-btn { box-shadow: 0 6px 16px rgba(6, 182, 212, 0.35); }
+
         /* Modal pozadí */
         #explicitModal {
             position: fixed;
@@ -68,6 +105,35 @@
             background-color: #dc3545;
             color: white;
         }
+        /* Vlastní modal pro info o vlastních písničkách */
+        #customSongModal {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.7);
+            display: none; justify-content: center; align-items: center;
+            z-index: 9999;
+        }
+        #customUnderstandBtn { background-color: #10b981; color: #fff; }
+        #customStayBtn { background-color: #6b7280; color: #fff; }
+        /* Podkladová barva pod textem v modalech pro lepší čitelnost */
+        .modal-content .info-block {
+            background: #f8fafc;
+            color: #111827;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin: 6px 0;
+        }
+        body.dark-mode .modal-content .info-block {
+            background: #111827;
+            color: #e5e7eb;
+            border-color: #374151;
+        }
+        /* Responsivita a šířka bubliny jako u Magnolia */
+        #customSongModal .modal-content { max-width: 460px; width: 92%; }
+        #customSongModal .modal-content h2 { margin: 0 0 8px 0; }
+        .info-list { margin: 0; padding-left: 1.1em; text-align: left; }
+        .info-list li { margin: 6px 0; line-height: 1.5; word-break: break-word; }
     </style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
@@ -169,6 +235,9 @@
         </div>
         {% endfor %}
     </div>
+    <div class="custom-song-cta" style="display:flex;justify-content:center;align-items:center;margin-top:16px;">
+        <a href="/vlastni_music" class="nice-btn" id="customSongBtn">Nevidíš svojí písničku? Klikni na mě</a>
+    </div>
 </main>
 
 <footer>
@@ -184,10 +253,25 @@
 <div id="explicitModal">
     <div class="modal-content">
         <h2>Upozornění ⚠️</h2>
-        <p>Tato písnička obsahuje vulgarismy a nevhodný jazyk.</p>
-        <p>Pokračuj jen pokud ti to nevadí.</p>
+        <p class="info-block">Tato písnička obsahuje vulgarismy a nevhodný jazyk.</p>
+        <p class="info-block">Pokračuj jen pokud ti to nevadí.</p>
         <button id="continueBtn">Pokračovat</button>
         <button id="leaveBtn">Odejít</button>
+    </div>
+</div>
+
+<!-- Modal pro vlastní písničku (info) -->
+<div id="customSongModal">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="customSongModalTitle">
+        <h2 id="customSongModalTitle">Informace ℹ️</h2>
+        <div class="info-block">
+            <ul class="info-list">
+                <li>Vyhledavaní písniček není přesné, zatím je to v Beta verzi.</li>
+                <li>Když jsou na knowixu hodně lidí, vyhodí vás to za "time out", průměrná doba je 5-10 sekund na získaní textu, písničku, překlad spojovačka a atd...</li>
+            </ul>
+        </div>
+        <button id="customUnderstandBtn">Rozumím</button>
+        <button id="customStayBtn">Zůstanu na stránce</button>
     </div>
 </div>
 
@@ -217,6 +301,32 @@
             profileMenu.style.transform = 'translateY(10px)';
         }
     });
+
+    // Modal pro "Nevidíš svojí písničku?"
+    const customBtn = document.getElementById('customSongBtn');
+    const customModal = document.getElementById('customSongModal');
+    const customUnderstandBtn = document.getElementById('customUnderstandBtn');
+    const customStayBtn = document.getElementById('customStayBtn');
+    if (customBtn && customModal) {
+        customBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            customModal.style.display = 'flex';
+        });
+        customUnderstandBtn?.addEventListener('click', () => {
+            window.location.href = customBtn.getAttribute('href');
+        });
+        customStayBtn?.addEventListener('click', () => {
+            customModal.style.display = 'none';
+        });
+        customModal.addEventListener('click', (e) => {
+            if (e.target === customModal) customModal.style.display = 'none';
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && customModal.style.display === 'flex') {
+                customModal.style.display = 'none';
+            }
+        });
+    }
 
     // Explicitní varování pro písničku Magnolia
     const explicitSongs = ['magnolia', 'magnolia.json'];

@@ -149,6 +149,17 @@
     <div class="error-desc">
         Omlouváme se, ale při zpracování vašeho požadavku došlo k chybě.<br>
         Zkuste to prosím později nebo se vraťte na hlavní stránku.
+        {% if error_message %}
+        <hr>
+        <b>Chybová zpráva:</b>
+        <pre style="color:#c00; background:#f9f2f4; padding:8px; border-radius:6px;">{{ error_message }}</pre>
+        {% endif %}
+        {% if error_traceback %}
+        <details style="margin-top:1em;">
+            <summary>Traceback (pouze pro vývojáře)</summary>
+            <pre style="font-size:0.9em; color:#555; background:#f1f1f1; padding:8px; border-radius:6px;">{{ error_traceback }}</pre>
+        </details>
+        {% endif %}
     </div>
     <a href="/" class="button">Zpět na hlavní stránku</a>
 </div>

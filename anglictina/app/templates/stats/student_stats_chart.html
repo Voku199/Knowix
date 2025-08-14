@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam.">
+    <meta name="keywords" content="angličtina, procvičování, písničky, testy, chat, výuka, zdarma, knowix, zábava, škola">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Knowix – Procvičování angličtiny zdarma">
+    <meta property="og:description" content="Procvičuj angličtinu zábavně pomocí písniček, chatu a testů. Bez reklam, zdarma.">
+    <meta property="og:url" content="https://www.knowix.cz">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://knowix.cz/static/og-banner.png">
+    <link rel="canonical" href="https://www.knowix.cz">
+    <title>Knowix</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    </noscript>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px;
+            justify-content: center;
+            margin: 30px auto;
+            max-width: 1400px; /* zvětšeno pro více grafů vedle sebe */
+        }
+        .chart-container {
+            width: 420px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px #0001;
+            padding: 20px 10px 10px 10px;
+            margin-bottom: 20px;
+            flex: 1 1 400px; /* umožní responsivní rozložení vedle sebe */
+            min-width: 350px;
+            max-width: 450px;
+        }
+        .date-label {
+            font-family: monospace;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            display: block;
+            margin: 10px 0 0 0;
+        }
+        h1 {
+            margin-top: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        @media (max-width: 1400px) {
+            .chart-grid {
+                max-width: 900px;
+            }
+        }
+        @media (max-width: 900px) {
+            .chart-grid {
+                flex-direction: column;
+                align-items: center;
+                max-width: 100vw;
+            }
+            .chart-container {
+                width: 95vw;
+                min-width: unset;
+                max-width: unset;
+            }
+        }
+    </style>
+</head>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}"></body>
+<header>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
+    </div>
+    <div class="nav-profile-wrapper">
+        <ul class="nav-right">
+            <li>
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
+            </li>
+        </ul>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
+</header>
+{% extends 'base.html' %}
+{% block content %}
+<body>
+<h2 style="text-align:center;">Statistiky studenta: {{ student.first_name }} {{ student.last_name }}</h2>
+<div class="chart-grid">
+    <div class="chart-container">
+        <canvas id="answersChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="mainNumbersChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="hangmanIrregularChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="ppChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="roleplayingChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="listeningAtChart"></canvas>
+    </div>
+</div>
+<div style="text-align:center;">
+    <span class="date-label">První aktivita: <span id="first-activity"></span></span>
+    <span class="date-label">Poslední aktivita: <span id="last-activity"></span></span>
+</div>
+<footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p class="footer-signature">
+        Made with ❤️ by
+        <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+        and lot of ☕
+    </p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Data z backendu (předpoklad: stats obsahuje stejné klíče jako v původním stats.html)
+    const correctRaw = {{ stats.correct_answers|default(0) }};
+    const wrongRaw = {{ stats.wrong_answers|default(0) }};
+    const lessons = {{ stats.total_lessons_done|default(0) }};
+    const learningTimeRaw = {{ stats.total_learning_time|default(0) }};
+    const psaniWords = {{ stats.total_psani_words|default(0) }};
+    const hangmanWords = {{ stats.hangman_words_guessed|default(0) }};
+    const irregularVerbsGuessed = {{ stats.irregular_verbs_guessed|default(0) }};
+    const irregularVerbsWrong = {{ stats.irregular_verbs_wrong|default(0) }};
+    const ppWrong = {{ stats.pp_wrong|default(0) }};
+    const ppMaybe = {{ stats.pp_maybe|default(0) }};
+    const ppCorrect = {{ stats.pp_correct|default(0) }};
+    const roleplayingCr = {{ stats.roleplaying_cr|default(0) }};
+    const roleplayingMb = {{ stats.roleplaying_mb|default(0) }};
+    const roleplayingWr = {{ stats.roleplaying_wr|default(0) }};
+    const lisCor = {{ stats.lis_cor|default(0) }};
+    const lisWr = {{ stats.lis_wr|default(0) }};
+    const atCor = {{ stats.at_cor|default(0) }};
+    const atWr = {{ stats.at_wr|default(0) }};
+    const firstActivityRaw = "{{ stats.first_activity or '' }}";
+    const lastActiveRaw = "{{ stats.last_active or '' }}";
+
+    const correct = Math.floor(correctRaw / 2);
+    const wrong = Math.floor(wrongRaw / 2);
+
+    function formatDateTime(dt) {
+        if (!dt || dt === "None") return "zatím žádná";
+        const match = dt.match(/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/);
+        if (!match) return dt;
+        const [date, time] = dt.split(/[ T]/);
+        const [y, m, d] = date.split('-');
+        const [h, min] = time.split(':');
+        return `${parseInt(d)}.${parseInt(m)} ${y} ${h}:${min}`;
+    }
+    document.getElementById('first-activity').textContent = formatDateTime(firstActivityRaw);
+    document.getElementById('last-activity').textContent = formatDateTime(lastActiveRaw);
+
+    document.addEventListener('DOMContentLoaded', function() {
+        new Chart(document.getElementById('answersChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Správné', 'Špatné'],
+                datasets: [{
+                    data: [correct, wrong],
+                    backgroundColor: ['#4caf50', '#f44336'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: true, position: 'bottom' },
+                    title: { display: true, text: 'Poměr správných a špatných odpovědí', font: { size: 18 } }
+                },
+                cutout: '65%'
+            }
+        });
+        new Chart(document.getElementById('mainNumbersChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Lekce', 'Čas učení (min)', 'Slova v psaní'],
+                datasets: [{
+                    data: [lessons, Math.round(learningTimeRaw / 60), psaniWords],
+                    backgroundColor: ['#2196f3', '#ff9800', '#9c27b0'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Celkové hodnoty', font: { size: 18 } }
+                },
+                indexAxis: 'y',
+                scales: { x: { beginAtZero: true } }
+            }
+        });
+        new Chart(document.getElementById('hangmanIrregularChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Hangman', 'Nepravidelná slovesa správně', 'Nepravidelná slovesa špatně'],
+                datasets: [{
+                    data: [hangmanWords, irregularVerbsGuessed, irregularVerbsWrong],
+                    backgroundColor: ['#607d8b', '#8bc34a', '#e57373'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Hangman & Nepravidelná slovesa', font: { size: 18 } }
+                },
+                indexAxis: 'y',
+                scales: { x: { beginAtZero: true } }
+            }
+        });
+        new Chart(document.getElementById('ppChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Špatně', 'Možná', 'Správně'],
+                datasets: [{
+                    data: [ppWrong, ppMaybe, ppCorrect],
+                    backgroundColor: ['#f44336', '#ffc107', '#4caf50'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Předpřítomný čas', font: { size: 18 } }
+                },
+                indexAxis: 'y',
+                scales: { x: { beginAtZero: true } }
+            }
+        });
+        new Chart(document.getElementById('roleplayingChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Správně', 'Možná', 'Špatně'],
+                datasets: [{
+                    data: [roleplayingCr, roleplayingMb, roleplayingWr],
+                    backgroundColor: ['#00bcd4', '#ff9800', '#9c27b0'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Roleplaying', font: { size: 18 } }
+                },
+                indexAxis: 'y',
+                scales: { x: { beginAtZero: true } }
+            }
+        });
+        new Chart(document.getElementById('listeningAtChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Listening správně', 'Listening špatně', 'At on in, správně', 'At on in, špatně'],
+                datasets: [{
+                    data: [lisCor, lisWr, atCor, atWr],
+                    backgroundColor: ['#4caf50', '#f44336', '#2196f3', '#e57373'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Listening & At on in', font: { size: 18 } }
+                },
+                indexAxis: 'y',
+                scales: { x: { beginAtZero: true } }
+            }
+        });
+    });
+</script>
+</body>
+{% endblock %}

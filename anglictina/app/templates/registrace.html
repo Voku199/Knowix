@@ -7,6 +7,55 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style_reg_log.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/min.css">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        /* Modal styles */
+        .modal-bg {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-bg.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 2rem 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 32px rgba(0, 0, 0, 0.15);
+            max-width: 350px;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #888;
+            cursor: pointer;
+        }
+
+        .modal-content p {
+            margin-bottom: 0;
+        }
+    </style>
 </head>
 <body>
 <nav class="auth-header">
@@ -76,6 +125,19 @@
             <div class="select-description">Vyber si svou aktuální úroveň angličtiny, aby ti lekce seděly.</div>
         </div>
 
+        <div class="input-group">
+            <input list="schools-list" id="school-input" name="school" placeholder="Začněte psát název školy" required
+                   autocomplete="off">
+            <datalist id="schools-list">
+                {% for school in schools %}
+                <option value="{{ school.name }}">
+                    {% endfor %}
+            </datalist>
+            <div id="school-create-info" style="display:none; color: #007bff; margin-top: 0.5em;">
+                Škola nebyla nalezena. <a href="#" id="create-school-link">Přidat tuto školu?</a>
+            </div>
+        </div>
+
         <div class="input-group checkbox-group">
             <input type="checkbox" id="terms_opt_in" name="terms_opt_in">
             <label for="terms_opt_in">
@@ -84,11 +146,124 @@
             </label>
         </div>
         <button type="submit">Zaregistrovat se</button>
+
     </form>
+    <div class="auth-footer">
+        <p>Jste učitel?<a href="#" id="teacher-register-link"> Registrujte se jako učitel</a></p>
+    </div>
 
     <div class="auth-footer">
         <p>Máte již účet? <a href="{{ url_for('auth.login') }}">Přihlaste se</a></p>
     </div>
 </div>
+
+<!-- Modal popout -->
+<div class="modal-bg" id="teacher-modal">
+    <div class="modal-content">
+        <button class="modal-close" id="close-modal" aria-label="Zavřít">&times;</button>
+        <h3>Chcete být učitelem?</h3>
+        <p>Zaregistrujte se a běžte do nastavení, pak postupujte podle instrukce.</p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Kód pro teacher modal (zůstává stejný)
+        const teacherLink = document.getElementById('teacher-register-link');
+        const modal = document.getElementById('teacher-modal');
+        const closeModal = document.getElementById('close-modal');
+        teacherLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            modal.classList.add('active');
+        });
+        closeModal.addEventListener('click', function () {
+            modal.classList.remove('active');
+        });
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+
+        // Vylepšený kód pro vyhledávání škol
+        const schoolInput = document.getElementById('school-input');
+        const datalist = document.getElementById('schools-list');
+        const info = document.getElementById('school-create-info');
+        const createLink = document.getElementById('create-school-link');
+
+        // Načteme všechny školy do pole
+        let schools = Array.from(datalist.options).map(opt => opt.value);
+
+        // Uložíme původní seznam škol pro případné resetování
+        const originalOptions = [...datalist.options];
+
+        // Funkce pro filtrování škol
+        function filterSchools(query) {
+            return schools.filter(school =>
+                school.toLowerCase().includes(query.toLowerCase())
+            );
+        }
+
+        // Při psaní do pole školy
+        schoolInput.addEventListener('input', function () {
+            const val = schoolInput.value.trim();
+
+            // Resetujeme datalist na původní seznam
+            datalist.innerHTML = '';
+            originalOptions.forEach(opt => {
+                datalist.appendChild(opt.cloneNode(true));
+            });
+
+            // Pokud je text dostatečně dlouhý, filtrujeme školy
+            if (val.length >= 2) {
+                const filteredSchools = filterSchools(val);
+
+                // Aktualizujeme datalist s filtrovanými školami
+                datalist.innerHTML = '';
+                filteredSchools.forEach(school => {
+                    const option = document.createElement('option');
+                    option.value = school;
+                    datalist.appendChild(option);
+                });
+
+                // Zobrazíme info o možnosti přidání nové školy
+                if (filteredSchools.length === 0 && val.length > 2) {
+                    info.style.display = '';
+                    createLink.textContent = `"${val}"`;
+                } else {
+                    info.style.display = 'none';
+                }
+            } else {
+                info.style.display = 'none';
+            }
+        });
+
+        // Zbytek kódu pro přidání školy zůstává stejný
+        createLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            const schoolName = schoolInput.value.trim();
+            if (!schoolName) return;
+            fetch('/add_school', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name: schoolName})
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // Přidej do datalistu
+                        const option = document.createElement('option');
+                        option.value = schoolName;
+                        datalist.appendChild(option);
+                        schools.push(schoolName);
+                        info.style.display = 'none';
+                        alert('Škola byla přidána.');
+                    } else {
+                        alert(data.error || 'Chyba při přidávání školy.');
+                    }
+                });
+        });
+    });
+</script>
 </body>
 </html>

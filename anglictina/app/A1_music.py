@@ -14,9 +14,31 @@ from collections import deque
 import traceback
 from xp import add_xp_to_user, get_user_xp_and_level  # DŮLEŽITÉ: XP systém
 from streak import update_user_streak, get_user_streak
+from user_stats import add_learning_time, update_user_stats
 
 # --- ČTENÍ LYRICS Z JSON SOUBORU ---
 LYRICS_JSON_DIR = os.path.join(os.path.dirname(__file__), 'static/music/lyrics_json')
+
+
+def parse_lrc_file(path):
+    """
+    Jednoduchý parser LRC souboru. Vrací list textových řádků podle časových značek.
+    Řádky bez textu nebo bez platné časové značky ignoruje.
+    """
+    lines = []
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            for raw in f:
+                raw = raw.strip()
+                m = re.match(r'\[(\d+):(\d+(?:\.\d+)?)\](.*)', raw)
+                if not m:
+                    continue
+                text = m.group(3).strip()
+                if text:
+                    lines.append(text)
+    except Exception as e:
+        print(f"Chyba při čtení LRC '{path}': {e}")
+    return lines
 
 
 def get_lyrics_and_translations_from_json(song_info):
@@ -176,6 +198,10 @@ def exercise(song_id):
 
     exercise_queue.append(user_id)
     start_time = time.time()
+    if 'user_id' in session:
+        session['training_start'] = time.time()
+        # Nastavíme first_activity pokud ještě není
+        update_user_stats(session['user_id'], set_first_activity=True)
 
     try:
         while True:
@@ -196,10 +222,19 @@ def exercise(song_id):
         except IndexError:
             return "Neplatné ID písničky", 404
 
-        # Nově načítáme lyrics i překlady
+        # Nově načítáme lyrics i překlady (JSON); pokud chybí, použij LRC fallback
         lyrics_lines, translations_lines = get_lyrics_and_translations_from_json(song_info)
+        print(f"Lyrics: {lyrics_lines}, Translations: {translations_lines}")
+
+        lrc_path = os.path.join(current_app.static_folder, 'music/audio/lyrics', song_info.get('lyrics_file', ''))
+        lrc_fallback = False
         if lyrics_lines is None or translations_lines is None:
-            return "Text písně nebo překlad nebyl nalezen v JSON souboru.", 404
+            lrc_lines = parse_lrc_file(lrc_path)
+            if not lrc_lines:
+                return "Text písně nebyl nalezen (chybí JSON i LRC).", 404
+            lyrics_lines = lrc_lines
+            translations_lines = [None] * len(lyrics_lines)
+            lrc_fallback = True
 
         def is_valid_lyric_line(line):
             line = line.strip()
@@ -218,6 +253,13 @@ def exercise(song_id):
         remaining_indices = list(set(valid_indices) - set(missing_indices))
         translation_indices = random.sample(remaining_indices,
                                             min(3, len(remaining_indices))) if remaining_indices else []
+
+        # Pokud používáme LRC fallback, přelož pouze nezbytné řádky pro aktuální cvičení
+        if lrc_fallback:
+            indices_to_translate = set(missing_indices + translation_indices)
+            for idx in indices_to_translate:
+                if 0 <= idx < len(lyrics_lines) and not translations_lines[idx]:
+                    translations_lines[idx] = translate_line_with_retry(current_app.translator, lyrics_lines[idx], target_lang='CS')
 
         missing_exercises = []
         for idx in missing_indices:
@@ -292,6 +334,8 @@ def exercise(song_id):
 
 @exercises_bp.route('/check-answer', methods=['POST'])
 def check_answer():
+    from user_stats import add_learning_time, update_user_stats  # Import uvnitř kvůli cyklickým závislostem
+
     data = request.json
     results = {
         'missing': [],
@@ -299,10 +343,12 @@ def check_answer():
         'pairs': False,
         'details': {
             'missing': [],
-            'translations': []
+            'translations': [],
+            'pairs': []
         }
     }
 
+    # Vyhodnocení missing exercises
     stored_missing = session.get('missing_exercises', [])
     for idx, ex in enumerate(data.get('missing', [])):
         user_answer = normalize(ex.get('user', ''))
@@ -321,6 +367,7 @@ def check_answer():
         else:
             results['missing'].append(False)
 
+    # Vyhodnocení translation exercises
     stored_translations = session.get('translation_exercises', [])
     for idx, ex in enumerate(data.get('translations', [])):
         user_answer = normalize(ex.get('user', ''))
@@ -345,14 +392,36 @@ def check_answer():
             results['translations'].append(False)
         results['details']['translations'].append(detail_result)
 
+    # Uložení času tréninku
+    if 'user_id' in session and session.get('training_start'):
+        try:
+            start = float(session.pop('training_start', None))
+            duration = max(1, int(time.time() - start))  # min. 1 sekunda
+            add_learning_time(session['user_id'], duration)
+        except Exception as e:
+            print("Chyba při ukládání času tréninku:", e)
+
+    # Vyhodnocení pairs (word-matching) - POČÍTÁME KAŽDÝ PÁR
     def normalize_pair(pair):
         return tuple(normalize(w) for w in pair)
 
-    correct_pairs = session.get('current_exercise_pairs', {})
-    user_pairs = set(normalize_pair(pair) for pair in data.get('pairs', []))
-    valid_pairs = set(normalize_pair((en, cs)) for en, cs in correct_pairs.items()) | set(normalize_pair((cs, en)) for en, cs in correct_pairs.items())
-    results['pairs'] = all(pair in valid_pairs for pair in user_pairs) and len(user_pairs) == len(correct_pairs)
+    correct_pairs_dict = session.get('current_exercise_pairs', {})
+    user_pairs = [normalize_pair(pair) for pair in data.get('pairs', [])]
+    correct_pairs_set = set(normalize_pair((en, cs)) for en, cs in correct_pairs_dict.items())
+    correct_pairs_set |= set(normalize_pair((cs, en)) for en, cs in correct_pairs_dict.items())
 
+    pair_results = []
+    for pair in user_pairs:
+        if pair in correct_pairs_set:
+            pair_results.append(True)
+        else:
+            pair_results.append(False)
+    results['details']['pairs'] = pair_results
+
+    # Pro úspěch je nutné, aby všechny páry byly správné a počet odpovídal zadání
+    results['pairs'] = all(pair_results) and len(user_pairs) == len(correct_pairs_dict)
+
+    # Celkový výsledek
     all_correct = (
             all(x in (True, 'almost') for x in results['missing']) and
             all(x in (True, 'almost') for x in results['translations']) and
@@ -360,6 +429,24 @@ def check_answer():
             len(results['missing']) == len(stored_missing) and
             len(results['translations']) == len(stored_translations)
     )
+
+    # --- Ukládání statistik uživatele ---
+    if 'user_id' in session:
+        # Spočítat správné/špatné odpovědi včetně jednotlivých párů
+        correct_count = sum(1 for x in results['missing'] if x is True) + \
+                        sum(1 for x in results['translations'] if x is True) + \
+                        sum(1 for x in pair_results if x is True)
+        wrong_count = (
+                len([x for x in results['missing'] if x is False]) +
+                len([x for x in results['translations'] if x is False]) +
+                len([x for x in pair_results if x is False])
+        )
+        update_user_stats(
+            session['user_id'],
+            correct=correct_count,
+            wrong=wrong_count,
+            lesson_done=all_correct
+        )
 
     # --- XP INTEGRACE ---
     xp_awarded = 0
@@ -372,12 +459,14 @@ def check_answer():
         try:
             xp_result = add_xp_to_user(session['user_id'], 10)
             streak_info = update_user_streak(session['user_id'])
-            print(streak_info)
             xp_awarded = 10
             new_xp = xp_result.get('xp')
             new_level = xp_result.get('level')
             new_achievements = xp_result.get('new_achievements', [])
-            print(new_achievements)
+            # Přidej informaci o streaku do odpovědi pouze pokud byl streak prodloužen nebo začal
+            streak_message = None
+            if streak_info and streak_info.get("status") in ("started", "continued"):
+                streak_message = f"🔥 Máš streak {streak_info['streak']} dní v řadě!"
         except Exception as e:
             xp_error = str(e)
             print("XP ERROR:", e)
