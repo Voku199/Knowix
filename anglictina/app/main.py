@@ -49,6 +49,24 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = True
 # respektuj proxy hlavičky (https) – důležité pro secure cookies a správné přesměrování
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
+
+# Fallback: pokud Redis není dostupný, přepnout na filesystem sessions
+use_redis = False
+redis_url = os.getenv('REDIS_URL')
+if redis_url and app.config.get('SESSION_REDIS') is not None:
+    try:
+        app.config['SESSION_REDIS'].ping()
+        use_redis = True
+        print(f"[main] Session backend: Redis OK -> {redis_url}")
+    except Exception as ex:
+        print(f"[main] WARNING: Redis ping failed ({ex}). Falling back to filesystem sessions.")
+
+if not use_redis:
+    app.config['SESSION_TYPE'] = 'filesystem'
+    if 'SESSION_REDIS' in app.config:
+        app.config.pop('SESSION_REDIS', None)
+    print("[main] Session backend: filesystem")
+
 Session(app)
 
 load_dotenv(dotenv_path=".env")
