@@ -312,7 +312,7 @@ document.getElementById('theme-toggle').addEventListener('click', () => {
             const content = document.getElementById('newsContent').value;
 
             try {
-                const res = await fetch('/news', {
+                const res = await fetch('/add_news', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({title, content})
@@ -322,9 +322,13 @@ document.getElementById('theme-toggle').addEventListener('click', () => {
                 if (data.status === 'success') {
                     loadNews();
                     e.target.reset();
+                    alert('Novinka byla úspěšně publikována!');
+                } else {
+                    alert('Chyba: ' + data.message);
                 }
             } catch (error) {
                 console.error("Chyba při odesílání:", error);
+                alert('Nastala chyba při odesílání novinky.');
             }
         });
 
