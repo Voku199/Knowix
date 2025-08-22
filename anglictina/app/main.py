@@ -36,6 +36,7 @@ from stats import user_stats_bp
 from admin import admin_bp
 from vlastni_music import vlastni_music_bp
 from proc import proc_bp
+from security_ext import init_security
 
 app = Flask(__name__)
 
@@ -89,6 +90,7 @@ app.config['UPLOAD_FOLDER'] = 'static/profile_pics'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['GENIUS_ACCESS_TOKEN'] = os.getenv('GENIUS_ACCESS_TOKEN')
 app.config['DEEPL_API_KEY'] = os.getenv('DEEPL_API_KEY')
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  # Max 2 MB upload (profilovky atd.)
 
 # Registrace blueprintů
 app.register_blueprint(main_bp)
@@ -115,6 +117,9 @@ app.register_blueprint(user_stats_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(vlastni_music_bp)
 app.register_blueprint(proc_bp)
+
+# Inicializace bezpečnostních rozšíření (CSRF + rate limiting)
+init_security(app)
 
 
 @app.route('/sitemap.xml')
@@ -279,23 +284,22 @@ def add_security_headers(response):
     # Vylepšená CSP politika s podporou pro Google Analytics a další služby
     response.headers['Content-Security-Policy'] = (
         "default-src 'self'; "
+        "base-uri 'self'; "
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' "
         "https://cdn.quilljs.com https://cdn.jsdelivr.net "
         "https://www.youtube.com https://s.ytimg.com "
         "https://www.googletagmanager.com https://www.google-analytics.com "
-        "https://ssl.google-analytics.com https://connect.facebook.net; "
-        "style-src 'self' 'unsafe-inline' "
-        "https://fonts.googleapis.com https://cdn.quilljs.com; "
+        "https://ssl.google-analytics.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.quilljs.com; "
         "font-src 'self' https://fonts.gstatic.com; "
-        "img-src 'self' data: https: blob: "
-        "https://www.google-analytics.com https://ssl.google-analytics.com "
-        "https://www.googletagmanager.com https://stats.g.doubleclick.net; "
-        "connect-src 'self' "
-        "https://www.google-analytics.com https://region1.google-analytics.com "
-        "https://analytics.google.com https://stats.g.doubleclick.net; "
-        "frame-src https://open.spotify.com https://*.spotify.com "
-        "https://www.youtube-nocookie.com https://www.youtube.com https://*.youtube.com; "
-        "frame-ancestors 'none';"
+        "img-src 'self' data: https: blob: https://www.google-analytics.com https://ssl.google-analytics.com https://www.googletagmanager.com https://stats.g.doubleclick.net; "
+        "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com; "
+        "frame-src https://open.spotify.com https://*.spotify.com https://www.youtube-nocookie.com https://www.youtube.com https://*.youtube.com; "
+        "object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests;"
+    )
+    # Přidána Permissions-Policy
+    response.headers['Permissions-Policy'] = (
+        "geolocation=(), microphone=(), camera=(), fullscreen=(self), magnetometer=(), gyroscope=(), usb=(), payment=()"
     )
 
     # Ensure cookies are properly set for authenticated users
@@ -327,4 +331,4 @@ def add_security_headers(response):
 if __name__ == "__main__":
     from waitress import serve
 
-    serve(app, host="0.0.0.0", port=8080, threads=4)
+    serve(app, host="0.0.0.0", port=8080)

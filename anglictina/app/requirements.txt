@@ -26,3 +26,4 @@ eventlet==0.33.3
 gevent==25.5.1
 gevent-websocket==0.10.1
 redis==6.2.0
+flask-limiter==3.1.2

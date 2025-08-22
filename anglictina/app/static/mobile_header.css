@@ -1,0 +1,306 @@
+/* Mobilní header design */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        padding: 10px;
+        gap: 15px;
+        align-items: center;
+    }
+
+    /* Logo nahoře uprostřed */
+    .logo-streak-wrapper {
+        order: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+
+    .logo img {
+        height: 60px;
+        width: auto;
+    }
+
+    .streak-badge {
+        display: none; /* Přesuneme dolů */
+    }
+
+    /* Navigační tlačítka - 50x50px vedle sebe */
+    .nav-profile-wrapper {
+        order: 2;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .nav-right {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    /* SILNÉ OVERRIDY – zajistí skutečně řadu čtverců */
+    header .nav-right {
+        flex-wrap: nowrap !important;
+        justify-content: center !important;
+        align-items: stretch !important;
+        width: auto !important;
+    }
+
+    header .nav-right li {
+        flex: 0 0 50px !important;
+        display: flex !important;
+    }
+
+    header .nav-right a,
+    header .nav-right button {
+        box-sizing: border-box !important;
+        width: 50px !important;
+        height: 50px !important;
+        flex: 0 0 50px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #f8f9fa !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 10px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    header .nav-right a .nav-icon,
+    header .nav-right button .nav-icon,
+    header .nav-right button span,
+    header .nav-right button svg {
+        width: 24px !important;
+        height: 24px !important;
+        max-width: 24px !important;
+        max-height: 24px !important;
+    }
+
+    .nav-right li {
+        margin: 0;
+        display: inline-block;
+    }
+
+    .nav-right a,
+    .nav-right button {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .nav-right a:hover,
+    .nav-right button:hover {
+        background: #e9ecef;
+        transform: translateY(-2px);
+    }
+
+    .nav-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    #theme-toggle {
+        font-size: 20px;
+        background: #f8f9fa !important;
+        cursor: pointer;
+    }
+
+    /* Spodní sekce - profilovka, XP, streak */
+    .user-profile {
+        order: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .profile-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .profile-pic {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 2px solid #e9ecef;
+    }
+
+    .greeting {
+        font-size: 14px;
+        font-weight: 600;
+        color: #495057;
+        margin: 0 !important;
+    }
+
+    /* XP bar mobilní verze */
+    .xp-header-bar {
+        width: 100%;
+        max-width: 300px;
+        margin: 0;
+    }
+
+    .xp-header-bar-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+
+    .xp-level-badge {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .xp-value {
+        color: #6c757d;
+    }
+
+    .xp-header-bar-progress-bg {
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .xp-header-bar-progress {
+        height: 100%;
+        background: linear-gradient(90deg, #28a745, #20c997);
+        transition: width 0.3s ease;
+    }
+
+    /* Streak badge pro mobilní - zobrazí se v spodní sekci */
+    .profile-container::after {
+        content: "🔥 " attr(data-streak);
+        font-size: 14px;
+        font-weight: 600;
+        color: #dc3545;
+        background: #fff5f5;
+        padding: 5px 10px;
+        border-radius: 15px;
+        border: 1px solid #f5c6cb;
+    }
+
+    /* Přidáme streak do profil containeru pomocí JS nebo jinak */
+    .mobile-streak {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #dc3545;
+        background: #fff5f5;
+        padding: 5px 10px;
+        border-radius: 15px;
+        border: 1px solid #f5c6cb;
+    }
+
+    /* Auth links pro nepřihlášené uživatele */
+    .auth-links {
+        order: 3;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .auth-btn {
+        padding: 12px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .login-btn {
+        background: #007bff;
+        color: white;
+    }
+
+    .register-btn {
+        background: #28a745;
+        color: white;
+    }
+
+    .auth-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Profile menu pro mobilní */
+    .profile-menu {
+        top: 60px;
+        right: 50%;
+        transform: translateX(50%);
+        min-width: 150px;
+    }
+
+    .profile-menu a {
+        display: block;
+        padding: 8px 12px;
+        text-decoration: none;
+        color: #495057;
+        border-radius: 4px;
+        margin-bottom: 5px;
+        transition: background 0.3s ease;
+    }
+
+    .profile-menu a:hover {
+        background: #f8f9fa;
+    }
+
+    .profile-menu a:last-child {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 400px) {
+    header .nav-right {
+        gap: 6px !important;
+    }
+
+    header .nav-right li,
+    header .nav-right a,
+    header .nav-right button {
+        flex: 0 0 44px !important;
+        width: 44px !important;
+        height: 44px !important;
+    }
+
+    header .nav-right a .nav-icon,
+    header .nav-right button .nav-icon {
+        width: 22px !important;
+        height: 22px !important;
+    }
+}
+
+/* Volitelný fallback: horizontální posun, pokud by se nevešlo (odkomentovat pokud třeba) */
+/*
+@media (max-width: 360px) {
+  header .nav-right { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  header .nav-right::-webkit-scrollbar { display: none; }
+}
+*/
