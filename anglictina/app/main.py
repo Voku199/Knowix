@@ -285,11 +285,16 @@ def add_security_headers(response):
     response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
     return response
 
-    # from waitress import serve
-    #
-    # serve(app, host="0.0.0.0", port=8080)
+
+# app.run(port=5000, debug=True)
+
+# from waitress import serve
+#
+# serve(app, host="0.0.0.0", port=8080)
 
 
 # === Spuštění aplikace ===
 if __name__ == "__main__":
-    app.run(port=5000, debug=True)
+    from waitress import serve
+
+    serve(app, host="0.0.0.0", port=8080)
