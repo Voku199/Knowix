@@ -165,10 +165,12 @@ def redirect_to_main_domain():
     if 'user_id' in session:
         session.permanent = True
         # Force session refresh to ensure cookies are sent
+
+
 # Inicializace bezpečnostních rozšíření (CSRF + rate limiting)
 init_security(app)
 
-        session.modified = True
+session.modified = True
 
 
 @app.route('/static/profile_pics/<path:filename>')
