@@ -251,14 +251,14 @@
 
     <section class="info">
 
-        <div class="bubble support-bubble" onclick="window.open('/anglictina', '_blank')">
+        <div class="bubble support-bubble" onclick="location.href='/anglictina'">
             <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="angličtina">
             <div class="bubble-text">
                 <h3>Angličtina</h3>
                 <p>Zábavné cvičení na téma Angličtina</p>
             </div>
         </div>
-        <div class="bubble support-bubble" onclick="window.open('/proc_jit_s_nama', '_blank')">
+        <div class="bubble support-bubble" onclick="location.href='/proc_jit_s_nama'">
             <img src="{{ url_for('static', filename='pic/why.png') }}" alt="Podpora">
             <div class="bubble-text">
                 <h3>Proč jít s náma?</h3>
@@ -293,18 +293,19 @@
 </footer>
 
 <script>
-    // theme-toggle.js
+    const CSRF_TOKEN = "{{ csrf_token() }}";
     document.getElementById('theme-toggle').addEventListener('click', () => {
         fetch('/set_theme', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {'Content-Type': 'application/json','X-CSRFToken': CSRF_TOKEN},
             body: JSON.stringify({
-                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark'
+                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark',
+                csrf_token: CSRF_TOKEN
             })
-        }).then(() => {
+        }).then(r=>{ if(r.ok){
             document.body.classList.toggle('dark-mode');
             sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-        });
+        }});
     });
 
     // Detekce kliknutí mimo menu
@@ -320,3 +321,4 @@
 </script>
 </body>
 </html>
+

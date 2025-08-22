@@ -86,6 +86,9 @@
     {% endwith %}
 
     <form method="POST" class="auth-form">
+        <!-- CSRF token -->
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
         <div class="input-group">
             <input type="text" name="first_name" placeholder=" " required>
             <label><i class="fas fa-user"></i> Jméno</label>
@@ -139,7 +142,7 @@
         </div>
 
         <div class="input-group checkbox-group">
-            <input type="checkbox" id="terms_opt_in" name="terms_opt_in">
+            <input type="checkbox" id="terms_opt_in" name="terms_opt_in" required>
             <label for="terms_opt_in">
                 Souhlasím s <a href="/terms" target="_blank">Podmínkami používání</a>
                 a <a href="/cookies" target="_blank">Zásadami cookies</a>
@@ -168,6 +171,8 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const csrfToken = "{{ csrf_token() }}"; // pro JS fetchy
+
         // Kód pro teacher modal (zůstává stejný)
         const teacherLink = document.getElementById('teacher-register-link');
         const modal = document.getElementById('teacher-modal');
@@ -245,13 +250,15 @@
             if (!schoolName) return;
             fetch('/add_school', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({name: schoolName})
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({name: schoolName, csrf_token: csrfToken})
             })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        // Přidej do datalistu
                         const option = document.createElement('option');
                         option.value = schoolName;
                         datalist.appendChild(option);

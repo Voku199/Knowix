@@ -37,6 +37,8 @@
     {% endwith %}
 
     <form method="POST" class="auth-form">
+        <!-- CSRF token -->
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="input-group">
             <input type="email" name="email" placeholder=" " required>
             <label><i class="fas fa-envelope"></i> E-mail</label>
