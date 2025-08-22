@@ -36,7 +36,6 @@ from stats import user_stats_bp
 from admin import admin_bp
 from vlastni_music import vlastni_music_bp
 from proc import proc_bp
-from security_ext import init_security
 
 app = Flask(__name__)
 
@@ -84,6 +83,7 @@ if not use_redis:
 
 # TEPRVE NYNÍ inicializuj Flask-Session (s už nastaveným SECRET_KEY)
 Session(app)
+from security_ext import init_security
 
 # Konfigurace
 app.config['UPLOAD_FOLDER'] = 'static/profile_pics'
@@ -117,9 +117,6 @@ app.register_blueprint(user_stats_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(vlastni_music_bp)
 app.register_blueprint(proc_bp)
-
-# Inicializace bezpečnostních rozšíření (CSRF + rate limiting)
-init_security(app)
 
 
 @app.route('/sitemap.xml')
@@ -168,6 +165,9 @@ def redirect_to_main_domain():
     if 'user_id' in session:
         session.permanent = True
         # Force session refresh to ensure cookies are sent
+# Inicializace bezpečnostních rozšíření (CSRF + rate limiting)
+init_security(app)
+
         session.modified = True
 
 
