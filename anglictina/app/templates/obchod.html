@@ -2,9 +2,10 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Obchod | Knowix</title>
     <link rel="stylesheet" href="/static/style.css">
-        <link rel="stylesheet" href="/static/mobile_header.css">
+    <link rel="stylesheet" href="/static/mobile_header.css">
 
     <!-- Preconnect zrychlí DNS a spojení -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,14 +21,20 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  gtag('config', 'G-W1EN990JKP');
-</script>
+      gtag('config', 'G-W1EN990JKP');
+    </script>
+
+    <!-- CSRF Token pro JavaScript -->
+    <script>
+        window.csrfToken = "{{ csrf_token() }}";
+    </script>
+
     <style>
         body.dark-mode {
             background: #f5f1e8;
@@ -99,17 +106,12 @@
             margin: 0.5em 0 1em 0;
             text-align: center;
             color: #6b5d4f;
+            line-height: 1.4;
         }
         body.dark-mode .shop-item p {
             color: #c4b49a;
         }
-        .shop-item form {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .shop-item button[type="submit"] {
+        .shop-item .buy-btn {
             background: linear-gradient(90deg, #8b7a60 60%, #a69080 100%);
             color: #fff;
             border: none;
@@ -121,26 +123,28 @@
             margin-bottom: 0.7em;
             transition: background 0.2s, box-shadow 0.2s;
             box-shadow: 0 2px 8px rgba(139,122,96,0.15);
+            width: 100%;
+            max-width: 200px;
         }
-        body.dark-mode .shop-item button[type="submit"] {
+        body.dark-mode .shop-item .buy-btn {
             background: linear-gradient(90deg, #5a4f3e 60%, #6b5d4f 100%);
             color: #d4c4a8;
             box-shadow: 0 2px 8px rgba(0,0,0,0.32);
         }
-        .shop-item button[type="submit"]:hover:not(:disabled) {
+        .shop-item .buy-btn:hover:not(:disabled) {
             background: linear-gradient(90deg, #7a6b55 60%, #8b7a60 100%);
             box-shadow: 0 4px 16px rgba(139,122,96,0.25);
         }
-        body.dark-mode .shop-item button[type="submit"]:hover:not(:disabled) {
+        body.dark-mode .shop-item .buy-btn:hover:not(:disabled) {
             background: linear-gradient(90deg, #6b5d4f 60%, #7a6b55 100%);
         }
-        .shop-item button[type="submit"]:disabled {
+        .shop-item .buy-btn:disabled {
             background: #bdbdbd;
             color: #eee;
             cursor: not-allowed;
             box-shadow: none;
         }
-        body.dark-mode .shop-item button[type="submit"]:disabled {
+        body.dark-mode .shop-item .buy-btn:disabled {
             background: #4a443a;
             color: #888;
         }
@@ -154,6 +158,7 @@
             margin-top: 0.2em;
             font-size: 0.98em;
             color: #6b5d4f;
+            text-align: center;
         }
         body.dark-mode .shop-item .freeze-count, body.dark-mode .shop-item .booster-status {
             color: #c4b49a;
@@ -176,16 +181,122 @@
         body.dark-mode a:hover {
             color: #f0eee9;
         }
-        @media (max-width: 700px) {
+
+        /* Mobilní optimalizace */
+        @media (max-width: 768px) {
             .shop-container {
-                padding: 1.2em 0.5em 1.5em 0.5em;
+                margin: 1em auto;
+                padding: 1.5em 1em;
+                border-radius: 12px;
+                max-width: calc(100% - 2em);
             }
+
+            .shop-container h1 {
+                font-size: 1.8em;
+                margin-bottom: 1em;
+                text-align: center;
+            }
+
+            .xp-status {
+                font-size: 1em;
+                margin-bottom: 1.5em;
+                padding: 0.6em;
+            }
+
             .shop-items {
                 flex-direction: column;
+                gap: 1.5em;
+            }
+
+            .shop-item {
+                min-width: unset;
+                max-width: 100%;
+                padding: 1.2em 1em;
+            }
+
+            .shop-item h2 {
+                font-size: 1.2em;
+                margin-bottom: 0.4em;
+            }
+
+            .shop-item p {
+                font-size: 0.95em;
+                margin: 0.4em 0 0.8em 0;
+            }
+
+            .shop-item .buy-btn {
+                font-size: 1em;
+                padding: 0.8em 1.2em;
+                max-width: 100%;
+            }
+
+            .shop-item .freeze-count, .shop-item .booster-status {
+                font-size: 0.9em;
+            }
+
+            a {
+                margin-top: 1.5em;
+                text-align: center;
+                display: block;
+            }
+        }
+
+        /* Velmi malé mobily */
+        @media (max-width: 480px) {
+            .shop-container {
+                margin: 0.5em auto;
+                padding: 1em 0.8em;
+                border-radius: 8px;
+            }
+
+            .shop-container h1 {
+                font-size: 1.6em;
+            }
+
+            .xp-status {
+                font-size: 0.95em;
+                padding: 0.5em;
+            }
+
+            .shop-items {
                 gap: 1.2em;
             }
+
             .shop-item {
-                max-width: 100%;
+                padding: 1em 0.8em;
+                border-radius: 8px;
+            }
+
+            .shop-item h2 {
+                font-size: 1.1em;
+            }
+
+            .shop-item p {
+                font-size: 0.9em;
+            }
+
+            .shop-item .buy-btn {
+                font-size: 0.95em;
+                padding: 0.7em 1em;
+            }
+        }
+
+        /* Landscape mobily */
+        @media (max-width: 900px) and (orientation: landscape) {
+            .shop-container {
+                margin: 1em auto;
+                padding: 1.2em;
+            }
+
+            .shop-items {
+                flex-direction: row;
+                gap: 1em;
+            }
+
+            .shop-item {
+                flex: 1;
+                min-width: 200px;
+                max-width: 300px;
             }
         }
     </style>
@@ -283,48 +394,100 @@
             <h2>🔥 Freeze</h2>
             <p>Ochrání tvůj streak, když bys o něj přišel. <br>
             <strong>Cena:</strong> {{ FREEZE_COST }} XP</p>
-            <form method="POST" action="{{ url_for('obchod.obchod') }}">
-                <input type="hidden" name="item" value="freeze">
-                <button type="submit"
-                    {% if shop_status['freeze_count'] >= 3 or shop_status['xp'] < FREEZE_COST %}
-                        disabled
-                    {% endif %}
-                >
-                    {% if shop_status['freeze_count'] >= 3 %}
-                        Limit 3 freeze dosažen
-                    {% elif shop_status['xp'] < FREEZE_COST %}
-                        Nedostatek XP
-                    {% else %}
-                        Koupit Freeze
-                    {% endif %}
-                </button>
-            </form>
+            <button type="button" class="buy-btn" data-item="freeze"
+                {% if shop_status['freeze_count'] >= 3 or shop_status['xp'] < FREEZE_COST %}
+                    disabled
+                {% endif %}
+            >
+                {% if shop_status['freeze_count'] >= 3 %}
+                    Limit 3 freeze dosažen
+                {% elif shop_status['xp'] < FREEZE_COST %}
+                    Nedostatek XP
+                {% else %}
+                    Koupit Freeze
+                {% endif %}
+            </button>
             <div class="freeze-count">Máš aktivních freeze: <strong>{{ shop_status['freeze_count'] }}</strong> / 3</div>
         </div>
         <div class="shop-item">
             <h2>⚡ XP Booster</h2>
             <p>Zdvojnásobí získané XP na 1 den.<br>
             <strong>Cena:</strong> {{ XP_BOOSTER_COST }} XP</p>
-            <form method="POST" action="{{ url_for('obchod.obchod') }}">
-                <input type="hidden" name="item" value="xp_booster">
-                <button type="submit"
-                    {% if shop_status['xp'] < XP_BOOSTER_COST or shop_status['xp_booster_active'] %}
-                        disabled
-                    {% endif %}
-                >
-                    {% if shop_status['xp_booster_active'] %}
-                        Booster už je aktivní
-                    {% elif shop_status['xp'] < XP_BOOSTER_COST %}
-                        Nedostatek XP
-                    {% else %}
-                        Koupit XP Booster
-                    {% endif %}
-                </button>
-            </form>
+            <button type="button" class="buy-btn" data-item="xp_booster"
+                {% if shop_status['xp'] < XP_BOOSTER_COST or shop_status['xp_booster_active'] %}
+                    disabled
+                {% endif %}
+            >
+                {% if shop_status['xp_booster_active'] %}
+                    Booster už je aktivní
+                {% elif shop_status['xp'] < XP_BOOSTER_COST %}
+                    Nedostatek XP
+                {% else %}
+                    Koupit XP Booster
+                {% endif %}
+            </button>
             <div class="booster-status">XP Booster je {% if shop_status['xp_booster_active'] %}<strong>aktivní</strong>{% else %}neaktivní{% endif %}.</div>
         </div>
     </div>
     <a href="{{ url_for('main.index') }}">← Zpět na hlavní stránku</a>
 </main>
+
+<script>
+    // Nákup položek s CSRF ochranou
+    document.querySelectorAll('.buy-btn').forEach(button => {
+        button.addEventListener('click', async (e) => {
+            const item = e.target.getAttribute('data-item');
+            if (!item || e.target.disabled) return;
+
+            try {
+                const res = await fetch('/buy_item', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': window.csrfToken
+                    },
+                    body: JSON.stringify({ item })
+                });
+
+                const data = await res.json();
+                if (data.status === 'success') {
+                    alert(data.message);
+                    location.reload(); // Znovu načteme stránku pro aktualizaci stavu
+                } else {
+                    alert('Chyba: ' + data.message);
+                }
+            } catch (error) {
+                console.error("Chyba při nákupu:", error);
+                alert('Nastala chyba při zpracování nákupu.');
+            }
+        });
+    });
+
+    // Theme toggle podle vzoru z news.html
+    document.getElementById('theme-toggle')?.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/toggle_theme', { method: 'POST' });
+            if (response.ok) {
+                location.reload();
+            }
+        } catch (error) {
+            console.error('Chyba při přepínání tématu:', error);
+        }
+    });
+
+    // Profile menu toggle
+    const profileTrigger = document.getElementById('profileMenuTrigger');
+    const profileMenu = document.getElementById('profileMenu');
+    if (profileTrigger && profileMenu) {
+        profileTrigger.addEventListener('click', () => {
+            profileMenu.style.display = profileMenu.style.display === 'block' ? 'none' : 'block';
+        });
+        document.addEventListener('click', (e) => {
+            if (!profileTrigger.contains(e.target) && !profileMenu.contains(e.target)) {
+                profileMenu.style.display = 'none';
+            }
+        });
+    }
+</script>
 </body>
 </html>

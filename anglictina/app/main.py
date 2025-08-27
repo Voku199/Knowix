@@ -251,6 +251,30 @@ def server_error(e):
 # === AFTER_REQUEST: bezpečnostní hlavičky + debug ===
 @app.after_request
 def add_security_headers(response):
+    # Speciální režim: u vlastni_music_bp endpointů výrazně povolíme zdroje (embedding YouTube)
+    endpoint = request.endpoint or ''
+    if endpoint.startswith('vlastni_music_bp.'):
+        # Minimalistická, uvolněná CSP pro tento blueprint
+        response.headers['Content-Security-Policy'] = (
+            "default-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://s.ytimg.com https://i.ytimg.com; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com; "
+            "img-src 'self' data: https://i.ytimg.com https://s.ytimg.com; "
+            "frame-src https://www.youtube.com https://www.youtube-nocookie.com; "
+            "object-src 'none';"
+        )
+        # Odstraníme restriktivní hlavičky které mohou komplikovat přehrávání
+        for h in (
+                'Permissions-Policy', 'Cross-Origin-Opener-Policy', 'Cross-Origin-Resource-Policy',
+                'X-Frame-Options'
+        ):
+            response.headers.pop(h, None)
+        # HSTS necháme jen pokud je produkce na doméně
+        if not request.host.endswith('knowix.cz'):
+            response.headers.pop('Strict-Transport-Security', None)
+        return response
+
     if request.path in ('/login', '/register', '/'):
         cookie_name = app.config.get('SESSION_COOKIE_NAME', 'session')
         set_cookie_header = response.headers.get('Set-Cookie')
@@ -265,7 +289,7 @@ def add_security_headers(response):
         "https://cdn.quilljs.com https://cdn.jsdelivr.net "
         "https://www.youtube.com https://s.ytimg.com "
         "https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com; "
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.quilljs.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.quilljs.com https://cdnjs.cloudflare.com; "
         "font-src 'self' https://fonts.gstatic.com; "
         "img-src 'self' data: https: blob: https://www.google-analytics.com https://ssl.google-analytics.com https://www.googletagmanager.com https://stats.g.doubleclick.net; "
         "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com; "
@@ -273,7 +297,9 @@ def add_security_headers(response):
         "object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests;"
     )
     response.headers['Permissions-Policy'] = (
-        "geolocation=(), microphone=(), camera=(), fullscreen=(self), magnetometer=(), gyroscope=(), usb=(), payment=()"
+        'geolocation=(), microphone=(), camera=(), '
+        'fullscreen=(self "https://www.youtube.com" "https://www.youtube-nocookie.com"), '
+        'magnetometer=(), gyroscope=(self "https://www.youtube.com" "https://www.youtube-nocookie.com"), usb=(), payment=()'
     )
     response.headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload'
     response.headers['X-Frame-Options'] = 'DENY'
@@ -287,17 +313,11 @@ def add_security_headers(response):
 # app.run(port=5000, debug=True)
 
 # from waitress import serve
-#
-# serve(
-#     app,
-#     host="0.0.0.0",
-#     port=8080,
-#     threads=16,       # kolik vláken má Waitress pro obsluhu požadavků
-#     backlog=100      # kolik požadavků může čekat ve frontě
-# )
+
+# serve(app, host="0.0.0.0", port=8080, threads=16, backlog=100)
 
 
 # === Spuštění aplikace ===
 from waitress import serve
 
-serve(app, host="0.0.0.0", port=8080, threads=16, backlog=100)  # kolik požadavků může čekat ve frontě)
+serve(app, host="0.0.0.0", port=8080, threads=16, backlog=100)

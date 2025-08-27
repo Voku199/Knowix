@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Procvičuj si angličtinu zábavně s Knowixem – chaty, písničky, překlady a hry.">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Roleplaying| Knowix</title>
     <link rel="stylesheet" href="/static/style.css">
         <link rel="stylesheet" href="/static/mobile_header.css">
@@ -449,6 +450,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // --- Přidání do historie: Alex ukazuje obě věty ---
     function addToHistory(speaker, cz, en = null, userInput = null, correct = null, isAlex = false, topic = null, index = null, showBothLangs = false) {
+        // Ověření, že speaker není undefined
+        if (!speaker) {
+            console.error('addToHistory: speaker is undefined or null');
+            return;
+        }
+
         const row = document.createElement('div');
         row.className = 'chat-row ' + (speaker.toLowerCase() === 'uživatel' ? 'user' : 'ai');
         const avatar = document.createElement('img');
@@ -514,13 +521,41 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         submitBtn.disabled = true;
+
+        // Získání CSRF tokenu
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
+        
+        if (!csrfToken) {
+            console.error('CSRF token not found in meta tag');
+            showResult('Chyba: CSRF token nenalezen. Obnovte stránku.', false);
+            submitBtn.disabled = false;
+            return;
+        }
+
         fetch(window.ROLEPLAYING_NEXT_URL, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
             body: JSON.stringify({preklad: translation})
         })
-            .then(response => response.json())
+            .then(response => {
+                // Nejprve zkontrolujeme, jestli je response OK
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        throw new Error(`HTTP ${response.status}: ${errorData.message || response.statusText}`);
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
+                // Kontrola, že máme správná data
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
                 addToHistory('Uživatel', document.getElementById('czText').textContent, data.correct_answer, translation, data.correct, false);
                 if (data.correct) {
                     showResult("Správně! ✅", true);
@@ -532,12 +567,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 setTimeout(() => {
                     showNextTurn(data);
                 }, 1200);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showResult('Chyba při odesílání odpovědi. Zkuste to znovu.', false);
+                submitBtn.disabled = false;
             });
     }
 
     function showNextTurn(data) {
         resultContainer.textContent = '';
         inputArea.innerHTML = '';
+
+        // Kontrola chyb v datech
+        if (data.error) {
+            showResult(`Chyba: ${data.error}`, false);
+            return;
+        }
+
         if (data.end) {
             if (data.matching_pairs && Array.isArray(data.matching_pairs) && data.matching_pairs.length > 0) {
                 showMatchingExercise(data.matching_pairs);
@@ -546,9 +593,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             return;
         }
-        if (data.speaker.toLowerCase() === 'uživatel') {
+
+        // Ověření, že máme potřebná data
+        if (!data.speaker) {
+            console.error('showNextTurn: data.speaker is missing', data);
+            showResult('Chyba: Chybí informace o mluvčím. Zkuste obnovit stránku.', false);
+            return;
+        }
+
+        if (data.speaker && data.speaker.toLowerCase() === 'uživatel') {
             inputArea.innerHTML = `
-                <div style="margin-bottom:10px; color:#888;">Co říct: <b id="czText">${data.cz}</b></div>
+                <div style="margin-bottom:10px; color:#888;">Co říct: <b id="czText">${data.cz || ''}</b></div>
                 <input type="text" class="translation-input" id="prekladInput" placeholder="Zkuste to anglicky...">
                 <button class="mic-btn" id="micButton"><span>🎤</span></button>
                 <button class="submit-btn" id="submitBtn">Odeslat</button>
@@ -572,20 +627,44 @@ document.addEventListener('DOMContentLoaded', function () {
             if (Array.isArray(en)) en = en[0];
             // Správný index pro mp3: window.currentAlexIndex nebo spočítat podle historie
             let idx = window.currentAlexIndex || 0;
-            addToHistory(data.speaker, data.cz, en, null, null, true, window.ROLEPLAYING_TOPIC, idx);
+            addToHistory(data.speaker, data.cz || '', en, null, null, true, window.ROLEPLAYING_TOPIC, idx);
             inputArea.innerHTML = `
                 <div style="margin-bottom:10px; color:#888;">Poslouchej a pokračuj</div>
                 <button class="next-btn" id="nextBtn" style="display:block;">Pokračovat &rarr;</button>
             `;
             nextBtn = document.getElementById('nextBtn');
             if (nextBtn) nextBtn.addEventListener('click', function () {
+                // Získání CSRF tokenu
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
+                
+                if (!csrfToken) {
+                    console.error('CSRF token not found in meta tag');
+                    showResult('Chyba: CSRF token nenalezen. Obnovte stránku.', false);
+                    return;
+                }
+
                 fetch(window.ROLEPLAYING_NEXT_URL, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
                     body: JSON.stringify({})
                 })
-                    .then(response => response.json())
-                    .then(showNextTurn);
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(errorData => {
+                                throw new Error(`HTTP ${response.status}: ${errorData.message || response.statusText}`);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(showNextTurn)
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showResult('Chyba při načítání další zprávy. Zkuste obnovit stránku.', false);
+                    });
             });
         }
     }
@@ -666,13 +745,30 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
         nextBtn = document.getElementById('nextBtn');
         if (nextBtn) nextBtn.addEventListener('click', function () {
+            // Získání CSRF tokenu
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
             fetch(window.ROLEPLAYING_NEXT_URL, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
                 body: JSON.stringify({})
             })
-                .then(response => response.json())
-                .then(showNextTurn);
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                            throw new Error(`HTTP ${response.status}: ${errorData.message || response.statusText}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(showNextTurn)
+                .catch(error => {
+                    console.error('Error:', error);
+                    showResult('Chyba při načítání další zprávy. Zkuste obnovit stránku.', false);
+                });
         });
     }
 
@@ -747,3 +843,4 @@ document.addEventListener('DOMContentLoaded', function () {
 <script src="/static/script.js"></script>
 </body>
 </html>
+

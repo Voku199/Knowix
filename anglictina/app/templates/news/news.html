@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Novinky | Knowix</title>
     <link rel="stylesheet" href="/static/style.css">
-        <link rel="stylesheet" href="/static/mobile_header.css">
+    <link rel="stylesheet" href="/static/mobile_header.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
     <!-- Preconnect zrychlí DNS a spojení -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,18 +20,20 @@
         <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
     </noscript>
 
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-W1EN990JKP');
+    </script>
 
-  gtag('config', 'G-W1EN990JKP');
-</script>
+    <!-- CSRF Token pro JavaScript -->
+    <script>
+        window.csrfToken = "{{ csrf_token() }}";
+    </script>
+
     <style>
 
         body.dark-mode {
@@ -315,7 +317,10 @@ document.getElementById('theme-toggle').addEventListener('click', () => {
             try {
                 const res = await fetch('/add_news', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': window.csrfToken
+                    },
                     body: JSON.stringify({title, content})
                 });
 

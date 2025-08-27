@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Psaní | Knowix</title>
     <link rel="stylesheet" href="/static/style.css">
         <link rel="stylesheet" href="/static/mobile_header.css">
@@ -313,6 +314,7 @@ li {
 {% endwith %}
 
 <form method="POST" id="psani-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div id="toolbar">
       <span class="ql-formats">
         <select class="ql-size">
@@ -378,6 +380,7 @@ li {
         <span class="dropdown-trigger" tabindex="0" aria-label="Možnosti" data-pribeh-id="{{ pribeh.id }}">&#x22EE;</span>
         <div class="dropdown-menu" id="dropdown-{{ pribeh.id }}">
           <form method="POST" action="{{ url_for('psani.smazat_psani', pribeh_id=pribeh.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" onclick="return confirm('Opravdu smazat tento příběh?')">Smazat</button>
           </form>
           <a href="{{ url_for('psani.upravit_psani', pribeh_id=pribeh.id) }}">Upravit</a>

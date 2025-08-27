@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Poslech | Knowix</title>
     <link rel="stylesheet" href="/static/style_lis.css">
         <link rel="stylesheet" href="/static/mobile_header.css">
@@ -442,6 +443,18 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             const formData = new FormData(form);
+            
+            // Add CSRF token to form data
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
+            
+            if (!csrfToken) {
+                console.error('CSRF token not found in meta tag');
+                showQuizPopup({success: false, errorMsg: 'Chyba: CSRF token nenalezen. Obnovte stránku.'});
+                return;
+            }
+            
+            formData.append('csrf_token', csrfToken);
 
             fetch('{{ url_for("listening_bp.validate_quiz") }}', {
                 method: 'POST',

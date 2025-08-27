@@ -299,7 +299,7 @@
                 <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
                      alt="Profilová fotka" width="64" class="profile-pic">
                 {% else %}
-                <img src="{{ url_for('static', filename='profile_pics/default.png') }}" alt="Defaultní profilovka"
+                <img src="{{ url_for('static', filename='profile_pics/default.jpg') }}" alt="Defaultní profilovka"
                      class="profile-pic" id="profileMenuTrigger">
                 {% endif %}
                 <div class="profile-menu" id="profileMenu">
@@ -353,7 +353,7 @@
                 {% for msg in history %}
                 <div class="message {{ 'user' if msg.sender in ['users', 'user'] else 'ai' }}">
                     {% if msg.sender in ['users', 'user'] %}
-                    <img class="avatar" src="{{ url_for('static', filename='profile_pics/default.png') }}" alt="User">
+                    <img class="avatar" src="{{ url_for('static', filename='profile_pics/default.jpg') }}" alt="User">
                     <div class="bubble">{{ msg.content }}</div>
                     {% else %}
                     <img class="avatar" src="{{ url_for('static', filename='pic/danndas.png') }}" alt="AI">
@@ -420,7 +420,7 @@ document.getElementById('start-chat-form').addEventListener('submit', function(e
     const userInput = document.getElementById('user_input');
 
     // Nastav cesty k avatarům
-    const userAvatar = "{{ url_for('static', filename='profile_pics/default.png') }}";
+    const userAvatar = "{{ url_for('static', filename='profile_pics/default.jpg') }}";
     const aiAvatar = "{{ url_for('static', filename='pic/danndas.png') }}";
 
     // Backend předává historii jako JSON (jinak prázdné pole)

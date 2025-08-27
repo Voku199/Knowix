@@ -2,6 +2,7 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Doplň předložku | Knowix</title>
     <link rel="stylesheet" href="/static/style.css">
         <link rel="stylesheet" href="/static/mobile_header.css">
@@ -259,7 +260,19 @@
                 feedbackBox.textContent = '';
                 feedbackBox.className = 'feedback-box';
 
+                // Get CSRF token
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
+                
+                if (!csrfToken) {
+                    console.error('CSRF token not found');
+                    window.location.reload();
+                    return;
+                }
+
                 const formData = new FormData(form);
+                formData.append('csrf_token', csrfToken);
+                
                 const response = await fetch(window.location.pathname, {
                     method: 'POST',
                     headers: {'Accept': 'application/json'},

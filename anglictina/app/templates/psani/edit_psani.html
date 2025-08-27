@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Upravit příběh | Knowix</title>
     <link rel="stylesheet" href="/static/style.css">
         <link rel="stylesheet" href="/static/mobile_header.css">
@@ -259,6 +260,7 @@ body.dark-mode .private-label {
 {% endwith %}
 
 <form method="POST" id="edit-psani-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div id="toolbar">
       <span class="ql-formats">
         <select class="ql-size">

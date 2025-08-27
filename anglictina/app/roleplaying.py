@@ -14,6 +14,25 @@ roleplaying_bp = Blueprint('roleplaying', __name__, template_folder='templates')
 SCENARIOS_DIR = os.path.join(os.path.dirname(__file__), 'static/speaking/roleplaying')
 
 
+@roleplaying_bp.errorhandler(502)
+@roleplaying_bp.errorhandler(503)
+@roleplaying_bp.errorhandler(504)
+@roleplaying_bp.errorhandler(500)
+@roleplaying_bp.errorhandler(404)
+def server_error(e):
+    # Pro AJAX požadavky vraťme JSON místo HTML
+    if request.is_json or request.path.startswith('/roleplaying/'):
+        return jsonify({
+            "error": f"Server error {getattr(e, 'code', 500)}",
+            "message": getattr(e, 'description', 'Internal server error'),
+            "code": getattr(e, 'code', 500),
+            "traceback": traceback.format_exc() if getattr(e, 'code', 500) >= 500 else None
+        }), getattr(e, 'code', 500)
+
+    # Pro běžné požadavky vraťme HTML error stránku
+    return render_template('error.html', error_code=getattr(e, 'code', 500)), getattr(e, 'code', 500)
+
+
 def load_scenario(filename):
     path = os.path.join(SCENARIOS_DIR, filename)
     if not os.path.exists(path):
@@ -109,21 +128,33 @@ def select_topic():
                            dialogue=scenario['dialogue'],
                            current_index=0,
                            speaker=scenario['dialogue'][0]['speaker'],
-                           cz=scenario['dialogue'][0]['cz'])
+                           cz=scenario['dialogue'][0]['cz'],
+                           en=scenario['dialogue'][0].get('en', ''))
 
 
 @roleplaying_bp.route('/roleplaying/next', methods=['POST'])
 def roleplaying_next():
     """Zpracuje odpověď uživatele a posune konverzaci dál."""
     import time as _time
-    data = request.get_json()
+
+    try:
+        data = request.get_json()
+        if data is None:
+            data = {}
+    except Exception as e:
+        print(f"Error parsing JSON: {e}")
+        data = {}
+
     user_translation = data.get('preklad', '').strip()
     index = session.get('roleplaying_index', 0)
     dialogue = session.get('roleplaying_dialogue')
     topic = session.get('roleplaying_topic')
 
-    if not dialogue or index >= len(dialogue):
-        return jsonify({'error': 'Konec konverzace.'})
+    if not dialogue:
+        return jsonify({'error': 'Konverzace nenalezena. Začněte znovu.'}), 400
+
+    if index >= len(dialogue):
+        return jsonify({'error': 'Konec konverzace.'}), 400
 
     current = dialogue[index]
     is_user_turn = current['speaker'].lower() == 'uživatel'
@@ -222,10 +253,10 @@ def roleplaying_next():
             'similarity': round(similarity * 100, 1) if is_user_turn else None,
             'history': dialogue[:next_index + 1],
             'correct_answer': best_match if is_user_turn else None,
-            'speaker': next_line['speaker'],
-            'cz': next_line['cz'],
-            'en': next_line['en'],
-            'is_user_turn': next_line['speaker'].lower() == 'uživatel',
+            'speaker': next_line.get('speaker', 'Alex'),  # Fallback pro případ chybějícího speaker
+            'cz': next_line.get('cz', ''),
+            'en': next_line.get('en', ''),
+            'is_user_turn': next_line.get('speaker', 'Alex').lower() == 'uživatel',
             'xp_awarded': xp_awarded,
             'new_xp': new_xp,
             'new_level': new_level,

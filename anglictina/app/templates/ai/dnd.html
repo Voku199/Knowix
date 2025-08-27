@@ -240,7 +240,7 @@
                 <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
                      alt="Profilová fotka" width="64" class="profile-pic">
                 {% else %}
-                <img src="{{ url_for('static', filename='profile_pics/default.png') }}" alt="Defaultní profilovka"
+                <img src="{{ url_for('static', filename='profile_pics/default.jpg') }}" alt="Defaultní profilovka"
                      class="profile-pic" id="profileMenuTrigger">
                 {% endif %}
                 <div class="profile-menu" id="profileMenu">
@@ -286,7 +286,7 @@
         {% for msg in history %}
         <div class="message {{ 'user' if msg.sender in ['users', 'user'] else 'ai' }}">
             {% if msg.sender in ['users', 'user'] %}
-            <img class="avatar" src="{{ url_for('static', filename='profile_pics/default.png') }}" alt="User">
+            <img class="avatar" src="{{ url_for('static', filename='profile_pics/default.jpg') }}" alt="User">
             <div class="bubble">{{ msg.content }}</div>
             {% else %}
             <img class="avatar" src="{{ url_for('static', filename='profile_pics/danndas.png') }}" alt="AI">
@@ -309,9 +309,9 @@
     </p>
 </footer>
 <script>
-    window.currentUserProfilePic = "{{ session.get('profile_pic', 'default.png') }}";
-    window.userAvatarUrl = window.currentUserProfilePic === 'default.png'
-        ? "{{ url_for('static', filename='profile_pics/default.png') }}"
+    window.currentUserProfilePic = "{{ session.get('profile_pic', 'default.jpg') }}";
+    window.userAvatarUrl = window.currentUserProfilePic === 'default.jpg'
+        ? "{{ url_for('static', filename='profile_pics/default.jpg') }}"
         : "{{ url_for('static', filename='profile_pics/') }}" + window.currentUserProfilePic;
     window.aiAvatarUrl = "{{ url_for('static', filename='pic/danndas.png') }}";
 

@@ -132,6 +132,13 @@ def allowed_levels(level):
 @hangman_bp.route("/hangman")
 def hangman_game():
     session.setdefault("used_words", [])
+    
+    # DEBUG: Print session state when loading page
+    print(f"DEBUG HANGMAN PAGE: Session keys: {list(session.keys())}")
+    print(f"DEBUG HANGMAN PAGE: Current word: {session.get('current_word')}")
+    print(f"DEBUG HANGMAN PAGE: Current word data: {session.get('current_word_data')}")
+    print(f"DEBUG HANGMAN PAGE: Used words: {session.get('used_words')}")
+    
     # --- Uložení času vstupu na stránku a nastavení first_activity ---
     user_id = session.get("user_id")
     if user_id:
@@ -184,7 +191,13 @@ def start_game():
 
     word_data = random.choice(filtered_words)
 
+    # DEBUG: Print selected word info
+    print(f"DEBUG START: Selected word: {word_data['word']}, hint: {word_data['hint']}")
+    print(f"DEBUG START: User level: {user_level}, allowed levels: {levels}")
+    print(f"DEBUG START: Used words: {used}")
+
     session["current_word"] = word_data["word"]
+    session["current_word_data"] = word_data  # Store complete word data
     session.setdefault("used_words", []).append(word_data["word"])
     session["guessed_letters"] = []
     session["remaining_attempts"] = 6
@@ -202,6 +215,7 @@ def start_game():
 def reset_game():
     session.pop("used_words", None)
     session.pop("current_word", None)
+    session.pop("current_word_data", None)  # Clear stored word data
     session.pop("guessed_letters", None)
     session.pop("remaining_attempts", None)
     session.pop("hangman_training_start", None)
@@ -213,7 +227,19 @@ def guess_letter():
     data = request.get_json()
     letter = data["letter"].lower()
 
-    word = session["current_word"]
+    word = session.get("current_word")
+    word_data = session.get("current_word_data")
+    
+    # DEBUG: Print session state
+    print(f"DEBUG GUESS: Letter: {letter}")
+    print(f"DEBUG GUESS: Current word from session: {word}")
+    print(f"DEBUG GUESS: Word data from session: {word_data}")
+    print(f"DEBUG GUESS: Session keys: {list(session.keys())}")
+
+    if not word or not word_data:
+        print("DEBUG GUESS: Missing word or word_data in session!")
+        return jsonify({"error": "Game not started properly"})
+
     guessed = session.get("guessed_letters", [])
     if letter in guessed:
         return jsonify({"message": "already_guessed"})
@@ -235,9 +261,6 @@ def guess_letter():
         else "lose" if session["remaining_attempts"] <= 0
         else "playing"
     )
-
-    words = load_words()
-    word_data = next((w for w in words if w["word"] == word), None)
 
     masked_word = get_masked_word(word, guessed)
 

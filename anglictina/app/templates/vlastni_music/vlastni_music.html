@@ -167,29 +167,48 @@
 <div class="vmusic-wrapper">
     <h1>Najdi a přehraj písničku</h1>
     <form method="post" class="vmusic-search">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="text" name="song" placeholder="Napiš název písničky" required>
         <button type="submit">Hledat</button>
     </form>
     <p class="vmusic-tip">Tip: Zadej celý název písně + jméno interpreta (např. "Someone Like You Adele") pro přesnější výběr a lepší obrázky.</p>
     <div class="vmusic-samples" aria-label="Ukázkové dotazy">
-        <button type="button" class="vmusic-badge" onclick="document.querySelector('[name=song]').value='Shape of You Ed Sheeran'">Shape of You</button>
-        <button type="button" class="vmusic-badge" onclick="document.querySelector('[name=song]').value='Someone Like You Adele'">Someone Like You</button>
-        <button type="button" class="vmusic-badge" onclick="document.querySelector('[name=song]').value='Perfect Ed Sheeran'">Perfect</button>
-        <button type="button" class="vmusic-badge" onclick="document.querySelector('[name=song]').value='Counting Stars OneRepublic'">Counting Stars</button>
+        <button type="button" class="vmusic-badge" onclick="fillAndSubmit('Shape of You Ed Sheeran')">Shape of You</button>
+        <button type="button" class="vmusic-badge" onclick="fillAndSubmit('Someone Like You Adele')">Someone Like You</button>
+        <button type="button" class="vmusic-badge" onclick="fillAndSubmit('Perfect Ed Sheeran')">Perfect</button>
+        <button type="button" class="vmusic-badge" onclick="fillAndSubmit('Counting Stars OneRepublic')">Counting Stars</button>
     </div>
+    <script>
+    function fillAndSubmit(songName) {
+        const form = document.querySelector('.vmusic-search');
+        const songInput = form.querySelector('[name=song]');
+        // Ensure CSRF hidden input exists and has a value
+        let csrfInput = form.querySelector('input[name="csrf_token"]');
+        if (!csrfInput) {
+            csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrf_token';
+            form.appendChild(csrfInput);
+        }
+        // Populate from server-rendered token
+        csrfInput.value = '{{ csrf_token() }}';
+        // Set song and submit
+        songInput.value = songName;
+        form.submit();
+    }
+    </script>
     {% if error %}<div class="vmusic-error" role="alert">{{ error }}</div>{% endif %}
 
     {% if video_id %}
     <div class="video-shell">
-        <div style="max-width: 800px; aspect-ratio: 16 / 9; margin:0 auto;">
+        <div style="max-width: 800px; margin:0 auto; position:relative; padding-top:56.25%;">
             <iframe
                 id="ytplayer"
-                style="width: 100%; height: 100%; border: 0; border-radius: 12px;"
-                src="https://www.youtube-nocookie.com/embed/{{ video_id }}?cc_load_policy=0&iv_load_policy=3&modestbranding=1&rel=0&controls=1&fs=1&playsinline=1&disablekb=0&enablejsapi=1"
+                style="position:absolute; inset:0; width: 100%; height: 100%; border: 0; border-radius: 12px;"
+                src="https://www.youtube-nocookie.com/embed/{{ video_id }}?cc_load_policy=0&iv_load_policy=3&modestbranding=1&rel=0&controls=1&fs=1&playsinline=1&disablekb=0&enablejsapi=1&origin={{ request.host_url.rstrip('/') }}"
                 title="YouTube video player"
                 frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
-                allowfullscreen>
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen">
             </iframe>
             <script>
                 // Load YouTube IFrame API

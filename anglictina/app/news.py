@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, jsonify, session
 from datetime import datetime
 from db import get_db_connection
 from xp import get_user_xp_and_level
+import secrets
 
 news_bp = Blueprint('news', __name__, template_folder='templates')
 
@@ -134,6 +135,7 @@ def news_page():
     is_owner = False
     if 'user_id' in session:
         is_owner = validate_owner(session['user_id'])
+
     return render_template('news/news.html', is_owner=is_owner)
 
 

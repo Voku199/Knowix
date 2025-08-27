@@ -97,24 +97,40 @@ function guessLetter(letter) {
     const button = [...buttonsContainer.children].find(b => b.textContent === letter);
     button.disabled = true;
 
+    // Get CSRF token
+    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
+    
+    if (!csrfToken) {
+        console.error('CSRF token not found');
+        return;
+    }
+
     fetch("/hangman/guess", {
         method: "POST",
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
         body: JSON.stringify({letter})
     })
         .then(res => res.json())
         .then(data => {
+            // Calculate if the letter was correct (if remaining attempts didn't decrease)
+            const currentAttempts = parseInt(document.getElementById("remainingAttempts").innerText);
+            const isCorrect = data.remaining_attempts >= currentAttempts;
+            
             // Update button style
-            if (data.is_correct) {
+            if (isCorrect) {
                 button.classList.add('correct');
             } else {
                 button.classList.add('incorrect');
             }
 
             // Update game state
-            document.getElementById("maskedWord").innerText = data.masked_word;
-            document.getElementById("guessedLetters").innerText = data.guessed_letters.join(", ");
-            document.getElementById("remainingAttempts").innerText = data.remaining_attempts;
+            document.getElementById("maskedWord").innerText = data.masked_word || "";
+            document.getElementById("guessedLetters").innerText = (data.guessed_letters || []).join(", ");
+            document.getElementById("remainingAttempts").innerText = data.remaining_attempts || 0;
             drawHangman(data.remaining_attempts);
 
             const resultMessage = document.getElementById("resultMessage");
@@ -171,7 +187,22 @@ function startGame() {
                 nextWordBtn.innerText = "Začít znovu";
                 nextWordBtn.style.display = "inline-block";
                 nextWordBtn.onclick = () => {
-                    fetch("/hangman/reset", {method: "POST"})
+                    // Get CSRF token
+                    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                    const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
+                    
+                    if (!csrfToken) {
+                        console.error('CSRF token not found');
+                        return;
+                    }
+
+                    fetch("/hangman/reset", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken
+                        }
+                    })
                         .then(() => startGame());
                 };
                 return;

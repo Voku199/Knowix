@@ -37,10 +37,12 @@ limiter = Limiter(
 
 CSRF_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 EXEMPT_ENDPOINTS = set()
+EXEMPT_PREFIXES = ('vlastni_music_bp.',)  # prefixy endpointu, na ktere se CSRF ani limiter nemaji aplikovat
 
 
 def _ensure_csrf_token():
     token = session.get('_csrf_token')
+    print(token)
     if not token:
         token = secrets.token_urlsafe(32)
         session['_csrf_token'] = token
@@ -54,6 +56,9 @@ def init_security(app):
 
     @app.before_request
     def _csrf_protect():
+        # Vyjimka podle prefixu endpointu
+        if request.endpoint and any(request.endpoint.startswith(p) for p in EXEMPT_PREFIXES):
+            return
         if request.method in CSRF_METHODS:
             if request.endpoint in EXEMPT_ENDPOINTS:
                 return
@@ -66,7 +71,23 @@ def init_security(app):
                 sent_token = data.get('csrf_token')
             if sent_token is None:
                 sent_token = request.form.get('csrf_token') or request.headers.get('X-CSRFToken')
+
+            # Debug logování
+            print(f"[CSRF DEBUG] Endpoint: {request.endpoint}")
+            print(f"[CSRF DEBUG] Session token: {session_token}")
+            print(f"[CSRF DEBUG] Sent token: {sent_token}")
+            print(f"[CSRF DEBUG] Form data: {dict(request.form)}")
+
             if not session_token or not sent_token or session_token != sent_token:
+                print(f"[CSRF DEBUG] CSRF check failed!")
                 abort(400)
+
+    # Exempt limiter pro prefixy
+    for rule in list(app.url_map.iter_rules()):
+        if any(rule.endpoint.startswith(p) for p in EXEMPT_PREFIXES):
+            try:
+                limiter.exempt(rule.endpoint)
+            except Exception:
+                pass
 
     app.jinja_env.globals['csrf_token'] = _ensure_csrf_token

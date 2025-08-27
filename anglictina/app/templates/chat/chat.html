@@ -2,9 +2,16 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat | Knowix</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-        <link rel="stylesheet" href="/static/mobile_header.css">
+    <link rel="stylesheet" href="/static/mobile_header.css">
+
+    <!-- CSRF Token pro JavaScript -->
+    <script>
+        window.csrfToken = "{{ csrf_token() }}";
+    </script>
+
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -422,6 +429,9 @@ if (zprava.image_url) {
 
         fetch('{{ url_for("zpravy.zpravy_poslat") }}', {
             method: 'POST',
+            headers: {
+                'X-CSRFToken': window.csrfToken
+            },
             body: formData
         }).then(res => res.json()).then(data => {
             if (data.success) {
@@ -444,3 +454,4 @@ if (zprava.image_url) {
 </script>
 </body>
 </html>
+

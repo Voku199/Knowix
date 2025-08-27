@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Nepravidělní slovesa | Knowix</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
         <link rel="stylesheet" href="/static/mobile_header.css">
@@ -410,6 +411,7 @@
     <p>Lekce dokončena! 🎉</p>
     <div class="completion-options">
         <form method="POST" action="{{ url_for('verbs.test') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" name="new_lesson" value="1" class="nav-btn">🔄 Nové sloveso</button>
             <input type="hidden" name="verb" value="{{ verb }}">
             <button type="submit" name="continue" value="1" class="completion-btn">Pokračovat</button>
@@ -419,6 +421,7 @@
     {% elif sentence %}
     <div class="sentence">{{ sentence }}</div>
     <form method="POST" action="{{ url_for('verbs.test') }}" class="answer-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="answer-buttons">
             {% for answer in possible_answers %}
             <button type="submit"
@@ -432,6 +435,7 @@
     </form>
     {% else %}
     <form method="POST" action="{{ url_for('verbs.test') }}" class="next-sentence-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="verb" value="{{ verb }}">
         <button type="submit" name="continue" value="1" class="continue-btn">Pokračovat</button>
     </form>

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Cvičení | Knowix</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
         <link rel="stylesheet" href="/static/mobile_header.css">
@@ -388,10 +389,27 @@ document.getElementById('checkButton').addEventListener('click', async () => {
     });
 
     try {
+        // Get CSRF token
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
+        
+        if (!csrfToken) {
+            console.error('CSRF token not found');
+            return;
+        }
+
         const res = await fetch('/check-answer', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ translations, missing: missings, pairs: userPairs })
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ 
+                translations, 
+                missing: missings, 
+                pairs: userPairs,
+                csrf_token: csrfToken
+            })
         });
         const data = await res.json();
         console.log("ODPOVĚĎ ZE SERVERU:", data);
@@ -540,7 +558,7 @@ document.getElementById('solutionPopup').addEventListener('click', (e) => {
     }
 });
 
-// Konfigurace cvičení pro případné další JS
+// Konfigurace cvi��ení pro případné další JS
 window.exerciseConfig = {{ config | tojson | safe }};
 // console.log('Konfigurace cvičení:', exerciseConfig);
 // ===== SPOJOVAČKA SLOV - KLIKACÍ, DVĚ KOLONY POD SEBOU, DARK MODE READY =====
