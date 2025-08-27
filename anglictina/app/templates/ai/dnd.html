@@ -30,169 +30,169 @@
 
   gtag('config', 'G-W1EN990JKP');
 </script>
-    <style>
+<style>
+    .chat-container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        padding: 24px 16px 16px 16px;
+        font-family: 'League Spartan', sans-serif;
+    }
 
+    .chat-header {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+        text-align: center;
+        color: #2c3e50;
+    }
 
-        .chat-container {
-            max-width: 600px;
-            margin: 40px auto;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-            padding: 24px 16px 16px 16px;
-        }
+    .inventory-bar {
+        margin-bottom: 16px;
+        text-align: center;
+        background: #e8f5e9;
+        border-radius: 8px;
+        padding: 8px 0;
+        color: #388e3c;
+        font-size: 0.9rem;
+    }
 
-        .chat-header {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-            text-align: center;
-        }
+    .chat-history {
+        max-height: 400px;
+        overflow-y: auto;
+        margin-bottom: 16px;
+        padding: 10px;
+        background: #fafafa;
+        border-radius: 8px;
+    }
 
-        .inventory-bar {
-            margin-bottom: 16px;
-            text-align: center;
-            background: #e3f2fd;
-            border-radius: 8px;
-            padding: 8px 0;
-        }
+    .message {
+        margin-bottom: 16px;
+        display: flex;
+        align-items: flex-start;
+    }
 
-        .inventory-bar strong {
-            color: #1976d2;
-        }
+    .message.user {
+        flex-direction: row-reverse;
+    }
 
-        .chat-history {
-            max-height: 400px;
-            overflow-y: auto;
-            margin-bottom: 16px;
-        }
+    .avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        margin: 0 8px;
+        object-fit: cover;
+        background: #eee;
+        border: 1px solid #ddd;
+        flex-shrink: 0;
+    }
 
-        .message {
-            margin-bottom: 12px;
-            display: flex;
-            align-items: flex-end;
-        }
+    .bubble {
+        max-width: 75%;
+        padding: 12px 16px;
+        border-radius: 18px;
+        font-size: 1rem;
+        line-height: 1.5;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        word-break: break-word;
+    }
 
-        .message.user {
-            flex-direction: row-reverse;
-        }
+    .message.user .bubble {
+        background: #bbdefb;
+        color: #0d47a1;
+        border-bottom-right-radius: 4px;
+    }
 
-        .message.ai {
-            flex-direction: row;
-        }
+    .message.ai .bubble {
+        background: #f5f5f5;
+        color: #212121;
+        border-bottom-left-radius: 4px;
+        display: block; /* Zajistí, že obsah bude blokový */
+    }
 
-        .avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            margin: 0 8px;
-            object-fit: cover;
-            background: #eee;
-            border: 1px solid #ddd;
-        }
+    /* Styly pro tlačítka v AI zprávách */
+    .message.ai .bubble .action-buttons {
+        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
 
-        .bubble {
-            max-width: 80%;
-            padding: 10px 16px;
-            border-radius: 18px;
-            font-size: 1rem;
-            line-height: 1.4;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-            word-break: break-word;
-        }
+    .message.ai .bubble button {
+        display: block;
+        width: 100%;
+        padding: 10px 16px;
+        border-radius: 6px;
+        border: none;
+        background: #4caf50;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        text-align: left;
+    }
 
-        .message.user .bubble {
-            background: #e0f7fa;
-            color: #00796b;
-            align-self: flex-end;
-        }
+    .message.ai .bubble button:hover {
+        background: #388e3c;
+    }
 
-        .message.ai .bubble {
-            background: #f1f8e9;
-            color: #33691e;
-            align-self: flex-start;
-        }
+    .chat-input-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 16px;
+    }
 
-        .chat-input-row {
-            display: flex;
-            gap: 8px;
-        }
+    .chat-input-row input[type="text"] {
+        flex: 1;
+        padding: 12px 16px;
+        border-radius: 24px;
+        border: 1px solid #ddd;
+        font-size: 1rem;
+        font-family: inherit;
+    }
 
-        .chat-input-row input[type="text"] {
-            flex: 1;
-            padding: 10px;
-            border-radius: 18px;
-            border: 1px solid #ccc;
-            font-size: 1rem;
-        }
+    .chat-input-row button {
+        padding: 12px 20px;
+        border-radius: 24px;
+        border: none;
+        background: #388e3c;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
 
-        .chat-input-row button {
-            padding: 10px 18px;
-            border-radius: 18px;
-            border: none;
-            background: #00796b;
-            color: #fff;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+    .chat-input-row button:hover {
+        background: #2e7d32;
+    }
 
-        .chat-input-row button:hover {
-            background: #004d40;
-        }
-/* Horizontální seznam v bublině */
-.bubble ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8em; /* Menší mezera */
-    margin: 0.5em 0;
-    padding: 0;
-    list-style: none;
-}
+    /* Tlačítko restartu */
+    #restart-btn {
+        float: right;
+        font-size: 0.85em;
+        padding: 6px 14px;
+        border-radius: 8px;
+        border: none;
+        background: #f44336;
+        color: #fff;
+        cursor: pointer;
+        margin-left: 16px;
+        transition: background 0.2s;
+    }
 
-.bubble ul li {
-    background: #e3f2fd;
-    border-radius: 8px;
-    padding: 0.6em 1em;
-    margin: 0;
-    font-size: 0.9em;
-    position: relative;
-    min-width: auto; /* Odstranit fixní šířku */
-    white-space: nowrap; /* Zabránit zalomení */
-}
-
-.bubble ul li::before {
-    content: "•"; /* Jednodušší indikátor */
-    margin-right: 0.5em;
-    color: #1976d2;
-}
-.bubble b, .bubble strong {
-    font-weight: bold;
-    color: #fff;
-    background: #1976d2;
-    border-radius: 6px;
-    padding: 0.18em 0.7em;
-    margin: 0 0.2em;
-    display: inline-flex;
-    align-items: center;
-    font-size: 1em;
-    transition: background 0.2s;
-    box-shadow: 0 1px 2px rgba(25, 118, 210, 0.08);
-    white-space: normal;
-    line-height: 1.2;
-}
-.bubble {
-    white-space: pre-line;
-}
-
-    </style>
+    #restart-btn:hover {
+        background: #d32f2f;
+    }
+</style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
     <div class="logo-streak-wrapper">
         <div class="logo">
             <a href="{{ url_for('main.index') }}">
-                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+                <img src="{{ url_for('static', filename='profile_pics/logo.webp') }}" alt="Knowix Logo">
             </a>
         </div>
         <span class="streak-badge">
@@ -240,7 +240,7 @@
                 <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
                      alt="Profilová fotka" width="64" class="profile-pic">
                 {% else %}
-                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                <img src="{{ url_for('static', filename='profile_pics/default.png') }}" alt="Defaultní profilovka"
                      class="profile-pic" id="profileMenuTrigger">
                 {% endif %}
                 <div class="profile-menu" id="profileMenu">
@@ -269,7 +269,7 @@
         {% endif %}
     </div>
 </header>
-<body>
+</body>
 <div class="chat-container">
     <div class="chat-header">D&D Adventure
         <button id="restart-btn" style="float:right;font-size:0.85em;padding:4px 14px;border-radius:8px;border:none;background:#f44336;color:#fff;cursor:pointer;margin-left:16px;">Restartovat příběh</button>
@@ -286,10 +286,10 @@
         {% for msg in history %}
         <div class="message {{ 'user' if msg.sender in ['users', 'user'] else 'ai' }}">
             {% if msg.sender in ['users', 'user'] %}
-            <img class="avatar" src="{{ url_for('static', filename='pic/default.webp') }}" alt="User">
+            <img class="avatar" src="{{ url_for('static', filename='profile_pics/default.png') }}" alt="User">
             <div class="bubble">{{ msg.content }}</div>
             {% else %}
-            <img class="avatar" src="{{ url_for('static', filename='pic/danndas.png') }}" alt="AI">
+            <img class="avatar" src="{{ url_for('static', filename='profile_pics/danndas.png') }}" alt="AI">
             <div class="bubble">{{ msg.content|safe }}</div>
             {% endif %}
         </div>
@@ -300,10 +300,18 @@
         <button type="submit">Send</button>
     </form>
 </div>
+<footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p class="footer-signature">
+        Made with ❤️ by
+        <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+        and lot of ☕
+    </p>
+</footer>
 <script>
-    window.currentUserProfilePic = "{{ session.get('profile_pic', 'default.webp') }}";
-    window.userAvatarUrl = window.currentUserProfilePic === 'default.webp'
-        ? "{{ url_for('static', filename='pic/default.webp') }}"
+    window.currentUserProfilePic = "{{ session.get('profile_pic', 'default.png') }}";
+    window.userAvatarUrl = window.currentUserProfilePic === 'default.png'
+        ? "{{ url_for('static', filename='profile_pics/default.png') }}"
         : "{{ url_for('static', filename='profile_pics/') }}" + window.currentUserProfilePic;
     window.aiAvatarUrl = "{{ url_for('static', filename='pic/danndas.png') }}";
 
@@ -322,7 +330,14 @@
         avatar.alt = role === 'user' ? 'Uživatel' : 'AI';
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
-        bubble.textContent = content;
+
+        // Pro AI zprávy použij innerHTML, pro user zprávy textContent
+        if (role === 'ai') {
+            bubble.innerHTML = content;
+        } else {
+            bubble.textContent = content;
+        }
+
         if (role === 'user') {
             msgDiv.appendChild(bubble);
             msgDiv.appendChild(avatar);
@@ -349,7 +364,8 @@
             .then(response => response.json())
             .then(data => {
                 const aiMessage = chatHistory.children[chatHistory.children.length - 1];
-                aiMessage.querySelector('.bubble').textContent = data.response || 'Error!';
+                // Použij innerHTML pro správné zobrazení HTML obsahu
+                aiMessage.querySelector('.bubble').innerHTML = data.response || 'Error!';
                 // Aktualizace inventáře v horním panelu
                 if (data.inventory !== undefined) {
                     let inv = data.inventory;

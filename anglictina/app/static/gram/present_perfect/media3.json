@@ -1,7 +1,7 @@
 [
   {
     "alex": "Have you seen the latest viral TikTok trend?",
-    "cz_reply": "Viděl jsi ten nejnovější virální TikTok trend?",
+    "cz_reply": "Ano, viděl jsem ten nejnovější virální TikTok trend.",
     "accepted_answers": [
       "Yes, I have seen the latest viral TikTok trend.",
       "I have watched the newest viral TikTok trend."
@@ -9,7 +9,7 @@
   },
   {
     "alex": "People have been obsessed with short videos recently.",
-    "cz_reply": "Lidi jsou poslední dobou posedlí krátkými videi.",
+    "cz_reply": "Lidé byli posedlí krátkými videi v poslední době.",
     "accepted_answers": [
       "People have been obsessed with short videos recently.",
       "Everyone has loved short videos lately."
@@ -17,7 +17,7 @@
   },
   {
     "alex": "Have you posted any reels on Instagram this week?",
-    "cz_reply": "Přidal jsi tento týden nějaký reels na Instagram?",
+    "cz_reply": "Ne, tento týden jsem nepřidal žádné reels.",
     "accepted_answers": [
       "No, I haven't posted any reels this week.",
       "Yes, I have posted some reels on Instagram this week."
@@ -25,7 +25,7 @@
   },
   {
     "alex": "I have noticed that reels get more views than normal posts.",
-    "cz_reply": "Všiml jsem si, že reels dostávají víc zhlédnutí než běžné příspěvky.",
+    "cz_reply": "Všiml jsem si, že reels dostávají více zhlédnutí než běžné příspěvky.",
     "accepted_answers": [
       "I have noticed that reels get more views than normal posts.",
       "Reels have gotten more views than regular posts."
@@ -33,7 +33,7 @@
   },
   {
     "alex": "Have you ever gone viral on any platform?",
-    "cz_reply": "Už jsi někdy byl virální na nějaké platformě?",
+    "cz_reply": "Ne, nikdy jsem nebyl virální na žádné platformě.",
     "accepted_answers": [
       "No, I haven't gone viral on any platform.",
       "Yes, I have gone viral once."
@@ -41,7 +41,7 @@
   },
   {
     "alex": "Do you think social media have changed how we communicate?",
-    "cz_reply": "Myslíš, že sociální sítě změnily, jak komunikujeme?",
+    "cz_reply": "Ano, sociální sítě změnily způsob, jak komunikujeme.",
     "accepted_answers": [
       "Yes, social media have changed how we communicate.",
       "No, social media haven't changed communication that much."
@@ -49,98 +49,122 @@
   },
   {
     "alex": "I have used memes to express my mood more than once.",
-    "cz_reply": "Použil jsem víc než jednou meme, abych vyjádřil náladu.",
+    "cz_reply": "Použil jsem memy k vyjádření nálady více než jednou.",
     "accepted_answers": [
       "I have used memes to express my mood more than once.",
       "Yes, I have used memes to show how I feel."
     ]
   },
   {
-    "alex": "Have you downloaded any new apps recently?",
-    "cz_reply": "Stáhl jsi si nedávno nějaké nové aplikace?",
-    "accepted_answers": [
-      "Yes, I have downloaded new apps recently.",
-      "No, I haven't downloaded any new apps recently."
-    ]
-  },
-  {
-    "alex": "I have tried new filters on Snapchat every day this week.",
-    "cz_reply": "Zkoušel jsem nové filtry na Snapchatu každý den tento týden.",
-    "accepted_answers": [
-      "I have tried new filters on Snapchat every day this week.",
-      "Yes, I have used new Snapchat filters daily."
-    ]
-  },
-  {
-    "alex": "Has your phone ever crashed while streaming videos?",
-    "cz_reply": "Někdy ti telefon spadnul při sledování videí?",
-    "accepted_answers": [
-      "Yes, my phone has crashed while streaming videos.",
-      "No, my phone hasn't crashed during video streaming."
-    ]
-  },
-  {
-    "alex": "I have shared funny videos with my friends many times.",
-    "cz_reply": "Sdílel jsem srandovní videa s kamarády už několikrát.",
-    "accepted_answers": [
-      "I have shared funny videos with my friends many times.",
-      "Yes, I have sent funny videos to my friends."
-    ]
-  },
-  {
-    "alex": "Have you updated your phone’s OS recently?",
-    "cz_reply": "Aktualizoval jsi nedávno operační systém telefonu?",
-    "accepted_answers": [
-      "Yes, I have updated my phone’s OS recently.",
-      "No, I haven’t updated my phone’s OS recently."
-    ]
-  },
-  {
-    "alex": "I have noticed my battery drains faster after updates.",
-    "cz_reply": "Všiml jsem si, že baterka mi po aktualizacích rychleji ubývá.",
-    "accepted_answers": [
-      "I have noticed my battery drains faster after updates.",
-      "My battery has drained faster after updates."
-    ]
-  },
-  {
-    "alex": "Have you ever used TikTok’s Duet feature?",
-    "cz_reply": "Použil jsi někdy funkci Duet na TikToku?",
-    "accepted_answers": [
-      "Yes, I have used TikTok’s Duet feature.",
-      "No, I haven't used TikTok’s Duet feature."
-    ]
-  },
-  {
-    "alex": "I have seen many creative duets from famous creators.",
-    "cz_reply": "Viděl jsem spoustu kreativních duetů od známých tvůrců.",
-    "accepted_answers": [
-      "I have seen many creative duets from famous creators.",
-      "Yes, I have watched creative duets from famous creators."
-    ]
-  },
-  {
     "alex": "Have you ever unfollowed someone because of their posts?",
-    "cz_reply": "Odstranil jsi někdy někoho z přátel kvůli jeho příspěvkům?",
+    "cz_reply": "Ano, přestal jsem sledovat někoho kvůli jeho příspěvkům.",
     "accepted_answers": [
       "Yes, I have unfollowed someone because of their posts.",
-      "No, I haven't unfollowed anyone for their posts."
+      "No, I haven't unfollowed anyone for that reason."
     ]
   },
   {
-    "alex": "I have learned a lot about trends just by scrolling daily.",
-    "cz_reply": "Naučil jsem se hodně o trendech jen tím, že jsem denně scrolloval.",
+    "alex": "I've noticed that influencers have become very powerful recently.",
+    "cz_reply": "Všiml jsem si, že influenceři se v poslední době stali velmi mocnými.",
     "accepted_answers": [
-      "I have learned a lot about trends just by scrolling daily.",
-      "Yes, scrolling has helped me learn trends."
+      "I've noticed that influencers have become very powerful recently.",
+      "Yes, influencers have gained a lot of influence."
     ]
   },
   {
-    "alex": "Do you think memes have shaped our culture in the last years?",
-    "cz_reply": "Myslíš, že meme ovlivnily naši kulturu v posledních letech?",
+    "alex": "Have you bought anything because an influencer recommended it?",
+    "cz_reply": "Ne, nekoupil jsem nic, protože to doporučil influencer.",
     "accepted_answers": [
-      "Yes, memes have shaped our culture in recent years.",
-      "No, memes haven't influenced culture that much."
+      "No, I haven't bought anything because an influencer recommended it.",
+      "Yes, I have purchased something after an influencer's recommendation."
+    ]
+  },
+  {
+    "alex": "Social media algorithms have changed how we discover content.",
+    "cz_reply": "Algoritmy sociálních sítí změnily způsob, jak objevujeme obsah.",
+    "accepted_answers": [
+      "Social media algorithms have changed how we discover content.",
+      "Yes, algorithms have transformed content discovery."
+    ]
+  },
+  {
+    "alex": "Have you ever deleted a social media app to take a break?",
+    "cz_reply": "Ano, smazal jsem aplikaci sociálních sítí, abych si udělal pauzu.",
+    "accepted_answers": [
+      "Yes, I have deleted a social media app to take a break.",
+      "No, I haven't deleted any social media apps."
+    ]
+  },
+  {
+    "alex": "I have seen people become addicted to scrolling through feeds.",
+    "cz_reply": "Viděl jsem lidi, jak se stali závislými na procházení feed-ů.",
+    "accepted_answers": [
+      "I have seen people become addicted to scrolling through feeds.",
+      "Yes, many people have developed scrolling addictions."
+    ]
+  },
+  {
+    "alex": "Have you ever regretted posting something online?",
+    "cz_reply": "Ano, litoval jsem toho, že jsem něco zveřejnil online.",
+    "accepted_answers": [
+      "Yes, I have regretted posting something online.",
+      "No, I haven't regretted any of my posts."
+    ]
+  },
+  {
+    "alex": "Privacy concerns have grown significantly in recent years.",
+    "cz_reply": "Obavy o soukromí významně vzrostly v posledních letech.",
+    "accepted_answers": [
+      "Privacy concerns have grown significantly in recent years.",
+      "Yes, people have become more worried about privacy."
+    ]
+  },
+  {
+    "alex": "Have you ever changed your privacy settings after hearing about data breaches?",
+    "cz_reply": "Ano, změnil jsem nastavení soukromí poté, co jsem slyšel o únicích dat.",
+    "accepted_answers": [
+      "Yes, I have changed my privacy settings after hearing about data breaches.",
+      "No, I haven't changed my privacy settings for that reason."
+    ]
+  },
+  {
+    "alex": "I've watched countless YouTube tutorials to learn new skills.",
+    "cz_reply": "Sledoval jsem nespočet YouTube tutoriálů, abych se naučil nové dovednosti.",
+    "accepted_answers": [
+      "I've watched countless YouTube tutorials to learn new skills.",
+      "Yes, I have learned many things from YouTube videos."
+    ]
+  },
+  {
+    "alex": "Have you ever started a hobby because you saw it on social media?",
+    "cz_reply": "Ano, začal jsem s koníčkem, protože jsem ho viděl na sociálních sítích.",
+    "accepted_answers": [
+      "Yes, I have started a hobby because I saw it on social media.",
+      "No, I haven't picked up hobbies from social media."
+    ]
+  },
+  {
+    "alex": "Online communities have helped many people find their tribes.",
+    "cz_reply": "Online komunity pomohly mnoha lidem najít své kmeny.",
+    "accepted_answers": [
+      "Online communities have helped many people find their tribes.",
+      "Yes, people have found their communities online."
+    ]
+  },
+  {
+    "alex": "Have you ever made real friends through social media?",
+    "cz_reply": "Ano, našel jsem skutečné přátele prostřednictvím sociálních sítí.",
+    "accepted_answers": [
+      "Yes, I have made real friends through social media.",
+      "No, I haven't made genuine friendships online."
+    ]
+  },
+  {
+    "alex": "I have noticed that people share more personal information than before.",
+    "cz_reply": "Všiml jsem si, že lidé sdílejí více osobních informací než dříve.",
+    "accepted_answers": [
+      "I have noticed that people share more personal information than before.",
+      "Yes, people have become more open about their personal lives."
     ]
   }
 ]

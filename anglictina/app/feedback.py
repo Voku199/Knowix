@@ -52,10 +52,15 @@ def inject_xp_info():
 @feedback_bp.errorhandler(504)
 @feedback_bp.errorhandler(500)
 @feedback_bp.errorhandler(404)
-@feedback_bp.errorhandler(Exception)
 def server_error(e):
-    # vrátí stránku error.html s informací o výpadku
-    return render_template('error.html', error_code=e.code), e.code
+    # Pouze pro GET požadavky (stránky), ne pro API
+    if request.method == 'GET' and not request.path.startswith('/api/'):
+        return render_template('error.html', error_code=e.code), e.code
+    # Pro API požadavky vrátit JSON
+    return jsonify({
+        "status": "error",
+        "message": "Interní chyba serveru"
+    }), e.code if hasattr(e, 'code') else 500
 
 
 @feedback_bp.route('/get_feedbacks', methods=['GET'])
@@ -185,17 +190,9 @@ def manage_feedback(feedback_id):
                 "new_rating": new_rating,
                 "last_modified": updated['last_modified'].strftime('%d.%m.%Y %H:%M'),
                 "is_edited": True,
-                "new_achievements": unlocked_achievements  # seznam nově získaných achievementů (může být prázdný)
+                "new_achievements": unlocked_achievements
             })
 
-            return jsonify({
-                "status": "success",
-                "message": "Feedback aktualizován",
-                "new_message": new_message,
-                "new_rating": new_rating,
-                "last_modified": updated['last_modified'].strftime('%d.%m.%Y %H:%M'),
-                "is_edited": True
-            })
         elif request.method == 'DELETE':
             cursor.execute('''
                 DELETE FROM feedback 
@@ -222,10 +219,10 @@ def manage_feedback(feedback_id):
 
 @feedback_bp.route('/feedback', methods=['GET'])
 def feedback_page():
-    return render_template("feedback.html")  # nebo redirect, nebo jiná logika
+    return render_template("feedback.html")
 
 
-@feedback_bp.route('/feedback', methods=['POST'])
+@feedback_bp.route('/feedback-post', methods=['POST'])
 def handle_feedback():
     if 'user_id' not in session:
         return jsonify({
@@ -234,6 +231,12 @@ def handle_feedback():
         }), 401
 
     data = request.get_json()
+    if not data:
+        return jsonify({
+            "status": "error",
+            "message": "Neplatná data"
+        }), 400
+
     message = data.get("message", "").strip()
 
     try:
@@ -306,7 +309,7 @@ def handle_feedback():
 
         conn.commit()
 
-        # --- NOVĚ: Kontrola a přidělení achievementů ---
+        # Kontrola a přidělení achievementů
         unlocked_achievements = check_and_award_achievements(session['user_id'])
 
         return jsonify({
@@ -322,7 +325,7 @@ def handle_feedback():
                 "is_owner": True,
                 "is_edited": False
             },
-            "new_achievements": unlocked_achievements  # seznam nově získaných achievementů (může být prázdný)
+            "new_achievements": unlocked_achievements
         })
 
     except Exception as e:

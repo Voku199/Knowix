@@ -291,14 +291,14 @@
                 </button>
             </li>
         </ul>
-        {% if session['user_name'] %}
+        {% if session.get('user_name') %}
         <div class="user-profile">
             <div class="profile-container">
                 {% if session.get('profile_pic') %}
                 <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
                      alt="Profilová fotka" width="64" class="profile-pic">
                 {% else %}
-                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                <img src="{{ url_for('static', filename='profile_pics/default.webp') }}" alt="Defaultní profilovka"
                      class="profile-pic" id="profileMenuTrigger">
                 {% endif %}
                 <div class="profile-menu" id="profileMenu">
@@ -327,7 +327,6 @@
         {% endif %}
     </div>
 </header>
-<body>
 <div class="main-flex">
     <div class="sidebar">
         <form id="new-chat-form" style="margin-bottom: 12px;">
@@ -354,9 +353,9 @@
                     <div class="message {{ 'user' if msg.sender in ['users', 'user'] else 'ai' }}">
                         {% if msg.sender in ['users', 'user'] %}
                         {% if msg.user_profile_pic %}
-                        <img class="avatar" src="{{ url_for('static', filename='profile_pics/' + msg.user_profile_pic) }}" alt="User">
+                        <img class="avatar" src="{{ url_for('static', filename='profile_pics/' + msg.user_profile_pic) }}" alt="User" onerror="this.onerror=null;this.src='{{ url_for('static', filename='profile_pics/default.webp') }}'">
                         {% else %}
-                        <img class="avatar" src="{{ url_for('static', filename='pic/default.webp') }}" alt="User">
+                        <img class="avatar" src="{{ url_for('static', filename='profile_pics/default.webp') }}" alt="User" onerror="this.onerror=null;this.src='{{ url_for('static', filename='profile_pics/default.webp') }}'">
                         {% endif %}
                         <div class="bubble">{{ msg.content }}</div>
                         {% else %}
@@ -379,9 +378,10 @@
     </div>
 </div>
 <script>
-    window.currentUserProfilePic = "{{ session.get('profile_pic', 'default.webp') }}";
-    window.userAvatarUrl = window.currentUserProfilePic === 'default.webp'
-        ? "{{ url_for('static', filename='pic/default.webp') }}"
+    // Robustní výpočet avatar URL - ošetří prázdné řetězce i null/undefined
+    window.currentUserProfilePic = "{{ session.get('profile_pic', '') }}";
+    window.userAvatarUrl = (!window.currentUserProfilePic || window.currentUserProfilePic === '')
+        ? "{{ url_for('static', filename='profile_pics/default.webp') }}"
         : "{{ url_for('static', filename='profile_pics/') }}" + window.currentUserProfilePic;
 </script>
 <script>
@@ -398,7 +398,7 @@
         e.preventDefault();
         fetch("{{ url_for('ai_bp.chat_list') }}", {
             method: "POST",
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': '{{ csrf_token() }}'},
             body: "title="
         })
         .then(response => response.redirected ? window.location.href = response.url : location.reload());
@@ -416,7 +416,7 @@
         // Přidej zprávu uživatele
         const msgDiv = document.createElement('div');
         msgDiv.className = 'message user';
-        msgDiv.innerHTML = `<img class="avatar" src="${window.userAvatarUrl}" alt="User"><div class="bubble"></div>`;
+        msgDiv.innerHTML = `<img class="avatar" src="${window.userAvatarUrl}" alt="User" onerror="this.onerror=null;this.src='{{ url_for('static', filename='profile_pics/default.webp') }}'"><div class="bubble"></div>`;
         msgDiv.querySelector('.bubble').textContent = text;
         chatHistory.appendChild(msgDiv);
         chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -429,7 +429,7 @@
         chatHistory.scrollTop = chatHistory.scrollHeight;
         fetch('{{ url_for("ai_bp.chat_multi", chat_id=chat_id) }}', {
             method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': '{{ csrf_token() }}'},
             body: 'user_input=' + encodeURIComponent(text)
         })
         .then(response => {

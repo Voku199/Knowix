@@ -246,7 +246,7 @@
         }
     </style>
 </head>
-<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}"></body>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
     <div class="logo-streak-wrapper">
         <div class="logo">
@@ -292,14 +292,14 @@
                 </button>
             </li>
         </ul>
-        {% if session['user_name'] %}
+        {% if session.get('user_name') %}
         <div class="user-profile">
             <div class="profile-container">
                 {% if session.get('profile_pic') %}
                 <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
                      alt="Profilová fotka" width="64" class="profile-pic">
                 {% else %}
-                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                <img src="{{ url_for('static', filename='profile_pics/default.png') }}" alt="Defaultní profilovka"
                      class="profile-pic" id="profileMenuTrigger">
                 {% endif %}
                 <div class="profile-menu" id="profileMenu">
@@ -328,10 +328,11 @@
         {% endif %}
     </div>
 </header>
-<body>
+<!-- removed duplicate body tag -->
 <div class="main-flex">
     <div class="sidebar">
         <form method="post" style="margin-bottom: 12px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="new-chat-btn">+ New Chat</button>
         </form>
         <div class="chat-list">
@@ -352,7 +353,7 @@
                 {% for msg in history %}
                 <div class="message {{ 'user' if msg.sender in ['users', 'user'] else 'ai' }}">
                     {% if msg.sender in ['users', 'user'] %}
-                    <img class="avatar" src="{{ url_for('static', filename='pic/default.webp') }}" alt="User">
+                    <img class="avatar" src="{{ url_for('static', filename='profile_pics/default.png') }}" alt="User">
                     <div class="bubble">{{ msg.content }}</div>
                     {% else %}
                     <img class="avatar" src="{{ url_for('static', filename='pic/danndas.png') }}" alt="AI">
@@ -397,7 +398,8 @@ document.getElementById('start-chat-form').addEventListener('submit', function(e
         method: "POST",
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest'
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': '{{ csrf_token() }}'
         },
         body: new URLSearchParams({title: 'Nový chat', first_message: msg}).toString()
     })
@@ -418,7 +420,7 @@ document.getElementById('start-chat-form').addEventListener('submit', function(e
     const userInput = document.getElementById('user_input');
 
     // Nastav cesty k avatarům
-    const userAvatar = "{{ url_for('static', filename='pic/default.webp') }}";
+    const userAvatar = "{{ url_for('static', filename='profile_pics/default.png') }}";
     const aiAvatar = "{{ url_for('static', filename='pic/danndas.png') }}";
 
     // Backend předává historii jako JSON (jinak prázdné pole)
@@ -447,6 +449,7 @@ document.getElementById('start-chat-form').addEventListener('submit', function(e
 
     // Při načtení stránky zobraz historii, nebo první AI zprávu
     window.addEventListener('DOMContentLoaded', function() {
+        if (!chatHistory) return;
         if (initialHistory.length > 0) {
             initialHistory.forEach(msg => {
                 addMessage(msg.sender === 'ai' ? 'ai' : 'user', msg.content);
@@ -457,32 +460,35 @@ document.getElementById('start-chat-form').addEventListener('submit', function(e
         }
     });
 
-    chatForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const text = userInput.value.trim();
-        if (!text) return;
-        addMessage('user', text);
-        userInput.value = '';
-        addMessage('ai', '...');
-        fetch('/ai', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: 'user_input=' + encodeURIComponent(text)
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Odstraň loading bublinu
-            chatHistory.removeChild(chatHistory.lastChild);
-            addMessage('ai', data.response || 'Chyba!');
-        })
-        .catch(error => {
-            chatHistory.removeChild(chatHistory.lastChild);
-            addMessage('ai', 'Došlo k chybě!');
-            console.error(error);
+    if (chatForm) {
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const text = userInput.value.trim();
+            if (!text) return;
+            addMessage('user', text);
+            userInput.value = '';
+            addMessage('ai', '...');
+            fetch('/ai', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+                body: 'user_input=' + encodeURIComponent(text)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Odstraň loading bublinu
+                chatHistory.removeChild(chatHistory.lastChild);
+                addMessage('ai', data.response || 'Chyba!');
+            })
+            .catch(error => {
+                chatHistory.removeChild(chatHistory.lastChild);
+                addMessage('ai', 'Došlo k chybě!');
+                console.error(error);
+            });
         });
-    });
+    }
 </script>
 </body>
 </html>

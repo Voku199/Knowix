@@ -23,6 +23,7 @@
   gtag('config', 'G-W1EN990JKP');
 </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
@@ -158,6 +159,12 @@
 </footer>
 
 <script>
+    // CSRF token z meta tagu (vždy k dispozici pro JS)
+    const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    function csrfHeaders(extra={}) {
+        return Object.assign({ 'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN }, extra);
+    }
 
     function updateStreakBadge(streak) {
         const badge = document.querySelector('.streak-badge');
@@ -221,12 +228,21 @@
     document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const form = e.target;
-        const message = document.getElementById('message').value;
+        const message = document.getElementById('message').value.trim();
         const rating = parseInt(document.getElementById('ratingValue').value, 10);
         const resultDiv = document.getElementById('feedbackResult');
 
+        // Kontrola prázdné zprávy
+        if (!message) {
+            resultDiv.textContent = "Prosím, napište zprávu.";
+            resultDiv.style.color = 'red';
+            resultDiv.classList.add('show');
+            setTimeout(() => resultDiv.classList.remove('show'), 3000);
+            return;
+        }
+
         // Kontrola hvězdiček
-        if (rating < 1 || rating > 5) {
+        if (isNaN(rating) || rating < 1 || rating > 5) {
             resultDiv.textContent = "Prosím, ohodnoťte hvězdičkami (1-5).";
             resultDiv.style.color = 'red';
             resultDiv.classList.add('show');
@@ -235,15 +251,29 @@
         }
 
         try {
-            const response = await fetch('/feedback', {
+            console.log('Odesílám data:', {message, rating}); // Debug log
+
+            const response = await fetch('/feedback-post', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({message, rating})
+                headers: csrfHeaders(),
+                body: JSON.stringify({message, rating, csrf_token: CSRF_TOKEN})
             });
 
-            const data = await response.json();
+            console.log('Response status:', response.status); // Debug log
+            console.log('Response headers:', response.headers); // Debug log
 
-            if (data.status === 'success') {
+            // Kontrola, zda response obsahuje validní JSON
+            let data;
+            try {
+                const responseText = await response.text();
+                console.log('Response text:', responseText); // Debug log
+                data = JSON.parse(responseText);
+            } catch (jsonError) {
+                console.error('JSON parse error:', jsonError);
+                throw new Error('Server vrátil neplatnou odpověď: ' + responseText);
+            }
+
+            if (response.ok && data.status === 'success') {
                 renderFeedback({
                     id: data.feedback?.id,
                     user_name: data.feedback?.user_name,
@@ -263,19 +293,24 @@
                     star.classList.add('far');
                     star.style.color = '#ccc';
                 });
-                resultDiv.textContent = data.message;
+                document.getElementById('ratingValue').value = 0;
+
+                resultDiv.textContent = data.message || "Děkujeme za zpětnou vazbu!";
                 resultDiv.style.color = 'green';
             } else {
-                resultDiv.textContent = data.message;
+                // Zobrazení chybové zprávy ze serveru
+                resultDiv.textContent = data.message || "Došlo k chybě při odesílání.";
                 resultDiv.style.color = 'red';
             }
 
             resultDiv.classList.add('show');
             setTimeout(() => resultDiv.classList.remove('show'), 3000);
         } catch (error) {
-            resultDiv.textContent = "Chyba připojení k serveru";
+            console.error('Chyba při odesílání feedbacku:', error);
+            resultDiv.textContent = "Chyba připojení k serveru: " + error.message;
             resultDiv.style.color = 'red';
             resultDiv.classList.add('show');
+            setTimeout(() => resultDiv.classList.remove('show'), 3000);
         }
     });
 
@@ -354,7 +389,7 @@
         if (target.classList.contains('delete-btn')) {
             if (confirm('Opravdu smazat tento feedback?')) {
                 try {
-                    const res = await fetch(`/feedback/${id}`, {method: 'DELETE'});
+                    const res = await fetch(`/feedback/${id}`, {method: 'DELETE', headers: csrfHeaders(), body: JSON.stringify({csrf_token: CSRF_TOKEN})});
                     const data = await res.json();
                     if (data.status === 'success') feedbackItem.remove();
                 } catch (error) {
@@ -410,8 +445,8 @@
                 try {
                     const res = await fetch(`/feedback/${id}`, {
                         method: 'PUT',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({message: newMessage, rating: newRating})
+                        headers: csrfHeaders(),
+                        body: JSON.stringify({message: newMessage, rating: newRating, csrf_token: CSRF_TOKEN})
                     });
 
                     const data = await res.json();
@@ -453,3 +488,4 @@
 </script>
 </body>
 </html>
+

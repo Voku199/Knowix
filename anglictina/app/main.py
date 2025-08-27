@@ -107,6 +107,8 @@ app.register_blueprint(admin_bp)
 app.register_blueprint(vlastni_music_bp)
 app.register_blueprint(proc_bp)
 
+init_security(app)
+
 
 # === Sitemap & robots ===
 @app.route('/sitemap.xml')
@@ -157,10 +159,6 @@ def handle_domain_and_session():
 
     # Flag pro after_request zda byla session změněna explicitně (informativní)
     g.session_keys_before = set(session.keys())
-
-
-# === INIT SECURITY (CSRF, rate limiting, atd.) ===
-init_security(app)
 
 
 # === Servírování profilovek s fallbackem ===
@@ -290,11 +288,16 @@ def add_security_headers(response):
 
 # from waitress import serve
 #
-# serve(app, host="0.0.0.0", port=8080)
+# serve(
+#     app,
+#     host="0.0.0.0",
+#     port=8080,
+#     threads=16,       # kolik vláken má Waitress pro obsluhu požadavků
+#     backlog=100      # kolik požadavků může čekat ve frontě
+# )
 
 
 # === Spuštění aplikace ===
-if __name__ == "__main__":
-    from waitress import serve
+from waitress import serve
 
-    serve(app, host="0.0.0.0", port=8080)
+serve(app, host="0.0.0.0", port=8080, threads=16, backlog=100)  # kolik požadavků může čekat ve frontě)

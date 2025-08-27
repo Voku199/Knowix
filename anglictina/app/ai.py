@@ -25,13 +25,31 @@ BAD_WORDS = [
 def get_or_create_user():
     if "user_id" in session:
         return session["user_id"]
+
     db = get_db_connection()
     with db.cursor() as cursor:
-        cursor.execute("INSERT INTO users () VALUES ()")
+        # Provide values for all known required fields
+        cursor.execute("""
+            INSERT INTO users (first_name, last_name, email, password, school) 
+            VALUES (%s, %s, %s, %s, %s)
+        """, (
+            'Anonymous',
+            'User',
+            f'anonymous_{random.randint(10000, 99999)}@example.com',
+            'scrypt:32768:8:1$SZwTcXBf633lMT5B$5314fff3be13114ecbf2bff33572a6e3771287491ad73f4dda4f2f13be7493853f0badd609b3bf0a09f0c821bf55c30c9282ee46e88bcb1f38eccab9b56f5eef',
+            'Základní škola Tomáše Šobra'
+        ))
         user_id = cursor.lastrowid
     db.commit()
     session["user_id"] = user_id
     return user_id
+
+
+@ai_bp.before_request
+def check_user():
+    # This ensures every request has a user_id
+    if "user_id" not in session:
+        get_or_create_user()
 
 
 def get_user_chats(user_id):
@@ -205,10 +223,25 @@ def ask_community_ai(user_id, user_input):
 
     # Detekce češtiny
     if is_czech(user_input):
-        return "Sorry, I don't understand. Please write in English. 🙏"
+        czech_responses = [
+            "Sorry, I don't understand. Please write in English. 🙏",
+            "I can't understand Czech, could you try English? 😊",
+            "Please use English, I don't understand Czech. 🌍",
+            "I'm not fluent in Czech, could you switch to English? 🤔",
+            "English, please! I can't follow Czech. 😅"
+        ]
+        return random.choice(czech_responses)
+
     # Detekce sprostých slov
     if contains_bad_word(user_input):
-        return "Hey, that's not cool. The owner can see this and might take action. 🚨"
+        bad_word_responses = [
+            "Hey, that's not cool. The owner can see this and might take action. 🚨",
+            "That's inappropriate. Please keep it respectful. 🙏",
+            "Watch your language, please. This is a friendly space. 😊",
+            "Let's keep it clean here, okay? 🚫",
+            "Please avoid using such language. It's not welcome here. 🙅"
+        ]
+        return random.choice(bad_word_responses)
 
     history = get_chat_history(user_id, limit=30, dnd=False)
     messages = build_community_prompt(history, user_input)

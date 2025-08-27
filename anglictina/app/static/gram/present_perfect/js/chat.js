@@ -63,14 +63,43 @@ function removeTypingIndicator() {
 
 async function startChat() {
     try {
+        console.log('Starting chat...');
         const res = await fetch('/chat/start');
-        if (!res.ok) throw new Error('Chyba serveru: ' + res.status);
+        console.log('Start chat response status:', res.status);
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error('Start chat error:', errorText);
+            throw new Error(`Chyba serveru při spuštění chatu: ${res.status}`);
+        }
+
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const responseText = await res.text();
+            console.error('Non-JSON response from start:', responseText);
+            throw new Error(`Server nevrátil JSON při spuštění chatu`);
+        }
+
         const data = await res.json();
+        console.log('Start chat data:', data);
+
+        if (data.error) {
+            throw new Error(`Chyba při spuštění: ${data.error}`);
+        }
+
         await simulateAlexMessage(data.alex, data.cz_reply);
     } catch (err) {
-        feedback.textContent = 'Chyba při načítání chatu. Zkuste to později.';
+        console.error('Start chat error:', err);
+        feedback.textContent = `Chyba při načítání chatu: ${err.message}. Zkuste obnovit stránku.`;
         feedback.className = 'incorrect';
-        console.error(err);
+
+        // Přidáme tlačítko pro obnovení
+        const reloadButton = document.createElement('button');
+        reloadButton.textContent = 'Obnovit stránku';
+        reloadButton.onclick = () => window.location.reload();
+        reloadButton.style.marginTop = '10px';
+        feedback.appendChild(document.createElement('br'));
+        feedback.appendChild(reloadButton);
     }
 }
 
@@ -100,6 +129,12 @@ function showEndOfChat(xp) {
     };
 }
 
+// Získání CSRF tokenu z meta tagu
+function getCSRFToken() {
+    const metaTag = document.querySelector('meta[name="csrf-token"]');
+    return metaTag ? metaTag.getAttribute('content') : null;
+}
+
 async function sendAnswer(answer) {
     submitBtn.disabled = true;
     feedback.textContent = '';
@@ -111,16 +146,37 @@ async function sendAnswer(answer) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({answer})
+            body: JSON.stringify({
+                answer: answer,
+                csrf_token: getCSRFToken()
+            })
         });
 
-        // Pokud server vrátí HTML místo JSON, vyhodíme chybu
+        console.log('Response status:', res.status);
+        console.log('Response headers:', res.headers);
+
+        // Kontrola HTTP status kódu
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error('Server error response:', errorText);
+            throw new Error(`Server vrátil chybu ${res.status}: ${res.statusText}`);
+        }
+
+        // Kontrola Content-Type hlavičky
         const contentType = res.headers.get("content-type");
         if (!contentType || !contentType.includes("application/json")) {
-            throw new Error('Server nevrátil JSON. Pravděpodobně došlo k chybě.');
+            const responseText = await res.text();
+            console.error('Non-JSON response:', responseText);
+            throw new Error(`Server nevrátil JSON (Content-Type: ${contentType}). Odpověď: ${responseText.substring(0, 200)}...`);
         }
 
         const data = await res.json();
+        console.log('Received data:', data);
+
+        // Kontrola, zda data obsahují error
+        if (data.error) {
+            throw new Error(`Server error: ${data.error}`);
+        }
 
         if (data.correct) {
             if (data.almost) {
@@ -158,9 +214,9 @@ async function sendAnswer(answer) {
             feedback.className = 'incorrect';
         }
     } catch (err) {
-        feedback.textContent = 'Chyba komunikace se serverem. Zkuste to později.';
+        console.error('Detailed error:', err);
+        feedback.textContent = `Chyba: ${err.message}`;
         feedback.className = 'incorrect';
-        console.error(err);
     }
 
     submitBtn.disabled = false;
