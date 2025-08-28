@@ -1,115 +1,5 @@
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Procvičuj si angličtinu zábavně s Knowixem – chaty, písničky, překlady a hry.">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Roleplaying| Knowix</title>
-    <link rel="stylesheet" href="/static/style.css">
-        <link rel="stylesheet" href="/static/mobile_header.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
-          media="print" onload="this.media='all'">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-W1EN990JKP');
-</script>
-    <noscript>
-        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
-    </noscript>
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <style>
-
-    </style>
-</head>
-<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
-<header>
-    <div class="logo-streak-wrapper">
-        <div class="logo">
-            <a href="{{ url_for('main.index') }}">
-                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
-            </a>
-        </div>
-        <span class="streak-badge">
-            <img src="/static/fire.svg" alt="Streak">
-            {{ user_streak }}
-        </span>
-    </div>
-    <div class="nav-profile-wrapper">
-        <ul class="nav-right">
-            <li>
-                <a href="/anglictina" title="Angličtina">
-                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <a href="/feedback" title="Feedback">
-                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <a href="/news" title="Novinky">
-                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <a href="/obchod" title="Obchod">
-                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <a href="/zpravy" title="Zprávy">
-                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
-                    🌙
-                </button>
-            </li>
-        </ul>
-        {% if session['user_name'] %}
-        <div class="user-profile">
-            <div class="profile-container">
-                {% if session.get('profile_pic') %}
-                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
-                     alt="Profilová fotka" width="64" class="profile-pic">
-                {% else %}
-                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
-                     class="profile-pic" id="profileMenuTrigger">
-                {% endif %}
-                <div class="profile-menu" id="profileMenu">
-                    <a href="{{ url_for('auth.settings') }}">:gear: Nastavení</a>
-                    <a href="{{ url_for('auth.logout') }}">:door: Odhlásit se</a>
-                </div>
-                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
-            </div>
-            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
-            <div class="xp-header-bar">
-                <div class="xp-header-bar-labels">
-                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
-                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
-                </div>
-                <div class="xp-header-bar-progress-bg">
-                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-        {% else %}
-<div class="auth-links">
-    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">:key: Přihlásit se</a>
-    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">:pencil: Registrovat se</a>
-</div>
-        {% endif %}
-    </div>
-</header>
+{% extends "base.html" %}
+{% block content %}
 
 <div class="game-container">
     <h1>Roleplaying konverzace</h1>
@@ -121,22 +11,22 @@
     </div>
     <div id="inputArea">
         {% if speaker.lower() == 'uživatel' %}
-            <div style="margin-bottom:10px; color:#888;">Co říct: <b>{{ cz }}</b></div>
-            <input type="text"
-                   class="translation-input"
-                   id="prekladInput"
-                   placeholder="Řekněte nebo napište překlad...">
-            <button class="mic-btn" id="micButton">
-                <span>🎤</span>
-            </button>
-            <button class="submit-btn" id="submitBtn">
-                Odeslat
-            </button>
+        <div style="margin-bottom:10px; color:#888;">Co říct: <b>{{ cz }}</b></div>
+        <input type="text"
+               class="translation-input"
+               id="prekladInput"
+               placeholder="Řekněte nebo napište překlad...">
+        <button class="mic-btn" id="micButton">
+            <span>🎤</span>
+        </button>
+        <button class="submit-btn" id="submitBtn">
+            Odeslat
+        </button>
         {% else %}
-            <div style="margin-bottom:10px; color:#888;">Poslouchej a pokračuj</div>
-            <button class="next-btn" id="nextBtn" style="display:block;">
-                Pokračovat &rarr;
-            </button>
+        <div style="margin-bottom:10px; color:#888;">Poslouchej a pokračuj</div>
+        <button class="next-btn" id="nextBtn" style="display:block;">
+            Pokračovat &rarr;
+        </button>
         {% endif %}
     </div>
     <div class="result" id="resultContainer"></div>
@@ -146,32 +36,25 @@
     <img src="/static/fire.svg" alt="Streak" class="streak-fire" style="width:32px;vertical-align:middle;">
     <span id="streakToastText"></span>
 </div>
-<footer>
-    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
-    <p class="footer-signature">
-        Made with ❤️ by
-        <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
-        and lot of ☕
-    </p>
-</footer>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    // --- SpeechRecognition ---
-    let recognition;
-    let isListening = false;
-    let noSpeechTimeout = null;
+    document.addEventListener('DOMContentLoaded', function () {
+        // --- SpeechRecognition ---
+        let recognition;
+        let isListening = false;
+        let noSpeechTimeout = null;
 
-    function lockScroll() {
-        document.body.style.overflow = 'hidden';
-    }
-    function unlockScroll() {
-        document.body.style.overflow = '';
-    }
+        function lockScroll() {
+            document.body.style.overflow = 'hidden';
+        }
 
-    // --- Vylepšená spojovačka slov ---
-    function showMatchingExercise(pairs) {
-        inputArea.innerHTML = `
+        function unlockScroll() {
+            document.body.style.overflow = '';
+        }
+
+        // --- Vylepšená spojovačka slov ---
+        function showMatchingExercise(pairs) {
+            inputArea.innerHTML = `
             <div style="font-size:1.2em;margin-bottom:10px;">Spoj anglická slova/věty s českými:</div>
             <div id="matchingExercise" style="display:flex;gap:40px;justify-content:center;">
                 <div id="enCol"></div>
@@ -181,117 +64,117 @@ document.addEventListener('DOMContentLoaded', function () {
             <div id="matchingResult" style="margin-top:15px;font-size:1.1em;"></div>
         `;
 
-        function shuffle(arr) {
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
+            function shuffle(arr) {
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
             }
+
+            const enArr = pairs.map(p => p.en);
+            const czArr = pairs.map(p => p.cz);
+            shuffle(enArr);
+            shuffle(czArr);
+
+            const enCol = document.getElementById('enCol');
+            const czCol = document.getElementById('czCol');
+
+            enArr.forEach((en) => {
+                const div = document.createElement('div');
+                div.className = 'matching-item';
+                div.textContent = en;
+                div.draggable = true;
+                div.dataset.en = en;
+                div.style.padding = '10px 18px';
+                div.style.margin = '8px 0';
+                div.style.background = '#e3eafc';
+                div.style.borderRadius = '8px';
+                div.style.cursor = 'grab';
+                div.style.border = '1px solid #b3c6e7';
+                enCol.appendChild(div);
+            });
+
+            czArr.forEach((cz) => {
+                const drop = document.createElement('div');
+                drop.className = 'matching-drop';
+                drop.textContent = cz;
+                drop.dataset.cz = cz;
+                drop.style.padding = '10px 18px';
+                drop.style.margin = '8px 0';
+                drop.style.background = '#f8f9fa';
+                drop.style.borderRadius = '8px';
+                drop.style.minHeight = '40px';
+                drop.style.border = '2px dashed #b3c6e7';
+                drop.style.position = 'relative';
+                drop.style.transition = 'background 0.2s';
+                czCol.appendChild(drop);
+            });
+
+            // Drag & drop logic
+            let dragged = null;
+            enCol.querySelectorAll('.matching-item').forEach(item => {
+                item.addEventListener('dragstart', function () {
+                    dragged = item;
+                    setTimeout(() => item.style.opacity = '0.5', 0);
+                });
+                item.addEventListener('dragend', function () {
+                    item.style.opacity = '1';
+                });
+            });
+            czCol.querySelectorAll('.matching-drop').forEach(drop => {
+                drop.addEventListener('dragover', function (e) {
+                    e.preventDefault();
+                    drop.style.background = '#d4edda';
+                });
+                drop.addEventListener('dragleave', function () {
+                    drop.style.background = '#f8f9fa';
+                });
+                drop.addEventListener('drop', function (e) {
+                    e.preventDefault();
+                    drop.style.background = '#f8f9fa';
+                    if (dragged) {
+                        // Remove previous if exists
+                        if (drop.querySelector('.matching-item')) {
+                            enCol.appendChild(drop.querySelector('.matching-item'));
+                        }
+                        drop.appendChild(dragged);
+                        dragged.style.margin = '0';
+                        dragged = null;
+                    }
+                });
+            });
+
+            // Kontrola výsledku
+            document.getElementById('checkMatchingBtn').onclick = function () {
+                let correct = 0;
+                let userMatches = [];
+                czCol.querySelectorAll('.matching-drop').forEach(drop => {
+                    const cz = drop.dataset.cz;
+                    const item = drop.querySelector('.matching-item');
+                    if (item) {
+                        const en = item.dataset.en;
+                        const pair = pairs.find(p => p.en === en && p.cz === cz);
+                        userMatches.push({en, cz, correct: !!pair});
+                        if (pair) correct++;
+                    }
+                });
+                const resultDiv = document.getElementById('matchingResult');
+                if (correct === pairs.length) {
+                    resultDiv.innerHTML = `<span style="color:#27ae60;">🎉 Vše správně! Výborně!</span>`;
+                    setTimeout(() => showCongratsPopout(pairs, userMatches), 1200);
+                } else {
+                    resultDiv.innerHTML = `<span style="color:#e74c3c;">Některé dvojice nesedí, zkus to znovu.</span>`;
+                }
+            };
         }
 
-        const enArr = pairs.map(p => p.en);
-        const czArr = pairs.map(p => p.cz);
-        shuffle(enArr);
-        shuffle(czArr);
-
-        const enCol = document.getElementById('enCol');
-        const czCol = document.getElementById('czCol');
-
-        enArr.forEach((en) => {
-            const div = document.createElement('div');
-            div.className = 'matching-item';
-            div.textContent = en;
-            div.draggable = true;
-            div.dataset.en = en;
-            div.style.padding = '10px 18px';
-            div.style.margin = '8px 0';
-            div.style.background = '#e3eafc';
-            div.style.borderRadius = '8px';
-            div.style.cursor = 'grab';
-            div.style.border = '1px solid #b3c6e7';
-            enCol.appendChild(div);
-        });
-
-        czArr.forEach((cz) => {
-            const drop = document.createElement('div');
-            drop.className = 'matching-drop';
-            drop.textContent = cz;
-            drop.dataset.cz = cz;
-            drop.style.padding = '10px 18px';
-            drop.style.margin = '8px 0';
-            drop.style.background = '#f8f9fa';
-            drop.style.borderRadius = '8px';
-            drop.style.minHeight = '40px';
-            drop.style.border = '2px dashed #b3c6e7';
-            drop.style.position = 'relative';
-            drop.style.transition = 'background 0.2s';
-            czCol.appendChild(drop);
-        });
-
-        // Drag & drop logic
-        let dragged = null;
-        enCol.querySelectorAll('.matching-item').forEach(item => {
-            item.addEventListener('dragstart', function () {
-                dragged = item;
-                setTimeout(() => item.style.opacity = '0.5', 0);
-            });
-            item.addEventListener('dragend', function () {
-                item.style.opacity = '1';
-            });
-        });
-        czCol.querySelectorAll('.matching-drop').forEach(drop => {
-            drop.addEventListener('dragover', function (e) {
-                e.preventDefault();
-                drop.style.background = '#d4edda';
-            });
-            drop.addEventListener('dragleave', function () {
-                drop.style.background = '#f8f9fa';
-            });
-            drop.addEventListener('drop', function (e) {
-                e.preventDefault();
-                drop.style.background = '#f8f9fa';
-                if (dragged) {
-                    // Remove previous if exists
-                    if (drop.querySelector('.matching-item')) {
-                        enCol.appendChild(drop.querySelector('.matching-item'));
-                    }
-                    drop.appendChild(dragged);
-                    dragged.style.margin = '0';
-                    dragged = null;
-                }
-            });
-        });
-
-        // Kontrola výsledku
-        document.getElementById('checkMatchingBtn').onclick = function () {
-            let correct = 0;
-            let userMatches = [];
-            czCol.querySelectorAll('.matching-drop').forEach(drop => {
-                const cz = drop.dataset.cz;
-                const item = drop.querySelector('.matching-item');
-                if (item) {
-                    const en = item.dataset.en;
-                    const pair = pairs.find(p => p.en === en && p.cz === cz);
-                    userMatches.push({en, cz, correct: !!pair});
-                    if (pair) correct++;
-                }
-            });
-            const resultDiv = document.getElementById('matchingResult');
-            if (correct === pairs.length) {
-                resultDiv.innerHTML = `<span style="color:#27ae60;">🎉 Vše správně! Výborně!</span>`;
-                setTimeout(() => showCongratsPopout(pairs, userMatches), 1200);
-            } else {
-                resultDiv.innerHTML = `<span style="color:#e74c3c;">Některé dvojice nesedí, zkus to znovu.</span>`;
-            }
-        };
-    }
-
-    // --- Vylepšený popout po spojovačce ---
-   // --- Vylepšený popout po spojovačce ---
-    function showCongratsPopout(matchingPairs, userMatches) {
-        lockScroll();
-        let answersHtml = '';
-        if (userMatches && userMatches.length) {
-            answersHtml = `
+        // --- Vylepšený popout po spojovačce ---
+        // --- Vylepšený popout po spojovačce ---
+        function showCongratsPopout(matchingPairs, userMatches) {
+            lockScroll();
+            let answersHtml = '';
+            if (userMatches && userMatches.length) {
+                answersHtml = `
                 <div class="matching-summary">
                     <h3 style="margin-bottom:10px;">Tvoje spojení:</h3>
                     <table class="matching-table" style="margin:auto;">
@@ -314,12 +197,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     </table>
                 </div>
             `;
-        }
+            }
 
-        const pop = document.createElement('div');
-        pop.id = 'congratsPopout';
-        pop.className = 'popup-container';
-        pop.innerHTML = `
+            const pop = document.createElement('div');
+            pop.id = 'congratsPopout';
+            pop.className = 'popup-container';
+            pop.innerHTML = `
             <div class="popup-content" style="max-width:420px;text-align:center;">
                 <div style="font-size:2.2em;margin-bottom:10px;">🎉 Skvělá práce!</div>
                 <div style="font-size:1.15em;margin-bottom:18px;">Dokončil(a) jsi konverzaci i spojovačku.</div>
@@ -335,279 +218,386 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             </div>
         `;
-        document.body.appendChild(pop);
+            document.body.appendChild(pop);
 
-        document.getElementById('showAnswersBtn').onclick = function () {
-            document.getElementById('matchingAnswersDetail').style.display = 'block';
-            this.style.display = 'none';
-        };
-        document.getElementById('continueBtn').onclick = goToRoleplaying;
-        document.getElementById('continueBtn2').onclick = goToRoleplaying;
-        document.getElementById('nextLessonBtn').onclick = goToRoleplaying;
+            document.getElementById('showAnswersBtn').onclick = function () {
+                document.getElementById('matchingAnswersDetail').style.display = 'block';
+                this.style.display = 'none';
+            };
+            document.getElementById('continueBtn').onclick = goToRoleplaying;
+            document.getElementById('continueBtn2').onclick = goToRoleplaying;
+            document.getElementById('nextLessonBtn').onclick = goToRoleplaying;
 
-        function goToRoleplaying() {
-            unlockScroll();
-            window.location.href = '/roleplaying';
+            function goToRoleplaying() {
+                unlockScroll();
+                window.location.href = '/roleplaying';
+            }
         }
-    }
 
-    // --- SpeechRecognition a další původní logika zůstává beze změny ---
+        // --- SpeechRecognition a další původní logika zůstává beze změny ---
 
-    function initSpeechRecognition() {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.lang = 'en-US';
-            recognition.onstart = function () {
-                isListening = true;
-                if (micButton) micButton.classList.add('listening');
-                if (prekladInput) prekladInput.placeholder = "Poslouchám...";
-                noSpeechTimeout = setTimeout(() => {
+        function initSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                recognition.onstart = function () {
+                    isListening = true;
+                    if (micButton) micButton.classList.add('listening');
+                    if (prekladInput) prekladInput.placeholder = "Poslouchám...";
+                    noSpeechTimeout = setTimeout(() => {
+                        stopListening();
+                        showNoSpeechWarning();
+                    }, 6000);
+                };
+                recognition.onresult = function (event) {
+                    clearTimeout(noSpeechTimeout);
+                    const transcript = event.results[0][0].transcript;
+                    if (prekladInput) prekladInput.value = transcript;
                     stopListening();
-                    showNoSpeechWarning();
-                }, 6000);
-            };
-            recognition.onresult = function (event) {
-                clearTimeout(noSpeechTimeout);
-                const transcript = event.results[0][0].transcript;
-                if (prekladInput) prekladInput.value = transcript;
-                stopListening();
-            };
-            recognition.onerror = function (event) {
-                clearTimeout(noSpeechTimeout);
-                if (event.error === "no-speech") {
-                    showNoSpeechWarning();
-                } else {
-                    showResult('Chyba: ' + event.error, false);
-                }
-                stopListening();
-            };
-            recognition.onend = function () {
-                clearTimeout(noSpeechTimeout);
-                stopListening();
-            };
-        } else {
-            if (micButton) micButton.disabled = true;
-            if (micButton) micButton.title = "Váš prohlížeč nepodporuje rozpoznávání řeči";
-            if (prekladInput) prekladInput.placeholder = "Napište překlad...";
+                };
+                recognition.onerror = function (event) {
+                    clearTimeout(noSpeechTimeout);
+                    if (event.error === "no-speech") {
+                        showNoSpeechWarning();
+                    } else {
+                        showResult('Chyba: ' + event.error, false);
+                    }
+                    stopListening();
+                };
+                recognition.onend = function () {
+                    clearTimeout(noSpeechTimeout);
+                    stopListening();
+                };
+            } else {
+                if (micButton) micButton.disabled = true;
+                if (micButton) micButton.title = "Váš prohlížeč nepodporuje rozpoznávání řeči";
+                if (prekladInput) prekladInput.placeholder = "Napište překlad...";
+            }
         }
-    }
 
-    function startListening() {
-        if (recognition) recognition.start();
-    }
-
-    function stopListening() {
-        if (recognition && isListening) {
-            recognition.stop();
-            isListening = false;
-            if (micButton) micButton.classList.remove('listening');
-            if (prekladInput) prekladInput.placeholder = "Zkuste to anglicky...";
+        function startListening() {
+            if (recognition) recognition.start();
         }
-        clearTimeout(noSpeechTimeout);
-    }
 
-    // ... showTypeWarning, showNoSpeechWarning, showStreakToast zůstávají stejné ...
+        function stopListening() {
+            if (recognition && isListening) {
+                recognition.stop();
+                isListening = false;
+                if (micButton) micButton.classList.remove('listening');
+                if (prekladInput) prekladInput.placeholder = "Zkuste to anglicky...";
+            }
+            clearTimeout(noSpeechTimeout);
+        }
 
-    const conversationHistory = document.getElementById('conversationHistory');
-    const inputArea = document.getElementById('inputArea');
-    const resultContainer = document.getElementById('resultContainer');
-    let prekladInput, micButton, submitBtn, nextBtn;
+        // ... showTypeWarning, showNoSpeechWarning, showStreakToast zůstávají stejné ...
 
-    function playAlexAudio(enText, topic, index) {
-        if (!topic) topic = window.ROLEPLAYING_TOPIC || "";
-        if (typeof index !== "number") index = window.currentAlexIndex || 0;
-        topic = topic.replace(/\.json$/i, '');
-        const audioUrl = `/static/speaking/roleplaying/mp3/${topic}_${index}.mp3`;
-        let audio = new Audio(audioUrl);
-        let played = false;
+        const conversationHistory = document.getElementById('conversationHistory');
+        const inputArea = document.getElementById('inputArea');
+        const resultContainer = document.getElementById('resultContainer');
+        let prekladInput, micButton, submitBtn, nextBtn;
 
-        audio.addEventListener('canplaythrough', function () {
-            audio.play().then(() => {
-                played = true;
-            }).catch(() => {
+        function playAlexAudio(enText, topic, index) {
+            if (!topic) topic = window.ROLEPLAYING_TOPIC || "";
+            if (typeof index !== "number") index = window.currentAlexIndex || 0;
+            topic = topic.replace(/\.json$/i, '');
+            const audioUrl = `/static/speaking/roleplaying/mp3/${topic}_${index}.mp3`;
+            let audio = new Audio(audioUrl);
+            let played = false;
+
+            audio.addEventListener('canplaythrough', function () {
+                audio.play().then(() => {
+                    played = true;
+                }).catch(() => {
+                    if (!played && enText && 'speechSynthesis' in window) {
+                        const utter = new SpeechSynthesisUtterance(enText);
+                        utter.lang = 'en-US';
+                        window.speechSynthesis.speak(utter);
+                    }
+                });
+            });
+
+            audio.addEventListener('error', function () {
                 if (!played && enText && 'speechSynthesis' in window) {
                     const utter = new SpeechSynthesisUtterance(enText);
                     utter.lang = 'en-US';
                     window.speechSynthesis.speak(utter);
                 }
             });
-        });
 
-        audio.addEventListener('error', function () {
-            if (!played && enText && 'speechSynthesis' in window) {
-                const utter = new SpeechSynthesisUtterance(enText);
-                utter.lang = 'en-US';
-                window.speechSynthesis.speak(utter);
-            }
-        });
-
-        audio.load();
-        window.currentAlexIndex = index + 2;
-    }
-
-  // --- Přidání do historie: Alex ukazuje obě věty ---
-    function addToHistory(speaker, cz, en = null, userInput = null, correct = null, isAlex = false, topic = null, index = null, showBothLangs = false) {
-        // Ověření, že speaker není undefined
-        if (!speaker) {
-            console.error('addToHistory: speaker is undefined or null');
-            return;
+            audio.load();
+            window.currentAlexIndex = index + 2;
         }
 
-        const row = document.createElement('div');
-        row.className = 'chat-row ' + (speaker.toLowerCase() === 'uživatel' ? 'user' : 'ai');
-        const avatar = document.createElement('img');
-        avatar.className = 'chat-avatar';
-        avatar.src = speaker.toLowerCase() === 'uživatel'
-            ? '/static/profile_pics/{{ session.get("profile_pic", "default.webp") }}'
-            : '/static/pic/danndas.png';
-        avatar.alt = speaker;
-        const bubble = document.createElement('div');
-        bubble.className = 'chat-bubble ' + (speaker.toLowerCase() === 'uživatel' ? 'bubble-user' : 'bubble-ai');
+        // --- Přidání do historie: Alex ukazuje obě věty ---
+        function addToHistory(speaker, cz, en = null, userInput = null, correct = null, isAlex = false, topic = null, index = null, showBothLangs = false) {
+            // Ověření, že speaker není undefined
+            if (!speaker) {
+                console.error('addToHistory: speaker is undefined or null');
+                return;
+            }
 
-        let text;
-        if (speaker.toLowerCase() === 'alex' && showBothLangs && en) {
-            // Vylepšený formát pro zobrazení obou jazyků
-            text = `
+            const row = document.createElement('div');
+            row.className = 'chat-row ' + (speaker.toLowerCase() === 'uživatel' ? 'user' : 'ai');
+            const avatar = document.createElement('img');
+            avatar.className = 'chat-avatar';
+            avatar.src = speaker.toLowerCase() === 'uživatel'
+                ? '/static/profile_pics/{{ session.get("profile_pic", "default.webp") }}'
+                : '/static/pic/danndas.png';
+            avatar.alt = speaker;
+            const bubble = document.createElement('div');
+            bubble.className = 'chat-bubble ' + (speaker.toLowerCase() === 'uživatel' ? 'bubble-user' : 'bubble-ai');
+
+            let text;
+            if (speaker.toLowerCase() === 'alex' && showBothLangs && en) {
+                // Vylepšený formát pro zobrazení obou jazyků
+                text = `
                 <div class="dual-lang-bubble">
                     <div class="lang-row">
                         <span class="lang-label">EN:</span>
                         <span class="lang-text en-text">${en}</span>
                     </div>
-                    <div class="lang-row">
-                        <span class="lang-label">CZ:</span>
-                        <span class="lang-text cz-text">${cz}</span>
-                    </div>
                 </div>
             `;
-        } else if (speaker.toLowerCase() === 'alex') {
-            text = en || cz;
-        } else {
-            text = cz;
-        }
-
-        bubble.innerHTML = `<span class="speaker-label">${speaker === 'Uživatel' ? 'Vy' : speaker}:</span> ${text}`;
-
-        if (userInput !== null) {
-            bubble.innerHTML += `<span class="answer-feedback">Vaše odpověď: <b>${userInput}</b></span>`;
-            if (correct !== null) {
-                bubble.innerHTML += correct
-                    ? `<span class="answer-feedback correct">✔️ Správně!</span>`
-                    : `<span class="answer-feedback incorrect">❌ Nesprávně.<br>Správně: <b>${en}</b></span>`;
-            }
-        }
-
-        if (speaker.toLowerCase() === 'uživatel') {
-            row.appendChild(bubble);
-            row.appendChild(avatar);
-        } else {
-            row.appendChild(avatar);
-            row.appendChild(bubble);
-        }
-
-        conversationHistory.appendChild(row);
-        conversationHistory.scrollTop = conversationHistory.scrollHeight;
-
-        if (isAlex && en) {
-            playAlexAudio(en, topic, index);
-        }
-    }
-    function handleUserSubmit() {
-        const translation = prekladInput.value.trim();
-        if (!translation) {
-            showResult("Zadejte nebo řekněte překlad", false);
-            return;
-        }
-        submitBtn.disabled = true;
-
-        // Získání CSRF tokenu
-        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-        const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
-        
-        if (!csrfToken) {
-            console.error('CSRF token not found in meta tag');
-            showResult('Chyba: CSRF token nenalezen. Obnovte stránku.', false);
-            submitBtn.disabled = false;
-            return;
-        }
-
-        fetch(window.ROLEPLAYING_NEXT_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({preklad: translation})
-        })
-            .then(response => {
-                // Nejprve zkontrolujeme, jestli je response OK
-                if (!response.ok) {
-                    return response.json().then(errorData => {
-                        throw new Error(`HTTP ${response.status}: ${errorData.message || response.statusText}`);
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Kontrola, že máme správná data
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-
-                addToHistory('Uživatel', document.getElementById('czText').textContent, data.correct_answer, translation, data.correct, false);
-                if (data.correct) {
-                    showResult("Správně! ✅", true);
-                    if (data.xp_awarded && data.xp_awarded > 0) showStreakToast(`+${data.xp_awarded} XP!`);
-                    if (data.streak_info && data.streak_info.streak) showStreakToast(`🔥 Streak: ${data.streak_info.streak} dní!`);
-                } else {
-                    showResult(`Nesprávně. Správná odpověď: "${data.correct_answer}"`, false);
-                }
-                setTimeout(() => {
-                    showNextTurn(data);
-                }, 1200);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showResult('Chyba při odesílání odpovědi. Zkuste to znovu.', false);
-                submitBtn.disabled = false;
-            });
-    }
-
-    function showNextTurn(data) {
-        resultContainer.textContent = '';
-        inputArea.innerHTML = '';
-
-        // Kontrola chyb v datech
-        if (data.error) {
-            showResult(`Chyba: ${data.error}`, false);
-            return;
-        }
-
-        if (data.end) {
-            if (data.matching_pairs && Array.isArray(data.matching_pairs) && data.matching_pairs.length > 0) {
-                showMatchingExercise(data.matching_pairs);
+            } else if (speaker.toLowerCase() === 'alex') {
+                text = en || cz;
             } else {
-                inputArea.innerHTML = `<div style="font-size:1.3em;margin:30px 0;">🎉 Konverzace dokončena!</div>`;
+                text = cz;
             }
-            return;
+
+            bubble.innerHTML = `<span class="speaker-label">${speaker === 'Uživatel' ? 'Vy' : speaker}:</span> ${text}`;
+
+            if (userInput !== null) {
+                bubble.innerHTML += `<span class="answer-feedback">Vaše odpověď: <b>${userInput}</b></span>`;
+                if (correct !== null) {
+                    bubble.innerHTML += correct
+                        ? `<span class="answer-feedback correct">✔️ Správně!</span>`
+                        : `<span class="answer-feedback incorrect">❌ Nesprávně.<br>Správně: <b>${en}</b></span>`;
+                }
+            }
+
+            if (speaker.toLowerCase() === 'uživatel') {
+                row.appendChild(bubble);
+                row.appendChild(avatar);
+            } else {
+                row.appendChild(avatar);
+                row.appendChild(bubble);
+            }
+
+            conversationHistory.appendChild(row);
+            conversationHistory.scrollTop = conversationHistory.scrollHeight;
+
+            if (isAlex && en) {
+                playAlexAudio(en, topic, index);
+            }
         }
 
-        // Ověření, že máme potřebná data
-        if (!data.speaker) {
-            console.error('showNextTurn: data.speaker is missing', data);
-            showResult('Chyba: Chybí informace o mluvčím. Zkuste obnovit stránku.', false);
-            return;
+        function handleUserSubmit() {
+            const translation = prekladInput.value.trim();
+            if (!translation) {
+                showResult("Zadejte nebo řekněte překlad", false);
+                return;
+            }
+            submitBtn.disabled = true;
+
+            // Získání CSRF tokenu
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
+
+            if (!csrfToken) {
+                console.error('CSRF token not found in meta tag');
+                showResult('Chyba: CSRF token nenalezen. Obnovte stránku.', false);
+                submitBtn.disabled = false;
+                return;
+            }
+
+            fetch(window.ROLEPLAYING_NEXT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({preklad: translation})
+            })
+                .then(response => {
+                    // Nejprve zkontrolujeme, jestli je response OK
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                            throw new Error(`HTTP ${response.status}: ${errorData.message || response.statusText}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Kontrola, že máme správná data
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    addToHistory('Uživatel', document.getElementById('czText').textContent, data.correct_answer, translation, data.correct, false);
+                    if (data.correct) {
+                        showResult("Správně! ✅", true);
+                        if (data.xp_awarded && data.xp_awarded > 0) showStreakToast(`+${data.xp_awarded} XP!`);
+                        if (data.streak_info && data.streak_info.streak) showStreakToast(`🔥 Streak: ${data.streak_info.streak} dní!`);
+                    } else {
+                        showResult(`Nesprávně. Správná odpověď: "${data.correct_answer}"`, false);
+                    }
+                    setTimeout(() => {
+                        showNextTurn(data);
+                    }, 1200);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showResult('Chyba při odesílání odpovědi. Zkuste to znovu.', false);
+                    submitBtn.disabled = false;
+                });
         }
 
-        if (data.speaker && data.speaker.toLowerCase() === 'uživatel') {
-            inputArea.innerHTML = `
+        function showNextTurn(data) {
+            resultContainer.textContent = '';
+            inputArea.innerHTML = '';
+
+            // Kontrola chyb v datech
+            if (data.error) {
+                showResult(`Chyba: ${data.error}`, false);
+                return;
+            }
+
+            if (data.end) {
+                if (data.matching_pairs && Array.isArray(data.matching_pairs) && data.matching_pairs.length > 0) {
+                    showMatchingExercise(data.matching_pairs);
+                } else {
+                    inputArea.innerHTML = `<div style="font-size:1.3em;margin:30px 0;">🎉 Konverzace dokončena!</div>`;
+                }
+                return;
+            }
+
+            // Ověření, že máme potřebná data
+            if (!data.speaker) {
+                console.error('showNextTurn: data.speaker is missing', data);
+                showResult('Chyba: Chybí informace o mluvčím. Zkuste obnovit stránku.', false);
+                return;
+            }
+
+            if (data.speaker && data.speaker.toLowerCase() === 'uživatel') {
+                inputArea.innerHTML = `
                 <div style="margin-bottom:10px; color:#888;">Co říct: <b id="czText">${data.cz || ''}</b></div>
                 <input type="text" class="translation-input" id="prekladInput" placeholder="Zkuste to anglicky...">
                 <button class="mic-btn" id="micButton"><span>🎤</span></button>
                 <button class="submit-btn" id="submitBtn">Odeslat</button>
             `;
+                prekladInput = document.getElementById('prekladInput');
+                micButton = document.getElementById('micButton');
+                submitBtn = document.getElementById('submitBtn');
+                if (micButton) {
+                    micButton.addEventListener('click', function () {
+                        if (isListening) stopListening();
+                        else startListening();
+                    });
+                }
+                if (submitBtn) submitBtn.addEventListener('click', handleUserSubmit);
+                prekladInput.addEventListener('input', function () {
+                    if (prekladInput.value.length > 0) showTypeWarning();
+                });
+            } else {
+                // Alex říká anglicky
+                let en = data.en;
+                if (Array.isArray(en)) en = en[0];
+                // Správný index pro mp3: window.currentAlexIndex nebo spočítat podle historie
+                let idx = window.currentAlexIndex || 0;
+                addToHistory(data.speaker, data.cz || '', en, null, null, true, window.ROLEPLAYING_TOPIC, idx);
+                inputArea.innerHTML = `
+                <div style="margin-bottom:10px; color:#888;">Poslouchej a pokračuj</div>
+                <button class="next-btn" id="nextBtn" style="display:block;">Pokračovat &rarr;</button>
+            `;
+                nextBtn = document.getElementById('nextBtn');
+                if (nextBtn) nextBtn.addEventListener('click', function () {
+                    // Získání CSRF tokenu
+                    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                    const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
+
+                    if (!csrfToken) {
+                        console.error('CSRF token not found in meta tag');
+                        showResult('Chyba: CSRF token nenalezen. Obnovte stránku.', false);
+                        return;
+                    }
+
+                    fetch(window.ROLEPLAYING_NEXT_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: JSON.stringify({})
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.json().then(errorData => {
+                                    throw new Error(`HTTP ${response.status}: ${errorData.message || response.statusText}`);
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(showNextTurn)
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showResult('Chyba při načítání další zprávy. Zkuste obnovit stránku.', false);
+                        });
+                });
+            }
+        }
+
+        function showResult(message, isCorrect) {
+            resultContainer.textContent = message;
+            resultContainer.className = 'result ' + (isCorrect ? 'correct' : 'incorrect');
+        }
+
+        window.ROLEPLAYING_NEXT_URL = window.ROLEPLAYING_NEXT_URL || '{{ url_for("roleplaying.roleplaying_next") }}';
+
+
+        const firstSpeaker = '{{ speaker }}';
+        const firstCz = `{{ cz }}`;
+        const firstEnRaw = '{{ en|default("") }}';
+        const topic = '{{ topic|e }}';
+        window.ROLEPLAYING_TOPIC = topic;
+        window.currentAlexIndex = 0;
+
+        if (firstSpeaker && firstCz) {
+            let en = firstEnRaw;
+            if (en && en.startsWith('[')) {
+                try {
+                    en = JSON.parse(en)[0];
+                } catch {
+                    en = "";
+                }
+            }
+
+            // Pro první Alexovu zprávu vždy zobrazíme obě jazykové verze
+            const isFirstAlex = firstSpeaker.toLowerCase() === 'alex';
+            addToHistory(
+                firstSpeaker,
+                firstCz,
+                en,
+                null,
+                null,
+                isFirstAlex,
+                topic,
+                0,  // index prvého audio souboru
+                true // vždy zobrazit obě jazykové verze pro první zprávu
+            );
+
+            // Odstraněno duplicitní přehrávání audia - audio se už přehraje v addToHistory
+        }
+
+        if (firstSpeaker.toLowerCase() === 'uživatel') {
+            inputArea.innerHTML = `
+            <div style="margin-bottom:10px; color:#888;">Co říct: <b id="czText">${firstCz}</b></div>
+            <input type="text" class="translation-input" id="prekladInput" placeholder="Zkuste to anglicky...">
+            <button class="mic-btn" id="micButton"><span>🎤</span></button>
+            <button class="submit-btn" id="submitBtn">Odeslat</button>
+        `;
             prekladInput = document.getElementById('prekladInput');
             micButton = document.getElementById('micButton');
             submitBtn = document.getElementById('submitBtn');
@@ -622,27 +612,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (prekladInput.value.length > 0) showTypeWarning();
             });
         } else {
-            // Alex říká anglicky
-            let en = data.en;
-            if (Array.isArray(en)) en = en[0];
-            // Správný index pro mp3: window.currentAlexIndex nebo spočítat podle historie
-            let idx = window.currentAlexIndex || 0;
-            addToHistory(data.speaker, data.cz || '', en, null, null, true, window.ROLEPLAYING_TOPIC, idx);
+            let en = firstEnRaw;
+            if (en && en.startsWith('[')) {
+                try {
+                    en = JSON.parse(en)[0];
+                } catch {
+                    en = "";
+                }
+            }
+            // Alex už byl přidán výše, zde jen input pro pokračování
             inputArea.innerHTML = `
-                <div style="margin-bottom:10px; color:#888;">Poslouchej a pokračuj</div>
-                <button class="next-btn" id="nextBtn" style="display:block;">Pokračovat &rarr;</button>
-            `;
+            <div style="margin-bottom:10px; color:#888;">Poslouchej a pokračuj</div>
+            <button class="next-btn" id="nextBtn" style="display:block;">Pokračovat &rarr;</button>
+        `;
             nextBtn = document.getElementById('nextBtn');
             if (nextBtn) nextBtn.addEventListener('click', function () {
                 // Získání CSRF tokenu
-                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-                const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
-                
-                if (!csrfToken) {
-                    console.error('CSRF token not found in meta tag');
-                    showResult('Chyba: CSRF token nenalezen. Obnovte stránku.', false);
-                    return;
-                }
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
                 fetch(window.ROLEPLAYING_NEXT_URL, {
                     method: 'POST',
@@ -667,180 +653,79 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
             });
         }
-    }
 
-    function showResult(message, isCorrect) {
-        resultContainer.textContent = message;
-        resultContainer.className = 'result ' + (isCorrect ? 'correct' : 'incorrect');
-    }
+        initSpeechRecognition();
 
-    window.ROLEPLAYING_NEXT_URL = window.ROLEPLAYING_NEXT_URL || '{{ url_for("roleplaying.roleplaying_next") }}';
+        // --- Doplň zde ostatní pomocné funkce showTypeWarning, showNoSpeechWarning, showStreakToast, atd. ---
 
 
-    const firstSpeaker = '{{ speaker }}';
-    const firstCz = `{{ cz }}`;
-    const firstEnRaw = '{{ en|default("") }}';
-    const topic = '{{ topic|e }}';
-    window.ROLEPLAYING_TOPIC = topic;
-    window.currentAlexIndex = 0;
-
-    if (firstSpeaker && firstCz) {
-        let en = firstEnRaw;
-        if (en && en.startsWith('[')) {
-            try { en = JSON.parse(en)[0]; } catch { en = ""; }
-        }
-
-        // Pro první Alexovu zprávu vždy zobrazíme obě jazykové verze
-        const isFirstAlex = firstSpeaker.toLowerCase() === 'alex';
-        addToHistory(
-            firstSpeaker,
-            firstCz,
-            en,
-            null,
-            null,
-            isFirstAlex,
-            topic,
-            0,  // index prvého audio souboru
-            true // vždy zobrazit obě jazykové verze pro první zprávu
-        );
-
-        // Pokud je prvé mluvčí Alex, přehrajeme audio okamžitě
-        if (isFirstAlex) {
-            // Malé zpoždění pro lepší UX
+        function showStreakToast(message) {
+            const toast = document.getElementById('streakToast');
+            const toastText = document.getElementById('streakToastText');
+            toastText.textContent = message;
+            toast.style.display = 'flex';
             setTimeout(() => {
-                playAlexAudio(en, topic, 0);
-            }, 500);
+                toast.style.display = 'none';
+            }, 2200);
         }
-    }
-
-    if (firstSpeaker.toLowerCase() === 'uživatel') {
-        inputArea.innerHTML = `
-            <div style="margin-bottom:10px; color:#888;">Co říct: <b id="czText">${firstCz}</b></div>
-            <input type="text" class="translation-input" id="prekladInput" placeholder="Zkuste to anglicky...">
-            <button class="mic-btn" id="micButton"><span>🎤</span></button>
-            <button class="submit-btn" id="submitBtn">Odeslat</button>
-        `;
-        prekladInput = document.getElementById('prekladInput');
-        micButton = document.getElementById('micButton');
-        submitBtn = document.getElementById('submitBtn');
-        if (micButton) {
-            micButton.addEventListener('click', function () {
-                if (isListening) stopListening();
-                else startListening();
-            });
-        }
-        if (submitBtn) submitBtn.addEventListener('click', handleUserSubmit);
-        prekladInput.addEventListener('input', function () {
-            if (prekladInput.value.length > 0) showTypeWarning();
-        });
-    } else {
-        let en = firstEnRaw;
-        if (en && en.startsWith('[')) {
-            try { en = JSON.parse(en)[0]; } catch { en = ""; }
-        }
-        // Alex už byl přidán výše, zde jen input pro pokračování
-        inputArea.innerHTML = `
-            <div style="margin-bottom:10px; color:#888;">Poslouchej a pokračuj</div>
-            <button class="next-btn" id="nextBtn" style="display:block;">Pokračovat &rarr;</button>
-        `;
-        nextBtn = document.getElementById('nextBtn');
-        if (nextBtn) nextBtn.addEventListener('click', function () {
-            // Získání CSRF tokenu
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-            fetch(window.ROLEPLAYING_NEXT_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({})
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(errorData => {
-                            throw new Error(`HTTP ${response.status}: ${errorData.message || response.statusText}`);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(showNextTurn)
-                .catch(error => {
-                    console.error('Error:', error);
-                    showResult('Chyba při načítání další zprávy. Zkuste obnovit stránku.', false);
-                });
-        });
-    }
-
-    initSpeechRecognition();
-
-    // --- Doplň zde ostatní pomocné funkce showTypeWarning, showNoSpeechWarning, showStreakToast, atd. ---
-
-
-    function showStreakToast(message) {
-        const toast = document.getElementById('streakToast');
-        const toastText = document.getElementById('streakToastText');
-        toastText.textContent = message;
-        toast.style.display = 'flex';
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 2200);
-    }
 
         function showTypeWarning() {
-        let warn = document.getElementById('typeWarning');
-        if (!warn) {
-            warn = document.createElement('div');
-            warn.id = 'typeWarning';
-            warn.style.position = 'fixed';
-            warn.style.bottom = '40px';
-            warn.style.left = '50%';
-            warn.style.transform = 'translateX(-50%)';
-            warn.style.background = '#fffbe6';
-            warn.style.border = '2px solid #ff9800';
-            warn.style.borderRadius = '12px';
-            warn.style.padding = '14px 28px';
-            warn.style.fontSize = '1.1em';
-            warn.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)';
-            warn.style.zIndex = 9999;
-            warn.style.color = '#b26a00';
-            warn.innerHTML = 'Používej mikrofon 🎤 pokud můžeš! Piš jen když opravdu nemůžeš mluvit.';
-            document.body.appendChild(warn);
-            setTimeout(() => {
-                warn.style.opacity = '0';
-                setTimeout(() => { if (warn) warn.remove(); }, 600);
-            }, 3200);
+            let warn = document.getElementById('typeWarning');
+            if (!warn) {
+                warn = document.createElement('div');
+                warn.id = 'typeWarning';
+                warn.style.position = 'fixed';
+                warn.style.bottom = '40px';
+                warn.style.left = '50%';
+                warn.style.transform = 'translateX(-50%)';
+                warn.style.background = '#fffbe6';
+                warn.style.border = '2px solid #ff9800';
+                warn.style.borderRadius = '12px';
+                warn.style.padding = '14px 28px';
+                warn.style.fontSize = '1.1em';
+                warn.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)';
+                warn.style.zIndex = 9999;
+                warn.style.color = '#b26a00';
+                warn.innerHTML = 'Používej mikrofon 🎤 pokud můžeš! Piš jen když opravdu nemůžeš mluvit.';
+                document.body.appendChild(warn);
+                setTimeout(() => {
+                    warn.style.opacity = '0';
+                    setTimeout(() => {
+                        if (warn) warn.remove();
+                    }, 600);
+                }, 3200);
+            }
         }
-    }
 
-    function showNoSpeechWarning() {
-        let warn = document.getElementById('noSpeechWarning');
-        if (!warn) {
-            warn = document.createElement('div');
-            warn.id = 'noSpeechWarning';
-            warn.style.position = 'fixed';
-            warn.style.bottom = '40px';
-            warn.style.left = '50%';
-            warn.style.transform = 'translateX(-50%)';
-            warn.style.background = '#ffeaea';
-            warn.style.border = '2px solid #e74c3c';
-            warn.style.borderRadius = '12px';
-            warn.style.padding = '14px 28px';
-            warn.style.fontSize = '1.1em';
-            warn.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)';
-            warn.style.zIndex = 9999;
-            warn.style.color = '#c0392b';
-            warn.innerHTML = 'Nebyla rozpoznána žádná řeč. Zkuste to znovu a mluvte zřetelněji!';
-            document.body.appendChild(warn);
-            setTimeout(() => {
-                warn.style.opacity = '0';
-                setTimeout(() => { if (warn) warn.remove(); }, 600);
-            }, 3200);
+        function showNoSpeechWarning() {
+            let warn = document.getElementById('noSpeechWarning');
+            if (!warn) {
+                warn = document.createElement('div');
+                warn.id = 'noSpeechWarning';
+                warn.style.position = 'fixed';
+                warn.style.bottom = '40px';
+                warn.style.left = '50%';
+                warn.style.transform = 'translateX(-50%)';
+                warn.style.background = '#ffeaea';
+                warn.style.border = '2px solid #e74c3c';
+                warn.style.borderRadius = '12px';
+                warn.style.padding = '14px 28px';
+                warn.style.fontSize = '1.1em';
+                warn.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)';
+                warn.style.zIndex = 9999;
+                warn.style.color = '#c0392b';
+                warn.innerHTML = 'Nebyla rozpoznána žádná řeč. Zkuste to znovu a mluvte zřetelněji!';
+                document.body.appendChild(warn);
+                setTimeout(() => {
+                    warn.style.opacity = '0';
+                    setTimeout(() => {
+                        if (warn) warn.remove();
+                    }, 600);
+                }, 3200);
+            }
         }
-    }
     });
 </script>
 <script src="/static/script.js"></script>
-</body>
-</html>
 
+{% endblock %}

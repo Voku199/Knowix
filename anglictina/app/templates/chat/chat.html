@@ -1,269 +1,188 @@
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat | Knowix</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="/static/mobile_header.css">
+{% extends "base.html" %}
+{% block content %}
 
-    <!-- CSRF Token pro JavaScript -->
-    <script>
-        window.csrfToken = "{{ csrf_token() }}";
-    </script>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
+<!-- CSRF Token pro JavaScript -->
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-W1EN990JKP');
+    window.csrfToken = "{{ csrf_token() }}";
 </script>
-    <style>
 
-        body.dark-mode {
-            background: #181c23;
-        }
-        .zpravy-container {
-            max-width: 540px;
-            margin: 2.5em auto 2em auto;
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-            padding: 2em 1.2em 1.2em 1.2em;
-        }
-        body.dark-mode .zpravy-container {
-            background: #000000;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.32);
-        }
-        .zpravy-seznam {
-            background: #f6fafd;
-            border-radius: 12px;
-            min-height: 260px;
-            max-height: 340px;
-            overflow-y: auto;
-            padding: 1em;
-            margin-bottom: 1.2em;
-            font-size: 1.08em;
-        }
-        body.dark-mode .zpravy-seznam {
-            background: #000000;
-        }
-        .zprava-item {
-            margin-bottom: 0.7em;
-            padding-bottom: 0.3em;
-            border-bottom: 1px solid #e3eaf2;
-        }
-        body.dark-mode .zprava-item {
-            border-bottom: 1px solid #000000;
-        }
-        .zprava-item:last-child {
-            border-bottom: none;
-        }
-        .zprava-user {
-            font-weight: 600;
-            color: #1976d2;
-            margin-right: 0.5em;
-        }
-        body.dark-mode .zprava-user {
-            color: #b2ff59;
-        }
-        .zprava-time {
-            color: #aaa;
-            font-size: 0.93em;
-            margin-left: 0.5em;
-        }
-        body.dark-mode .zprava-time {
-            color: #7b8fa6;
-        }
-        .zprava-form {
-            display: flex;
-            gap: 0.7em;
-        }
-        .zprava-form input[type="text"] {
-            flex: 1;
-            padding: 0.7em;
-            border-radius: 7px;
-            border: 1.5px solid #b3c6e0;
-            font-size: 1.08em;
-        }
-        body.dark-mode .zprava-form input[type="text"] {
-            background: #000000;
-            color: #fff;
-            border: 1.5px solid #38405a;
-        }
-        .zprava-form button {
-            padding: 0.7em 1.4em;
-            border-radius: 7px;
-            border: none;
-            background: #1976d2;
-            color: #fff;
-            font-weight: 600;
-            font-size: 1.08em;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .zprava-form button:hover {
-            background: #0d47a1;
-        }
-        body.dark-mode .zprava-form button {
-            background: #000000;
-            color: #b2ff59;
-        }
-        body.dark-mode .zprava-form button:hover {
-            background: #232b36;
-        }
-        /* Styly pro obrázky */
-        .zprava-image {
-            max-width: 200px;
-            max-height: 200px;
-            margin-top: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .zprava-image:hover {
-            transform: scale(1.05);
-        }
-        .image-actions {
-            margin-top: 5px;
-        }
-        .image-btn {
-            background: #e3eaf2;
-            border: none;
-            border-radius: 4px;
-            padding: 3px 8px;
-            margin-right: 5px;
-            cursor: pointer;
-            font-size: 0.85em;
-        }
-        .message-link {
-            color: #1976d2;
-            text-decoration: underline;
-        }
-        #uploadBtn {
-            padding: 0.7em;
-            border-radius: 7px;
-            background: #f0f4f9;
-            border: 1.5px solid #b3c6e0;
-            cursor: pointer;
-            font-size: 1.2em;
-        }
-        .image-preview {
-            max-width: 100px;
-            max-height: 100px;
-            margin-top: 10px;
-            border-radius: 8px;
-            display: none;
-        }
-    </style>
-</head>
+<style>
 
-<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
-<header>
-    <div class="logo-streak-wrapper">
-        <div class="logo">
-            <a href="{{ url_for('main.index') }}">
-                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
-            </a>
-        </div>
-        <span class="streak-badge">
-            <img src="/static/fire.svg" alt="Streak">
-            {{ user_streak }}
-        </span>
-    </div>
-    <div class="nav-profile-wrapper">
-        <ul class="nav-right">
-            <li>
-                <a href="/anglictina" title="Angličtina">
-                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <a href="/feedback" title="Feedback">
-                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <a href="/news" title="Novinky">
-                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <a href="/obchod" title="Obchod">
-                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <a href="/zpravy" title="Zprávy">
-                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
-                    🌙
-                </button>
-            </li>
-        </ul>
-        {% if session['user_name'] %}
-        <div class="user-profile">
-            <div class="profile-container">
-                {% if session.get('profile_pic') %}
-                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
-                     alt="Profilová fotka" width="64" class="profile-pic">
-                {% else %}
-                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
-                     class="profile-pic" id="profileMenuTrigger">
-                {% endif %}
-                <div class="profile-menu" id="profileMenu">
-                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
-                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
-                </div>
-                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
-            </div>
-            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
-            <div class="xp-header-bar">
-                <div class="xp-header-bar-labels">
-                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
-                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
-                </div>
-                <div class="xp-header-bar-progress-bg">
-                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-        {% else %}
-<div class="auth-links">
-    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
-    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
-</div>
-        {% endif %}
-    </div>
-</header>
+    body.dark-mode {
+        background: #181c23;
+    }
+
+    .zpravy-container {
+        max-width: 540px;
+        margin: 2.5em auto 2em auto;
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        padding: 2em 1.2em 1.2em 1.2em;
+    }
+
+    body.dark-mode .zpravy-container {
+        background: #000000;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.32);
+    }
+
+    .zpravy-seznam {
+        background: #f6fafd;
+        border-radius: 12px;
+        min-height: 260px;
+        max-height: 340px;
+        overflow-y: auto;
+        padding: 1em;
+        margin-bottom: 1.2em;
+        font-size: 1.08em;
+    }
+
+    body.dark-mode .zpravy-seznam {
+        background: #000000;
+    }
+
+    .zprava-item {
+        margin-bottom: 0.7em;
+        padding-bottom: 0.3em;
+        border-bottom: 1px solid #e3eaf2;
+    }
+
+    body.dark-mode .zprava-item {
+        border-bottom: 1px solid #000000;
+    }
+
+    .zprava-item:last-child {
+        border-bottom: none;
+    }
+
+    .zprava-user {
+        font-weight: 600;
+        color: #1976d2;
+        margin-right: 0.5em;
+    }
+
+    body.dark-mode .zprava-user {
+        color: #b2ff59;
+    }
+
+    .zprava-time {
+        color: #aaa;
+        font-size: 0.93em;
+        margin-left: 0.5em;
+    }
+
+    body.dark-mode .zprava-time {
+        color: #7b8fa6;
+    }
+
+    .zprava-form {
+        display: flex;
+        gap: 0.7em;
+    }
+
+    .zprava-form input[type="text"] {
+        flex: 1;
+        padding: 0.7em;
+        border-radius: 7px;
+        border: 1.5px solid #b3c6e0;
+        font-size: 1.08em;
+    }
+
+    body.dark-mode .zprava-form input[type="text"] {
+        background: #000000;
+        color: #fff;
+        border: 1.5px solid #38405a;
+    }
+
+    .zprava-form button {
+        padding: 0.7em 1.4em;
+        border-radius: 7px;
+        border: none;
+        background: #1976d2;
+        color: #fff;
+        font-weight: 600;
+        font-size: 1.08em;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .zprava-form button:hover {
+        background: #0d47a1;
+    }
+
+    body.dark-mode .zprava-form button {
+        background: #000000;
+        color: #b2ff59;
+    }
+
+    body.dark-mode .zprava-form button:hover {
+        background: #232b36;
+    }
+
+    /* Styly pro obrázky */
+    .zprava-image {
+        max-width: 200px;
+        max-height: 200px;
+        margin-top: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .zprava-image:hover {
+        transform: scale(1.05);
+    }
+
+    .image-actions {
+        margin-top: 5px;
+    }
+
+    .image-btn {
+        background: #e3eaf2;
+        border: none;
+        border-radius: 4px;
+        padding: 3px 8px;
+        margin-right: 5px;
+        cursor: pointer;
+        font-size: 0.85em;
+    }
+
+    .message-link {
+        color: #1976d2;
+        text-decoration: underline;
+    }
+
+    #uploadBtn {
+        padding: 0.7em;
+        border-radius: 7px;
+        background: #f0f4f9;
+        border: 1.5px solid #b3c6e0;
+        cursor: pointer;
+        font-size: 1.2em;
+    }
+
+    .image-preview {
+        max-width: 100px;
+        max-height: 100px;
+        margin-top: 10px;
+        border-radius: 8px;
+        display: none;
+    }
+</style>
 
 
 <div class="zpravy-container">
     <h1>Veřejný chat</h1>
     <div id="zpravySeznam" class="zpravy-seznam"></div>
-<form id="zpravaForm" class="zprava-form" autocomplete="off" enctype="multipart/form-data">
-    <input type="text" id="zpravaInput" name="zprava" maxlength="500" placeholder="Napiš zprávu...">
-    <input type="file" id="imageUpload" name="image" accept="image/*" style="display:none">
-    <button type="button" id="uploadBtn">🖼️</button>
-    <button type="submit">Odeslat</button>
-</form>
+    <form id="zpravaForm" class="zprava-form" autocomplete="off" enctype="multipart/form-data">
+        <input type="text" id="zpravaInput" name="zprava" maxlength="500" placeholder="Napiš zprávu...">
+        <input type="file" id="imageUpload" name="image" accept="image/*" style="display:none">
+        <button type="button" id="uploadBtn">🖼️</button>
+        <button type="submit">Odeslat</button>
+    </form>
     <img id="imagePreview" class="image-preview" alt="Náhled obrázku">
 </div>
 
-<footer>
-    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
-    <p class="footer-signature">
-        Made with ❤️ by
-        <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
-        and lot of ☕
-    </p>
-</footer>
 <script>
     // theme-toggle.js
     document.getElementById('theme-toggle').addEventListener('click', () => {
@@ -381,10 +300,10 @@
                     }
 
                     // Obrázek pokud existuje
-if (zprava.image_url) {
-    const imageContainer = displayImage(zprava.image_url, zprava.id);
-    div.appendChild(imageContainer);
-}
+                    if (zprava.image_url) {
+                        const imageContainer = displayImage(zprava.image_url, zprava.id);
+                        div.appendChild(imageContainer);
+                    }
 
                     seznam.appendChild(div);
                 });
@@ -401,10 +320,10 @@ if (zprava.image_url) {
     const imageUpload = document.getElementById('imageUpload');
     const imagePreview = document.getElementById('imagePreview');
 
-    imageUpload.addEventListener('change', function() {
+    imageUpload.addEventListener('change', function () {
         if (this.files && this.files[0]) {
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 imagePreview.src = e.target.result;
                 imagePreview.style.display = 'block';
             }
@@ -415,7 +334,7 @@ if (zprava.image_url) {
     });
 
     // Odesílání formuláře
-    document.getElementById('zpravaForm').addEventListener('submit', function(e) {
+    document.getElementById('zpravaForm').addEventListener('submit', function (e) {
         e.preventDefault();
         const zpravaInput = document.getElementById('zpravaInput');
         const imageUpload = document.getElementById('imageUpload');
@@ -452,6 +371,5 @@ if (zprava.image_url) {
     document.addEventListener('DOMContentLoaded', fetchZpravy);
     setInterval(fetchZpravy, 3000);
 </script>
-</body>
-</html>
+{% endblock %}
 

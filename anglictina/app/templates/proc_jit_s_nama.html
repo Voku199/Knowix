@@ -1,129 +1,14 @@
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-    <meta charset="UTF-8">
-    <title>Proč jít s námi? | Knowix</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
 
-    <meta name="description" content="Knowix je moderní, zábavná platforma pro praktickou angličtinu zdarma. Streaky, XP, odznaky a cvičení, která děti baví i reálně naučí.">
-    <link rel="canonical" href="{{ request.url }}">
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-        <link rel="stylesheet" href="/static/mobile_header.css">
-        <link rel="stylesheet" href="{{ url_for('static', filename='proc/style.css') }}">
-
-    <!-- Performance: preconnect + font lazy-load -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript>
-        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
-    </noscript>
-
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){ dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'G-W1EN990JKP');
-    </script>
-
-    <style>
-
-    </style>
-</head>
-<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
-<header>
-    <div class="logo-streak-wrapper">
-        <div class="logo">
-            <a href="{{ url_for('main.index') }}">
-                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
-            </a>
-        </div>
-        <span class="streak-badge">
-            <img src="/static/fire.svg" alt="Streak">
-            {{ user_streak }}
-        </span>
-    </div>
-    <div class="nav-profile-wrapper">
-        <ul class="nav-right">
-            <li>
-                <a href="/anglictina" title="Angličtina">
-                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <a href="/feedback" title="Feedback">
-                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <a href="/news" title="Novinky">
-                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <a href="/obchod" title="Obchod">
-                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <a href="/zpravy" title="Zprávy">
-                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
-                    🌙
-                </button>
-            </li>
-        </ul>
-        {% if session['user_name'] %}
-        <div class="user-profile">
-            <div class="profile-container">
-                {% if session.get('profile_pic') %}
-                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
-                     alt="Profilová fotka" width="64" class="profile-pic">
-                {% else %}
-                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
-                     class="profile-pic" id="profileMenuTrigger">
-                {% endif %}
-                <div class="profile-menu" id="profileMenu">
-                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
-                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
-                </div>
-                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
-            </div>
-            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
-            <div class="xp-header-bar">
-                <div class="xp-header-bar-labels">
-                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
-                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
-                </div>
-                <div class="xp-header-bar-progress-bg">
-                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-        {% else %}
-<div class="auth-links">
-    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
-    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
-</div>
-        {% endif %}
-    </div>
-</header>
+{% block content %}
 <main>
     <!-- Hero -->
     <section class="why-hero container">
         <h1>Proč jít s námi?</h1>
         <p class="lead">
             Jsme moderní, zábavná platforma pro <span class="highlight">praktickou angličtinu</span>. Projekt vytvořil
-            <span class="highlight">Vojtěch Kurinec</span> – student (14, brzy 15) s cílem, aby se mohl učit <span class="highlight">každý zdarma</span>.
+            <span class="highlight">Vojtěch Kurinec</span> – student (14, brzy 15) s cílem, aby se mohl učit <span
+                class="highlight">každý zdarma</span>.
         </p>
         <div class="badge-row" aria-label="Klíčové vlastnosti">
             <span class="pill">Zdarma</span>
@@ -141,8 +26,10 @@
         <div class="container">
             <h2>Co je Knowix?</h2>
             <p>
-                Knowix je web zaměřený na <span class="highlight">praktickou angličtinu</span> – to, co děti využijí v běžných situacích.
-                Najdete tu i několik náročnějších <span class="highlight">gramatických cvičení</span>, ale těžiště je v poslechu, porozumění
+                Knowix je web zaměřený na <span class="highlight">praktickou angličtinu</span> – to, co děti využijí v
+                běžných situacích.
+                Najdete tu i několik náročnějších <span class="highlight">gramatických cvičení</span>, ale těžiště je v
+                poslechu, porozumění
                 a použití v praxi. Krátká cvičení, jasný postup a okamžitá zpětná vazba.
             </p>
 
@@ -164,7 +51,8 @@
             <h2>Jak vznikl Knowix</h2>
             <div class="story">
                 <p>
-                    Inspiroval mě táta, který během covidu vytvořil Počítejsám – jednoduchý web na procvičování matematiky
+                    Inspiroval mě táta, který během covidu vytvořil Počítejsám – jednoduchý web na procvičování
+                    matematiky
                     pro 1.–3. třídu. Ve škole jsme řešili licence na UmímeTo.org a napadlo mě:
                     <em>Co kdyby existoval web podobný, ale nejdřív jen na angličtinu – a zdarma?</em>
                 </p>
@@ -174,7 +62,8 @@
                     který chce dát vzdělávání všem.
                 </p>
                 <div class="blockquote">
-                    „Začali jsme angličtinou a hudbou (písničky). Cíl je porozumění – rozumět, používat, zvládat reálné situace.“
+                    „Začali jsme angličtinou a hudbou (písničky). Cíl je porozumění – rozumět, používat, zvládat reálné
+                    situace.“
                 </div>
             </div>
 
@@ -182,7 +71,8 @@
             <div class="grid-3">
                 <div class="card">
                     <h3>🧠 Důraz na porozumění</h3>
-                    <p>Ne biflování, ale <span class="highlight">pochopení a použití</span>. Psané i mluvené situace z praxe.</p>
+                    <p>Ne biflování, ale <span class="highlight">pochopení a použití</span>. Psané i mluvené situace z
+                        praxe.</p>
                 </div>
                 <div class="card">
                     <h3>🏆 Herní prvky</h3>
@@ -224,46 +114,24 @@
     </section>
 </main>
 
-<footer>
-    <div class="container">
-        <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
-        <p class="footer-signature">
-            Vytvořeno s ❤️
-            <a href="https://ko-fi.com/voku199" target="_blank" rel="noopener">Voku</a>
-            a spoustou ☕
-        </p>
-    </div>
-</footer>
 
 <script>
     // Theme toggle with localStorage and emoji update
-    (function() {
-        const body = document.body;
-        const btn = document.getElementById('theme-toggle');
-        const icon = document.getElementById('theme-icon');
-
-        function setIcon() {
-            const dark = body.classList.contains('dark-mode');
-            icon.textContent = dark ? '☀️' : '🌙';
-            btn.setAttribute('aria-pressed', String(dark));
-        }
-
-        // If server provided theme via session, respect it; otherwise read from storage
-        const stored = localStorage.getItem('knowix-theme');
-        if (!body.classList.contains('dark-mode') && stored === 'dark') {
-            body.classList.add('dark-mode');
-        } else if (body.classList.contains('dark-mode') && stored === 'light') {
-            body.classList.remove('dark-mode');
-        }
-        setIcon();
-
-        btn?.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            const dark = body.classList.contains('dark-mode');
-            localStorage.setItem('knowix-theme', dark ? 'dark' : 'light');
-            setIcon();
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        fetch('/set_theme', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
+            body: JSON.stringify({
+                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark',
+                csrf_token: CSRF_TOKEN
+            })
+        }).then(r => {
+            if (r.ok) {
+                document.body.classList.toggle('dark-mode');
+                sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            }
         });
-    })();
+    });
 </script>
-</body>
-</html>
+
+{% endblock %}
