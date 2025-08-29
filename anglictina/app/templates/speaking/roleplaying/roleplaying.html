@@ -25,7 +25,50 @@
     </noscript>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
+        .dual-lang-bubble {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
+        .lang-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .lang-label {
+            font-weight: bold;
+            color: #666;
+            min-width: 30px;
+            font-size: 0.9em;
+        }
+
+        .lang-text {
+            flex: 1;
+        }
+
+        .en-text {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .cz-text {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .dark-mode .lang-label {
+            color: #bdc3c7;
+        }
+
+        .dark-mode .en-text {
+            color: #ecf0f1;
+        }
+
+        .dark-mode .cz-text {
+            color: #95a5a6;
+        }
     </style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
@@ -79,14 +122,15 @@
             <div class="profile-container">
                 {% if session.get('profile_pic') %}
                 <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
-                     alt="Profilová fotka" width="64" class="profile-pic">
+                     alt="Profilová fotka" width="64" class="profile-pic"
+                     onerror="this.onerror=null; this.src='{{ url_for('static', filename='pic/default.webp') }}';">
                 {% else %}
                 <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
                      class="profile-pic" id="profileMenuTrigger">
                 {% endif %}
                 <div class="profile-menu" id="profileMenu">
-                    <a href="{{ url_for('auth.settings') }}">:gear: Nastavení</a>
-                    <a href="{{ url_for('auth.logout') }}">:door: Odhlásit se</a>
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
                 </div>
                 <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
             </div>
@@ -104,8 +148,8 @@
         </div>
         {% else %}
 <div class="auth-links">
-    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">:key: Přihlásit se</a>
-    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">:pencil: Registrovat se</a>
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
 </div>
         {% endif %}
     </div>
@@ -625,9 +669,12 @@ document.addEventListener('DOMContentLoaded', function () {
             // Alex říká anglicky
             let en = data.en;
             if (Array.isArray(en)) en = en[0];
-            // Správný index pro mp3: window.currentAlexIndex nebo spočítat podle historie
-            let idx = window.currentAlexIndex || 0;
-            addToHistory(data.speaker, data.cz || '', en, null, null, true, window.ROLEPLAYING_TOPIC, idx);
+            // Přidáme zprávu do historie pouze pokud není již přidána
+            if (!data.already_in_history) {
+                let idx = window.currentAlexIndex || 0;
+                addToHistory(data.speaker, data.cz || '', en, null, null, true, window.ROLEPLAYING_TOPIC, idx);
+                window.currentAlexIndex = (window.currentAlexIndex || 0) + 1;
+            }
             inputArea.innerHTML = `
                 <div style="margin-bottom:10px; color:#888;">Poslouchej a pokračuj</div>
                 <button class="next-btn" id="nextBtn" style="display:block;">Pokračovat &rarr;</button>
@@ -704,13 +751,7 @@ document.addEventListener('DOMContentLoaded', function () {
             true // vždy zobrazit obě jazykové verze pro první zprávu
         );
 
-        // Pokud je prvé mluvčí Alex, přehrajeme audio okamžitě
-        if (isFirstAlex) {
-            // Malé zpoždění pro lepší UX
-            setTimeout(() => {
-                playAlexAudio(en, topic, 0);
-            }, 500);
-        }
+        // Audio se už přehraje v addToHistory() funkci, takže zde to nemusíme volat znovu
     }
 
     if (firstSpeaker.toLowerCase() === 'uživatel') {

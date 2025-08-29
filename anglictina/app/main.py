@@ -290,7 +290,7 @@ def add_security_headers(response):
         "https://www.youtube.com https://s.ytimg.com "
         "https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.quilljs.com https://cdnjs.cloudflare.com; "
-        "font-src 'self' https://fonts.gstatic.com; "
+        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
         "img-src 'self' data: https: blob: https://www.google-analytics.com https://ssl.google-analytics.com https://www.googletagmanager.com https://stats.g.doubleclick.net; "
         "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com; "
         "frame-src https://open.spotify.com https://*.spotify.com https://www.youtube-nocookie.com https://www.youtube.com https://*.youtube.com; "
@@ -318,6 +318,4 @@ def add_security_headers(response):
 
 
 # === Spuštění aplikace ===
-from waitress import serve
-
-serve(app, host="0.0.0.0", port=8080, threads=24, backlog=100)
+app.run(port=5000, debug=True)

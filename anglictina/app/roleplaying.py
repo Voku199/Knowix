@@ -257,6 +257,7 @@ def roleplaying_next():
             'cz': next_line.get('cz', ''),
             'en': next_line.get('en', ''),
             'is_user_turn': next_line.get('speaker', 'Alex').lower() == 'uživatel',
+            'already_in_history': False,  # Nová zpráva, není v historii
             'xp_awarded': xp_awarded,
             'new_xp': new_xp,
             'new_level': new_level,

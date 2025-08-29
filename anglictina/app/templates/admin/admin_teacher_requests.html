@@ -2,74 +2,265 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Schvalování učitelů | Admin</title>
     <style>
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background: linear-gradient(to bottom, #4477bb 0%, #3366aa 50%, #225588 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: #000;
+        }
+
+        h1 {
+            font-family: 'Tahoma', sans-serif;
+            font-weight: bold;
+            font-size: 18px;
+            color: #003d6b;
+            margin-bottom: 20px;
+            padding: 8px 12px;
+            background: linear-gradient(to bottom, #ffffff 0%, #f0f0f0 50%, #e0e0e0 100%);
+            border: 2px outset #d4d0c8;
+            border-radius: 0;
+            box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #808080;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #d4d0c8;
+            border: 2px outset #d4d0c8;
+            padding: 0;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .title-bar {
+            background: linear-gradient(to bottom, #0997ff 0%, #0053ee 50%, #0033aa 100%);
+            color: white;
+            padding: 4px 8px;
+            font-weight: bold;
+            font-size: 11px;
+            border-bottom: 1px solid #003d6b;
+            display: flex;
+            align-items: center;
+        }
+
+        .title-bar::before {
+            content: "📋";
+            margin-right: 8px;
+        }
+
+        .window-content {
+            padding: 20px;
+            background: #d4d0c8;
+        }
+
         table {
             width: 100%;
-            border-collapse: collapse;
-            margin: 2em 0;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 20px 0;
+            background: #ffffff;
+            border: 2px inset #d4d0c8;
         }
 
         th, td {
-            border: 1px solid #ccc;
-            padding: 0.7em;
+            padding: 8px 12px;
             text-align: left;
+            border-right: 1px solid #c0c0c0;
+            border-bottom: 1px solid #c0c0c0;
+            font-size: 11px;
         }
 
         th {
-            background: #f6fafd;
+            background: linear-gradient(to bottom, #f0f0f0 0%, #e0e0e0 50%, #d0d0d0 100%);
+            color: #000;
+            font-weight: bold;
+            border-top: 1px solid #ffffff;
+            border-left: 1px solid #ffffff;
+            border-right: 1px solid #808080;
+            border-bottom: 1px solid #808080;
         }
 
-        tr:nth-child(even) {
-            background: #f9f9f9;
+        tr:nth-child(even) td {
+            background: #f8f8f8;
+        }
+
+        tr:nth-child(odd) td {
+            background: #ffffff;
+        }
+
+        tr:hover td {
+            background: #316ac5 !important;
+            color: white;
+        }
+
+        td {
+            font-weight: normal;
+            font-size: 11px;
+            vertical-align: middle;
+            border-left: 1px solid #ffffff;
+            border-top: 1px solid #ffffff;
+            border-right: 1px solid #c0c0c0;
+            border-bottom: 1px solid #c0c0c0;
         }
 
         button {
-            padding: 0.5em 1.2em;
-            margin-right: 0.5em;
+            font-family: 'Tahoma', sans-serif;
+            font-size: 11px;
+            padding: 4px 12px;
+            margin: 2px;
+            border: 2px outset #d4d0c8;
+            background: linear-gradient(to bottom, #f0f0f0 0%, #e0e0e0 50%, #d0d0d0 100%);
+            color: #000;
+            cursor: pointer;
+            min-width: 75px;
+            height: 23px;
+        }
+
+        button:hover {
+            background: linear-gradient(to bottom, #f8f8f8 0%, #e8e8e8 50%, #d8d8d8 100%);
+        }
+
+        button:active {
+            border: 2px inset #d4d0c8;
+            background: linear-gradient(to bottom, #d8d8d8 0%, #e8e8e8 50%, #f0f0f0 100%);
+        }
+
+        button[type="submit"]:first-of-type {
+            background: linear-gradient(to bottom, #e8f4e8 0%, #d0e8d0 50%, #b8d8b8 100%);
+        }
+
+        button[type="submit"]:first-of-type:hover {
+            background: linear-gradient(to bottom, #f0f8f0 0%, #d8f0d8 50%, #c0e0c0 100%);
+        }
+
+        button[type="submit"]:last-of-type {
+            background: linear-gradient(to bottom, #f4e8e8 0%, #e8d0d0 50%, #d8b8b8 100%);
+        }
+
+        button[type="submit"]:last-of-type:hover {
+            background: linear-gradient(to bottom, #f8f0f0 0%, #f0d8d8 50%, #e0c0c0 100%);
+        }
+
+        .no-requests {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            font-size: 11px;
+            padding: 20px;
+            background: #ffffff;
+            border: 2px inset #d4d0c8;
+            margin: 20px 0;
+        }
+
+        /* Scrollbar styling pro XP vzhled */
+        ::-webkit-scrollbar {
+            width: 16px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #d4d0c8;
+            border: 1px inset #d4d0c8;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #f0f0f0 0%, #e0e0e0 50%, #d0d0d0 100%);
+            border: 1px outset #d4d0c8;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #f8f8f8 0%, #e8e8e8 50%, #d8d8d8 100%);
+        }
+
+        /* Status bar */
+        .status-bar {
+            background: #d4d0c8;
+            border-top: 1px solid #ffffff;
+            border-bottom: 2px outset #d4d0c8;
+            padding: 4px 8px;
+            font-size: 11px;
+            color: #000;
+        }
+
+        /* Mobile responsivita s XP vzhledem */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+
+            table {
+                font-size: 10px;
+            }
+
+            th, td {
+                padding: 4px 6px;
+            }
+
+            button {
+                padding: 3px 8px;
+                font-size: 10px;
+                min-width: 60px;
+                height: 20px;
+            }
         }
     </style>
 </head>
 <body>
-<h1>Žádosti o roli učitele</h1>
-<table>
-    <thead>
-    <tr>
-        <th>Uživatel</th>
-        <th>Email</th>
-        <th>Škola</th>
-        <th>Předmět</th>
-        <th>Titul</th>
-        <th>Akce</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for req in requests %}
-    <tr>
-        <td>{{ req.first_name }} {{ req.last_name }} (ID: {{ req.user_id }})</td>
-        <td>{{ req.email }}</td>
-        <td>{{ req.school }}</td>
-        <td>{{ req.subject }}</td>
-        <td>{{ req.title }}</td>
-        <td>
-            <form style="display:inline;" method="post"
-                  action="{{ url_for('admin.approve_teacher_request', request_id=req.id) }}"
-                  onsubmit="return confirm('Opravdu schválit?');">
-                <button type="submit">Přijmout</button>
-            </form>
-            <form style="display:inline;" method="post"
-                  action="{{ url_for('admin.reject_teacher_request', request_id=req.id) }}"
-                  onsubmit="return confirm('Opravdu zamítnout?');">
-                <button type="submit">Zamítnout</button>
-            </form>
-        </td>
-    </tr>
-    {% else %}
-    <tr>
-        <td colspan="6">Žádné čekající žádosti.</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="container">
+    <div class="title-bar">Schvalování učitelů - Admin Panel</div>
+    <div class="window-content">
+        <h1>Žádosti o roli učitele</h1>
+        <table>
+            <thead>
+            <tr>
+                <th>Uživatel</th>
+                <th>Email</th>
+                <th>Škola</th>
+                <th>Předmět</th>
+                <th>Titul</th>
+                <th>Akce</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for req in requests %}
+            <tr>
+                <td>{{ req.username }}</td>
+                <td>{{ req.email }}</td>
+                <td>{{ req.school }}</td>
+                <td>{{ req.subject }}</td>
+                <td>{{ req.title }}</td>
+                <td>
+                    <form style="display:inline;" method="post"
+                          action="{{ url_for('admin.approve_teacher_request', request_id=req.id) }}"
+                          onsubmit="return confirm('Opravdu schválit?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit">Přijmout</button>
+                    </form>
+                    <form style="display:inline;" method="post"
+                          action="{{ url_for('admin.reject_teacher_request', request_id=req.id) }}"
+                          onsubmit="return confirm('Opravdu zamítnout?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit">Zamítnout</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            {% if not requests %}
+            <tr>
+                <td colspan="6" class="no-requests">Žádné nové žádosti o roli učitele</td>
+            </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <div class="status-bar">Připraveno | Celkem žádostí: {{ requests|length }}</div>
+</div>
 </body>
 </html>
