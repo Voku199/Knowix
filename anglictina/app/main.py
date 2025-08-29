@@ -318,4 +318,6 @@ def add_security_headers(response):
 
 
 # === Spuštění aplikace ===
-app.run(port=5000, debug=True)
+from waitress import serve
+
+serve(app, host="0.0.0.0", port=8080, threads=24, backlog=100)
