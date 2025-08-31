@@ -313,13 +313,39 @@ def clean_lyrics_lines(raw: str) -> list[str]:
         low = ln.lower()
         if any(b in low for b in ban_substrings):
             continue
+        # Filtruj řádky obsahující čísla, hashtags a speciální symboly
+        if filter_unwanted_content(ln):
+            continue
         cleaned.append(ln)
     return cleaned
 
 
+def filter_unwanted_content(text: str) -> bool:
+    """
+    Vrací True, pokud text obsahuje nežádoucí obsah (čísla, hashtags, speciální symboly).
+    Takový text bude odfiltrován.
+    """
+    # Kontrola na čísla
+    if re.search(r'\d', text):
+        return True
+
+    # Kontrola na hashtags a speciální symboly
+    unwanted_symbols = ['#', '@', '&', '%', '$', '€', '£', '¥', '₽', '+', '=', '<', '>', '|', '\\', '/', '*', '^', '~',
+                        '`']
+    if any(symbol in text for symbol in unwanted_symbols):
+        return True
+
+    # Kontrola na nadměrné množství speciálních znaků
+    special_chars = re.findall(r'[^\w\s\'\-\.\,\!\?\:\;\(\)]', text)
+    if len(special_chars) > 2:  # Povolit maximálně 2 speciální znaky na řádek
+        return True
+
+    return False
+
+
 def build_exercises_from_lyrics(lines: list[str]) -> tuple[list[dict], list[dict]]:
-    # pick candidate lines of reasonable length
-    candidates = [ln for ln in lines if 20 <= len(ln) <= 120]
+    # pick candidate lines of reasonable length and filter unwanted content
+    candidates = [ln for ln in lines if 20 <= len(ln) <= 120 and not filter_unwanted_content(ln)]
     random.shuffle(candidates)
 
     def make_cloze(ln: str) -> dict | None:
@@ -652,7 +678,10 @@ def index():
 
         # --- GENEROVÁNÍ CVIČENÍ ---
         def good_line(ln: str) -> bool:
-            return bool(ln) and 3 <= len(ln.split()) <= 16 and not ln.endswith(':')
+            return (bool(ln) and
+                    3 <= len(ln.split()) <= 16 and
+                    not ln.endswith(':') and
+                    not filter_unwanted_content(ln))  # Přidána kontrola nežádoucího obsahu
 
         candidates = [ln for ln in lines if good_line(ln)]
         random.shuffle(candidates)

@@ -78,7 +78,9 @@ def verejne_psani():
     conn = get_db_connection()
     cur = conn.cursor(dictionary=True)
     cur.execute("""
-        SELECT p.obsah, p.created_at, u.first_name, u.profile_pic 
+        SELECT p.obsah, p.created_at, 
+               CONCAT(u.first_name, ' ', u.last_name) AS user_name, 
+               u.profile_pic 
         FROM psani p
         JOIN users u ON p.user_id = u.id
         WHERE p.public = 1 

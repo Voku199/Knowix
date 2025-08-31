@@ -296,6 +296,9 @@
         {% endfor %}
     </div>
     <form class="chat-input-row" id="chat-form" autocomplete="off">
+        {% if session.get('_csrf_token') %}
+        <input type="hidden" name="csrf_token" value="{{ session._csrf_token }}">
+        {% endif %}
         <input type="text" id="user_input" name="user_input" placeholder="What will you do?" required autofocus>
         <button type="submit">Send</button>
     </form>
@@ -320,6 +323,8 @@
     const userInput = document.getElementById('user_input');
     const inventoryBar = document.querySelector('.inventory-bar');
     const restartBtn = document.getElementById('restart-btn');
+
+
 
     function addMessage(role, content) {
         const msgDiv = document.createElement('div');
@@ -356,12 +361,31 @@
         addMessage('user', text);
         userInput.value = '';
         addMessage('ai', '...');
+
+        // Získej CSRF token z formuláře
+        const csrfToken = document.querySelector('input[name="csrf_token"]');
+        let body = 'user_input=' + encodeURIComponent(text);
+        if (csrfToken) {
+            body += '&csrf_token=' + encodeURIComponent(csrfToken.value);
+        }
+
         fetch('{{ url_for("ai_bp.dnd") }}', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: 'user_input=' + encodeURIComponent(text)
+            body: body
         })
-            .then(response => response.json())
+            .then(response => {
+                // Kontrola, zda je odpověď JSON
+                const contentType = response.headers.get('content-type');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    throw new Error('Server nevrátil JSON odpověď');
+                }
+            })
             .then(data => {
                 const aiMessage = chatHistory.children[chatHistory.children.length - 1];
                 // Použij innerHTML pro správné zobrazení HTML obsahu
@@ -378,19 +402,43 @@
             })
             .catch(error => {
                 const aiMessage = chatHistory.children[chatHistory.children.length - 1];
-                aiMessage.querySelector('.bubble').textContent = 'Error!';
-                console.error(error);
+                aiMessage.querySelector('.bubble').textContent = 'Chyba: ' + error.message;
+                console.error('Fetch error:', error);
             });
     });
 
     restartBtn.addEventListener('click', function() {
         if (!confirm('Opravdu chceš restartovat příběh? Všechny zprávy budou smazány.')) return;
+
+        // Získej CSRF token
+        const csrfToken = document.querySelector('input[name="csrf_token"]');
+        let body = 'restart=1';
+        if (csrfToken) {
+            body += '&csrf_token=' + encodeURIComponent(csrfToken.value);
+        }
+
+        // Zobraz loading indikátor
+        restartBtn.textContent = 'Restartování...';
+        restartBtn.disabled = true;
+
         fetch('{{ url_for("ai_bp.dnd") }}', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: 'restart=1'
+            body: body
         })
-        .then(() => window.location.reload());
+        .then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                throw new Error('Chyba při restartování');
+            }
+        })
+        .catch(error => {
+            console.error('Restart error:', error);
+            restartBtn.textContent = 'Restartovat příběh';
+            restartBtn.disabled = false;
+            alert('Chyba při restartování příběhu. Zkus to znovu.');
+        });
     });
 </script>
 </body>

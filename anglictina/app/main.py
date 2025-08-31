@@ -45,7 +45,6 @@ if not app.secret_key:
     raise RuntimeError("SECRET_KEY is missing. Set SECRET_KEY in environment.")
 
 app.config.update(
-    SESSION_TYPE='redis',
     SESSION_COOKIE_NAME=os.getenv('SESSION_COOKIE_NAME', 'knowix_session'),
     SESSION_COOKIE_SAMESITE='Lax',
     SESSION_COOKIE_SECURE=True,  # Přepneme v before_request pro localhost
@@ -60,25 +59,35 @@ app.config.update(
     MAX_CONTENT_LENGTH=2 * 1024 * 1024
 )
 
+# Determine session backend based on environment
 redis_url = os.getenv('REDIS_URL')
-use_redis = False
-if redis_url:
+if redis_url and not os.getenv('FLASK_DEBUG'):  # Use Redis only in production
     try:
+        app.config['SESSION_TYPE'] = 'redis'
         app.config['SESSION_REDIS'] = redis.from_url(redis_url)
         app.config['SESSION_REDIS'].ping()
-        use_redis = True
         print(f"[main] Session backend: Redis OK -> {redis_url}")
     except Exception as ex:
         print(f"[main] WARNING: Redis ping failed ({ex}). Falling back to filesystem sessions.")
-
-if not use_redis:
+        app.config['SESSION_TYPE'] = 'filesystem'
+else:
+    # Use filesystem sessions for local development
     app.config['SESSION_TYPE'] = 'filesystem'
-    app.config.pop('SESSION_REDIS', None)
-    print("[main] Session backend: filesystem")
+    print("[main] Session backend: filesystem (local development)")
+
+# Ensure session directory exists for filesystem sessions
+if app.config['SESSION_TYPE'] == 'filesystem':
+    # Use a directory outside of OneDrive to avoid sync issues
+    session_dir = os.path.join(os.path.expanduser("~"), "knowix_sessions")
+    if not os.path.exists(session_dir):
+        os.makedirs(session_dir, exist_ok=True)
+    app.config['SESSION_FILE_DIR'] = session_dir
+    print(f"[main] Using session directory: {session_dir}")
 
 # Proxy fix kvůli správnému HTTPS z pohledu Flasku
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 
+# Initialize session after all config is set
 Session(app)
 
 # === Registrace blueprintů ===

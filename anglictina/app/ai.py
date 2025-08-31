@@ -47,9 +47,21 @@ def get_or_create_user():
 
 @ai_bp.before_request
 def check_user():
+    print(f"DEBUG BEFORE_REQUEST: Method={request.method}, Endpoint={request.endpoint}")
+    print(f"DEBUG BEFORE_REQUEST: Session before: {dict(session)}")
+
     # This ensures every request has a user_id
     if "user_id" not in session:
-        get_or_create_user()
+        try:
+            get_or_create_user()
+            print(f"DEBUG BEFORE_REQUEST: Created new user, session after: {dict(session)}")
+        except Exception as e:
+            print(f"DEBUG BEFORE_REQUEST: Error creating user: {e}")
+            # Možná je problém s databází, zkusme fallback
+            session["user_id"] = random.randint(100000, 999999)
+            print(f"DEBUG BEFORE_REQUEST: Used fallback user_id: {session['user_id']}")
+    else:
+        print(f"DEBUG BEFORE_REQUEST: User already exists: {session['user_id']}")
 
 
 def get_user_chats(user_id):
@@ -251,7 +263,7 @@ def ask_community_ai(user_id, user_input):
         "Content-Type": "application/json"
     }
     data = {
-        "model": "gpt-4o-mini",
+        "model": "gpt-4o-mini-2024-07-18'",
         "messages": messages,
         "temperature": 1,
         "max_tokens": 120
@@ -287,6 +299,10 @@ def build_dnd_prompt(history, user_input, inventory, is_intro=False):
                                                                                           "If the user tries to cheat, ask for something impossible, or tries to skip the adventure, politely refuse and keep the story balanced. "
                                                                                           "Never give the user a sword, legendary item, or kill them instantly unless it is part of a fair, logical story progression. "
                                                                                           "If the user says they died, got a sword, or something similar, remind them that only the game master can decide such outcomes. "
+                                                                                          "IMPORTANT: In your responses, NEVER include numbers, hashtags (#), at symbols (@), ampersands (&), or other special characters like $, %, ^, *, etc. "
+                                                                                          "Use words instead of numbers (e.g., 'twenty' instead of '20', 'three' instead of '3'). "
+                                                                                          "Avoid using any social media symbols or special characters in your storytelling. "
+                                                                                          "Keep the narrative clean and use only letters, basic punctuation (.,!?), spaces, and HTML formatting tags."
     )
 
     messages = [{"role": "system", "content": system_content}]
@@ -330,7 +346,7 @@ def ask_ai(user_id, user_input, user_name=None, dnd=False):
     if dnd:
         messages = build_dnd_prompt(history, user_input, inventory)
         model = "mistralai/mistral-nemo"
-        max_tokens = 300
+        max_tokens = 120
     else:
         messages = build_chat_prompt(history, user_input)
         model = "gpt-4o-mini"
@@ -402,7 +418,7 @@ def chat_list():
             data = {
                 "model": "gpt-4o-mini",
                 "messages": messages,
-                "max_tokens": 700,
+                "max_tokens": 120,
                 "temperature": 0.7
             }
             try:
@@ -436,8 +452,13 @@ def chat_multi(chat_id):
 
     if request.method == "POST":
         user_input = request.form.get("user_input")
-        if not user_input:
-            return jsonify({"error": "No input"}), 400
+        print(f"DEBUG: Received user_input: '{user_input}'")
+        print(f"DEBUG: Form data: {dict(request.form)}")
+        print(f"DEBUG: Raw data: {request.get_data()}")
+
+        if not user_input or user_input.strip() == "":
+            return jsonify({"error": "Žádný vstup nebo prázdný text"}), 400
+
         insert_message_chat(chat_id, user_id, "user", user_input)
         # --- AI logika pro komunitní chat ---
         history = get_chat_history_by_chatid(chat_id)
@@ -451,7 +472,7 @@ def chat_multi(chat_id):
         data = {
             "model": "gpt-4o-mini",
             "messages": messages,
-            "max_tokens": 700,
+            "max_tokens": 120,
             "temperature": 0.7
         }
         try:
@@ -544,25 +565,89 @@ def chat():
 
 @ai_bp.route("/dnd", methods=["GET", "POST"])
 def dnd():
+    print(f"DEBUG DND START: Method={request.method}, Content-Type={request.content_type}")
+    print(f"DEBUG DND START: Headers={dict(request.headers)}")
+
     # Získání nebo vytvoření user_id v session
     if "user_id" not in session:
         import random
         session["user_id"] = random.randint(100000, 999999)
     user_id = session["user_id"]
 
+    print(f"DEBUG DND: User ID = {user_id}")
+
     # --- RESTART CHATU ---
     if request.method == "POST" and request.form.get("restart") == "1":
-        db = get_db_connection()
-        with db.cursor() as cursor:
-            cursor.execute("DELETE FROM dnd_message WHERE user_id=%s", (user_id,))
+        print("DEBUG DND: Restart detected")
+        try:
+            db = get_db_connection()
+            with db.cursor() as cursor:
+                cursor.execute("DELETE FROM dnd_message WHERE user_id=%s", (user_id,))
             db.commit()
-        set_inventory(user_id, [])
-        return ('', 204)
+            db.close()
 
-    if request.method == "POST":
+            set_inventory(user_id, [])
+
+            # Po restartu vygeneruj nový úvodní příběh
+            api_key = ai_bp.ai_api_key
+            inventory = []  # Prázdný inventář po restartu
+            messages = build_dnd_prompt([], None, inventory, is_intro=True)
+            url = "https://api.aimlapi.com/v1/chat/completions"
+            headers = {
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            }
+            data = {
+                "model": "mistralai/mistral-nemo",
+                "messages": messages + [{"role": "user",
+                                         "content": "Start the adventure for the player. Give them 2-3 choices what to do next. Use emoji and HTML formatting."}],
+                "temperature": 1,
+                "max_tokens": 120
+            }
+            response = requests.post(url, headers=headers, json=data)
+
+            if response.status_code in [200, 201]:
+                try:
+                    response_data = response.json()
+                    ai_reply = response_data['choices'][0]['message']['content']
+                    insert_message(user_id, "ai", ai_reply, dnd=True)
+                    history = [{"sender": "ai", "content": ai_reply}]
+                except (json.JSONDecodeError, KeyError, IndexError) as e:
+                    print(f"Error parsing AI intro response: {e}")
+                    history = [{"sender": "ai",
+                                "content": "🏰 Welcome to your D&D adventure! You find yourself standing at the entrance of a mysterious castle. What will you do? <b>Enter the castle</b> | <b>Look around</b> | <b>Walk away</b>"}]
+                    insert_message(user_id, "ai", history[0]["content"], dnd=True)
+            else:
+                history = [{"sender": "ai",
+                            "content": "🏰 Welcome to your D&D adventure! You find yourself standing at the entrance of a mysterious castle. What will you do? <b>Enter the castle</b> | <b>Look around</b> | <b>Walk away</b>"}]
+                insert_message(user_id, "ai", history[0]["content"], dnd=True)
+
+            return render_template("ai/dnd.html", history=history, inventory=inventory)
+
+        except Exception as e:
+            print(f"DEBUG DND: Restart error: {e}")
+            return jsonify({"error": "Chyba při restartování příběhu"}), 500
+
+    elif request.method == "POST":
         user_input = request.form.get("user_input")
+        print(f"DEBUG DND: Received user_input: '{user_input}'")
+        print(f"DEBUG DND: Form data: {dict(request.form)}")
+        print(f"DEBUG DND: Raw data: {request.get_data()}")
+
+        # Pokus o alternativní způsob získání dat
         if not user_input:
-            return jsonify({"error": "Žádný vstup"}), 400
+            try:
+                raw_data = request.get_data(as_text=True)
+                if 'user_input=' in raw_data:
+                    import urllib.parse
+                    parsed = urllib.parse.parse_qs(raw_data)
+                    user_input = parsed.get('user_input', [''])[0]
+                    print(f"DEBUG DND: Alternative parsing got: '{user_input}'")
+            except Exception as e:
+                print(f"DEBUG DND: Alternative parsing failed: {e}")
+
+        if not user_input or user_input.strip() == "":
+            return jsonify({"error": "Žádný vstup nebo prázdný text"}), 400
 
         insert_message(user_id, "users", user_input, dnd=True)
 
@@ -577,10 +662,10 @@ def dnd():
             "Content-Type": "application/json"
         }
         data = {
-            "model": "mistralai/mistral-nemo",
+            "model": "gpt-4o-mini",
             "messages": messages,
             "temperature": 1,
-            "max_tokens": 300
+            "max_tokens": 120
         }
         response = requests.post(url, headers=headers, json=data)
         if response.status_code == 403:
@@ -589,7 +674,17 @@ def dnd():
                 "img_url": "/static/pic/pikachu_sad.png"
             }), 403
         if response.status_code in [200, 201]:
-            ai_reply = response.json()['choices'][0]['message']['content']
+            try:
+                response_data = response.json()
+                ai_reply = response_data['choices'][0]['message']['content']
+            except (json.JSONDecodeError, KeyError, IndexError) as e:
+                print(f"Error parsing AI response: {e}")
+                print(f"Response status: {response.status_code}")
+                print(f"Response content: {response.text[:500]}")
+                return jsonify({
+                    "response": "❌ Chyba při parsování odpovědi od AI. Zkus to znovu.",
+                    "inventory": inventory or []
+                })
             # --- INVENTÁŘ MANAGEMENT (jednoduchá heuristika) ---
             lower = ai_reply.lower()
             inventory = inventory or []
@@ -626,7 +721,7 @@ def dnd():
             "messages": messages + [{"role": "user",
                                      "content": "Start the adventure for the player. Give them 2-3 choices what to do next. Use emoji and HTML formatting."}],
             "temperature": 1,
-            "max_tokens": 400
+            "max_tokens": 120
         }
         response = requests.post(url, headers=headers, json=data)
         if response.status_code == 403:
@@ -635,9 +730,21 @@ def dnd():
                 "img_url": "/static/img/pikachu_sad.png"
             }), 403
         if response.status_code in [200, 201]:
-            ai_reply = response.json()['choices'][0]['message']['content']
-            insert_message(user_id, "ai", ai_reply, dnd=True)
-            history = [{"sender": "ai", "content": ai_reply}]
+            try:
+                response_data = response.json()
+                ai_reply = response_data['choices'][0]['message']['content']
+                insert_message(user_id, "ai", ai_reply, dnd=True)
+                history = [{"sender": "ai", "content": ai_reply}]
+            except (json.JSONDecodeError, KeyError, IndexError) as e:
+                print(f"Error parsing AI intro response: {e}")
+                print(f"Response status: {response.status_code}")
+                print(f"Response content: {response.text[:500]}")
+                history = [{"sender": "ai",
+                            "content": "🏰 Welcome to your D&D adventure! You find yourself standing at the entrance of a mysterious castle. What will you do? <b>Enter the castle</b> | <b>Look around</b> | <b>Walk away</b>"}]
+                insert_message(user_id, "ai", history[0]["content"], dnd=True)
         else:
-            history = []
+            history = [{"sender": "ai",
+                        "content": "🏰 Welcome to your D&D adventure! You find yourself standing at the entrance of a mysterious castle. What will you do? <b>Enter the castle</b> | <b>Look around</b> | <b>Walk away</b>"}]
+            insert_message(user_id, "ai", history[0]["content"], dnd=True)
+
     return render_template("ai/dnd.html", history=history, inventory=inventory)
