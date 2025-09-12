@@ -35,6 +35,8 @@ from admin import admin_bp
 from vlastni_music import vlastni_music_bp
 from proc import proc_bp
 from security_ext import init_security
+from math_main import math_main_bp
+from math_pocitejsam import math_pocitejsam_bp
 
 app = Flask(__name__)
 
@@ -115,6 +117,8 @@ app.register_blueprint(user_stats_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(vlastni_music_bp)
 app.register_blueprint(proc_bp)
+# app.register_blueprint(math_main_bp)
+# app.register_blueprint(math_pocitejsam_bp)
 
 init_security(app)
 
@@ -306,7 +310,7 @@ def add_security_headers(response):
         "object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests;"
     )
     response.headers['Permissions-Policy'] = (
-        'geolocation=(), microphone=(), camera=(), '
+        'geolocation=(), microphone=(self), camera=(), '
         'fullscreen=(self "https://www.youtube.com" "https://www.youtube-nocookie.com"), '
         'magnetometer=(), gyroscope=(self "https://www.youtube.com" "https://www.youtube-nocookie.com"), usb=(), payment=()'
     )

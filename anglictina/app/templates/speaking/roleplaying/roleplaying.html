@@ -205,12 +205,95 @@ document.addEventListener('DOMContentLoaded', function () {
     let recognition;
     let isListening = false;
     let noSpeechTimeout = null;
+    // Nové stavové příznaky pro oprávnění mikrofonu
+    let micPermissionGranted = false;
 
     function lockScroll() {
         document.body.style.overflow = 'hidden';
     }
     function unlockScroll() {
         document.body.style.overflow = '';
+    }
+
+    // Pomocné: bezpečný kontext (HTTPS nebo localhost)
+    function isSecureContextOrLocalhost() {
+        try {
+            return window.isSecureContext || location.protocol === 'https:' || /(localhost|127\.0\.0\.1)/.test(location.hostname);
+        } catch (_) { return false; }
+    }
+
+    // Zobrazení nápovědy k povolení mikrofonu
+    function showPermissionHelp(message) {
+        const text = message || 'Pro pokračování povol mikrofon v prohlížeči (ikona kamery/mikrofonu v adresním řádku).';
+        let warn = document.getElementById('micPermissionHelp');
+        if (!warn) {
+            warn = document.createElement('div');
+            warn.id = 'micPermissionHelp';
+            warn.style.position = 'fixed';
+            warn.style.bottom = '40px';
+            warn.style.left = '50%';
+            warn.style.transform = 'translateX(-50%)';
+            warn.style.background = '#fffbe6';
+            warn.style.border = '2px solid #ff9800';
+            warn.style.borderRadius = '12px';
+            warn.style.padding = '14px 28px';
+            warn.style.fontSize = '1.05em';
+            warn.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)';
+            warn.style.zIndex = 9999;
+            warn.style.color = '#b26a00';
+            warn.style.maxWidth = '90%';
+            warn.style.textAlign = 'center';
+            document.body.appendChild(warn);
+        }
+        warn.innerHTML = text + '<br><small>Tip: Pokud vidíš hlášku o nezabezpečeném připojení, otevři stránku přes HTTPS.</small>';
+        setTimeout(() => {
+            warn.style.opacity = '0';
+            setTimeout(() => { if (warn) warn.remove(); }, 800);
+        }, 5000);
+    }
+
+    // Vyžádání oprávnění mikrofonu (vyvolá systémovou bublinu)
+    async function ensureMicPermission() {
+        if (!isSecureContextOrLocalhost()) {
+            showPermissionHelp('Prohlížeč vyžaduje HTTPS pro přístup k mikrofonu. Otevři tuto stránku přes https:// nebo použij localhost.');
+            throw new Error('insecure-context');
+        }
+        // Permissions API (když je k dispozici)
+        try {
+            if (navigator.permissions && navigator.permissions.query) {
+                const status = await navigator.permissions.query({ name: 'microphone' });
+                if (status.state === 'granted') {
+                    micPermissionGranted = true;
+                    return true;
+                }
+                // status: 'prompt' nebo 'denied' -> spustíme getUserMedia pro vyvolání bubliny
+            }
+        } catch (_) { /* ignorujeme, pokračujeme níže */ }
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            showPermissionHelp('Tento prohlížeč nepodporuje přístup k mikrofonu. Zkus Chrome/Edge na desktopu.');
+            throw new Error('no-getUserMedia');
+        }
+
+        try {
+            // Vyžádáme pouze audio; stopneme hned po udělení
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            stream.getTracks().forEach(t => t.stop());
+            micPermissionGranted = true;
+            return true;
+        } catch (err) {
+            const name = err && (err.name || err.code) || '';
+            if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+                showPermissionHelp('Povol prosím mikrofon v horním panelu prohlížeče a zkus to znovu.');
+            } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+                showPermissionHelp('Nenalezen žádný mikrofon. Zkontroluj připojení zařízení.');
+            } else if (name === 'NotReadableError') {
+                showPermissionHelp('Mikrofon je používán jinou aplikací. Zavři ji a zkus to znovu.');
+            } else {
+                showPermissionHelp('Nepodařilo se získat přístup k mikrofonu. Zkus to prosím znovu.');
+            }
+            throw err;
+        }
     }
 
     // --- Vylepšená spojovačka slov ---
@@ -421,8 +504,13 @@ document.addEventListener('DOMContentLoaded', function () {
             };
             recognition.onerror = function (event) {
                 clearTimeout(noSpeechTimeout);
-                if (event.error === "no-speech") {
+                // Specifické chybové stavy – ukaž nápovědu a neblokuj uživatele
+                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    showPermissionHelp('Přístup k mikrofonu byl zamítnut. Povol jej v nastavení webu a zkus to znovu.');
+                } else if (event.error === 'no-speech') {
                     showNoSpeechWarning();
+                } else if (event.error === 'aborted') {
+                    // uživatel zavřel bublinu; nezahlcuj hláškou
                 } else {
                     showResult('Chyba: ' + event.error, false);
                 }
@@ -439,13 +527,25 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    async function startListeningWithPermission() {
+        try {
+            if (!micPermissionGranted) {
+                await ensureMicPermission();
+            }
+            if (recognition) recognition.start();
+        } catch (_) {
+            // Povolení se nezdařilo – ponecháme psaní jako fallback
+            if (prekladInput) prekladInput.placeholder = 'Povolení mikrofonu selhalo – napiš překlad...';
+        }
+    }
+
     function startListening() {
         if (recognition) recognition.start();
     }
 
     function stopListening() {
         if (recognition && isListening) {
-            recognition.stop();
+            try { recognition.stop(); } catch (_) {}
             isListening = false;
             if (micButton) micButton.classList.remove('listening');
             if (prekladInput) prekladInput.placeholder = "Zkuste to anglicky...";
@@ -656,9 +756,12 @@ document.addEventListener('DOMContentLoaded', function () {
             micButton = document.getElementById('micButton');
             submitBtn = document.getElementById('submitBtn');
             if (micButton) {
-                micButton.addEventListener('click', function () {
-                    if (isListening) stopListening();
-                    else startListening();
+                micButton.addEventListener('click', async function () {
+                    if (isListening) {
+                        stopListening();
+                    } else {
+                        await startListeningWithPermission();
+                    }
                 });
             }
             if (submitBtn) submitBtn.addEventListener('click', handleUserSubmit);
@@ -765,9 +868,12 @@ document.addEventListener('DOMContentLoaded', function () {
         micButton = document.getElementById('micButton');
         submitBtn = document.getElementById('submitBtn');
         if (micButton) {
-            micButton.addEventListener('click', function () {
-                if (isListening) stopListening();
-                else startListening();
+            micButton.addEventListener('click', async function () {
+                if (isListening) {
+                    stopListening();
+                } else {
+                    await startListeningWithPermission();
+                }
             });
         }
         if (submitBtn) submitBtn.addEventListener('click', handleUserSubmit);
