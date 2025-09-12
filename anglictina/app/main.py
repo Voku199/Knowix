@@ -35,8 +35,9 @@ from admin import admin_bp
 from vlastni_music import vlastni_music_bp
 from proc import proc_bp
 from security_ext import init_security
-from math_main import math_main_bp
-from math_pocitejsam import math_pocitejsam_bp
+
+# from math_main import math_main_bp
+# from math_pocitejsam import math_pocitejsam_bp
 
 app = Flask(__name__)
 
