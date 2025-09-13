@@ -35,9 +35,10 @@ from admin import admin_bp
 from vlastni_music import vlastni_music_bp
 from proc import proc_bp
 from security_ext import init_security
-
 # from math_main import math_main_bp
 # from math_pocitejsam import math_pocitejsam_bp
+# from math_ulohy import math_ulohy_bp
+from SOBRA_prezentace import prezentace_bp
 
 app = Flask(__name__)
 
@@ -118,8 +119,14 @@ app.register_blueprint(user_stats_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(vlastni_music_bp)
 app.register_blueprint(proc_bp)
+
+# -------- Matematiky --------------------
 # app.register_blueprint(math_main_bp)
 # app.register_blueprint(math_pocitejsam_bp)
+# app.register_blueprint(math_ulohy_bp)
+
+# --------- Prezentace --------------
+app.register_blueprint(prezentace_bp)
 
 init_security(app)
 

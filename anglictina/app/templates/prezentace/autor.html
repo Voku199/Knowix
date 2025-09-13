@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Harper Lee – Autor | Maycomb</title>
+    <link rel="stylesheet" href="../../static/prezentace/style.css"/>
+</head>
+<body>
+<button class="back-btn" aria-label="Vrátit se zpět"
+        onclick="return false;">← Zpět
+</button>
+
+<!-- Pixel PowerPoint Container -->
+<div class="powerpoint-container" id="powerpointContainer">
+    <!-- Slide Navigation -->
+    <div class="slide-nav">
+        <button class="nav-btn prev-btn" id="prevBtn" aria-label="Předchozí slide">‹</button>
+        <div class="slide-counter">
+            <span class="current-slide" id="currentSlide">1</span>
+            <span class="slide-separator">/</span>
+            <span class="total-slides" id="totalSlides">5</span>
+        </div>
+        <button class="nav-btn next-btn" id="nextBtn" aria-label="Další slide">›</button>
+    </div>
+
+    <!-- Slides Container -->
+    <div class="slides-wrapper" id="slidesWrapper">
+
+        <!-- Slide 1: Úvod -->
+        <div class="slide active" data-slide="1">
+            <div class="slide-content title-slide">
+                <div class="pixel-icon">
+                    <div class="icon-bird">
+                        <div class="bird-body"></div>
+                        <div class="bird-wing"></div>
+                        <div class="bird-eye"></div>
+                    </div>
+                </div>
+                <h1 class="slide-title">Harper Lee <span class="accent">(1926–2016)</span></h1>
+                <h2 class="slide-subtitle">Autorka románu To Kill a Mockingbird</h2>
+                <div class="slide-meta">Příběh o empatii, spravedlnosti a dospívání ve městě Maycomb</div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Život a kontext -->
+        <div class="slide" data-slide="2">
+            <div class="slide-content">
+                <h1 class="slide-title">Život a kontext</h1>
+                <div class="bullet-points">
+                    <div class="bullet-point" data-reveal="1">
+                        <span class="bullet">»</span>
+                        <span class="text">Vyrůstala v Monroeville (USA Alabama); atmosféra maloměsta inspirovala Maycomb.</span>
+                    </div>
+                    <div class="bullet-point" data-reveal="2">
+                        <span class="bullet">»</span>
+                        <span class="text">Byla známá jako soukromá osoba, nikoliv veřejná osoba. Chránila si své soukromí.</span>
+                    </div>
+                    <div class="bullet-point" data-reveal="3">
+                        <span class="bullet">»</span>
+                        <span class="text">Pulitzerova cena za beletrii (1961).</span>
+                        <span class="text">(Můžeme říct že získala ocenění za "nejlepší kníhu"</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Díla -->
+        <div class="slide" data-slide="3">
+            <div class="slide-content">
+                <h1 class="slide-title">Díla</h1>
+                <div class="bullet-points">
+                    <div class="bullet-point" data-reveal="1">
+                        <span class="bullet">»</span>
+                        <span class="text"><span class="accent">To Kill a Mockingbird</span> (1960)</span>
+                    </div>
+                    <div class="bullet-point" data-reveal="2">
+                        <span class="bullet">»</span>
+                        <span class="text"><span class="accent">Go Set a Watchman</span> (2015)</span>
+                    </div>
+                </div>
+                <div class="message-box" style="margin-top: 32px;">
+                    <p>Kniha "Go set a Watchman" byla spíše kontroverzní, byla braná spíše jako 1 verze
+                        "Mockingbirdu"</p>
+                </div>
+            </div>
+        </div>
+
+        <!--        &lt;!&ndash; Slide 4: Témata a motivy &ndash;&gt;-->
+        <!--        <div class="slide" data-slide="4">-->
+        <!--            <div class="slide-content">-->
+        <!--                <h1 class="slide-title">Témata a motivy</h1>-->
+        <!--                <div class="bullet-points">-->
+        <!--                    <div class="bullet-point" data-reveal="1">-->
+        <!--                        <span class="bullet">»</span>-->
+        <!--                        <span class="text"><span class="accent">Empatie a morální odvaha</span></span>-->
+        <!--                    </div>-->
+        <!--                    <div class="bullet-point" data-reveal="2">-->
+        <!--                        <span class="bullet">»</span>-->
+        <!--                        <span class="text">Rasové a třídní předsudky</span>-->
+        <!--                    </div>-->
+        <!--                    <div class="bullet-point" data-reveal="3">-->
+        <!--                        <span class="bullet">»</span>-->
+        <!--                        <span class="text">Symbol „ptáčka” – nevinnost a ochrana slabých</span>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </div>-->
+
+        <!-- Slide 5: Zajímavosti -->
+        <div class="slide" data-slide="4">
+            <div class="slide-content">
+                <h1 class="slide-title">Zajímavosti</h1>
+                <div class="bullet-points">
+                    <div class="bullet-point" data-reveal="1">
+                        <span class="bullet">»</span>
+                        <span class="text">V roce 1962 vznikl film podle knihy Jak zabít ptáčka. Získali několik oskaru</span>
+                    </div>
+                    <div class="bullet-point" data-reveal="2">
+                        <span class="bullet">»</span>
+                        <span class="text">"Jak zabít ptáčka" odkazuje na metaforu "zabíjet nevinné je špatné"</span>
+                    </div>
+                    <div class="bullet-point" data-reveal="3">
+                        <span class="bullet">»</span>
+                        <span class="text">Kniha je stále povinnou četbu a občanské debaty v USA.</span>
+                    </div>
+                </div>
+                <div class="result-actions" style="margin-top: 36px;">
+                    <button class="back-to-map-btn" id="backToMapBtn">Zpět na mapu</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Slide indicators -->
+    <div class="slide-indicators" id="slideIndicators">
+        <span class="indicator active" data-slide="1"></span>
+        <span class="indicator" data-slide="2"></span>
+        <span class="indicator" data-slide="3"></span>
+        <span class="indicator" data-slide="4"></span>
+        <!--        <span class="indicator" data-slide="5"></span>-->
+    </div>
+</div>
+
+<!-- Loading overlay markup -->
+<div class="loading-overlay" id="loading" aria-hidden="true">
+    <div class="stars" id="stars"></div>
+    <div class="loading-container">
+        <div class="loading-icon">
+            <div class="pixel-building">
+                <div class="building-base"></div>
+                <div class="building-roof"></div>
+                <div class="building-windows">
+                    <div class="window"></div>
+                    <div class="window"></div>
+                    <div class="window"></div>
+                    <div class="window"></div>
+                </div>
+            </div>
+        </div>
+        <div class="loading-label">PŘESUN NA MAPU...</div>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+                <div class="progress-blocks">
+                    <div class="block"></div>
+                    <div class="block"></div>
+                    <div class="block"></div>
+                    <div class="block"></div>
+                    <div class="block"></div>
+                    <div class="block"></div>
+                    <div class="block"></div>
+                    <div class="block"></div>
+                    <div class="block"></div>
+                    <div class="block"></div>
+                </div>
+            </div>
+            <div class="progress-text" id="progressText">0%</div>
+        </div>
+        <div class="loading-phases" id="loadingPhases">
+            <div class="phase active">» Připravujeme návrat...</div>
+            <div class="phase">» Ukládání informací...</div>
+            <div class="phase">» Příprava mapy Maycombu...</div>
+            <div class="phase">» Tvoření hvězdné cesty...</div>
+            <div class="phase">» Přistání na mapě...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        let currentSlide = 1;
+        const totalSlides = 5;
+
+        // Loading overlay elements
+        const overlay = document.getElementById('loading');
+        const stars = document.getElementById('stars');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const loadingPhases = document.getElementById('loadingPhases');
+        const LOAD_DELAY = 4000; // 4s přechod zpět na mapu
+
+        function buildStars() {
+            if (!stars) return;
+            stars.innerHTML = '';
+            const w = window.innerWidth, h = window.innerHeight;
+            const area = w * h;
+            const count = Math.min(240, Math.max(40, Math.round(area / 12000)));
+            for (let i = 0; i < count; i++) {
+                const s = document.createElement('div');
+                s.className = 'star';
+                const x = Math.random() * w, y = Math.random() * h;
+                const delay = Math.round(Math.random() * 900) + 'ms';
+                s.style.left = x + 'px';
+                s.style.top = y + 'px';
+                s.style.animationDelay = delay;
+                stars.appendChild(s);
+            }
+        }
+
+        function animateLoading() {
+            if (!loadingPhases) return;
+            const phases = loadingPhases.querySelectorAll('.phase');
+            let currentPhase = 0;
+            let progress = 0;
+
+            const interval = setInterval(() => {
+                progress += 2;
+                if (progressFill) progressFill.style.width = Math.min(progress, 100) + '%';
+                if (progressText) progressText.textContent = Math.min(progress, 100) + '%';
+
+                const phaseProgress = Math.floor(progress / 20);
+                if (phaseProgress > currentPhase && phaseProgress < phases.length) {
+                    phases[currentPhase].classList.remove('active');
+                    phases[phaseProgress].classList.add('active');
+                    currentPhase = phaseProgress;
+                }
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    phases[currentPhase]?.classList.remove('active');
+                    const completionPhase = document.createElement('div');
+                    completionPhase.className = 'phase active completion';
+                    completionPhase.textContent = '» Připraveno!';
+                    loadingPhases.appendChild(completionPhase);
+                }
+            }, LOAD_DELAY / 50);
+        }
+
+        function backToMap() {
+            if (overlay) {
+                buildStars();
+                overlay.classList.add('show');
+                animateLoading();
+                setTimeout(() => {
+                    window.location.href = 'prezentacer_main.html';
+                }, LOAD_DELAY);
+            } else {
+                window.location.href = 'prezentacer_main.html';
+            }
+        }
+
+        function setupEventListeners() {
+            document.getElementById('prevBtn').addEventListener('click', () => changeSlide(-1));
+            document.getElementById('nextBtn').addEventListener('click', () => changeSlide(1));
+            document.getElementById('backToMapBtn').addEventListener('click', backToMap);
+
+            // Override top back button to use overlay
+            const backBtn = document.querySelector('.back-btn');
+            if (backBtn) backBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                backToMap();
+            });
+
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                if (e.key === 'ArrowRight') changeSlide(1);
+                if (e.key === 'Escape') backToMap();
+            });
+
+            // Slide indicators
+            document.querySelectorAll('.indicator').forEach(indicator => {
+                indicator.addEventListener('click', (e) => {
+                    const targetSlide = parseInt(e.target.dataset.slide);
+                    goToSlide(targetSlide);
+                });
+            });
+
+            // Rebuild stars on resize when overlay visible
+            window.addEventListener('resize', () => {
+                if (overlay && overlay.classList.contains('show')) buildStars();
+            });
+        }
+
+        function changeSlide(direction) {
+            const newSlide = currentSlide + direction;
+            if (newSlide >= 1 && newSlide <= totalSlides) {
+                goToSlide(newSlide);
+            }
+        }
+
+        function goToSlide(slideNumber) {
+            currentSlide = slideNumber;
+            updateSlideDisplay();
+            setTimeout(() => {
+                revealBulletPoints();
+            }, 200);
+        }
+
+        function updateSlideDisplay() {
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
+            });
+
+            const currentSlideEl = document.querySelector(`.slide[data-slide="${currentSlide}"]`);
+            if (currentSlideEl) {
+                currentSlideEl.classList.add('active');
+            }
+
+            document.getElementById('currentSlide').textContent = currentSlide;
+            document.getElementById('prevBtn').disabled = currentSlide === 1;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+
+            document.querySelectorAll('.indicator').forEach((indicator, index) => {
+                indicator.classList.toggle('active', index + 1 === currentSlide);
+            });
+        }
+
+        function revealBulletPoints() {
+            const currentSlideEl = document.querySelector(`.slide[data-slide="${currentSlide}"]`);
+            if (!currentSlideEl) return;
+            const bulletPoints = currentSlideEl.querySelectorAll('[data-reveal]');
+            if (bulletPoints.length > 0) {
+                bulletPoints.forEach((bullet, index) => {
+                    setTimeout(() => {
+                        bullet.classList.add('revealed');
+                    }, index * 350);
+                });
+            }
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('totalSlides').textContent = totalSlides;
+            updateSlideDisplay();
+            setupEventListeners();
+            // initial reveal for first slide bullets (if any)
+            setTimeout(() => revealBulletPoints(), 200);
+        });
+    })();
+</script>
+
+<style>
+    /* Prezentace používá globální style.css */
+</style>
+
+</body>
+</html>

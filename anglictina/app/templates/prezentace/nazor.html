@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Můj názor | Maycomb - Pixel PowerPoint</title>
+    <link rel="stylesheet" href="../../static/prezentace/style.css"/>
+</head>
+<body>
+<button class="back-btn" aria-label="Vrátit se zpět"
+        onclick="if(history.length>1){history.back()}else{window.location.href='prezentacer_main.html'}">← Zpět
+</button>
+
+<!-- Pixel PowerPoint Container -->
+<div class="powerpoint-container" id="powerpointContainer">
+    <!-- Slide Navigation -->
+    <div class="slide-nav">
+        <button class="nav-btn prev-btn" id="prevBtn" aria-label="Předchozí slide">‹</button>
+        <div class="slide-counter">
+            <span class="current-slide" id="currentSlide">1</span>
+            <span class="slide-separator">/</span>
+            <span class="total-slides" id="totalSlides">8</span>
+        </div>
+        <button class="nav-btn next-btn" id="nextBtn" aria-label="Další slide">›</button>
+    </div>
+
+    <!-- Slides Container -->
+    <div class="slides-wrapper" id="slidesWrapper">
+
+        <!-- Slide 1: Úvodní slide -->
+        <div class="slide active" data-slide="1">
+            <div class="slide-content title-slide">
+                <div class="pixel-icon">
+                    <div class="icon-bird">
+                        <div class="bird-body"></div>
+                        <div class="bird-wing"></div>
+                        <div class="bird-eye"></div>
+                    </div>
+                </div>
+                <h1 class="slide-title">Můj Názor</h1>
+                <h2 class="slide-subtitle">Jak zabít ptáčka</h2>
+                <div class="slide-meta">Osobní hodnocení a reflexe</div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Co se mi líbilo -->
+        <div class="slide" data-slide="2">
+            <div class="slide-content">
+                <h1 class="slide-title">CO SE MI LÍBILO</h1>
+                <div class="bullet-points">
+                    <div class="bullet-point" data-reveal="1">
+                        <span class="bullet">»</span>
+                        <span class="text">Vyprávění z dětského pohledu.</span>
+                    </div>
+                    <div class="bullet-point" data-reveal="2">
+                        <span class="bullet">»</span>
+                        <span class="text">Realita ve 20 století.</span>
+                    </div>
+                    <div class="bullet-point" data-reveal="3">
+                        <span class="bullet">»</span>
+                        <span class="text">Propojení symbolů (ptáček) s hlavními tématy</span>
+                    </div>
+                    <div class="bullet-point" data-reveal="4">
+                        <span class="bullet">»</span>
+                        <span class="text">Pohled dětí na svět dospělých</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Co bylo náročné -->
+        <div class="slide" data-slide="3">
+            <div class="slide-content">
+                <h1 class="slide-title">CO BYLO NÁROČNÉ</h1>
+                <div class="bullet-points">
+                    <div class="bullet-point" data-reveal="1">
+                        <span class="bullet">×</span>
+                        <span class="text">Těžká témata předsudků a nespravedlnosti vůči postavám.</span>
+                    </div>
+                    <div class="bullet-point" data-reveal="2">
+                        <span class="bullet">×</span>
+                        <span class="text">Nebrečet u toho.</span>
+                    </div>
+                    <div class="bullet-point" data-reveal="3">
+                        <span class="bullet">×</span>
+                        <span class="text">Složité vztahy mezi postavami</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Hlavní poselství -->
+        <div class="slide" data-slide="4">
+            <div class="slide-content">
+                <h1 class="slide-title">HLAVNÍ POSELSTVÍ</h1>
+                <div class="quote-box">
+                    <div class="quote-text">
+                        "Odvaha není muž se zbraní v ruce.<br>
+                        Odvaha je, když víš, že už předem prohráváš,<br>
+                        ale přesto začneš a jdeš až do konce."
+                    </div>
+                    <div class="quote-author">— Harper Leeová</div>
+                </div>
+                <div class="message-box">
+                    <p>Kniha učí podle mě empati, toleranci a odvahu postavit se za nespravedlnosti.</p>
+                    <p>(Empatie znamená se "vcítit" do někoho druhého ohledně emocích)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Proč doporučit -->
+        <div class="slide" data-slide="5">
+            <div class="slide-content">
+                <h1 class="slide-title">PROČ DOPORUČIT?</h1>
+                <div class="recommendation-grid">
+                    <div class="rec-item" data-reveal="1">
+                        <div class="rec-icon">📚</div>
+                        <div class="rec-text">Historie 20. století</div>
+                    </div>
+                    <div class="rec-item" data-reveal="2">
+                        <div class="rec-icon">💭</div>
+                        <div class="rec-text">Zamyšlení nad morálkou</div>
+                    </div>
+                    <div class="rec-item" data-reveal="3">
+                        <div class="rec-icon">👥</div>
+                        <div class="rec-text">Rozvoj empatie</div>
+                    </div>
+                    <div class="rec-item" data-reveal="4">
+                        <div class="rec-icon">🎯</div>
+                        <div class="rec-text">Životní lekce</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Hodnocení -->
+        <div class="slide" data-slide="6">
+            <div class="slide-content">
+                <h1 class="slide-title">MÉ HODNOCENÍ</h1>
+                <div class="rating-section">
+                    <div class="rating-category">
+                        <span class="category-name">PŘÍBĚH</span>
+                        <div class="pixel-stars">
+                            <span class="star filled">★</span>
+                            <span class="star filled">★</span>
+                            <span class="star filled">★</span>
+                            <span class="star filled">★</span>
+                            <span class="star filled">★</span>
+                        </div>
+                    </div>
+                    <div class="rating-category">
+                        <span class="category-name">POSTAVY</span>
+                        <div class="pixel-stars">
+                            <span class="star filled">★</span>
+                            <span class="star filled">★</span>
+                            <span class="star filled">★</span>
+                            <span class="star filled">★</span>
+                            <span class="star">★</span>
+                        </div>
+                    </div>
+                    <div class="rating-category">
+                        <span class="category-name">NÁROČNOST</span>
+                        <div class="pixel-stars">
+                            <span class="star filled">★</span>
+                            <span class="star filled">★</span>
+                            <span class="star filled">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                    </div>
+                    <div class="overall-rating">
+                        <div class="overall-text">CELKOVÉ HODNOCENÍ</div>
+                        <div class="overall-score">9/10</div>
+                    </div>
+                    <button class="back-to-map-btn" id="backToMapBtn">ZPĚT NA MAPU</button>
+                </div>
+            </div>
+        </div>
+
+        <!--        &lt;!&ndash; Slide 7: Kvíz úvod &ndash;&gt;-->
+        <!--        <div class="slide" data-slide="7">-->
+        <!--            <div class="slide-content quiz-intro">-->
+        <!--                <h1 class="slide-title">SHRNUTÍ - KVÍZ</h1>-->
+        <!--                <div class="quiz-intro-text">-->
+        <!--                    <p>Otestuj si, co sis zapamatoval z prezentace!</p>-->
+        <!--                    <div class="quiz-stats">-->
+        <!--                        <div class="stat-item">-->
+        <!--                            <span class="stat-number">5</span>-->
+        <!--                            <span class="stat-label">OTÁZEK</span>-->
+        <!--                        </div>-->
+        <!--                        <div class="stat-item">-->
+        <!--                            <span class="stat-number">3</span>-->
+        <!--                            <span class="stat-label">MOŽNOSTI</span>-->
+        <!--                        </div>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--                <button class="start-quiz-btn" id="startQuizBtn">ZAČÍT KVÍZ</button>-->
+        <!--            </div>-->
+        <!--        </div>-->
+
+        <!--        &lt;!&ndash; Slide 8: Kvíz &ndash;&gt;-->
+        <!--        <div class="slide" data-slide="8">-->
+        <!--            <div class="slide-content quiz-content">-->
+        <!--                <div class="quiz-header">-->
+        <!--                    <div class="quiz-progress">-->
+        <!--                        <span class="progress-text">OTÁZKA <span id="questionNumber">1</span> Z 5</span>-->
+        <!--                        <div class="progress-bar-quiz">-->
+        <!--                            <div class="progress-fill-quiz" id="progressFillQuiz"></div>-->
+        <!--                        </div>-->
+        <!--                    </div>-->
+        <!--                    <div class="quiz-score">SKÓRE: <span id="quizScore">0</span>/5</div>-->
+        <!--                </div>-->
+
+        <!--                <div class="quiz-question">-->
+        <!--                    <h2 class="question-text" id="questionText">Co bylo podle prezentace nejtěžší na čtení knihy?</h2>-->
+        <!--                </div>-->
+
+        <!--                <div class="quiz-answers" id="quizAnswers">-->
+        <!--                    <button class="answer-btn" data-answer="A">A) Reálie doby a dialekty</button>-->
+        <!--                    <button class="answer-btn" data-answer="B">B) Dlouhé popisy</button>-->
+        <!--                    <button class="answer-btn" data-answer="C">C) Příliš mnoho postav</button>-->
+        <!--                </div>-->
+
+        <!--                <div class="quiz-feedback" id="quizFeedback" style="display: none;">-->
+        <!--                    <div class="feedback-text"></div>-->
+        <!--                    <button class="next-question-btn" id="nextQuestionBtn">DALŠÍ OTÁZKA</button>-->
+        <!--                </div>-->
+
+        <!--                <div class="quiz-result" id="quizResult" style="display: none;">-->
+        <!--                    <h2 class="result-title">VÝSLEDEK KVÍZU</h2>-->
+        <!--                    <div class="result-score" id="finalScore">0/5</div>-->
+        <!--                    <div class="result-message" id="resultMessage">Skvělé!</div>-->
+        <!--                    <div class="result-actions">-->
+        <!--                        <button class="restart-quiz-btn" id="restartQuizBtn">ZKUSIT ZNOVU</button>-->
+        <!--                        <button class="back-to-map-btn" id="backToMapBtn">ZPĚT NA MAPU</button>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </div>-->
+
+    </div>
+
+    <!-- Slide indicators -->
+    <div class="slide-indicators" id="slideIndicators">
+        <span class="indicator active" data-slide="1"></span>
+        <span class="indicator" data-slide="2"></span>
+        <span class="indicator" data-slide="3"></span>
+        <span class="indicator" data-slide="4"></span>
+        <span class="indicator" data-slide="5"></span>
+        <span class="indicator" data-slide="6"></span>
+        <span class="indicator" data-slide="7"></span>
+        <span class="indicator" data-slide="8"></span>
+    </div>
+</div>
+
+<!-- Loading overlay markup -->
+<div class="loading-overlay" id="loading" aria-hidden="true">
+    <div class="stars" id="stars"></div>
+    <div class="loading-container">
+        <div class="loading-icon">
+            <div class="pixel-building">
+                <div class="building-base"></div>
+                <div class="building-roof"></div>
+                <div class="building-windows">
+                    <div class="window"></div>
+                    <div class="window"></div>
+                    <div class="window"></div>
+                    <div class="window"></div>
+                </div>
+            </div>
+        </div>
+        <div class="loading-label">PŘESUN NA MAPU...</div>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+                <div class="progress-blocks">
+                    <div class="block"></div>
+                    <div class="block"></div>
+                    <div class="block"></div>
+                    <div class="block"></div>
+                    <div class="block"></div>
+                    <div class="block"></div>
+                    <div class="block"></div>
+                    <div class="block"></div>
+                    <div class="block"></div>
+                    <div class="block"></div>
+                </div>
+            </div>
+            <div class="progress-text" id="progressText">0%</div>
+        </div>
+        <div class="loading-phases" id="loadingPhases">
+            <div class="phase active">» Zavírání kvízu...</div>
+            <div class="phase">» Ukládání bodů do paměti...</div>
+            <div class="phase">» Příprava mapy Maycombu...</div>
+            <div class="phase">» Tvoření hvězdné cesty...</div>
+            <div class="phase">» Přistání na mapě...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Pixel PowerPoint Logic
+    (function () {
+        let currentSlide = 1;
+        const totalSlides = 8;
+        let quizStarted = false;
+        let currentQuestion = 0;
+        let quizScore = 0;
+        let revealedBullets = new Set();
+
+        // Loading overlay elements for transition back to map
+        const overlay = document.getElementById('loading');
+        const stars = document.getElementById('stars');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const loadingPhases = document.getElementById('loadingPhases');
+        const LOAD_DELAY = 4000; // 4s přechod zpět na mapu
+
+        function buildStars() {
+            if (!stars) return;
+            stars.innerHTML = '';
+            const w = window.innerWidth, h = window.innerHeight;
+            const area = w * h;
+            const count = Math.min(240, Math.max(40, Math.round(area / 12000)));
+            for (let i = 0; i < count; i++) {
+                const s = document.createElement('div');
+                s.className = 'star';
+                const x = Math.random() * w, y = Math.random() * h;
+                const delay = Math.round(Math.random() * 900) + 'ms';
+                s.style.left = x + 'px';
+                s.style.top = y + 'px';
+                s.style.animationDelay = delay;
+                stars.appendChild(s);
+            }
+        }
+
+        function animateLoading() {
+            if (!loadingPhases) return;
+            const phases = loadingPhases.querySelectorAll('.phase');
+            let currentPhase = 0;
+            let progress = 0;
+
+            const interval = setInterval(() => {
+                progress += 2;
+                if (progressFill) progressFill.style.width = Math.min(progress, 100) + '%';
+                if (progressText) progressText.textContent = Math.min(progress, 100) + '%';
+
+                const phaseProgress = Math.floor(progress / 20);
+                if (phaseProgress > currentPhase && phaseProgress < phases.length) {
+                    phases[currentPhase].classList.remove('active');
+                    phases[phaseProgress].classList.add('active');
+                    currentPhase = phaseProgress;
+                }
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    phases[currentPhase]?.classList.remove('active');
+                    const completionPhase = document.createElement('div');
+                    completionPhase.className = 'phase active completion';
+                    completionPhase.textContent = '» Připraveno!';
+                    loadingPhases.appendChild(completionPhase);
+                }
+            }, LOAD_DELAY / 50); // 50 kroků přes celou dobu
+        }
+
+        window.addEventListener('resize', () => {
+            if (overlay && overlay.classList.contains('show')) buildStars();
+        });
+
+        // Quiz questions data
+        const quizQuestions = [
+            {
+                question: "Co bylo podle prezentace nejtěžší na čtení knihy?",
+                answers: ["A) Reálie doby a dialekty", "B) Dlouhé popisy", "C) Příliš mnoho postav"],
+                correct: "A",
+                feedback: "Správně! Reálie doby a dialekty byly uvedeny jako náročné."
+            },
+            {
+                question: "Jaké hlavní téma kniha podle prezentace obsahuje?",
+                answers: ["A) Lásku a romantiku", "B) Odvahu a morální integritu", "C) Dobrodružství"],
+                correct: "B",
+                feedback: "Ano! Odvaha a morální integrita jsou ústřední témata."
+            },
+            {
+                question: "Kolik hvězdiček dostal příběh v hodnocení?",
+                answers: ["A) 3 hvězdičky", "B) 4 hvězdičky", "C) 5 hvězdiček"],
+                correct: "C",
+                feedback: "Správně! Příběh dostal plný počet 5 hvězdiček."
+            },
+            {
+                question: "Co je podle prezentace symbolem v knize?",
+                answers: ["A) Strom", "B) Ptáček", "C) Dům"],
+                correct: "B",
+                feedback: "Přesně! Ptáček je důležitým symbolem knihy."
+            },
+            {
+                question: "Jaké bylo celkové hodnocení knihy?",
+                answers: ["A) 8/10", "B) 9/10", "C) 10/10"],
+                correct: "B",
+                feedback: "Správně! Celkové hodnocení bylo 9/10."
+            }
+        ];
+
+        // Initialize PowerPoint
+        function init() {
+            updateSlideDisplay();
+            setupEventListeners();
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            document.getElementById('prevBtn').addEventListener('click', () => changeSlide(-1));
+            document.getElementById('nextBtn').addEventListener('click', () => changeSlide(1));
+            const startBtn = document.getElementById('startQuizBtn');
+            startBtn && startBtn.addEventListener('click', startQuiz);
+            const nextQ = document.getElementById('nextQuestionBtn');
+            nextQ && nextQ.addEventListener('click', nextQuestion);
+            const restartQ = document.getElementById('restartQuizBtn');
+            restartQ && restartQ.addEventListener('click', restartQuiz);
+            const backBtnInSlide = document.getElementById('backToMapBtn');
+            backBtnInSlide && backBtnInSlide.addEventListener('click', backToMap);
+            const backBtnTop = document.querySelector('.back-btn');
+            backBtnTop && backBtnTop.addEventListener('click', (e) => {
+                e.preventDefault();
+                backToMap();
+            });
+
+            // Keyboard navigation (ignore inputs)
+            window.addEventListener('keydown', (e) => {
+                const tag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : '';
+                if (['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(tag)) return;
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    changeSlide(-1);
+                }
+                if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    changeSlide(1);
+                }
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    backToMap();
+                } // ESC pro rychlý návrat
+            });
+
+            // Slide indicators
+            document.querySelectorAll('.indicator').forEach(indicator => {
+                indicator.addEventListener('click', (e) => {
+                    const targetSlide = parseInt(e.target.dataset.slide);
+                    goToSlide(targetSlide);
+                });
+            });
+
+            // Quiz answers
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('answer-btn') && quizStarted) {
+                    selectAnswer(e.target);
+                }
+            });
+        }
+
+        // Change slide
+        function changeSlide(direction) {
+            const newSlide = currentSlide + direction;
+            if (newSlide >= 1 && newSlide <= totalSlides) {
+                goToSlide(newSlide);
+            }
+        }
+
+        // Go to specific slide
+        function goToSlide(slideNumber) {
+            currentSlide = slideNumber;
+            updateSlideDisplay();
+            // Delay reveal animations slightly for better effect
+            setTimeout(() => {
+                revealBulletPoints();
+            }, 200);
+        }
+
+        // Update slide display
+        function updateSlideDisplay() {
+            // Hide all slides
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
+            });
+
+            // Show current slide
+            const currentSlideEl = document.querySelector(`.slide[data-slide="${currentSlide}"]`);
+            if (currentSlideEl) {
+                currentSlideEl.classList.add('active');
+            }
+
+            // Update navigation
+            document.getElementById('currentSlide').textContent = currentSlide;
+            document.getElementById('prevBtn').disabled = currentSlide === 1;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+
+            // Update indicators
+            document.querySelectorAll('.indicator').forEach((indicator, index) => {
+                indicator.classList.toggle('active', index + 1 === currentSlide);
+            });
+        }
+
+        // Reveal bullet points with animation
+        function revealBulletPoints() {
+            const currentSlideEl = document.querySelector(`.slide[data-slide="${currentSlide}"]`);
+            const bulletPoints = currentSlideEl.querySelectorAll('[data-reveal]');
+
+            if (bulletPoints.length > 0) {
+                bulletPoints.forEach((bullet, index) => {
+                    setTimeout(() => {
+                        bullet.classList.add('revealed');
+                    }, index * 400); // Slower reveal for better effect
+                });
+            }
+
+            // Special animations for recommendation grid
+            const recItems = currentSlideEl.querySelectorAll('.rec-item[data-reveal]');
+            if (recItems.length > 0) {
+                recItems.forEach((item, index) => {
+                    setTimeout(() => {
+                        item.classList.add('revealed');
+                    }, index * 500); // Slower reveal
+                });
+            }
+        }
+
+        // Quiz functions
+        function startQuiz() {
+            quizStarted = true;
+            currentQuestion = 0;
+            quizScore = 0;
+            goToSlide(8);
+            setTimeout(() => {
+                showQuestion();
+            }, 300);
+        }
+
+        function showQuestion() {
+            const question = quizQuestions[currentQuestion];
+            document.getElementById('questionNumber').textContent = currentQuestion + 1;
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('quizScore').textContent = quizScore;
+
+            // Update progress
+            const progress = ((currentQuestion) / quizQuestions.length) * 100;
+            document.getElementById('progressFillQuiz').style.width = progress + '%';
+
+            // Show answers
+            const answersContainer = document.getElementById('quizAnswers');
+            answersContainer.innerHTML = '';
+            question.answers.forEach(answer => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.dataset.answer = answer.charAt(0);
+                btn.textContent = answer;
+                answersContainer.appendChild(btn);
+            });
+
+            // Hide feedback and result
+            document.getElementById('quizFeedback').style.display = 'none';
+            document.getElementById('quizResult').style.display = 'none';
+            document.getElementById('quizAnswers').style.display = 'block';
+        }
+
+        function selectAnswer(answerBtn) {
+            const selectedAnswer = answerBtn.dataset.answer;
+            const correct = quizQuestions[currentQuestion].correct;
+
+            // Disable all answers
+            document.querySelectorAll('.answer-btn').forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('correct', 'incorrect');
+            });
+
+            // Show correct/incorrect
+            if (selectedAnswer === correct) {
+                answerBtn.classList.add('correct');
+                quizScore++;
+            } else {
+                answerBtn.classList.add('incorrect');
+                document.querySelector(`[data-answer="${correct}"]`).classList.add('correct');
+            }
+
+            // Update score
+            document.getElementById('quizScore').textContent = quizScore;
+
+            // Show feedback
+            setTimeout(() => {
+                const feedback = document.getElementById('quizFeedback');
+                feedback.querySelector('.feedback-text').textContent = quizQuestions[currentQuestion].feedback;
+                feedback.style.display = 'block';
+                document.getElementById('quizAnswers').style.display = 'none';
+            }, 2000); // Longer delay to see the result
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizQuestions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            const resultScore = document.getElementById('finalScore');
+            const resultMessage = document.getElementById('resultMessage');
+
+            resultScore.textContent = `${quizScore}/${quizQuestions.length}`;
+
+            let message = '';
+            if (quizScore === quizQuestions.length) {
+                message = 'Perfektní! Všechno sis zapamatoval! 🏆';
+            } else if (quizScore >= quizQuestions.length * 0.8) {
+                message = 'Výborně! Téměř všechno správně! ⭐';
+            } else if (quizScore >= quizQuestions.length * 0.6) {
+                message = 'Dobře! Můžeš si znovu projít prezentaci. 👍';
+            } else {
+                message = 'Zkus si znovu projít prezentaci a zkus to znovu! 📚';
+            }
+
+            resultMessage.textContent = message;
+
+            // Update progress to 100%
+            document.getElementById('progressFillQuiz').style.width = '100%';
+
+            // Show result
+            document.getElementById('quizFeedback').style.display = 'none';
+            document.getElementById('quizResult').style.display = 'block';
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            quizScore = 0;
+            goToSlide(7);
+            quizStarted = false;
+        }
+
+        function backToMap() {
+            // Zobraz loading a přesměruj na mapu po krátkém přechodu
+            if (overlay) {
+                buildStars();
+                overlay.classList.add('show');
+                animateLoading();
+                setTimeout(() => {
+                    window.location.href = 'prezentacer_main.html';
+                }, LOAD_DELAY);
+            } else {
+                window.location.href = 'prezentacer_main.html';
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    })();
+</script>
+
+<style>
+    /* PowerPoint specific styles will be added to main CSS */
+</style>
+
+</body>
+</html>
