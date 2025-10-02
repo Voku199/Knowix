@@ -134,5 +134,125 @@
       "Thanks, it’s helped me a lot.",
       "Thank you, this has really helped."
     ]
+  },
+  {
+    "alex": "I've been feeling really overwhelmed lately.",
+    "cz_reply": "Cítil jsem se také zahlcený v poslední době.",
+    "accepted_answers": [
+      "I've been feeling overwhelmed lately too.",
+      "I have also felt overwhelmed recently.",
+      "Same, I've been feeling really stressed.",
+      "I've been experiencing that feeling too.",
+      "I know exactly how you feel.",
+      "I've had similar feelings recently."
+    ]
+  },
+  {
+    "alex": "Have you ever felt like you have too much on your plate?",
+    "cz_reply": "Ano, často mám pocit, že toho mám příliš mnoho.",
+    "accepted_answers": [
+      "Yes, I often feel like I have too much to do.",
+      "I've definitely felt that way before.",
+      "Yeah, I've had that feeling many times.",
+      "I've experienced that overwhelming feeling.",
+      "Yes, I've felt like that quite often.",
+      "I know that feeling very well."
+    ]
+  },
+  {
+    "alex": "I've started making to-do lists to organize my thoughts.",
+    "cz_reply": "To je dobrý nápad. Pomáhá ti to?",
+    "accepted_answers": [
+      "That's a good idea. Does it help you?",
+      "Smart approach. Has it been helpful?",
+      "Good strategy. Is it working for you?",
+      "That sounds useful. Does it make a difference?",
+      "Wise choice. Has it improved things?",
+      "Great idea. Do you find it effective?"
+    ]
+  },
+  {
+    "alex": "Yes! I've felt more in control since I started doing it.",
+    "cz_reply": "Možná bych to měl také zkusit.",
+    "accepted_answers": [
+      "Maybe I should try that too.",
+      "I should probably give that a go.",
+      "Perhaps I'll start making lists as well.",
+      "I might try that approach.",
+      "That sounds like something I should do.",
+      "I should consider doing that too."
+    ]
+  },
+  {
+    "alex": "Have you talked to your family about how you're feeling?",
+    "cz_reply": "Ne, nechci je zatěžovat svými problémy.",
+    "accepted_answers": [
+      "No, I don't want to burden them with my problems.",
+      "I haven't, I don't want to worry them.",
+      "No, I prefer to handle it myself.",
+      "I don't want to stress them out.",
+      "No, I keep my feelings to myself.",
+      "I haven't shared my concerns with them."
+    ]
+  },
+  {
+    "alex": "I've learned that sharing actually makes me feel lighter.",
+    "cz_reply": "Opravdu? Nikdy jsem o tom takhle nepřemýšlel.",
+    "accepted_answers": [
+      "Really? I've never thought about it that way.",
+      "I hadn't considered that perspective.",
+      "That's an interesting point of view.",
+      "I never looked at it like that.",
+      "That's a different way to think about it.",
+      "I haven't thought of it from that angle."
+    ]
+  },
+  {
+    "alex": "Have you tried any mindfulness apps or meditation?",
+    "cz_reply": "Ne, ale slyšel jsem, že pomáhají.",
+    "accepted_answers": [
+      "No, but I've heard they help.",
+      "I haven't, but I've heard good things.",
+      "No, but people say they're helpful.",
+      "I haven't tried them, but I've heard they work.",
+      "No, but I've heard positive things about them.",
+      "I haven't, but they seem to be beneficial."
+    ]
+  },
+  {
+    "alex": "I've used one for a few weeks now, and it's made a difference.",
+    "cz_reply": "Jaký druh rozdílu jsi zpozoroval?",
+    "accepted_answers": [
+      "What kind of difference have you noticed?",
+      "How has it helped you specifically?",
+      "What changes have you experienced?",
+      "In what ways has it made a difference?",
+      "What improvements have you seen?",
+      "How exactly has it benefited you?"
+    ]
+  },
+  {
+    "alex": "I've become better at noticing when I'm getting stressed.",
+    "cz_reply": "To zní užitečné pro prevenci.",
+    "accepted_answers": [
+      "That sounds useful for prevention.",
+      "That seems helpful for early intervention.",
+      "That sounds like good self-awareness.",
+      "That's a valuable skill to have.",
+      "That could help catch stress early.",
+      "That sounds like effective self-monitoring."
+    ]
+  },
+  {
+    "alex": "Have you considered talking to a counselor or therapist?",
+    "cz_reply": "Přemýšlel jsem o tom, ale trochu se toho bojím.",
+    "accepted_answers": [
+      "I've thought about it, but I'm a bit scared.",
+      "I've considered it, but I'm nervous about it.",
+      "I've thought about that, but it feels intimidating.",
+      "I've considered it, but I'm hesitant.",
+      "I've thought about it, but I'm not sure.",
+      "I've considered that option, but I'm anxious about it."
+    ]
   }
 ]

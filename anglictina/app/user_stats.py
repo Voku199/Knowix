@@ -9,7 +9,7 @@ def ensure_user_stats_exists(user_id):
     exists = cur.fetchone()
     if not exists:
         cur.execute(
-            "INSERT INTO user_stats (user_id, total_lessons_done, correct_answers, wrong_answers, total_learning_time, last_active, total_psani_words, first_activity) VALUES (%s, 0, 0, 0, 0, NOW(), 0, NULL)",
+            "INSERT INTO user_stats (user_id, total_lessons_done, correct_answers, wrong_answers, total_learning_time, last_active, total_psani_words, first_activity, AI_poslech_minut) VALUES (%s, 0, 0, 0, 0, NOW(), 0, NULL, 0)",
             (user_id,)
         )
         conn.commit()
@@ -47,15 +47,10 @@ def set_first_activity_if_needed(user_id):
 def update_user_stats(user_id, correct=0, wrong=0, lesson_done=False, psani_words=0, hangman_words_guessed=0,
                       irregular_verbs_guessed=0, irregular_verbs_wrong=0, pp_wrong=0, pp_maybe=0, pp_correct=0,
                       roleplaying_cr=0, roleplaying_mb=0, roleplaying_wr=0, lis_cor=0, lis_wr=0, at_cor=0, at_wr=0,
-                      learning_time=None, set_first_activity=False):
+                      learning_time=None, set_first_activity=False, ai_poslech_minut=0, ai_poslech_seconds=0):
     """
-    Aktualizuje statistiky uživatele:
-    - Přičte správné a špatné odpovědi
-    - Inkrementuje počet dokončených lekcí, pokud lesson_done=True
-    - Přičte počet slov z psaní, pokud psani_words > 0
-    - Přičte počet uhodnutých slov v hangmanovi, pokud hangman_words_guessed > 0
-    - Přičte čas učení (learning_time) pokud je zadán
-    - Nastaví first_activity pokud set_first_activity=True
+    Aktualizuje statistiky uživatele v user_stats.
+    Důležité inkrementy: total_learning_time (sekundy), AI_poslech_seconds (sekundy pro AI Poslech), AI_poslech_minut (zpětná kompatibilita).
     """
     ensure_user_stats_exists(user_id)
     conn = get_db_connection()
@@ -116,6 +111,13 @@ def update_user_stats(user_id, correct=0, wrong=0, lesson_done=False, psani_word
     if learning_time is not None:
         updates.append("total_learning_time = total_learning_time + %s")
         params.append(int(learning_time))
+    if ai_poslech_seconds:
+        updates.append("AI_poslech_seconds = AI_poslech_seconds + %s")
+        params.append(int(ai_poslech_seconds))
+    if ai_poslech_minut:
+        updates.append("AI_poslech_minut = AI_poslech_minut + %s")
+        params.append(int(ai_poslech_minut))
+
     updates.append("last_active = NOW()")
 
     if not updates:

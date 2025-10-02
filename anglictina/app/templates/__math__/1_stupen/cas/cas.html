@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam.">
+    <meta name="keywords" content="angličtina, procvičování, písničky, testy, chat, výuka, zdarma, knowix, zábava, škola">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Knowix – Procvičování angličtiny zdarma">
+    <meta property="og:description" content="Procvičuj angličtinu zábavně pomocí písniček, chatu a testů. Bez reklam, zdarma.">
+    <meta property="og:url" content="https://www.knowix.cz">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://www.knowix.cz/static/og-banner.png">
+
+    <link rel="canonical" href="https://www.knowix.cz">
+
+    <title>Učíme se čas | Knowix</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/mobile_header.css">
+    <link rel="stylesheet" href="/static/__math__/1_stupen/math.css">
+
+    <!-- Preconnect zrychlí DNS a spojení -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Font načti až po načtení stránky -->
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    </noscript>
+
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-W1EN990JKP');
+    </script>
+
+    <style>
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 2rem 0;
+        }
+
+        .clock {
+            width: 300px;
+            height: 300px;
+            border: 8px solid #4a90e2;
+            border-radius: 50%;
+            position: relative;
+            background: linear-gradient(135deg, #87ceeb, #e0f6ff);
+            box-shadow: 0 0 20px rgba(74, 144, 226, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        .clock-face {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .hour-marker {
+            position: absolute;
+            width: 4px;
+            height: 30px;
+            background: #2c3e50;
+            left: 50%;
+            top: 10px;
+            transform-origin: 50% 140px;
+            border-radius: 2px;
+        }
+
+        .hour-number {
+            position: absolute;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            left: 50%;
+            top: 20px;
+            transform-origin: 50% 130px;
+            margin-left: -15px;
+        }
+
+        .hand {
+            position: absolute;
+            background: #2c3e50;
+            left: 50%;
+            bottom: 50%;
+            transform-origin: 50% 100%;
+            border-radius: 2px;
+            transition: transform 0.5s cubic-bezier(0.4, 2.3, 0.6, 1);
+        }
+
+        .hour-hand {
+            width: 6px;
+            height: 80px;
+            margin-left: -3px;
+            background: #e74c3c;
+            z-index: 2;
+        }
+
+        .minute-hand {
+            width: 4px;
+            height: 120px;
+            margin-left: -2px;
+            background: #2c3e50;
+            z-index: 3;
+        }
+
+        .center-dot {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #e74c3c;
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 4;
+            border: 3px solid white;
+        }
+
+        .time-display {
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .time-question {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .clock-emoji {
+            font-size: 2rem;
+            margin: 0 0.5rem;
+        }
+
+        .feedback-correct {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 1rem 0;
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        .feedback-wrong {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .math-input {
+            font-size: 1.2rem;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #4a90e2;
+            text-align: center;
+            width: 250px;
+            margin: 0 auto;
+        }
+
+        .time-format-hint {
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        .fun-elements {
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .encouragement {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #2c3e50;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 10px 0;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
+<header>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
+    </div>
+    <div class="nav-profile-wrapper">
+        <ul class="nav-right">
+            <li>
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
+            </li>
+        </ul>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="auth-links">
+            <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+            <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+        </div>
+        {% endif %}
+    </div>
+</header>
+
+<main class="exercise-wrapper">
+    <h1>🕐 Učíme se čas – 1. stupeň</h1>
+
+    <div class="fun-elements">
+        <div class="encouragement">
+            ⏰ Naučme se číst čas! ⏰
+        </div>
+    </div>
+
+    <form method="post" action="{{ url_for('cas.math') }}" class="math-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <label for="format">Formát odpovědi:</label>
+            <select id="format" name="format" class="math-select">
+                {% for key, meta in formats.items() %}
+                <option value="{{ key }}" {% if prefs.format == key %}selected{% endif %}>{{ meta.label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="math-btn">🔄 Uložit volbu / Vygenerovat nový čas</button>
+    </form>
+
+    {% if problem %}
+    <section class="exercise-panel">
+        <h2>🎯 Jaký je čas na hodinách?</h2>
+
+        <div class="clock-container">
+            <div class="clock">
+                <div class="clock-face">
+                    <!-- Hodinové značky a číslice -->
+                    {% for hour in range(1, 13) %}
+                    <div class="hour-marker" style="transform: translateX(-50%) rotate({{ (hour - 1) * 30 }}deg);"></div>
+                    <div class="hour-number" style="transform: translateX(-50%) rotate({{ (hour - 1) * 30 }}deg) translateY(-130px) rotate({{ -((hour - 1) * 30) }}deg);">{{ hour }}</div>
+                    {% endfor %}
+
+                    <!-- Ručičky - opravené zobrazení -->
+                    <div class="hand hour-hand" style="transform: translateX(-50%) rotate({{ problem.angle_hour }}deg);"></div>
+                    <div class="hand minute-hand" style="transform: translateX(-50%) rotate({{ problem.angle_minute }}deg);"></div>
+                    <div class="center-dot"></div>
+                </div>
+            </div>
+
+            <div class="time-display">
+                <div class="time-question">
+                    <span class="clock-emoji">🕐</span>
+                    Kolik je hodin?
+                    <span class="clock-emoji">🕐</span>
+                </div>
+                {% if prefs.format == 'digital' %}
+                <div class="time-format-hint">Napiš čas v číselném formátu (např. 14:30)</div>
+                {% elif prefs.format == 'words' %}
+                <div class="time-format-hint">Napiš čas slovně (např. půl třetí, čtvrt na osm)</div>
+                {% else %}
+                <div class="time-format-hint">Napiš čas číselně (14:30) nebo slovně (půl třetí)</div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if result is not none %}
+            {% if result.correct %}
+                <p class="feedback-correct">🎉 Výborně! Máš to správně! 🎉</p>
+            {% else %}
+                <p class="feedback-wrong">🤔 Skoro to! Tvoje odpověď: <strong>{{ result.given }}</strong><br>
+                Správně je: <strong>{{ result.expected }}</strong></p>
+            {% endif %}
+        {% endif %}
+
+        <form method="post" action="{{ url_for('cas.math') }}" class="math-answer-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="format" value="{{ prefs.format }}">
+            <input type="text" name="answer" placeholder="Tvoje odpověď..." required class="math-input" autofocus>
+            <button type="submit" class="math-btn">✅ Odeslat a vygenerovat další</button>
+        </form>
+
+        <div class="fun-elements">
+            {% if result and result.correct %}
+            <div class="encouragement">
+                🌟 Skvělá práce! Pokračuj dál! 🌟
+            </div>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+    <p><a href="{{ url_for('math.stupen1') }}" class="back-link">← Zpět na 1. stupeň</a></p>
+</main>
+
+<script>
+// Jednoduché animace pro zábavnost
+document.addEventListener('DOMContentLoaded', function() {
+    // Animace úspěchu
+    const correctFeedback = document.querySelector('.feedback-correct');
+    if (correctFeedback) {
+        setTimeout(() => {
+            correctFeedback.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                correctFeedback.style.transform = 'scale(1)';
+            }, 200);
+        }, 100);
+    }
+
+    // Focus na input při načtení
+    const answerInput = document.querySelector('input[name="answer"]');
+    if (answerInput) {
+        answerInput.focus();
+    }
+});
+</script>
+<script>const CSRF_TOKEN = "{{ csrf_token() }}";</script>
+<script>
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        fetch('/set_theme', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
+            body: JSON.stringify({
+                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark',
+                csrf_token: CSRF_TOKEN
+            })
+        }).then(r => {
+            if (r.ok) {
+                document.body.classList.toggle('dark-mode');
+                sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -134,5 +134,125 @@
       "Thanks, you too!",
       "Thank you, you too!"
     ]
+  },
+  {
+    "alex": "Have you finished your science project yet?",
+    "cz_reply": "Ne, ještě jsem ho nedokončil.",
+    "accepted_answers": [
+      "No, I haven't finished it yet.",
+      "I haven't completed it yet.",
+      "No, I'm still working on it.",
+      "I haven't finished it completely.",
+      "Not yet, I'm still doing it.",
+      "No, I still need to finish it."
+    ]
+  },
+  {
+    "alex": "What topic have you chosen for your project?",
+    "cz_reply": "Vybral jsem si téma o solární energii.",
+    "accepted_answers": [
+      "I've chosen the topic of solar energy.",
+      "I picked solar energy as my topic.",
+      "I've selected solar energy.",
+      "My topic is solar energy.",
+      "I chose to write about solar energy.",
+      "Solar energy is my chosen topic."
+    ]
+  },
+  {
+    "alex": "That's interesting! Have you done research on it?",
+    "cz_reply": "Ano, našel jsem spoustu informací online.",
+    "accepted_answers": [
+      "Yes, I've found lots of information online.",
+      "I've discovered plenty of information on the internet.",
+      "Yes, I've researched it extensively online.",
+      "I've found a lot of useful information online.",
+      "Yes, there's tons of information available online.",
+      "I've gathered lots of data from the internet."
+    ]
+  },
+  {
+    "alex": "Have you started writing the report?",
+    "cz_reply": "Začal jsem, ale zatím jsem nenapsal moc.",
+    "accepted_answers": [
+      "I've started, but I haven't written much yet.",
+      "I began writing, but there's not much so far.",
+      "I've started it, but haven't written a lot.",
+      "I began the report, but it's still quite short.",
+      "I've made a start, but haven't written much.",
+      "I started writing, but I need to do more."
+    ]
+  },
+  {
+    "alex": "When is the deadline for submission?",
+    "cz_reply": "Máme to odevzdat příští pátek.",
+    "accepted_answers": [
+      "We have to submit it next Friday.",
+      "It's due next Friday.",
+      "The deadline is next Friday.",
+      "We need to hand it in next Friday.",
+      "It must be submitted by next Friday.",
+      "Next Friday is the submission date."
+    ]
+  },
+  {
+    "alex": "Have you talked to the teacher about your progress?",
+    "cz_reply": "Ne, ale plánuju se jí zeptat na radu.",
+    "accepted_answers": [
+      "No, but I plan to ask her for advice.",
+      "I haven't, but I'm planning to ask for her guidance.",
+      "No, but I want to get her advice.",
+      "I haven't yet, but I plan to seek her help.",
+      "No, but I'm going to ask for her suggestions.",
+      "I haven't, but I intend to consult with her."
+    ]
+  },
+  {
+    "alex": "That's a good idea. Have you created any diagrams or charts?",
+    "cz_reply": "Ano, udělal jsem diagram solárního panelu.",
+    "accepted_answers": [
+      "Yes, I've made a diagram of a solar panel.",
+      "I've created a solar panel diagram.",
+      "Yes, I've drawn a diagram showing a solar panel.",
+      "I've made a diagram illustrating solar panels.",
+      "Yes, I've designed a solar panel diagram.",
+      "I've created a visual diagram of solar panels."
+    ]
+  },
+  {
+    "alex": "Have you included any statistics in your project?",
+    "cz_reply": "Ano, přidal jsem statistiky o účinnosti solární energie.",
+    "accepted_answers": [
+      "Yes, I've added statistics about solar energy efficiency.",
+      "I've included data on solar energy efficiency.",
+      "Yes, I've incorporated efficiency statistics.",
+      "I've added statistical information about solar efficiency.",
+      "Yes, I've included efficiency data.",
+      "I've put in statistics about how efficient solar energy is."
+    ]
+  },
+  {
+    "alex": "Have you practiced your presentation yet?",
+    "cz_reply": "Ne, ještě jsem neprezentoval před nikým.",
+    "accepted_answers": [
+      "No, I haven't presented to anyone yet.",
+      "I haven't practiced presenting to anyone.",
+      "No, I haven't done any practice presentations.",
+      "I haven't presented it to anyone so far.",
+      "No, I haven't practiced speaking in front of people.",
+      "I haven't done any practice runs yet."
+    ]
+  },
+  {
+    "alex": "You should practice with your family. Have you prepared any visual aids?",
+    "cz_reply": "Ano, připravil jsem PowerPoint prezentaci.",
+    "accepted_answers": [
+      "Yes, I've prepared a PowerPoint presentation.",
+      "I've created a PowerPoint slideshow.",
+      "Yes, I've made a PowerPoint presentation.",
+      "I've prepared slides using PowerPoint.",
+      "Yes, I've put together a PowerPoint.",
+      "I've created a presentation in PowerPoint."
+    ]
   }
 ]

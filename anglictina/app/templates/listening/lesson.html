@@ -299,6 +299,7 @@
         and lot of ☕
     </p>
 </footer>
+<script>const CSRF_TOKEN = "{{ csrf_token() }}";</script>
 
 <script defer>
 document.addEventListener('DOMContentLoaded', function () {
@@ -511,22 +512,22 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Theme toggle
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            fetch('/set_theme', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark'
-                })
-            }).then(() => {
-                document.body.classList.toggle('dark-mode');
-                localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-            });
-        });
-    }
 
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        fetch('/set_theme', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
+            body: JSON.stringify({
+                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark',
+                csrf_token: CSRF_TOKEN
+            })
+        }).then(r => {
+            if (r.ok) {
+                document.body.classList.toggle('dark-mode');
+                sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            }
+        });
+    });
     // Profile menu handling
     const profileMenu = document.getElementById('profileMenu');
     const profileMenuTrigger = document.getElementById('profileMenuTrigger');

@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description"
+          content="Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam.">
+    <meta name="keywords"
+          content="angličtina, procvičování, písničky, testy, chat, výuka, zdarma, knowix, zábava, škola">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Knowix – Procvičování angličtiny zdarma">
+    <meta property="og:description"
+          content="Procvičuj angličtinu zábavně pomocí písniček, chatu a testů. Bez reklam, zdarma.">
+    <meta property="og:url" content="https://www.knowix.cz">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://knowix.cz/static/og-banner.png">
+
+    <link rel="canonical" href="https://www.knowix.cz">
+
+
+    <title>AI Mluvení | Knowix</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/mobile_header.css">
+
+    <!-- Preconnect zrychlí DNS a spojení -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Font načti až po načtení stránky -->
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    </noscript>
+
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-W1EN990JKP');
+    </script>
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Knowix",
+            "url": "https://www.knowix.cz",
+            "description": "Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam."
+        }
+    </script>
+
+    <style>
+        body {
+            background: #f5f7fb;
+        }
+
+        .wrap {
+            max-width: 880px;
+            margin: 0 auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .stage {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* STICKMAN */
+        .stickman {
+            width: min(80vw, 360px);
+            height: auto;
+            --mouth: 0;
+            --bob: 0;
+        }
+
+        .skin {
+            fill: #fff;
+            stroke: #e5e7eb;
+            stroke-width: 2;
+        }
+
+        /* čáry stickmana */
+        .line {
+            stroke: #111827;
+            stroke-width: 6;
+            stroke-linecap: round;
+            fill: none;
+        }
+
+        .eye {
+            fill: #111827;
+        }
+
+        /* obočí odstraněno */
+        .mouth {
+            fill: #111827;
+            transform-box: fill-box;
+            transform-origin: 50% 50%;
+        }
+
+        .head {
+            transform-box: fill-box;
+            transform-origin: 50% 50%;
+        }
+
+        .smile {
+            fill: none;
+            stroke: #111827;
+            stroke-width: 3;
+            stroke-linecap: round;
+            opacity: 0;
+            transition: opacity .1s linear;
+        }
+
+        svg:not([data-speaking]) .smile {
+            opacity: 1;
+        }
+
+        svg[data-speaking] .smile {
+            opacity: 0;
+        }
+
+        /* ženský úsměv jemnější barvou */
+        svg[data-gender="female"] .smile {
+            stroke: #e11d48;
+            stroke-width: 2.2;
+        }
+
+        /* Emocní výrazy – Surprised zvětší oči škálou */
+        svg[data-emotion="Surprised"] .eye {
+            transform: scale(1.5);
+        }
+
+        svg .eye {
+            transition: transform .15s ease;
+        }
+
+        /* Mluvení: výška pusy řízená CSS proměnnou --mouth (0..1) */
+        .mouth {
+            transform: scaleY(calc(0.15 + var(--mouth, 0) * 1.0));
+            transition: transform .05s linear;
+        }
+
+        .head {
+            transform: translateY(calc(var(--bob, 0) * -6px));
+            transition: transform .05s linear;
+        }
+
+        .status { color: #6b7280; font-size: .95em; min-height: 1.2em; }
+        .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; }
+        .mic { margin-top: 6px; background: #10b981; color: #fff; border: none; border-radius: 50%; width: 82px; height: 82px; font-size: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 24px rgba(16, 185, 129, .35); transition: transform .1s ease; }
+        .mic:hover { transform: translateY(-1px); }
+        .mic.listening { background: #ef4444; box-shadow: 0 10px 24px rgba(239, 68, 68, .35); }
+        .cc { height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid #d1d5db; background: #111827; color: #fff; font-weight: 700; cursor: pointer; }
+        .cc.active { background: #2563eb; border-color: #1d4ed8; }
+        .gender { display: flex; gap: 8px; }
+        .gender-btn { height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid #d1d5db; background: #fff; color: #111827; font-weight: 700; cursor: pointer; }
+        .gender-btn.active { background: #2563eb; color: #fff; border-color: #1d4ed8; }
+        .hint { color: #6b7280; font-size: .9em; }
+
+        /* Titulky */
+        .caption { min-height: 40px; max-width: 720px; text-align: center; color: #111827; background: #fff; border: 1px solid #e5e7eb; padding: 10px 14px; border-radius: 12px; box-shadow: 0 6px 18px rgba(0, 0, 0, .06); }
+        .caption.hidden { visibility: hidden; }
+
+        /* Female-only části */
+        .female-only { display: none; }
+        svg[data-gender="female"] .female-only { display: block; }
+        svg:not([data-speaking])[data-gender="female"] .mouth { opacity: 0; }
+
+        /* Stats panel */
+        .stats { width: 100%; max-width: 720px; background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:12px 14px; box-shadow:0 6px 18px rgba(0,0,0,.06); }
+        .stats-row { display:flex; gap:14px; align-items:center; flex-wrap:wrap; justify-content:space-between; }
+        .stat { color:#111827; font-weight:600; }
+        .progress-wrap { flex:1; min-width: 220px; }
+        .progress-bar { height:10px; background:#e5e7eb; border-radius: 999px; overflow:hidden; }
+        .progress { height:100%; width:0%; background:#f59e0b; transition: width .2s ease; }
+        .progress-label { font-size:.9em; color:#6b7280; margin-top:6px; display:flex; justify-content:space-between; }
+
+
+
+        /* Stickman – vyšší kontrast v dark-mode */
+        .dark-mode .line { stroke: #e5e7eb; }
+        .dark-mode .eye { fill: #000000; }
+        .dark-mode .mouth { fill: #e5e7eb; }
+        .dark-mode .smile { stroke: #000000; }
+        .dark-mode svg[data-gender="female"] .smile { stroke: #f472b6; }
+        /* Hlava ponechána bílá, obrys zjemněn */
+        .dark-mode .skin { fill: #ffffff; stroke: #334155; }
+
+        /* Titulky (CC) */
+        .dark-mode .caption { background: #111827; border-color: #334155; color: #e5e7eb; }
+
+        /* Stats panel */
+        .dark-mode .stats { background:#0b1220; border-color:#334155; }
+        .dark-mode .stat { color:#e5e7eb; }
+        .dark-mode .progress-bar { background:#334155; }
+        .dark-mode .progress { background:#f59e0b; }
+        .dark-mode .progress-label { color:#94a3b8; }
+
+        /* Přepínače pohlaví a CC tlačítko */
+        .dark-mode .gender-btn { background:#0b1220; color:#e5e7eb; border-color:#334155; }
+        .dark-mode .gender-btn.active { background:#2563eb; color:#fff; border-color:#1d4ed8; }
+        .dark-mode .cc { background:#0b1220; color:#e5e7eb; border-color:#334155; }
+        .dark-mode .cc.active { background:#2563eb; border-color:#1d4ed8; color:#fff; }
+    </style>
+</head>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
+<header>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
+    </div>
+    <div class="nav-profile-wrapper">
+        <ul class="nav-right">
+            <li>
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
+            </li>
+<!--            <li>-->
+<!--                <a href="/math" title="Matematika">-->
+<!--                    <img src="{{ url_for('static', filename='icons/math.png') }}" alt="Angličtina" class="nav-icon">-->
+<!--                </a>-->
+<!--            </li>-->
+            <li>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
+            </li>
+        </ul>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic"
+                     onerror="this.onerror=null; this.src='{{ url_for('static', filename='pic/default.webp') }}';">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
+</header>
+<div class="wrap">
+    <h1 style="margin:0;">AI Poslech – mluv a poslouchej</h1>
+    <div class="hint">Stiskni mikrofon, řekni anglickou větu. AI odpoví nahlas. Titulky (CC) jsou volitelné. Přepni
+        pohlaví ♂/♀.
+    </div>
+
+    <div class="stage">
+        <!-- STICKMAN SVG -->
+        <svg id="stickman" class="stickman" viewBox="0 0 200 260" data-emotion="Happy" data-gender="male"
+             aria-label="AI stickman">
+            <!-- hlava -->
+            <g class="head" id="head">
+                <circle class="skin" cx="100" cy="60" r="38"/>
+                <!-- oči -->
+                <circle class="eye" cx="86" cy="54" r="5"/>
+                <circle class="eye" cx="114" cy="54" r="5"/>
+                <!-- úsměv (viditelný, když nemluví) -->
+                <path class="smile" d="M90 78 q10 8 20 0"/>
+                <!-- pusa (otevírání dle --mouth) -->
+                <ellipse id="mouthOpen" class="mouth" cx="100" cy="72" rx="10" ry="3"/>
+            </g>
+            <!-- tělo -->
+            <line class="line" x1="100" y1="98" x2="100" y2="160"/>
+            <!-- ruce -->
+            <line class="line" x1="100" y1="110" x2="60" y2="135"/>
+            <line class="line" x1="100" y1="110" x2="140" y2="135"/>
+            <!-- prsa (jen female) -->
+            <path class="line female-only" d="M82 120 q6 8 12 0"/>
+            <path class="line female-only" d="M106 120 q6 8 12 0"/>
+            <!-- nohy -->
+            <line class="line" x1="100" y1="160" x2="75" y2="210"/>
+            <line class="line" x1="100" y1="160" x2="125" y2="210"/>
+        </svg>
+
+        <div class="controls">
+            <button id="micBtn" class="mic" title="Mluvit" aria-pressed="false">🎤</button>
+            <button id="ccBtn" class="cc" aria-pressed="false" title="Subtitles">CC</button>
+            <div class="gender" role="group" aria-label="Gender">
+                <button id="genderMale" class="gender-btn" aria-pressed="true" title="Male">♂</button>
+                <button id="genderFemale" class="gender-btn" aria-pressed="false" title="Female">♀</button>
+            </div>
+        </div>
+        <div id="status" class="status"></div>
+        <div id="caption" class="caption hidden"><span id="captionText"></span></div>
+
+        <!-- Stats panel -->
+        <div class="stats" id="statsPanel" aria-live="polite">
+            <div class="stats-row">
+                <div class="stat"><span id="spokenTime">0:00</span> mluvení</div>
+                <div class="stat"><span id="sentenceCount">0</span> vět</div>
+                <div class="progress-wrap">
+                    <div class="progress-bar"><div class="progress" id="streakProgress"></div></div>
+                    <div class="progress-label"><span>Směrem ke streaku</span><span id="streakRemaining">2:30 zbývá</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p class="footer-signature">
+        Made with ❤️ by
+        <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+        and lot of ☕
+    </p>
+</footer>
+<script>
+    (function () {
+        const micBtn = document.getElementById('micBtn');
+        const ccBtn = document.getElementById('ccBtn');
+        const statusEl = document.getElementById('status');
+        const svg = document.getElementById('stickman');
+        const caption = document.getElementById('caption');
+        const captionText = document.getElementById('captionText');
+        const btnMale = document.getElementById('genderMale');
+        const btnFemale = document.getElementById('genderFemale');
+        const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        // Stats UI
+        const spokenTimeEl = document.getElementById('spokenTime');
+        const sentenceCountEl = document.getElementById('sentenceCount');
+        const streakRemainingEl = document.getElementById('streakRemaining');
+        const streakProgressEl = document.getElementById('streakProgress');
+
+        let recognition = null;
+        let listening = false;
+        let ccOn = (localStorage.getItem('ai_cc') === '1');
+        let lastAIText = '';
+        let gender = (localStorage.getItem('ai_gender') || 'male');
+        let recStart = 0;
+        let lastSpokenMs = 0;
+        const STREAK_MS = 150000; // 2.5 min
+
+        updateCCUI();
+        applyGender(gender);
+
+        function formatMs(ms) {
+            ms = Math.max(0, Math.floor(ms || 0));
+            const s = Math.floor(ms / 1000);
+            const m = Math.floor(s / 60);
+            const sec = s % 60;
+            return m + ':' + String(sec).padStart(2, '0');
+        }
+
+        async function refreshStats() {
+            try {
+                const r = await fetch('/ai-poslech/stats', {headers: {'X-CSRFToken': csrf}});
+                if (!r.ok) return;
+                const d = await r.json();
+                const t = d.total_spoken_ms || 0;
+                const sc = d.sentence_count || 0;
+                const thr = d.streak_threshold_ms || STREAK_MS;
+                const rem = Math.max(0, (d.remaining_ms != null ? d.remaining_ms : (thr - t)));
+                const pct = Math.max(0, Math.min(100, Math.round((t / thr) * 100)));
+                spokenTimeEl.textContent = formatMs(t);
+                sentenceCountEl.textContent = sc;
+                streakRemainingEl.textContent = (rem === 0 ? 'Hotovo!' : (formatMs(rem) + ' zbývá'));
+                streakProgressEl.style.width = pct + '%';
+            } catch (_) {}
+        }
+
+        function updateCCUI() {
+            ccBtn.classList.toggle('active', ccOn);
+            ccBtn.setAttribute('aria-pressed', ccOn ? 'true' : 'false');
+            if (ccOn) {
+                caption.classList.remove('hidden');
+                captionText.textContent = lastAIText || '';
+            } else {
+                caption.classList.add('hidden');
+                captionText.textContent = '';
+            }
+        }
+
+        function setStatus(t) {
+            statusEl.textContent = t || '';
+        }
+
+        // === EMOCE ===
+        const EMO_MAP = {
+            'HAPPY': 'Happy',
+            'SAD': 'Sad',
+            'CALM': 'Calm',
+            'EXCITED': 'Excited',
+            'CONFUSED': 'Confused',
+            'ANGRY': 'Angry',
+            'SURPRISED': 'Surprised',
+            'FIRM': 'Angry'
+        };
+
+        function parseEmotionAndCleanText(s) {
+            if (!s) return {emotion: 'Happy', clean: ''};
+            const m = s.match(/^\s*\[([^\]]+)\]\s*(.*)$/);
+            if (!m) return {emotion: 'Happy', clean: s};
+            const raw = (m[1] || '').trim().toUpperCase();
+            const emotion = EMO_MAP[raw] || 'Happy';
+            const clean = (m[2] || '').trim();
+            return {emotion, clean};
+        }
+
+        function setEmotion(e) {
+            svg.setAttribute('data-emotion', e);
+        }
+
+        // === Mluvení (otevírání pusy) ===
+        function setMouth(val) {
+            const v = Math.max(0, Math.min(1, val || 0));
+            svg.style.setProperty('--mouth', v.toFixed(3));
+            svg.style.setProperty('--bob', v.toFixed(3));
+        }
+
+        async function ensureMicPermission() {
+            try {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    const s = await navigator.mediaDevices.getUserMedia({audio: true});
+                    s.getTracks().forEach(t => t.stop());
+                }
+            } catch (e) {
+            }
+        }
+
+        function setSpeaking(on) {
+            if (on) {
+                svg.setAttribute('data-speaking', '1');
+            } else {
+                svg.removeAttribute('data-speaking');
+            }
+        }
+
+        // Audio vizualizace pro MP3
+        async function playWithViz(audio) {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                const ctx = new AudioCtx();
+                await ctx.resume();
+                const src = ctx.createMediaElementSource(audio);
+                const analyser = ctx.createAnalyser();
+                analyser.fftSize = 1024;
+                src.connect(analyser);
+                analyser.connect(ctx.destination);
+                const arr = new Uint8Array(analyser.fftSize);
+                let raf = null;
+
+                function loop() {
+                    analyser.getByteTimeDomainData(arr);
+                    let sum = 0;
+                    for (let i = 0; i < arr.length; i++) {
+                        const v = (arr[i] - 128) / 128;
+                        sum += v * v;
+                    }
+                    let rms = Math.sqrt(sum / arr.length);
+                    let amp = Math.min(1, Math.max(0, (rms - 0.02) * 4));
+                    setMouth(amp);
+                    raf = requestAnimationFrame(loop);
+                }
+
+                audio.addEventListener('play', () => {
+                    setSpeaking(true);
+                    loop();
+                });
+
+                function stop() {
+                    if (raf) cancelAnimationFrame(raf);
+                    setMouth(0);
+                    setSpeaking(false);
+                    try {
+                        ctx.close();
+                    } catch (_) {
+                    }
+                }
+
+                audio.addEventListener('ended', stop);
+                audio.addEventListener('pause', stop);
+                await audio.play();
+            } catch (e) {
+                // fallback: jemné pulzování během přehrávání
+                let t = 0, timer = null;
+                audio.addEventListener('play', () => {
+                    setSpeaking(true);
+                    timer = setInterval(() => {
+                        const amp = (Math.sin(t) + 1) / 2 * 0.6;
+                        t += 0.3;
+                        setMouth(amp);
+                    }, 60);
+                });
+                audio.addEventListener('ended', () => {
+                    if (timer) clearInterval(timer);
+                    setMouth(0);
+                    setSpeaking(false);
+                });
+                try {
+                    await audio.play();
+                } catch (_) {
+                }
+            }
+        }
+
+        async function speak(text) {
+            try {
+                const resp = await fetch('/ai-poslech/tts', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrf},
+                    body: JSON.stringify({text, gender})
+                });
+                if (!resp.ok) throw new Error('TTS HTTP ' + resp.status);
+                const blob = await resp.blob();
+                const url = URL.createObjectURL(blob);
+                const audio = new Audio(url);
+                await playWithViz(audio);
+            } catch (e) {
+                // Fallback: SpeechSynthesis s výběrem hlasu podle pohlaví
+                if ('speechSynthesis' in window) {
+                    const u = new SpeechSynthesisUtterance(text);
+                    u.lang = 'en-US';
+
+                    // Pokus o výběr hlasu podle pohlaví
+                    const voices = speechSynthesis.getVoices();
+                    if (voices.length > 0) {
+                        if (gender === 'female') {
+                            // Hledáme ženský hlas
+                            const femaleVoice = voices.find(v =>
+                                v.lang.startsWith('en') &&
+                                (v.name.toLowerCase().includes('female') ||
+                                    v.name.toLowerCase().includes('woman') ||
+                                    v.name.toLowerCase().includes('zira') ||
+                                    v.name.toLowerCase().includes('susan') ||
+                                    v.name.toLowerCase().includes('samantha'))
+                            );
+                            if (femaleVoice) u.voice = femaleVoice;
+                        } else {
+                            // Hledáme mužský hlas
+                            const maleVoice = voices.find(v =>
+                                v.lang.startsWith('en') &&
+                                (v.name.toLowerCase().includes('male') ||
+                                    v.name.toLowerCase().includes('man') ||
+                                    v.name.toLowerCase().includes('david') ||
+                                    v.name.toLowerCase().includes('mark') ||
+                                    v.name.toLowerCase().includes('alex'))
+                            );
+                            if (maleVoice) u.voice = maleVoice;
+                        }
+                    }
+
+                    let t = 0, timer = null;
+                    u.onstart = () => {
+                        setSpeaking(true);
+                        timer = setInterval(() => {
+                            const amp = (Math.sin(t) + 1) / 2 * 0.6;
+                            t += 0.3;
+                            setMouth(amp);
+                        }, 60);
+                    };
+                    u.onend = () => {
+                        if (timer) clearInterval(timer);
+                        setMouth(0);
+                        setSpeaking(false);
+                    };
+                    speechSynthesis.speak(u);
+                }
+            }
+        }
+
+        async function sendToAI(text, spokenMs) {
+            setStatus('Přemýšlím...');
+            try {
+                const r = await fetch('/ai-poslech/message', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrf},
+                    body: JSON.stringify({text, gender, spoken_ms: Math.floor(spokenMs || 0)})
+                });
+                const data = await r.json();
+                if (!r.ok) throw new Error(data && (data.error || data.ai_error_msg) || ('HTTP ' + r.status));
+                const raw = data.reply || '';
+                const {emotion, clean} = parseEmotionAndCleanText(raw);
+                setEmotion(emotion);
+                lastAIText = clean;
+                if (ccOn) {
+                    captionText.textContent = clean;
+                }
+                setStatus('');
+                await speak(clean);
+                // Update stats UI (from response if present; else fetch)
+                if (data.stats) {
+                    const t = data.stats.total_spoken_ms || 0;
+                    const sc = data.stats.sentence_count || 0;
+                    const thr = data.stats.streak_threshold_ms || STREAK_MS;
+                    const rem = Math.max(0, thr - t);
+                    const pct = Math.max(0, Math.min(100, Math.round((t / thr) * 100)));
+                    spokenTimeEl.textContent = formatMs(t);
+                    sentenceCountEl.textContent = sc;
+                    streakRemainingEl.textContent = (rem === 0 ? 'Hotovo!' : (formatMs(rem) + ' zbývá'));
+                    streakProgressEl.style.width = pct + '%';
+                } else {
+                    refreshStats();
+                }
+            } catch (e) {
+                setStatus('Chyba: ' + e.message);
+            }
+        }
+
+        function initSR() {
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SR) {
+                micBtn.disabled = true;
+                micBtn.title = 'Prohlížeč nepodporuje rozpoznávání řeči';
+                setStatus('Tento prohlížeč neumí rozpoznávání řeči.');
+                return;
+            }
+            recognition = new SR();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.continuous = false;
+            recognition.onstart = () => {
+                listening = true;
+                recStart = performance.now();
+                lastSpokenMs = 0;
+                micBtn.classList.add('listening');
+                micBtn.setAttribute('aria-pressed', 'true');
+                setStatus('Poslouchám...');
+            };
+            recognition.onresult = (evt) => {
+                const t = evt.results[0][0].transcript;
+                // odhad doby mluvení do okamžiku výsledku
+                if (recStart) {
+                    lastSpokenMs = Math.max(0, performance.now() - recStart);
+                }
+                setStatus('');
+                sendToAI(t, lastSpokenMs);
+            };
+            recognition.onerror = (e) => {
+                setStatus('Mikrofon: ' + (e.error || 'chyba'));
+            };
+            recognition.onend = () => {
+                listening = false;
+                micBtn.classList.remove('listening');
+                micBtn.setAttribute('aria-pressed', 'false');
+                if (statusEl.textContent === 'Poslouchám...') setStatus('');
+                recStart = 0;
+            };
+        }
+
+        micBtn.addEventListener('click', async () => {
+            if (!recognition) return;
+            try {
+                if (!listening) {
+                    await ensureMicPermission();
+                    recognition.start();
+                } else {
+                    recognition.stop();
+                }
+            } catch (_) {
+            }
+        });
+        ccBtn.addEventListener('click', () => {
+            ccOn = !ccOn;
+            localStorage.setItem('ai_cc', ccOn ? '1' : '0');
+            updateCCUI();
+            if (ccOn) captionText.textContent = lastAIText || '';
+        });
+
+        function applyGender(g) {
+            gender = (g === 'female') ? 'female' : 'male';
+            svg.setAttribute('data-gender', gender);
+            btnMale.classList.toggle('active', gender === 'male');
+            btnFemale.classList.toggle('active', gender === 'female');
+            btnMale.setAttribute('aria-pressed', gender === 'male' ? 'true' : 'false');
+            btnFemale.setAttribute('aria-pressed', gender === 'female' ? 'true' : 'false');
+            localStorage.setItem('ai_gender', gender);
+        }
+
+        btnMale.addEventListener('click', () => applyGender('male'));
+        btnFemale.addEventListener('click', () => applyGender('female'));
+
+        // výchozí stav
+        setEmotion('Happy');
+        setMouth(0);
+        setSpeaking(false);
+        captionText.textContent = '';
+        initSR();
+        refreshStats();
+    })();
+</script>
+<script>const CSRF_TOKEN = "{{ csrf_token() }}";</script>
+<script>
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        fetch('/set_theme', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
+            body: JSON.stringify({
+                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark',
+                csrf_token: CSRF_TOKEN
+            })
+        }).then(r => {
+            if (r.ok) {
+                document.body.classList.toggle('dark-mode');
+                sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            }
+        });
+    });
+</script>
+</body>
+</html>

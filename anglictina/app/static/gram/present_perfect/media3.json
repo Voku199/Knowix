@@ -4,7 +4,11 @@
     "cz_reply": "Ano, viděl jsem ten nejnovější virální TikTok trend.",
     "accepted_answers": [
       "Yes, I have seen the latest viral TikTok trend.",
-      "I have watched the newest viral TikTok trend."
+      "I have watched the newest viral TikTok trend.",
+      "Yeah, I've seen that viral TikTok trend.",
+      "Yes, I've watched the latest trend.",
+      "I've seen it, it's everywhere.",
+      "Yeah, that trend is all over my feed."
     ]
   },
   {
@@ -12,7 +16,11 @@
     "cz_reply": "Lidé byli posedlí krátkými videi v poslední době.",
     "accepted_answers": [
       "People have been obsessed with short videos recently.",
-      "Everyone has loved short videos lately."
+      "Everyone has loved short videos lately.",
+      "Short videos have become really popular.",
+      "People can't get enough of short content.",
+      "Everyone's addicted to quick videos now.",
+      "Short-form content has taken over."
     ]
   },
   {
@@ -20,7 +28,11 @@
     "cz_reply": "Ne, tento týden jsem nepřidal žádné reels.",
     "accepted_answers": [
       "No, I haven't posted any reels this week.",
-      "Yes, I have posted some reels on Instagram this week."
+      "I haven't posted any reels recently.",
+      "No, I haven't made any reels this week.",
+      "I haven't uploaded any reels lately.",
+      "No reels from me this week.",
+      "I haven't been posting reels recently."
     ]
   },
   {
@@ -28,7 +40,11 @@
     "cz_reply": "Všiml jsem si, že reels dostávají více zhlédnutí než běžné příspěvky.",
     "accepted_answers": [
       "I have noticed that reels get more views than normal posts.",
-      "Reels have gotten more views than regular posts."
+      "Reels have gotten more views than regular posts.",
+      "I've seen that reels perform better.",
+      "Reels definitely get more engagement.",
+      "I've noticed reels are more popular.",
+      "Short videos get way more views."
     ]
   },
   {
@@ -36,7 +52,11 @@
     "cz_reply": "Ne, nikdy jsem nebyl virální na žádné platformě.",
     "accepted_answers": [
       "No, I haven't gone viral on any platform.",
-      "Yes, I have gone viral once."
+      "I've never gone viral anywhere.",
+      "No, I haven't had any viral content.",
+      "I've never had a viral post.",
+      "No viral moments for me.",
+      "I haven't experienced viral fame."
     ]
   },
   {
@@ -44,16 +64,59 @@
     "cz_reply": "Ano, sociální sítě změnily způsob, jak komunikujeme.",
     "accepted_answers": [
       "Yes, social media have changed how we communicate.",
-      "No, social media haven't changed communication that much."
+      "Social media have definitely changed communication.",
+      "They've completely transformed how we talk.",
+      "Yes, they've revolutionized communication.",
+      "Absolutely, communication is totally different now.",
+      "Social media have changed everything about communication."
     ]
   },
   {
     "alex": "I have used memes to express my mood more than once.",
-    "cz_reply": "Použil jsem memy k vyjádření nálady více než jednou.",
+    "cz_reply": "Já také, memes jsou perfektní způsob vyjádření.",
     "accepted_answers": [
-      "I have used memes to express my mood more than once.",
-      "Yes, I have used memes to show how I feel."
+      "Me too, memes are perfect for expression.",
+      "I have also used memes to show my feelings.",
+      "Same, memes say it all.",
+      "I've done that too, memes are great.",
+      "Memes are the perfect language.",
+      "I've used memes for expression many times."
+    ]
+  },
+  {
+    "alex": "Have you ever unfollowed someone because of their posts?",
+    "cz_reply": "Ano, přestal jsem sledovat někoho kvůli jeho příspěvkům.",
+    "accepted_answers": [
+      "Yes, I have unfollowed someone because of their posts.",
+      "I've unfollowed people for annoying posts.",
+      "Yes, I've had to unfollow some people.",
+      "I've unfollowed people who post too much.",
+      "Yes, some posts are just too much.",
+      "I've definitely unfollowed annoying people."
+    ]
+  },
+  {
+    "alex": "I have spent hours scrolling through social media today.",
+    "cz_reply": "Já také, je to návykové.",
+    "accepted_answers": [
+      "Me too, it's addictive.",
+      "I have also spent hours scrolling today.",
+      "Same, I can't stop scrolling.",
+      "I've been scrolling all day too.",
+      "It's so easy to lose track of time.",
+      "I've wasted so much time scrolling today."
+    ]
+  },
+  {
+    "alex": "Have you ever regretted posting something online?",
+    "cz_reply": "Ano, litoval jsem něčeho, co jsem zveřejnil online.",
+    "accepted_answers": [
+      "Yes, I have regretted posting something online.",
+      "I've definitely regretted some posts.",
+      "Yes, I've had post regret before.",
+      "I've regretted sharing things online.",
+      "Yes, I've posted things I shouldn't have.",
+      "I've had moments of social media regret."
     ]
   }
 ]
-

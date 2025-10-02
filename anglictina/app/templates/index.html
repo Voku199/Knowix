@@ -164,10 +164,8 @@
         </div>
     </section>
 </main>
-
-
+<script>const CSRF_TOKEN = "{{ csrf_token() }}";</script>
 <script>
-    const CSRF_TOKEN = "{{ csrf_token() }}";
     document.getElementById('theme-toggle').addEventListener('click', () => {
         fetch('/set_theme', {
             method: 'POST',

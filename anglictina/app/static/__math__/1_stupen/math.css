@@ -1,0 +1,206 @@
+/* Styl pro matematické procvičování (výběr + odpověď) */
+
+.exercise-wrapper {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 16px;
+    text-align: left;
+}
+
+.exercise-wrapper h1 {
+    text-align: left;
+    margin-bottom: 6px;
+}
+
+.math-form, .math-answer-form {
+    display: flex;
+    gap: 18px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin: 18px 0 14px 0;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 160px;
+}
+
+.form-group label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
+}
+
+.math-select, .math-input {
+    appearance: none;
+    padding: 10px 14px;
+    font-size: 1rem;
+    border: 2px solid #1976d2;
+    border-radius: 10px;
+    background: #fff;
+    color: #0d47a1;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(25, 118, 210, 0.08);
+    transition: border-color .2s, box-shadow .2s, background .25s;
+}
+
+.math-select:focus, .math-input:focus {
+    outline: none;
+    border-color: #0d47a1;
+    box-shadow: 0 4px 14px rgba(25, 118, 210, 0.20);
+}
+
+.math-btn {
+    background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+    color: #fff;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    letter-spacing: 0.4px;
+    box-shadow: 0 4px 14px rgba(25, 118, 210, 0.18);
+    transition: transform .15s, box-shadow .25s;
+}
+
+.math-btn:hover, .math-btn:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(25, 118, 210, 0.28);
+    outline: none;
+}
+
+.math-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 12px rgba(25, 118, 210, 0.25);
+}
+
+.exercise-panel {
+    margin-top: 20px;
+    padding: 22px 22px 24px 22px;
+    border: 2px solid #e3eef8;
+    border-radius: 16px;
+    background: linear-gradient(145deg, #ffffff 0%, #f4f9ff 100%);
+    box-shadow: 0 6px 26px -8px rgba(25, 118, 210, 0.20), 0 2px 8px rgba(25, 118, 210, 0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.exercise-panel:before {
+    content: "";
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 160px;
+    height: 160px;
+    background: radial-gradient(circle at center, rgba(25, 118, 210, 0.18), rgba(25, 118, 210, 0) 70%);
+    pointer-events: none;
+}
+
+.exercise-panel h2 {
+    text-align: left;
+    margin: 0 0 12px 0;
+}
+
+.current-problem {
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #0d47a1;
+    margin: 4px 0 14px 0;
+}
+
+.word-task-text {
+    font-size: 1.15rem;
+    line-height: 1.45;
+}
+
+.feedback-correct {
+    color: #2e7d32;
+    font-weight: 600;
+}
+
+.feedback-wrong {
+    color: #c62828;
+    font-weight: 600;
+}
+
+.math-answer-form .math-input {
+    width: 210px;
+}
+
+@media (max-width: 640px) {
+    .math-answer-form .math-input {
+        width: 170px;
+    }
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 28px;
+    text-decoration: none;
+    font-weight: 600;
+    color: #1565c0;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+body.dark-mode .back-link {
+    color: #64b5f6;
+}
+
+/* Dark mode */
+body.dark-mode .exercise-panel {
+    background: linear-gradient(160deg, #1f2429 0%, #1b1f23 100%);
+    border-color: #2a343e;
+    box-shadow: 0 6px 26px -8px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .exercise-panel:before {
+    background: radial-gradient(circle at center, rgba(25, 118, 210, 0.35), rgba(25, 118, 210, 0) 70%);
+}
+
+body.dark-mode .current-problem {
+    color: #64b5f6;
+}
+
+body.dark-mode .math-select, body.dark-mode .math-input {
+    background: #20262b;
+    border-color: #1976d2;
+    color: #e0f2ff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+body.dark-mode .math-select:focus, body.dark-mode .math-input:focus {
+    box-shadow: 0 4px 14px rgba(25, 118, 210, 0.55);
+}
+
+body.dark-mode .math-btn {
+    box-shadow: 0 4px 14px rgba(25, 118, 210, 0.45);
+}
+
+/* Focus ring */
+.math-btn:focus-visible, .math-select:focus-visible, .math-input:focus-visible {
+    outline: 2px solid #42a5f5;
+    outline-offset: 2px;
+}
+
+/* Subtle transition for main wrapper (already may exist globally) */
+.exercise-wrapper {
+    animation: fadeIn .6s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

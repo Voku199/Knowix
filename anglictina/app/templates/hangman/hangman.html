@@ -177,22 +177,25 @@
         and lot of ☕
     </p>
 </footer>
-
+<script>const CSRF_TOKEN = "{{ csrf_token() }}";</script>
 <script>
-    // theme-toggle.js
     document.getElementById('theme-toggle').addEventListener('click', () => {
         fetch('/set_theme', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
             body: JSON.stringify({
-                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark'
+                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark',
+                csrf_token: CSRF_TOKEN
             })
-        }).then(() => {
-            document.body.classList.toggle('dark-mode');
-            sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        }).then(r => {
+            if (r.ok) {
+                document.body.classList.toggle('dark-mode');
+                sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            }
         });
     });
-
+</script>
+<script>
     // Detekce kliknutí mimo menu
     document.addEventListener('click', (e) => {
         const profileMenu = document.getElementById('profileMenu');

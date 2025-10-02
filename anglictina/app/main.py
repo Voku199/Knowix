@@ -25,7 +25,7 @@ from present_perfect import chat_bp
 from review import review_bp
 from roleplaying import roleplaying_bp
 from theme import theme_bp
-from pexeso import pexeso_bp, register_socketio_handlers
+from pexeso import pexeso_bp
 from xp import get_user_xp_and_level
 from xp import xp_bp
 from drawing import drawing_bp
@@ -35,10 +35,18 @@ from admin import admin_bp
 from vlastni_music import vlastni_music_bp
 from proc import proc_bp
 from security_ext import init_security
+from AI_poslech import ai_poslech_bp
+
+# -------- Matematiky --------------------
 # from math_main import math_main_bp
 # from math_pocitejsam import math_pocitejsam_bp
+# from math_cas import cas_bp
 # from math_ulohy import math_ulohy_bp
-from SOBRA_prezentace import prezentace_bp
+# from math_porovnani import porovnani_bp
+# from math_prevodky import prevodky_bp
+
+# --------- Prezentace --------------
+
 
 app = Flask(__name__)
 
@@ -119,14 +127,15 @@ app.register_blueprint(user_stats_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(vlastni_music_bp)
 app.register_blueprint(proc_bp)
+app.register_blueprint(ai_poslech_bp)
 
 # -------- Matematiky --------------------
 # app.register_blueprint(math_main_bp)
 # app.register_blueprint(math_pocitejsam_bp)
+# app.register_blueprint(cas_bp)
 # app.register_blueprint(math_ulohy_bp)
-
-# --------- Prezentace --------------
-app.register_blueprint(prezentace_bp)
+# app.register_blueprint(porovnani_bp)
+# app.register_blueprint(prevodky_bp)
 
 init_security(app)
 
@@ -315,6 +324,7 @@ def add_security_headers(response):
         "img-src 'self' data: https: blob: https://www.google-analytics.com https://ssl.google-analytics.com https://www.googletagmanager.com https://stats.g.doubleclick.net; "
         "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com; "
         "frame-src https://open.spotify.com https://*.spotify.com https://www.youtube-nocookie.com https://www.youtube.com https://*.youtube.com; "
+        "media-src 'self' blob:; "
         "object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests;"
     )
     response.headers['Permissions-Policy'] = (

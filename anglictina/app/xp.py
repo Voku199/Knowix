@@ -42,10 +42,52 @@ def get_user_xp_and_level(user_id):
     return {"xp": 0, "level": 1}
 
 
+# --- Seeding AI achievementů (idempotentně) ---
+def _ensure_ai_achievements_seeded():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        # Minimální potřebné sloupce: code, name, description, condition_type, condition_value
+        seeds = [
+            ("AI_LISTEN_10MIN", "AI posluchač: 10 minut", "Mluv s AI alespoň 10 minut celkem.", "ai_poslech_seconds",
+             600),
+            ("AI_LISTEN_60MIN", "AI posluchač: 1 hodina", "Mluv s AI alespoň 60 minut celkem.", "ai_poslech_seconds",
+             3600),
+            ("AI_LISTEN_300MIN", "AI posluchač: 5 hodin", "Mluv s AI alespoň 300 minut celkem.", "ai_poslech_seconds",
+             18000),
+            ("AI_CHAT_100", "AI kecal: 100 zpráv", "Odešli 100 zpráv v AI chatu.", "ai_chat_messages", 100),
+            ("AI_CHAT_500", "AI kecal: 500 zpráv", "Odešli 500 zpráv v AI chatu.", "ai_chat_messages", 500),
+        ]
+        for code, name, desc, ctype, cval in seeds:
+            cur.execute("SELECT id FROM achievements WHERE code = %s", (code,))
+            exists = cur.fetchone()
+            if not exists:
+                try:
+                    cur.execute(
+                        """
+                        INSERT INTO achievements (code, name, description, condition_type, condition_value)
+                        VALUES (%s, %s, %s, %s, %s)
+                        """,
+                        (code, name, desc, ctype, int(cval))
+                    )
+                except Exception:
+                    # Pokud tabulka obsahuje jiné sloupce s NOT NULL bez defaultu, seeding přeskoč
+                    conn.rollback()
+                    continue
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception:
+        # Tichý fallback: pokud DB není k dispozici nebo schéma neodpovídá, nic nesemenuj
+        pass
+
+
 def get_all_achievements():
     """
     Vrátí všechna achievementy jako seznam slovníků.
     """
+    # Zajisti, že AI achievementy jsou nasemínované (bezpečně a idempotentně)
+    _ensure_ai_achievements_seeded()
     conn = get_db_connection()
     cur = conn.cursor(dictionary=True)
     cur.execute("SELECT * FROM achievements")
@@ -61,11 +103,14 @@ def get_user_achievements(user_id):
     """
     conn = get_db_connection()
     cur = conn.cursor(dictionary=True)
-    cur.execute("""
+    cur.execute(
+        """
         SELECT a.* FROM achievements a
         JOIN user_achievements ua ON a.id = ua.achievement_id
         WHERE ua.user_id = %s
-    """, (user_id,))
+    """,
+        (user_id,)
+    )
     achievements = cur.fetchall()
     cur.close()
     conn.close()
@@ -78,15 +123,21 @@ def add_achievement_to_user(user_id, achievement_id):
     """
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
         SELECT id FROM user_achievements WHERE user_id = %s AND achievement_id = %s
-    """, (user_id, achievement_id))
+    """,
+        (user_id, achievement_id),
+    )
     exists = cur.fetchone()
     if not exists:
-        cur.execute("""
+        cur.execute(
+            """
             INSERT INTO user_achievements (user_id, achievement_id, achieved_at)
             VALUES (%s, %s, NOW())
-        """, (user_id, achievement_id))
+        """,
+            (user_id, achievement_id),
+        )
         conn.commit()
     cur.close()
     conn.close()
@@ -135,6 +186,41 @@ def check_and_award_achievements(user_id, new_xp=None):
         elif ach['condition_type'] == 'lvl':
             level_value = user_xp_level['level']
             if level_value >= ach['condition_value']:
+                add_achievement_to_user(user_id, ach['id'])
+                unlocked.append(ach)
+
+        # --- AI-specific: nasbírané sekundy z AI Poslech ---
+        elif ach['condition_type'] == 'ai_poslech_seconds':
+            try:
+                conn = get_db_connection()
+                cur = conn.cursor()
+                cur.execute("SELECT AI_poslech_seconds FROM user_stats WHERE user_id = %s", (user_id,))
+                row = cur.fetchone()
+                cur.close()
+                conn.close()
+                secs = int(row[0]) if row and row[0] is not None else 0
+            except Exception:
+                secs = 0
+            if secs >= int(ach['condition_value'] or 0):
+                add_achievement_to_user(user_id, ach['id'])
+                unlocked.append(ach)
+
+        # --- AI-specific: počet zpráv v komunitních AI chatech ---
+        elif ach['condition_type'] == 'ai_chat_messages':
+            try:
+                conn = get_db_connection()
+                cur = conn.cursor()
+                # Počítej uživatelské zprávy v tabulce chat_message (komunitní chat)
+                cur.execute(
+                    "SELECT COUNT(*) FROM chat_message WHERE user_id = %s AND (sender = 'user' OR sender = 'users')",
+                    (user_id,),
+                )
+                count = int(cur.fetchone()[0])
+                cur.close()
+                conn.close()
+            except Exception:
+                count = 0
+            if count >= int(ach['condition_value'] or 0):
                 add_achievement_to_user(user_id, ach['id'])
                 unlocked.append(ach)
 
@@ -298,10 +384,13 @@ def is_xp_booster_active(user_id):
     """
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
         SELECT COUNT(*) FROM user_xp_booster
         WHERE user_id = %s AND active = TRUE AND start_date <= %s AND end_date >= %s
-    """, (user_id, date.today(), date.today()))
+    """,
+        (user_id, date.today(), date.today()),
+    )
     result = cur.fetchone()
     cur.close()
     conn.close()
@@ -314,12 +403,15 @@ def get_top_users(limit=10):
     """
     conn = get_db_connection()
     cur = conn.cursor(dictionary=True)
-    cur.execute("""
+    cur.execute(
+        """
         SELECT id, first_name, last_name, xp, level, profile_pic, streak
         FROM users
         ORDER BY xp DESC, id ASC
         LIMIT %s
-    """, (limit,))
+    """,
+        (limit,),
+    )
     users = cur.fetchall()
     cur.close()
     conn.close()

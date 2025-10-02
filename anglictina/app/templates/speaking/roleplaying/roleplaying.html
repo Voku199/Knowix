@@ -69,6 +69,22 @@
         .dark-mode .cz-text {
             color: #95a5a6;
         }
+        /* Zlepšení čitelnosti prvního řádku EN v dark-mode */
+        .dark-mode .dual-lang-bubble .lang-row:first-child {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 6px;
+            padding: 4px 6px;
+        }
+        .dark-mode .dual-lang-bubble .lang-row:first-child .lang-label,
+        .dark-mode .dual-lang-bubble .lang-row:first-child .en-text {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        /* Lepší kontrast pro štítek mluvčího v dark-mode */
+        .dark-mode .speaker-label {
+            color: #d0d6db;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
@@ -987,6 +1003,24 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     });
 </script>
-<script src="/static/script.js"></script>
+<script>const CSRF_TOKEN = "{{ csrf_token() }}";</script>
+<script>
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        fetch('/set_theme', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
+            body: JSON.stringify({
+                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark',
+                csrf_token: CSRF_TOKEN
+            })
+        }).then(r => {
+            if (r.ok) {
+                document.body.classList.toggle('dark-mode');
+                sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            }
+        });
+    });
+</script>
+
 </body>
 </html>

@@ -4,7 +4,11 @@
     "cz_reply": "To je klasika, nikdy nezestárne.",
     "accepted_answers": [
       "That's a classic, never gets old.",
-      "I have just been Rickrolled again."
+      "It's a timeless classic.",
+      "Classic meme, always funny.",
+      "That never gets old.",
+      "It's a legendary prank.",
+      "Rickrolling is eternal."
     ]
   },
   {
@@ -12,7 +16,11 @@
     "cz_reply": "Ten 3D tančící mimino? To je retro!",
     "accepted_answers": [
       "That 3D dancing baby? That's retro!",
-      "I have watched the Dancing Baby video from 1996."
+      "The dancing baby? So retro!",
+      "That old 3D baby? Classic retro!",
+      "The dancing baby gif? Pure nostalgia!",
+      "That's some serious retro content!",
+      "Old school internet right there!"
     ]
   },
   {
@@ -20,7 +28,11 @@
     "cz_reply": "Kdo potřebuje správnou gramatiku, že?",
     "accepted_answers": [
       "Who needs proper grammar, right?",
-      "I have been quoting 'All your base are belong to us' all day."
+      "Grammar is overrated anyway.",
+      "Correct grammar is for losers.",
+      "Who cares about grammar?",
+      "Grammar rules are just suggestions.",
+      "Perfect grammar is overrated."
     ]
   },
   {
@@ -28,7 +40,11 @@
     "cz_reply": "To je odvážné, ale respektuju to.",
     "accepted_answers": [
       "That's bold, but I respect it.",
-      "I have set 'Peanut Butter Jelly Time' as my ringtone."
+      "That's brave, I respect that choice.",
+      "Bold move, but I admire it.",
+      "That's daring, respect.",
+      "Risky choice, but I like it.",
+      "That takes courage, respect."
     ]
   },
   {
@@ -36,7 +52,11 @@
     "cz_reply": "Mushroom, mushroom! Teď mi to bude znít v hlavě celý den.",
     "accepted_answers": [
       "Mushroom, mushroom! Now it's stuck in my head all day.",
-      "I have been watching 'Badger Badger Badger' on loop."
+      "Mushroom, mushroom! That's going to be in my head forever.",
+      "Mushroom, mushroom! Great, now I can't get it out of my head.",
+      "Mushroom, mushroom! Thanks for the earworm.",
+      "Mushroom, mushroom! That song is so catchy.",
+      "Mushroom, mushroom! It's impossible to forget."
     ]
   },
   {
@@ -44,104 +64,59 @@
     "cz_reply": "Tohle je klasika WoW memů!",
     "accepted_answers": [
       "That's a classic WoW meme!",
-      "I have shared the 'Leeroy Jenkins' video with my friends."
+      "Classic World of Warcraft meme!",
+      "That's WoW history right there!",
+      "Legendary gaming meme!",
+      "The most famous WoW moment ever!",
+      "Pure WoW nostalgia!"
     ]
   },
   {
     "alex": "I've tried to say 'All your base are belong to us' in Czech.",
-    "cz_reply": "To zní hrozně, ale je to zábavné.",
+    "cz_reply": "Všechny vaše základny patří nám? To nezní tak vtipně.",
     "accepted_answers": [
-      "It sounds horrible but it's funny.",
-      "I have tried to say 'All your base are belong to us' in Czech."
+      "All your bases belong to us? That doesn't sound as funny.",
+      "It doesn't have the same ring in Czech.",
+      "The humor gets lost in translation.",
+      "It's not as catchy in Czech.",
+      "Czech version isn't as funny.",
+      "Loses its charm when translated."
     ]
   },
   {
-    "alex": "I've used the phrase 'Do a barrel roll' today.",
-    "cz_reply": "Tenhle meme nikdy neumře.",
+    "alex": "I've been humming the Hamster Dance song.",
+    "cz_reply": "Dee-ba-dee-ba-doo-ba-dee-ba-dee-ba-doo-ba!",
     "accepted_answers": [
-      "This meme will never die.",
-      "I have used the phrase 'Do a barrel roll' today."
+      "Dee-ba-dee-ba-doo-ba-dee-ba-dee-ba-doo-ba!",
+      "That song is so catchy!",
+      "Now I'm humming it too!",
+      "That tune is impossible to forget!",
+      "Such an addictive melody!",
+      "I can't get it out of my head now!"
     ]
   },
   {
-    "alex": "I've been humming the 'Nyan Cat' song.",
-    "cz_reply": "Ta písnička se mi pořád motá v hlavě.",
+    "alex": "I've downloaded the entire collection of 'You're the man now, dog!' sounds.",
+    "cz_reply": "YTMND byl zlatý věk internetu.",
     "accepted_answers": [
-      "That song is still stuck in my head.",
-      "I have been humming the 'Nyan Cat' song."
+      "YTMND was the golden age of the internet.",
+      "Those were the golden days of the web.",
+      "YTMND was peak internet culture.",
+      "That was internet at its finest.",
+      "The golden era of memes.",
+      "Peak internet nostalgia right there."
     ]
   },
   {
-    "alex": "I've made a 'Trollface' drawing.",
-    "cz_reply": "Tohle je pravý meme umění.",
+    "alex": "I've been trying to explain memes to my grandparents.",
+    "cz_reply": "To musí být jako vysvětlovat barvy slepému.",
     "accepted_answers": [
-      "That's true meme art.",
-      "I have made a 'Trollface' drawing."
-    ]
-  },
-  {
-    "alex": "I've rewatched 'Charlie Bit My Finger' again.",
-    "cz_reply": "To video je stále roztomilé.",
-    "accepted_answers": [
-      "That video is still cute.",
-      "I have rewatched 'Charlie Bit My Finger' again."
-    ]
-  },
-  {
-    "alex": "I've used 'All your base are belong to us' as a joke.",
-    "cz_reply": "Jasně, všichni memeři to znají.",
-    "accepted_answers": [
-      "Sure, all memers know it.",
-      "I have used 'All your base are belong to us' as a joke."
-    ]
-  },
-  {
-    "alex": "I've seen the 'Dramatic Chipmunk' video multiple times.",
-    "cz_reply": "Ten dramatický veverák mě nikdy nepřestane bavit.",
-    "accepted_answers": [
-      "That dramatic chipmunk never stops entertaining me.",
-      "I have seen the 'Dramatic Chipmunk' video multiple times."
-    ]
-  },
-  {
-    "alex": "I've laughed at 'Rickroll' prank videos all day.",
-    "cz_reply": "To je jednoduše vrchol internetového humoru.",
-    "accepted_answers": [
-      "That's simply the peak of internet humor.",
-      "I have laughed at 'Rickroll' prank videos all day."
-    ]
-  },
-  {
-    "alex": "I've tried to imitate 'Peanut Butter Jelly Time' dance.",
-    "cz_reply": "To chceš natočit a dát na TikTok!",
-    "accepted_answers": [
-      "You should record that and post on TikTok!",
-      "I have tried to imitate 'Peanut Butter Jelly Time' dance."
-    ]
-  },
-  {
-    "alex": "I've collected all the best memes from the 2000s.",
-    "cz_reply": "To je pokladnice internetové historie.",
-    "accepted_answers": [
-      "That's a treasure of internet history.",
-      "I have collected all the best memes from the 2000s."
-    ]
-  },
-  {
-    "alex": "I've shared the 'Leeroy Jenkins' battle shout live.",
-    "cz_reply": "Ten křik prostě nikdy neomrzí.",
-    "accepted_answers": [
-      "That shout never gets boring.",
-      "I have shared the 'Leeroy Jenkins' battle shout live."
-    ]
-  },
-  {
-    "alex": "I've sent 'Trollface' stickers to my friends.",
-    "cz_reply": "To je jasný trolling na úrovni.",
-    "accepted_answers": [
-      "That's clear trolling at its best.",
-      "I have sent 'Trollface' stickers to my friends."
+      "That must be like explaining colors to a blind person.",
+      "That sounds impossible.",
+      "Good luck with that mission.",
+      "That's a hopeless cause.",
+      "Mission impossible right there.",
+      "That's like teaching fish to fly."
     ]
   }
 ]
-

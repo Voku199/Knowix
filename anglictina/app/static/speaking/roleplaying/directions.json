@@ -20,14 +20,20 @@
         "Hi! I'm trying to get to a bus stop.",
         "Hey, do you know where I can catch the bus?",
         "Hi, could you tell me where the nearest bus stop is?",
-        "Hello, I’m looking for a place to catch the bus.",
+        "Hello, I'm looking for a place to catch the bus.",
         "Excuse me, do you know where the bus stop is?",
-        "Hi, I’m trying to find the bus stop in this area.",
+        "Hi, I'm trying to find the bus stop in this area.",
         "Hello, is there a bus stop nearby?",
         "Hi, where can I get the bus from here?",
         "Excuse me, I need directions to the bus stop.",
         "Hi, could you help me find the bus stop?",
-        "Hello, I’m searching for the bus stop. Can you help me?"
+        "Hello, I'm searching for the bus stop. Can you help me?",
+        "Hi there! I'm a bit lost - where's the bus stop?",
+        "Hello, I'm new here. Could you point me to the bus stop?",
+        "Hi, I'm trying to figure out where to catch the bus.",
+        "Excuse me, I need to find the closest bus stop.",
+        "Hello, which way is the bus stop?",
+        "Hi, I'm looking for public transport - where's the bus stop?"
       ]
     },
     {
@@ -39,16 +45,21 @@
       "speaker": "Uživatel",
       "cz": "Řekni, že jedeš do centra města.",
       "en": [
-        "I’m going to the city centre.",
+        "I'm going to the city centre.",
         "I need to get to the city center.",
         "To the city centre, please.",
         "I'm heading to the city center.",
         "I want to go to downtown.",
-        "I’m trying to get to the center of town.",
-        "I’d like to go to the city centre.",
-        "I’m looking to get to downtown.",
+        "I'm trying to get to the center of town.",
+        "I'd like to go to the city centre.",
+        "I'm looking to get to downtown.",
         "I want to go to the main part of the city.",
-        "I need to go to the city centre area."
+        "I need to go to the city centre area.",
+        "I'm heading downtown.",
+        "I need to get to the town center.",
+        "I'm going to the central part of the city.",
+        "I want to reach the city center.",
+        "I'm traveling to downtown area."
       ]
     },
     {
@@ -61,7 +72,7 @@
       "cz": "Zeptej se, kdy jede další autobus.",
       "en": [
         "When is the next bus?",
-        "when is the next bus arriving",
+        "When is the next bus arriving?",
         "What time does the next bus arrive?",
         "Do you know when the next bus comes?",
         "How long until the next bus?",
@@ -70,7 +81,13 @@
         "Excuse me, when does the next bus get here?",
         "Do you know how soon the next bus comes?",
         "How much time until the next bus arrives?",
-        "Can you tell me when the next bus will be here?"
+        "Can you tell me when the next bus will be here?",
+        "What time is the next bus due?",
+        "How often do the buses run?",
+        "Do you know the bus schedule?",
+        "When can I expect the next bus?",
+        "Is there a regular timetable?",
+        "How frequently do buses come?"
       ]
     },
     {
@@ -91,7 +108,12 @@
         "Hi, could you tell me where I can buy a ticket?",
         "Thanks, where is the ticket office?",
         "I need to buy a ticket, where can I do that?",
-        "Can you tell me where to buy a ticket for the bus?"
+        "Can you tell me where to buy a ticket for the bus?",
+        "Thanks! Do I need to buy a ticket in advance?",
+        "Thank you! Where's the best place to get a ticket?",
+        "Thanks! Is there a ticket machine somewhere?",
+        "Thank you! Can I buy a ticket on the bus?",
+        "Thanks! What's the easiest way to get a ticket?"
       ]
     },
     {
@@ -104,7 +126,7 @@
       "cz": "Zeptej se, kolik to stojí a jestli se dá platit kartou.",
       "en": [
         "How much is it? Can I pay by card?",
-        "What’s the price of the ticket? Can I use a card?",
+        "What's the price of the ticket? Can I use a card?",
         "How much does a ticket cost? And can I pay with a card?",
         "Is it possible to pay with a card? And how much is the ticket?",
         "Do you know how much it is and if card payments are accepted?",
@@ -113,7 +135,11 @@
         "Thanks, how much is the ticket and can I pay with my card?",
         "I need to know the price of the ticket and if I can pay with a card.",
         "Can you tell me the price of the ticket and if card payments are accepted?",
-        "thank you and where can i buy a tickets"
+        "What does a ticket cost and do they take cards?",
+        "How much should I expect to pay? Can I use my credit card?",
+        "What's the fare and is contactless payment available?",
+        "Do you know the ticket price and payment options?",
+        "How much for a single ticket and can I pay electronically?"
       ]
     },
     {
@@ -129,12 +155,17 @@
         "How long does the ticket last?",
         "Is there a time limit on the ticket?",
         "How long can I use the ticket?",
-        "What’s the ticket’s validity?",
+        "What's the ticket's validity?",
         "Excuse me, how long is the ticket valid?",
         "Hi, could you tell me how long the ticket is valid for?",
         "Thanks, how long does the ticket last?",
         "I need to know how long the ticket is valid.",
-        "Can you tell me the ticket’s validity period?"
+        "Can you tell me the ticket's validity period?",
+        "How much time do I have once I buy the ticket?",
+        "What's the time limit on a single ticket?",
+        "How long before the ticket expires?",
+        "Is it valid for the whole day?",
+        "Do I need to use it within a certain time?"
       ]
     },
     {
@@ -155,7 +186,12 @@
         "I appreciate your help. Goodbye!",
         "Thanks a lot! Have a nice day!",
         "Thank you so much for your help!",
-        "You’re welcome! Have a great day!"
+        "You're very kind! Have a great day!",
+        "I really appreciate your time. Goodbye!",
+        "Thanks for being so helpful! Bye!",
+        "You've been amazing, thank you! Have a good day!",
+        "I'm so grateful for your help. See you later!",
+        "Thanks for making this so easy! Goodbye!"
       ]
     },
     {

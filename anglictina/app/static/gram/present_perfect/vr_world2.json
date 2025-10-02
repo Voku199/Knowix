@@ -118,5 +118,125 @@
       "I’ll be there, bye!",
       "See you, I’ll join!"
     ]
+  },
+  {
+    "alex": "Have you explored any virtual worlds recently?",
+    "cz_reply": "Ano, byl jsem ve virtuálním muzeu a na koncertě.",
+    "accepted_answers": [
+      "Yes, I've been to a virtual museum and a concert.",
+      "I've visited a virtual museum and attended a concert.",
+      "Yes, I explored a virtual museum and went to a concert.",
+      "I've been in a virtual museum and at a virtual concert.",
+      "Yes, I've experienced a virtual museum and concert.",
+      "I've toured a virtual museum and enjoyed a concert."
+    ]
+  },
+  {
+    "alex": "Have you met any interesting people in VR?",
+    "cz_reply": "Ano, potkal jsem lidi z celého světa.",
+    "accepted_answers": [
+      "Yes, I've met people from all over the world.",
+      "I've encountered people from around the globe.",
+      "Yes, I've connected with people worldwide.",
+      "I've met individuals from various countries.",
+      "Yes, I've interacted with people globally.",
+      "I've come across people from different continents."
+    ]
+  },
+  {
+    "alex": "Have you learned anything new through VR experiences?",
+    "cz_reply": "Ano, naučil jsem se o starověkém Egyptě a vesmíru.",
+    "accepted_answers": [
+      "Yes, I've learned about ancient Egypt and space.",
+      "I've discovered things about ancient Egypt and the universe.",
+      "Yes, I've studied ancient Egypt and space exploration.",
+      "I've gained knowledge about ancient Egypt and astronomy.",
+      "Yes, I've explored ancient Egyptian history and space.",
+      "I've learned about Egyptian civilization and the cosmos."
+    ]
+  },
+  {
+    "alex": "Have you tried creating anything in VR?",
+    "cz_reply": "Ano, zkusil jsem kreslení a stavění virtuálních objektů.",
+    "accepted_answers": [
+      "Yes, I've tried drawing and building virtual objects.",
+      "I've experimented with drawing and constructing virtual items.",
+      "Yes, I've done some drawing and virtual construction.",
+      "I've attempted drawing and creating virtual structures.",
+      "Yes, I've tried artistic creation and building in VR.",
+      "I've explored drawing and virtual object construction."
+    ]
+  },
+  {
+    "alex": "Have you experienced any VR travel destinations?",
+    "cz_reply": "Ano, 'navštívil' jsem Paříž a Mount Everest.",
+    "accepted_answers": [
+      "Yes, I've 'visited' Paris and Mount Everest.",
+      "I've 'traveled' to Paris and Mount Everest.",
+      "Yes, I've 'explored' Paris and Mount Everest.",
+      "I've 'been to' Paris and Mount Everest virtually.",
+      "Yes, I've 'toured' Paris and Mount Everest.",
+      "I've 'experienced' Paris and Mount Everest in VR."
+    ]
+  },
+  {
+    "alex": "Have you noticed any improvements in VR technology lately?",
+    "cz_reply": "Ano, grafika je mnohem lepší než dříve.",
+    "accepted_answers": [
+      "Yes, the graphics are much better than before.",
+      "The visual quality has improved significantly.",
+      "Yes, the graphics have enhanced considerably.",
+      "The visual fidelity is much better now.",
+      "Yes, there's been a major improvement in graphics.",
+      "The visual quality has advanced dramatically."
+    ]
+  },
+  {
+    "alex": "Have you tried any VR educational programs?",
+    "cz_reply": "Ano, absolvoval jsem kurz o anatomii člověka.",
+    "accepted_answers": [
+      "Yes, I've completed a course on human anatomy.",
+      "I've taken a human anatomy course.",
+      "Yes, I've done a program about human anatomy.",
+      "I've studied human anatomy through VR.",
+      "Yes, I've participated in an anatomy course.",
+      "I've gone through a human anatomy program."
+    ]
+  },
+  {
+    "alex": "Have you shared any VR experiences with friends?",
+    "cz_reply": "Ano, hráli jsme spolu kooperativní hry.",
+    "accepted_answers": [
+      "Yes, we've played cooperative games together.",
+      "We've enjoyed co-op games together.",
+      "Yes, we've played collaborative games.",
+      "We've shared cooperative gaming experiences.",
+      "Yes, we've played team-based games together.",
+      "We've had cooperative gaming sessions."
+    ]
+  },
+  {
+    "alex": "Have you attended any VR events or conferences?",
+    "cz_reply": "Ano, byl jsem na virtuální tech konferenci.",
+    "accepted_answers": [
+      "Yes, I've been to a virtual tech conference.",
+      "I've attended a virtual technology conference.",
+      "Yes, I've participated in a virtual tech event.",
+      "I've been to a virtual technology summit.",
+      "Yes, I've joined a virtual tech gathering.",
+      "I've attended a virtual technology meeting."
+    ]
+  },
+  {
+    "alex": "Have you considered VR as a tool for work or study?",
+    "cz_reply": "Ano, myslím, že by to mohlo být užitečné pro vzdělávání.",
+    "accepted_answers": [
+      "Yes, I think it could be useful for education.",
+      "I believe it could be beneficial for learning.",
+      "Yes, I think it has educational potential.",
+      "I feel it could enhance learning experiences.",
+      "Yes, I see its value for educational purposes.",
+      "I think it could revolutionize education."
+    ]
   }
 ]

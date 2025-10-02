@@ -134,5 +134,125 @@
       "Thanks, it’s helped me a lot.",
       "Thank you, this has really helped."
     ]
+  },
+  {
+    "alex": "I've been having trouble sleeping because of anxiety.",
+    "cz_reply": "Já také mám problémy se spánkem kvůli úzkosti.",
+    "accepted_answers": [
+      "I've also been having trouble sleeping because of anxiety.",
+      "I have sleep problems due to anxiety too.",
+      "Same here, anxiety affects my sleep.",
+      "I've experienced similar sleep issues.",
+      "Anxiety has been affecting my sleep as well.",
+      "I know that feeling, anxiety disrupts my sleep too."
+    ]
+  },
+  {
+    "alex": "Have you tried any relaxation techniques before bed?",
+    "cz_reply": "Ne, obvykle jen ležím a myslím na všechno možné.",
+    "accepted_answers": [
+      "No, I usually just lie there thinking about everything.",
+      "I haven't tried anything, I just overthink.",
+      "No, my mind just races with thoughts.",
+      "I usually just worry about everything in bed.",
+      "No, I just lay there with racing thoughts.",
+      "I haven't tried relaxation, I just think too much."
+    ]
+  },
+  {
+    "alex": "I've found that progressive muscle relaxation helps me.",
+    "cz_reply": "Co to znamená? Nikdy jsem o tom neslyšel.",
+    "accepted_answers": [
+      "What does that mean? I've never heard of it.",
+      "I haven't heard of that before. What is it?",
+      "That's new to me. How does it work?",
+      "I'm not familiar with that technique.",
+      "I've never heard of progressive muscle relaxation.",
+      "What exactly is progressive muscle relaxation?"
+    ]
+  },
+  {
+    "alex": "You tense and then relax different muscle groups. I've felt calmer since I started.",
+    "cz_reply": "To zní zajímavě. Kde ses to naučil?",
+    "accepted_answers": [
+      "That sounds interesting. Where did you learn that?",
+      "That's intriguing. How did you find out about it?",
+      "Sounds helpful. Where did you discover this technique?",
+      "That seems useful. Who taught you that?",
+      "Interesting approach. Where did you learn about it?",
+      "That sounds promising. How did you learn this method?"
+    ]
+  },
+  {
+    "alex": "I've watched some YouTube videos about it.",
+    "cz_reply": "Možná si také najdu nějaká videa.",
+    "accepted_answers": [
+      "Maybe I'll look up some videos too.",
+      "I should probably search for some videos.",
+      "Perhaps I'll find some videos online.",
+      "I might check out some YouTube videos.",
+      "I should look into that on YouTube.",
+      "Maybe I'll give those videos a try."
+    ]
+  },
+  {
+    "alex": "Have you talked to your parents about your anxiety?",
+    "cz_reply": "Ne, myslím, že by se zbytečně starali.",
+    "accepted_answers": [
+      "No, I think they would worry unnecessarily.",
+      "I haven't, I don't want them to worry.",
+      "No, I think it would just stress them out.",
+      "I haven't told them, they'd probably overreact.",
+      "No, I don't want to burden them with worry.",
+      "I haven't shared it, I think they'd be too concerned."
+    ]
+  },
+  {
+    "alex": "I've learned that parents often understand more than we think.",
+    "cz_reply": "Možná máš pravdu. Nikdy jsem o tom takhle nepřemýšlel.",
+    "accepted_answers": [
+      "Maybe you're right. I've never thought about it that way.",
+      "You might be right. I hadn't considered that.",
+      "That's a good point. I never looked at it like that.",
+      "Perhaps you're correct. I haven't thought of it that way.",
+      "You could be right. That's a new perspective for me.",
+      "Maybe so. I've never considered that angle."
+    ]
+  },
+  {
+    "alex": "Have you noticed if certain activities make your anxiety worse?",
+    "cz_reply": "Ano, social media mě často stresují.",
+    "accepted_answers": [
+      "Yes, social media often stresses me out.",
+      "Social media makes my anxiety worse.",
+      "Yeah, I've noticed social media affects me negatively.",
+      "Social media definitely increases my stress.",
+      "Yes, scrolling through social media makes me anxious.",
+      "I've found that social media triggers my anxiety."
+    ]
+  },
+  {
+    "alex": "I've started limiting my screen time before bed.",
+    "cz_reply": "Pomohlo ti to?",
+    "accepted_answers": [
+      "Has it helped you?",
+      "Did it make a difference?",
+      "Has that been beneficial?",
+      "Is it working for you?",
+      "Have you seen improvement?",
+      "Has it had a positive effect?"
+    ]
+  },
+  {
+    "alex": "Yes! I've slept better since I made that change.",
+    "cz_reply": "To je skvělé. Možná bych to měl také zkusit.",
+    "accepted_answers": [
+      "That's great. Maybe I should try that too.",
+      "That's wonderful. I should probably do the same.",
+      "That's fantastic. Perhaps I'll give it a try.",
+      "That sounds great. I might try limiting screen time too.",
+      "That's awesome. I should consider doing that.",
+      "That's excellent. Maybe I'll implement that change too."
+    ]
   }
 ]

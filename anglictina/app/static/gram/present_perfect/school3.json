@@ -134,5 +134,125 @@
       "See you!",
       "Take care!"
     ]
+  },
+  {
+    "alex": "Have you studied for the English test tomorrow?",
+    "cz_reply": "Ano, učil jsem se celé odpoledne.",
+    "accepted_answers": [
+      "Yes, I've studied all afternoon.",
+      "I've been studying all afternoon.",
+      "Yes, I spent the whole afternoon studying.",
+      "I've studied for the entire afternoon.",
+      "Yes, I've been preparing all afternoon.",
+      "I studied throughout the afternoon."
+    ]
+  },
+  {
+    "alex": "Have you memorized all the vocabulary words?",
+    "cz_reply": "Většinu ano, ale pár slov je těžkých.",
+    "accepted_answers": [
+      "Most of them, yes, but some words are difficult.",
+      "I've learned most, but a few words are hard.",
+      "Yes, most of them, but some are challenging.",
+      "I know most, but a few are quite difficult.",
+      "Most of them, but some words are tough.",
+      "I've memorized most, but some are tricky."
+    ]
+  },
+  {
+    "alex": "Have you practiced writing essays in English?",
+    "cz_reply": "Ano, napsal jsem tři cvičné eseje.",
+    "accepted_answers": [
+      "Yes, I've written three practice essays.",
+      "I've completed three practice essays.",
+      "Yes, I've done three essay practices.",
+      "I've written three essays for practice.",
+      "Yes, I've practiced with three essays.",
+      "I've prepared three practice essays."
+    ]
+  },
+  {
+    "alex": "Have you asked anyone to check your grammar?",
+    "cz_reply": "Ano, máma mi je zkontrolovala.",
+    "accepted_answers": [
+      "Yes, my mom has checked them for me.",
+      "My mother has reviewed them.",
+      "Yes, my mom looked over them.",
+      "My mother has checked my grammar.",
+      "Yes, my mom has reviewed my work.",
+      "My mother has gone through them."
+    ]
+  },
+  {
+    "alex": "Have you read any English books recently?",
+    "cz_reply": "Ano, četl jsem Harry Pottera v angličtině.",
+    "accepted_answers": [
+      "Yes, I've read Harry Potter in English.",
+      "I've been reading Harry Potter in English.",
+      "Yes, I read Harry Potter in English.",
+      "I've been reading the Harry Potter books.",
+      "Yes, I've gone through Harry Potter in English.",
+      "I've read Harry Potter books in English."
+    ]
+  },
+  {
+    "alex": "That's impressive! Have you watched any English movies?",
+    "cz_reply": "Ano, koukám na filmy s anglickými titulky.",
+    "accepted_answers": [
+      "Yes, I watch movies with English subtitles.",
+      "I've been watching films with English subtitles.",
+      "Yes, I watch films with English captions.",
+      "I've watched movies with English subtitles.",
+      "Yes, I view movies with English text.",
+      "I watch films with English subtitles."
+    ]
+  },
+  {
+    "alex": "Have you joined any English conversation groups?",
+    "cz_reply": "Ne, ale chtěl bych najít nějakou skupinu.",
+    "accepted_answers": [
+      "No, but I'd like to find a group.",
+      "I haven't, but I want to find one.",
+      "No, but I'm looking for a group.",
+      "I haven't joined any, but I'd like to.",
+      "No, but I'm interested in finding one.",
+      "I haven't, but I want to join one."
+    ]
+  },
+  {
+    "alex": "Have you used any language learning apps?",
+    "cz_reply": "Ano, používám Duolingo každý den.",
+    "accepted_answers": [
+      "Yes, I use Duolingo every day.",
+      "I've been using Duolingo daily.",
+      "Yes, I practice with Duolingo every day.",
+      "I use Duolingo on a daily basis.",
+      "Yes, I've been doing Duolingo daily.",
+      "I practice on Duolingo every day."
+    ]
+  },
+  {
+    "alex": "Have you set any goals for your English learning?",
+    "cz_reply": "Ano, chci dosáhnout úrovně B2 do konce roku.",
+    "accepted_answers": [
+      "Yes, I want to reach B2 level by the end of the year.",
+      "I've set a goal to achieve B2 level this year.",
+      "Yes, my goal is B2 level by year-end.",
+      "I want to attain B2 level before the year ends.",
+      "Yes, I'm aiming for B2 level by December.",
+      "My target is to reach B2 level this year."
+    ]
+  },
+  {
+    "alex": "Have you taken any official English exams before?",
+    "cz_reply": "Ne, ale plánuju si udělat Cambridge zkoušku.",
+    "accepted_answers": [
+      "No, but I plan to take a Cambridge exam.",
+      "I haven't, but I'm planning a Cambridge test.",
+      "No, but I want to do a Cambridge examination.",
+      "I haven't taken any, but I plan to do Cambridge.",
+      "No, but I'm considering a Cambridge exam.",
+      "I haven't, but Cambridge exam is my plan."
+    ]
   }
 ]

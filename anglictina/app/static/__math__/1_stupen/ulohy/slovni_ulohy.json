@@ -1,0 +1,387 @@
+{
+  "1_class": [
+    {
+      "id": 1,
+      "text": "Máš 5 jablek a kamarád ti dá 3. Kolik jablek máš teď?",
+      "correct": 8
+    },
+    {
+      "id": 2,
+      "text": "Na stromě sedí 7 ptáčků, 2 odletěli. Kolik jich zůstalo?",
+      "correct": 5
+    },
+    {
+      "id": 3,
+      "text": "Máša má 9 balónků a 4 praskly. Kolik balónků jí zůstalo?",
+      "correct": 5
+    },
+    {
+      "id": 4,
+      "text": "Tom má 8 autíček a dostal ještě 6. Kolik autíček má dohromady?",
+      "correct": 14
+    },
+    {
+      "id": 5,
+      "text": "V krabičce je 10 sušenek a 3 sníš. Kolik sušenek zbyde?",
+      "correct": 7
+    },
+    {
+      "id": 6,
+      "text": "Na hřišti bylo 12 dětí, 5 odešlo. Kolik dětí zůstalo?",
+      "correct": 7
+    },
+    {
+      "id": 7,
+      "text": "Pejsek Alík našel 6 kostí a Rex mu dal 2. Kolik kostí má Alík?",
+      "correct": 8
+    },
+    {
+      "id": 8,
+      "text": "V řadě je 15 tužek, 7 spadlo. Kolik tužek zůstalo v řadě?",
+      "correct": 8
+    },
+    {
+      "id": 9,
+      "text": "Které číslo je větší: 12 nebo 9?",
+      "correct": 12
+    },
+    {
+      "id": 10,
+      "text": "Máš 13 karet. Kolik karet musíš přidat, aby jich bylo 20?",
+      "correct": 7
+    },
+    {
+      "id": 11,
+      "text": "V misce jsou 4 hrušky a přidáme 5. Kolik hrušek je teď?",
+      "correct": 9
+    },
+    {
+      "id": 12,
+      "text": "Máš 14 korálků a 6 dáš kamarádce. Kolik ti zůstane?",
+      "correct": 8
+    },
+    {
+      "id": 13,
+      "text": "Na polici je 11 knih a přidáme 3 nové. Kolik knih bude na polici?",
+      "correct": 14
+    },
+    {
+      "id": 14,
+      "text": "V parku běželo 9 psů, 4 odešli. Kolik psů zůstalo?",
+      "correct": 5
+    },
+    {
+      "id": 15,
+      "text": "Kolik je 7 + 7?",
+      "correct": 14
+    }
+  ],
+  "2_class": [
+    {
+      "id": 1,
+      "text": "Máme 24 bonbónů a rozdělíme je mezi 4 děti. Kolik každý dostane?",
+      "correct": 6
+    },
+    {
+      "id": 2,
+      "text": "Míša má 15 korun a koupí si tužku za 7 korun. Kolik jí zůstane?",
+      "correct": 8
+    },
+    {
+      "id": 3,
+      "text": "Na farmě je 35 slepic a 28 kuřat. Kolik je to dohromady?",
+      "correct": 63
+    },
+    {
+      "id": 4,
+      "text": "Z 90 minut uběhlo 25 minut. Kolik minut zbývá?",
+      "correct": 65
+    },
+    {
+      "id": 5,
+      "text": "Máme 5 sáčků a v každém je 6 bonbonů. Kolik bonbonů máme celkem?",
+      "correct": 30
+    },
+    {
+      "id": 6,
+      "text": "Rozděl 48 jablek mezi 8 dětí stejně. Kolik dostane jedno dítě?",
+      "correct": 6
+    },
+    {
+      "id": 7,
+      "text": "Pepa má 50 Kč a koupí sešit za 18 Kč. Kolik korun mu zůstane?",
+      "correct": 32
+    },
+    {
+      "id": 8,
+      "text": "Na hodinách je 3 hodiny. Kolik bude hodin za 9 hodin?",
+      "correct": 12
+    },
+    {
+      "id": 9,
+      "text": "Tereza nasbírala 42 kaštanů a 15 dala kamarádovi. Kolik jí zůstalo?",
+      "correct": 27
+    },
+    {
+      "id": 10,
+      "text": "Kolikrát se do čísla 56 vejde číslo 7?",
+      "correct": 8
+    },
+    {
+      "id": 11,
+      "text": "Z 40 bonbonů sníme 13. Kolik jich zbývá?",
+      "correct": 27
+    },
+    {
+      "id": 12,
+      "text": "V bedně je 6 řad po 5 lahvích. Kolik lahví je celkem?",
+      "correct": 30
+    },
+    {
+      "id": 13,
+      "text": "Rozděl 56 koláčků mezi 8 dětí. Kolik dostane jedno?",
+      "correct": 7
+    },
+    {
+      "id": 14,
+      "text": "Kolik je 9 × 7?",
+      "correct": 63
+    },
+    {
+      "id": 15,
+      "text": "Z 54 kuliček dáme 18 pryč. Kolik zůstane?",
+      "correct": 36
+    }
+  ],
+  "3_class": [
+    {
+      "id": 1,
+      "text": "V krabici je 36 jablek. Rozdělíme je do 6 košíků rovnoměrně. Kolik jablek bude v každém košíku?",
+      "correct": 6
+    },
+    {
+      "id": 2,
+      "text": "Auto jede 60 km za hodinu. Kolik ujede za 3 hodiny?",
+      "correct": 180
+    },
+    {
+      "id": 3,
+      "text": "Krabice má 4 vrstvy a v každé je 9 knih. Kolik knih je v krabici?",
+      "correct": 36
+    },
+    {
+      "id": 4,
+      "text": "Stůl měří 120 cm a židle 45 cm. O kolik cm je stůl delší?",
+      "correct": 75
+    },
+    {
+      "id": 5,
+      "text": "Zahradník zasadil 8 řad po 7 stromcích. Kolik stromků je celkem?",
+      "correct": 56
+    },
+    {
+      "id": 6,
+      "text": "Pekárna upekla 72 rohlíků a rozdělila je do 9 sáčků stejně. Kolik rohlíků je v jednom sáčku?",
+      "correct": 8
+    },
+    {
+      "id": 7,
+      "text": "Balík váží 5 kg a druhý 3 kg. Kolik to je dohromady v gramech?",
+      "correct": 8000
+    },
+    {
+      "id": 8,
+      "text": "Běžec uběhne 250 metrů na jedno kolo. Kolik metrů uběhne za 6 kol?",
+      "correct": 1500
+    },
+    {
+      "id": 9,
+      "text": "V akváriu je 28 rybek, 7 darovali. Kolik rybek zůstalo?",
+      "correct": 21
+    },
+    {
+      "id": 10,
+      "text": "Kolik centimetrů je 3 metry?",
+      "correct": 300
+    },
+    {
+      "id": 11,
+      "text": "V pytli je 84 míčků a rozdělíme je do 7 krabic stejně. Kolik je v jedné?",
+      "correct": 12
+    },
+    {
+      "id": 12,
+      "text": "Školní výlet trvá 5 hodin. Kolik minut to je?",
+      "correct": 300
+    },
+    {
+      "id": 13,
+      "text": "Kolik je 45 × 3?",
+      "correct": 135
+    },
+    {
+      "id": 14,
+      "text": "Z 900 g mouky spotřebujeme 350 g. Kolik gramů zůstane?",
+      "correct": 550
+    },
+    {
+      "id": 15,
+      "text": "Autobus ujede 240 km za 4 hodiny. Kolik km za 1 hodinu?",
+      "correct": 60
+    }
+  ],
+  "4_class": [
+    {
+      "id": 1,
+      "text": "Máme 3 pizzy. Každá je rozdělena na 8 dílků. Kolik celkem je dílků?",
+      "correct": 24
+    },
+    {
+      "id": 2,
+      "text": "Lukáš má 120 Kč. Koupí 3 knihy po 25 Kč. Kolik mu zůstane?",
+      "correct": 45
+    },
+    {
+      "id": 3,
+      "text": "V bedně je 96 pomerančů. Rozdělíme je do 12 krabic stejně. Kolik je v jedné krabici?",
+      "correct": 8
+    },
+    {
+      "id": 4,
+      "text": "Kolik je polovina z 86?",
+      "correct": 43
+    },
+    {
+      "id": 5,
+      "text": "Kolik je čtvrtina ze 64?",
+      "correct": 16
+    },
+    {
+      "id": 6,
+      "text": "Zboží stálo 90 Kč a zlevnilo o 30 Kč. Kolik stojí nyní?",
+      "correct": 60
+    },
+    {
+      "id": 7,
+      "text": "V kině je 7 řad po 8 sedadlech. Kolik sedadel je celkem?",
+      "correct": 56
+    },
+    {
+      "id": 8,
+      "text": "Sešit má 120 stran. Přečetl 45 ráno a 30 odpoledne. Kolik stran zbývá?",
+      "correct": 45
+    },
+    {
+      "id": 9,
+      "text": "V nádrži je 200 litrů vody, odčerpáme 65 litrů. Kolik litrů zůstane?",
+      "correct": 135
+    },
+    {
+      "id": 10,
+      "text": "Autobus ujede 15 km za 10 minut. Kolik ujede za 1 hodinu?",
+      "correct": 90
+    },
+    {
+      "id": 11,
+      "text": "Obdélník má délku 15 cm a šířku 9 cm. Jaký je jeho obvod?",
+      "correct": 48
+    },
+    {
+      "id": 12,
+      "text": "Kolik je třetina z 81?",
+      "correct": 27
+    },
+    {
+      "id": 13,
+      "text": "Krychle má hranu 5 cm. Jaký je obsah jedné stěny v cm²?",
+      "correct": 25
+    },
+    {
+      "id": 14,
+      "text": "Z 150 Kč utratíme 65 Kč. Kolik korun zůstane?",
+      "correct": 85
+    },
+    {
+      "id": 15,
+      "text": "Kolik je 6 řad po 11 židlích?",
+      "correct": 66
+    }
+  ],
+  "5_class": [
+    {
+      "id": 1,
+      "text": "V třídě je 20 žáků, 3/4 mají modré tričko. Kolik žáků má modré tričko?",
+      "correct": 15
+    },
+    {
+      "id": 2,
+      "text": "Obdélník má délku 8 cm a šířku 5 cm. Jaký je jeho obvod?",
+      "correct": 26
+    },
+    {
+      "id": 3,
+      "text": "Z 200 Kč utratil 25 %. Kolik korun utratil?",
+      "correct": 50
+    },
+    {
+      "id": 4,
+      "text": "Třída má 32 žáků a 50 % hraje fotbal. Kolik žáků hraje fotbal?",
+      "correct": 16
+    },
+    {
+      "id": 5,
+      "text": "Ze sklizně 50 kg jablek prodali 3/5. Kolik kg prodali?",
+      "correct": 30
+    },
+    {
+      "id": 6,
+      "text": "Obdélník má délku 12 cm a šířku 9 cm. Jaký je jeho obsah v cm²?",
+      "correct": 108
+    },
+    {
+      "id": 7,
+      "text": "Krychle má hranu 4 cm. Jaká je celková délka všech hran v cm?",
+      "correct": 48
+    },
+    {
+      "id": 8,
+      "text": "Cena stoupla z 80 Kč na 96 Kč. O kolik procent se zvýšila?",
+      "correct": 20
+    },
+    {
+      "id": 9,
+      "text": "Měřítko mapy je 1 : 1000. Vzdálenost 7 cm na mapě je kolik metrů ve skutečnosti?",
+      "correct": 70
+    },
+    {
+      "id": 10,
+      "text": "Jaká je průměrná známka z testů 2, 1 a 3?",
+      "correct": 2
+    },
+    {
+      "id": 11,
+      "text": "Průměrná známka z testů 1, 2, 3 a 2 je?",
+      "correct": 2
+    },
+    {
+      "id": 12,
+      "text": "Z 360 Kč dostal slevu 15 %. Kolik korun je sleva?",
+      "correct": 54
+    },
+    {
+      "id": 13,
+      "text": "Obdélník 14 × 8 cm – obsah v cm²?",
+      "correct": 112
+    },
+    {
+      "id": 14,
+      "text": "Kvádr má rozměry 4 cm, 5 cm, 6 cm. Jaký je objem v cm³?",
+      "correct": 120
+    },
+    {
+      "id": 15,
+      "text": "Měřítko mapy 1 : 5000. Vzdálenost 3 cm je kolik metrů?",
+      "correct": 150
+    }
+  ]
+}

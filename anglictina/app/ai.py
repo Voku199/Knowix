@@ -7,6 +7,7 @@ import random
 import time
 import json
 from db import get_db_connection  # Importuj svoji funkci na připojení k DB
+from xp import check_and_award_achievements  # vyhodnocení achievementů po zprávě v AI chatu
 
 ai_bp = Blueprint('ai_bp', __name__)
 load_dotenv(dotenv_path=".env")
@@ -406,6 +407,11 @@ def chat_list():
         chat_id = create_new_chat(user_id, title)
         if first_message:
             insert_message_chat(chat_id, user_id, "user", first_message)
+            # --- spustit kontrolu achievementů po uživatelské zprávě ---
+            try:
+                check_and_award_achievements(user_id)
+            except Exception:
+                pass
             # Po vložení prvé zprávy rovnou vygeneruj AI odpověď
             history = get_chat_history_by_chatid(chat_id)
             messages = build_community_prompt(history, first_message)
@@ -460,6 +466,11 @@ def chat_multi(chat_id):
             return jsonify({"error": "Žádný vstup nebo prázdný text"}), 400
 
         insert_message_chat(chat_id, user_id, "user", user_input)
+        # --- spustit kontrolu achievementů po uživatelské zprávě ---
+        try:
+            check_and_award_achievements(user_id)
+        except Exception:
+            pass
         # --- AI logika pro komunitní chat ---
         history = get_chat_history_by_chatid(chat_id)
         messages = build_community_prompt(history, user_input)
@@ -501,6 +512,11 @@ def chat():
 
         # Ulož uživatelskou zprávu
         insert_message(user_id, "users", user_input, dnd=False)
+        # --- spustit kontrolu achievementů po uživatelské zprávě ---
+        try:
+            check_and_award_achievements(user_id)
+        except Exception:
+            pass
 
         # Detekce češtiny a sprostých slov (AI odpoví přímo)
         ai_response = ask_community_ai(user_id, user_input)

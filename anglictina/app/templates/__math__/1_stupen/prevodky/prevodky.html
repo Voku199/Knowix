@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <meta name="description" content="Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam.">
+  <meta name="keywords" content="angličtina, procvičování, písničky, testy, chat, výuka, zdarma, knowix, zábava, škola">
+  <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Knowix – Procvičování angličtiny zdarma">
+<meta property="og:description" content="Procvičuj angličtinu zábavně pomocí písniček, chatu a testů. Bez reklam, zdarma.">
+<meta property="og:url" content="https://www.knowix.cz">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://www.knowix.cz/static/og-banner.png">
+
+    <link rel="canonical" href="https://www.knowix.cz">
+
+    <title>Převodky jednotek | Knowix</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/mobile_header.css">
+    <link rel="stylesheet" href="/static/__math__/1_stupen/math.css">
+
+    <!-- Preconnect zrychlí DNS a spojení -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Font načti až po načtení stránky -->
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    </noscript>
+
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-W1EN990JKP');
+</script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Knowix",
+  "url": "https://knowix.cz",
+  "description": "Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam."
+}
+</script>
+
+</head>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
+<header>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
+    </div>
+    <div class="nav-profile-wrapper">
+        <ul class="nav-right">
+            <li>
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
+            </li>
+        </ul>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
+</header>
+<main class="exercise-wrapper">
+    <h1>Převodky jednotek – 1. stupeň</h1>
+
+    <form method="post" action="{{ url_for('prevodky.math') }}" class="math-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-group">
+            <label for="conversion_type">Typ převodu:</label>
+            <select id="conversion_type" name="conversion_type" class="math-select">
+                {% for key, meta in conversion_types.items() %}
+                <option value="{{ key }}" {% if prefs.type == key %}selected{% endif %}>{{ meta.label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="max_value">Rozsah do:</label>
+            <select id="max_value" name="max_value" class="math-select">
+                {% for r in ranges %}
+                <option value="{{ r }}" {% if prefs.max == r %}selected{% endif %}>{{ r }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="math-btn">Uložit volbu / Vygenerovat nový</button>
+    </form>
+
+    {% if problem %}
+    <section class="exercise-panel">
+        <h2>Aktuální příklad</h2>
+        <div class="current-problem">
+            {{ problem.value }} {{ problem.unit_from }} = ? {{ problem.unit_to }}
+        </div>
+        <p>Převeď {{ problem.value }} {{ problem.label_from }} na {{ problem.label_to }}:</p>
+
+        {% if result is not none %}
+            {% if result.correct %}
+                <p class="feedback-correct">Správně! 👍</p>
+            {% else %}
+                <p class="feedback-wrong">Špatně. Tvoje odpověď: {{ result.given }}. Správně je: {{ result.expected }}.</p>
+            {% endif %}
+        {% endif %}
+
+        <form method="post" action="{{ url_for('prevodky.math') }}" class="math-answer-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="conversion_type" value="{{ prefs.type }}">
+            <input type="hidden" name="max_value" value="{{ prefs.max }}">
+            <input type="number" step="any" name="answer" placeholder="Tvoje odpověď" required class="math-input" autofocus>
+            <button type="submit" class="math-btn">Odeslat a vygenerovat další</button>
+        </form>
+    </section>
+    {% endif %}
+
+    <div class="conversion-help">
+        <h3>Nápověda pro převody:</h3>
+        <div class="help-sections">
+            <div class="help-section">
+                <h4>⚖️ Hmotnost:</h4>
+                <ul>
+                    <li>1 kg = 1000 g</li>
+                    <li>1 t = 1000 kg</li>
+                </ul>
+            </div>
+            <div class="help-section">
+                <h4>🥤 Objem:</h4>
+                <ul>
+                    <li>1 l = 1000 ml</li>
+                    <li>1 hl = 100 l</li>
+                </ul>
+            </div>
+            <div class="help-section">
+                <h4>⏰ Čas:</h4>
+                <ul>
+                    <li>1 h = 60 min</li>
+                    <li>1 min = 60 s</li>
+                    <li>1 h = 3600 s</li>
+                </ul>
+            </div>
+            <div class="help-section">
+                <h4>📏 Délka:</h4>
+                <ul>
+                    <li>1 m = 100 cm</li>
+                    <li>1 km = 1000 m</li>
+                    <li>1 m = 1000 mm</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <p><a href="{{ url_for('math.stupen1') }}" class="back-link">← Zpět na 1. stupeň</a></p>
+</main>
+<script>const CSRF_TOKEN = "{{ csrf_token() }}";</script>
+<script>
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        fetch('/set_theme', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
+            body: JSON.stringify({
+                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark',
+                csrf_token: CSRF_TOKEN
+            })
+        }).then(r => {
+            if (r.ok) {
+                document.body.classList.toggle('dark-mode');
+                sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            }
+        });
+    });
+</script>
+</body>
+</html>

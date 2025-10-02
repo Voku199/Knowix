@@ -17,14 +17,19 @@
       "en": [
         "What's going on? You can trust me.",
         "Tell me, what happened? You know you can talk to me.",
-        "What is it? I won’t judge, I promise.",
+        "What is it? I won't judge, I promise.",
         "Is everything alright? You can tell me anything.",
-        "What’s up? I’m here for you.",
-        "You can trust me, what’s happening?",
-        "Feel free to share, I won’t tell anyone.",
-        "You know you can rely on me. What’s wrong?",
-        "I’m listening, just tell me what’s on your mind.",
-        "Don’t worry, whatever it is, I’ll understand."
+        "What's up? I'm here for you.",
+        "You can trust me, what's happening?",
+        "Feel free to share, I won't tell anyone.",
+        "You know you can rely on me. What's wrong?",
+        "I'm listening, just tell me what's on your mind.",
+        "Don't worry, whatever it is, I'll understand.",
+        "What's bothering you? I'm here to help.",
+        "You seem upset. What's the matter?",
+        "I'm your friend, you can tell me anything.",
+        "What's troubling you? I want to help.",
+        "Talk to me, I'm here to listen."
       ]
     },
     {
@@ -45,7 +50,12 @@
         "Initiate small talk and see where it goes.",
         "Try to make him feel comfortable around you.",
         "Be friendly and approachable when you see him.",
-        "Just try to talk to him like you would with any friend."
+        "Just try to talk to him like you would with any friend.",
+        "Start with casual conversations about everyday things.",
+        "Find common interests to talk about.",
+        "Be genuine and let conversations flow naturally.",
+        "Don't overthink it - just be yourself when talking to him.",
+        "Make an effort to engage with him in group settings first."
       ]
     },
     {
@@ -66,7 +76,12 @@
         "Try to make eye contact and smile often.",
         "Ask him about his interests and listen closely.",
         "Find common topics to talk about and laugh together.",
-        "Be playful and friendly to show you’re interested."
+        "Be playful and friendly to show you're interested.",
+        "Use body language to show you're interested - lean in when he talks.",
+        "Remember things he tells you and bring them up later.",
+        "Laugh at his jokes and show you enjoy his company.",
+        "Send positive signals through your gestures and expressions.",
+        "Be attentive when he speaks and show genuine interest."
       ]
     },
     {
@@ -79,15 +94,20 @@
       "cz": "Porad podle situace – pokud je plachý, možná zprávu; jinak osobně je lepší.",
       "en": [
         "If he's shy, maybe text him first. But in person is always better.",
-        "It depends – if he’s nervous, a message might be easier. Otherwise, talk to him face to face.",
+        "It depends – if he's nervous, a message might be easier. Otherwise, talk to him face to face.",
         "If you feel comfortable, say it in person. If not, texting is fine.",
-        "Try texting him if you’re unsure, but face to face is more personal.",
-        "If you think he’s shy, start with a message. Otherwise, talk to him directly.",
+        "Try texting him if you're unsure, but face to face is more personal.",
+        "If you think he's shy, start with a message. Otherwise, talk to him directly.",
         "Go with what feels right – sometimes a message is easier.",
         "If you see him often, try to talk in person. If not, send him a message.",
         "Texting is okay, but in person is more sincere.",
-        "If you’re nervous, start with a message. When you’re ready, talk to him in person.",
-        "Do what feels most comfortable for you."
+        "If you're nervous, start with a message. When you're ready, talk to him in person.",
+        "Do what feels most comfortable for you.",
+        "Consider his personality - some people prefer texts, others face-to-face.",
+        "Start with what feels less scary for you, then build up confidence.",
+        "Think about what would make him feel most comfortable too.",
+        "If you're both shy, maybe start with texting and work up to meeting.",
+        "Choose the method that lets you express yourself best."
       ]
     },
     {
@@ -97,11 +117,16 @@
     },
     {
       "speaker": "Uživatel",
-      "cz": "To je vlastně docela dobré! Možná by to mohlo být trochu neformálnější, třeba: „Ahoj, myslím, že jsi super a rád bych si s tebou někdy vyrazil.“",
+      "cz": "To je vlastně docela dobré! Možná by to mohlo být trochu neformálnější, třeba: „Ahoj, myslím, že jsi super a rád bych si s tebou někdy vyrazil.\"",
       "en": [
-        "That’s actually pretty good! Maybe make it more casual, like: 'Hey, I think you're cool and I'd like to hang out sometime.'",
-        "It’s honest, which is great. You could also say: 'I like spending time with you. Want to hang out more?'",
-        "It’s fine as it is, but if you want to be more subtle, try something like: 'We should do something together one day.'"
+        "That's actually pretty good! Maybe make it more casual, like: 'Hey, I think you're cool and I'd like to hang out sometime.'",
+        "It's honest, which is great. You could also say: 'I like spending time with you. Want to hang out more?'",
+        "It's fine as it is, but if you want to be more subtle, try something like: 'We should do something together one day.'",
+        "That sounds good! You could also try: 'I really enjoy talking to you. Want to grab coffee sometime?'",
+        "Perfect! Or you could say: 'I think we have a great connection. Would you like to spend more time together?'",
+        "That's sweet and direct. Another option: 'I feel comfortable around you. Maybe we could hang out outside of here?'",
+        "Good approach! You might also consider: 'I find you really interesting. Would you like to do something fun together?'",
+        "That works well! Alternative: 'I enjoy your company. How about we meet up sometime just the two of us?'"
       ]
     },
     {
@@ -113,9 +138,21 @@
       "speaker": "Uživatel",
       "cz": "Popřej jí hodně štěstí a řekni, že to určitě zvládne.",
       "en": [
-        "Good luck! You’ve got this!",
-        "He’d be lucky to have you. Go get him!",
-        "You’ll be amazing. I believe in you!"
+        "Good luck! You've got this!",
+        "He'd be lucky to have you. Go get him!",
+        "You'll be amazing. I believe in you!",
+        "You're going to do great! Just be yourself.",
+        "I have complete faith in you. You can do this!",
+        "You're awesome, and he'll see that too. Good luck!",
+        "I'm rooting for you! You're going to be fine.",
+        "You've got everything it takes. Go for it!",
+        "I know you'll handle this perfectly. Best of luck!",
+        "You're brave for doing this. I'm proud of you!",
+        "Trust yourself - you know what to do. Good luck!",
+        "You're going to surprise yourself with how well this goes!",
+        "Remember, the worst thing that can happen is he says no - and that's not the end of the world.",
+        "You're taking a chance, and that's admirable. Go get 'em!",
+        "I'm here for you no matter what happens. You've got this!"
       ]
     },
     {
@@ -128,8 +165,16 @@
       "cz": "Prostě poděkuj.",
       "en": [
         "Okay, but nothing stupid okay?",
-        "Thats sounds great! I’ll wait \uD83D\uDE0F",
-        "Okay, thank you! \uD83D\uDE0F"
+        "That sounds great! I'll wait 😏",
+        "Okay, thank you! 😏",
+        "Haha, deal! Thanks for being such a good friend.",
+        "You don't owe me anything, but I appreciate the thought!",
+        "Just seeing you happy will be enough reward for me.",
+        "I'm just glad I could help. That's what friends are for!",
+        "Thanks, but your happiness is the best gift you could give me.",
+        "I'll hold you to that! But seriously, I'm just happy to help.",
+        "You're so sweet! I'm just doing what any good friend would do.",
+        "Aww, that's thoughtful of you. I'm excited to hear how it goes!"
       ]
     }
   ]

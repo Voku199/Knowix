@@ -14,17 +14,21 @@
       "speaker": "Uživatel",
       "cz": "Řekni, že ne a že jsi sám/sama.",
       "en": [
-        "No, I don’t. I’m alone.",
-        "No, I don’t have a reservation. I am alone.",
-        "No reservation, I’m alone.",
-        "I’m alone. No reservation.",
-        "No, just me. I don’t have a reservation.",
-        "No reservation, it’s just me.",
-        "No, I’m by myself.",
-        "No, I’m eating alone.",
-        "No, it’s only me today.",
-        "No, I’m here alone, no reservation.",
-        "Hi, I don’t have a reservation. I’m alone."
+        "No, I don't. I'm alone.",
+        "No, I don't have a reservation. I am alone.",
+        "No reservation, I'm alone.",
+        "I'm alone. No reservation.",
+        "No, just me. I don't have a reservation.",
+        "No reservation, it's just me.",
+        "No, I'm by myself.",
+        "No, I'm eating alone.",
+        "No, it's only me today.",
+        "No, I'm here alone, no reservation.",
+        "Hi, I don't have a reservation. I'm alone.",
+        "Sorry, no reservation. Table for one, please.",
+        "No, I'm hoping you have a spot for one person.",
+        "I don't have a reservation, but I'm looking for a table for one.",
+        "No booking, just me today."
       ]
     },
     {
@@ -40,12 +44,16 @@
         "Yes, please. Thank you.",
         "Sure, thank you.",
         "Yes, that would be great. Thanks.",
-        "Yes, I’d appreciate that. Thank you.",
+        "Yes, I'd appreciate that. Thank you.",
         "Yes, please. Thanks a lot.",
         "Yes, thanks.",
         "Thank you, yes.",
-        "Yes, I’d love to see the menu. Thank you.",
-        "Yes, thanks very much."
+        "Yes, I'd love to see the menu. Thank you.",
+        "Yes, thanks very much.",
+        "That would be wonderful, thank you.",
+        "Yes, please bring the menu.",
+        "I'd really appreciate that, thanks.",
+        "Yes, that sounds perfect."
       ]
     },
     {
@@ -64,10 +72,17 @@
         "Could I get some water, please?",
         "Water is fine, thank you.",
         "Just a glass of water for me.",
-        "I’ll have water, please.",
+        "I'll have water, please.",
         "Could you bring me some water?",
         "Only water for now, thanks.",
-        " I would like to order bottle of water"
+        "I would like to order bottle of water",
+        "Sparkling water, if you have it.",
+        "Still water would be great.",
+        "A bottle of water, please.",
+        "Can I get some tap water?",
+        "Water with ice, please.",
+        "Just plain water for me.",
+        "I'll start with water, thank you."
       ]
     },
     {
@@ -79,16 +94,21 @@
       "speaker": "Uživatel",
       "cz": "Řekni, že už jsi připraven/a objednat.",
       "en": [
-        "I’m ready to order.",
-        "I know what I’d like.",
-        "I’m ready to order now.",
-        "I’ve decided, I’m ready to order.",
-        "I’d like to order now, please.",
-        "I’m ready to make my order.",
-        "I’m ready to choose.",
-        "I’d like to order.",
-        "I’ve made my choice.",
-        "I’m ready to tell you my order."
+        "I'm ready to order.",
+        "I know what I'd like.",
+        "I'm ready to order now.",
+        "I've decided, I'm ready to order.",
+        "I'd like to order now, please.",
+        "I'm ready to make my order.",
+        "I'm ready to choose.",
+        "I'd like to order.",
+        "I've made my choice.",
+        "I'm ready to tell you my order.",
+        "I think I know what I want.",
+        "I've decided what to have.",
+        "Can I place my order now?",
+        "I'm ready, let's order.",
+        "I'd like to order something now."
       ]
     },
     {
@@ -101,15 +121,21 @@
       "cz": "Objednej si hamburger a hranolky.",
       "en": [
         "I would like a hamburger and fries.",
-        "I’ll have a hamburger and fries.",
+        "I'll have a hamburger and fries.",
         "Can I get a hamburger with fries?",
         "A hamburger with fries, please.",
-        "I’d like a hamburger and some fries.",
-        "I’ll take a hamburger and fries, thank you.",
+        "I'd like a hamburger and some fries.",
+        "I'll take a hamburger and fries, thank you.",
         "Can I have a hamburger and fries?",
-        "I’d like to order a hamburger and fries.",
+        "I'd like to order a hamburger and fries.",
         "Burger and fries, please.",
-        "Can I get a burger with a side of fries?"
+        "Can I get a burger with a side of fries?",
+        "I'll go with the hamburger and french fries.",
+        "A cheeseburger and fries would be great.",
+        "Could I have your burger with a side of fries?",
+        "The hamburger combo with fries, please.",
+        "I'd like the classic burger and fries.",
+        "A hamburger meal with fries, thank you."
       ]
     },
     {
@@ -123,14 +149,19 @@
       "en": [
         "Ketchup, please.",
         "Just ketchup, thanks.",
-        "I’ll have ketchup.",
+        "I'll have ketchup.",
         "Ketchup is fine, thank you.",
         "Could I get ketchup, please?",
         "Only ketchup, please.",
         "Ketchup for me.",
         "Just ketchup for my fries, thanks.",
-        "I’d like ketchup.",
-        "Ketchup, please, no mayonnaise."
+        "I'd like ketchup.",
+        "Ketchup, please, no mayonnaise.",
+        "Can I have some ketchup?",
+        "Ketchup would be perfect.",
+        "I prefer ketchup, thank you.",
+        "Just ketchup on the side, please.",
+        "Ketchup is all I need."
       ]
     },
     {
@@ -144,14 +175,19 @@
       "en": [
         "Maybe later.",
         "Not now, maybe later.",
-        "I’m not sure yet. Maybe later.",
+        "I'm not sure yet. Maybe later.",
         "Later, maybe.",
-        "I’ll think about it, maybe later.",
+        "I'll think about it, maybe later.",
         "Maybe later, thank you.",
-        "I’m not sure, maybe later.",
-        "I’ll decide later, thank you.",
-        "Maybe later, I’m not sure yet.",
-        "I’ll think about dessert later, thank you."
+        "I'm not sure, maybe later.",
+        "I'll decide later, thank you.",
+        "Maybe later, I'm not sure yet.",
+        "I'll think about dessert later, thank you.",
+        "Perhaps after the main course.",
+        "I'll see how I feel after eating.",
+        "Let me finish this first, then maybe.",
+        "Not right now, but maybe later.",
+        "I might want something sweet later."
       ]
     },
     {
@@ -168,11 +204,16 @@
         "Thank you very much.",
         "Thanks a lot.",
         "Thank you, I appreciate it.",
-        "Thanks, I’m looking forward to it.",
-        "Thank you, that’s great.",
-        "Thanks, I’m excited.",
-        "Thank you, I’m hungry.",
-        "Thanks, that sounds good."
+        "Thanks, I'm looking forward to it.",
+        "Thank you, that's great.",
+        "Thanks, I'm excited.",
+        "Thank you, I'm hungry.",
+        "Thanks, that sounds good.",
+        "Perfect, thank you.",
+        "Great, thanks!",
+        "Wonderful, thank you.",
+        "Awesome, thanks!",
+        "That's perfect, thanks."
       ]
     },
     {
@@ -190,11 +231,16 @@
         "Thanks! Looks yummy.",
         "Thank you, it looks amazing.",
         "Thanks, it looks perfect.",
-        "Thank you, I’m excited to eat.",
+        "Thank you, I'm excited to eat.",
         "Thanks, it looks wonderful.",
         "Thank you, it looks tasty.",
         "Thanks, it looks fantastic.",
-        "thank you it's looking pretty good"
+        "Thank you, it's looking pretty good",
+        "This looks incredible, thank you!",
+        "Wow, it looks so appetizing!",
+        "Thanks, it smells amazing too!",
+        "Perfect presentation, thank you!",
+        "It looks exactly what I wanted, thanks!"
       ]
     },
     {
@@ -215,7 +261,13 @@
         "It was amazing.",
         "The food was excellent.",
         "I enjoyed it very much.",
-        "It was perfect."
+        "It was perfect.",
+        "Everything was fantastic.",
+        "The meal was outstanding.",
+        "It exceeded my expectations.",
+        "Absolutely delicious!",
+        "One of the best burgers I've had!",
+        "The flavors were incredible."
       ]
     },
     {
@@ -228,15 +280,20 @@
       "cz": "Řekni, že ano.",
       "en": [
         "Yes, please.",
-        "Yes, I’d like the bill.",
+        "Yes, I'd like the bill.",
         "Yes, can I have the bill?",
-        "I’d like to pay, please.",
+        "I'd like to pay, please.",
         "Yes, please bring me the bill.",
-        "Yes, I’m ready to pay.",
+        "Yes, I'm ready to pay.",
         "Yes, can I get the bill?",
-        "Yes, I’d appreciate the bill.",
+        "Yes, I'd appreciate the bill.",
         "Yes, please bring me the check.",
-        "Yes, I’m ready to settle my bill."
+        "Yes, I'm ready to settle my bill.",
+        "Yes, could I have the check?",
+        "That would be great, thanks.",
+        "Yes, I'd like to settle up.",
+        "I'm ready to pay now.",
+        "Could I get the bill, please?"
       ]
     },
     {
@@ -248,16 +305,20 @@
       "speaker": "Uživatel",
       "cz": "Řekni, že zaplatíš kartou a poděkuj.",
       "en": [
-        "I’ll pay by card. Thank you.",
-        "By card, thank you.",
-        "Card, please. Thank you.",
-        "I’d like to pay by card, thank you.",
-        "I’ll use my card, thanks.",
-        "I’ll pay with my card, thank you.",
+        "I'll pay by card. Thank you.",
+        "Card, please. Thanks.",
+        "I'd like to pay by card, thank you.",
+        "Can I pay with my card? Thanks.",
+        "I'll use my card. Thank you.",
         "Card payment, please. Thanks.",
-        "By card, please. Thank you.",
-        "I’ll pay with card, thank you.",
-        "I’ll pay by card, thanks."
+        "I'd prefer to pay by card. Thank you.",
+        "Can I pay with a credit card? Thanks.",
+        "I'll pay with my debit card. Thank you.",
+        "Card is fine. Thanks for everything!",
+        "I'll use contactless payment. Thank you.",
+        "Credit card, please. Thanks for the great service!",
+        "I'd like to pay by card. Thanks for a lovely meal!",
+        "Card payment would be great. Thank you!"
       ]
     },
     {

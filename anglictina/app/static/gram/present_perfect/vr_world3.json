@@ -118,5 +118,125 @@
       "Thanks, I’m excited!",
       "Can’t wait, thank you!"
     ]
+  },
+  {
+    "alex": "Have you tried any advanced VR experiences?",
+    "cz_reply": "Ano, zkoušel jsem haptic feedback a hand tracking.",
+    "accepted_answers": [
+      "Yes, I've tried haptic feedback and hand tracking.",
+      "I've experimented with haptic feedback and hand tracking.",
+      "Yes, I've experienced haptic technology and hand tracking.",
+      "I've tested haptic feedback and gesture recognition.",
+      "Yes, I've tried tactile feedback and hand tracking.",
+      "I've used haptic systems and hand tracking technology."
+    ]
+  },
+  {
+    "alex": "Have you experienced any VR horror games?",
+    "cz_reply": "Ano, ale bylo to tak děsivé, že jsem skončil brzy.",
+    "accepted_answers": [
+      "Yes, but it was so scary I quit early.",
+      "I tried one, but it was too frightening.",
+      "Yes, but I stopped because it was terrifying.",
+      "I've played one, but it was too scary to continue.",
+      "Yes, but I couldn't handle the fear.",
+      "I tried horror VR, but it was too intense."
+    ]
+  },
+  {
+    "alex": "Have you tried any VR meditation or relaxation apps?",
+    "cz_reply": "Ano, používám je pro relaxaci před spaním.",
+    "accepted_answers": [
+      "Yes, I use them for relaxation before sleep.",
+      "I've used them to relax before bedtime.",
+      "Yes, they help me unwind before sleeping.",
+      "I use VR meditation for pre-sleep relaxation.",
+      "Yes, I find them calming before bed.",
+      "I've tried them for nighttime relaxation."
+    ]
+  },
+  {
+    "alex": "Have you experimented with VR art creation?",
+    "cz_reply": "Ano, namaloval jsem několik 3D obrazů ve virtuálním prostoru.",
+    "accepted_answers": [
+      "Yes, I've painted several 3D pictures in virtual space.",
+      "I've created some 3D artwork in VR.",
+      "Yes, I've made 3D paintings in virtual reality.",
+      "I've done 3D art creation in virtual environments.",
+      "Yes, I've painted 3D images in VR space.",
+      "I've created 3D artistic works in virtual reality."
+    ]
+  },
+  {
+    "alex": "Have you tried any VR sports simulations?",
+    "cz_reply": "Ano, hrál jsem virtuální tenis a golf.",
+    "accepted_answers": [
+      "Yes, I've played virtual tennis and golf.",
+      "I've tried VR tennis and golf simulations.",
+      "Yes, I've experienced virtual tennis and golf.",
+      "I've played tennis and golf in VR.",
+      "Yes, I've done virtual sports like tennis and golf.",
+      "I've tried VR versions of tennis and golf."
+    ]
+  },
+  {
+    "alex": "Have you explored any VR historical reconstructions?",
+    "cz_reply": "Ano, navštívil jsem virtuální starověký Řím a středověký hrad.",
+    "accepted_answers": [
+      "Yes, I've visited virtual ancient Rome and a medieval castle.",
+      "I've explored virtual ancient Rome and medieval castles.",
+      "Yes, I've been to reconstructed ancient Rome and medieval castles.",
+      "I've visited virtual historical sites like Rome and castles.",
+      "Yes, I've experienced ancient Rome and medieval architecture in VR.",
+      "I've toured virtual ancient Rome and medieval fortresses."
+    ]
+  },
+  {
+    "alex": "Have you used VR for language learning?",
+    "cz_reply": "Ano, cvičil jsem angličtinu v simulovaných konverzacích.",
+    "accepted_answers": [
+      "Yes, I've practiced English in simulated conversations.",
+      "I've used VR for English conversation practice.",
+      "Yes, I've practiced English through VR conversations.",
+      "I've done English practice in virtual conversations.",
+      "Yes, I've improved my English using VR dialogues.",
+      "I've practiced English speaking in VR scenarios."
+    ]
+  },
+  {
+    "alex": "Have you tried any VR music experiences?",
+    "cz_reply": "Ano, byl jsem na virtuálním koncertě a zkusil hrát na virtuální nástroje.",
+    "accepted_answers": [
+      "Yes, I've been to a virtual concert and tried playing virtual instruments.",
+      "I've attended virtual concerts and played virtual instruments.",
+      "Yes, I've experienced virtual concerts and musical instruments.",
+      "I've been to VR concerts and experimented with virtual instruments.",
+      "Yes, I've enjoyed virtual music performances and instrument playing.",
+      "I've attended virtual concerts and tried VR musical instruments."
+    ]
+  },
+  {
+    "alex": "Have you experienced any VR collaborative workspaces?",
+    "cz_reply": "Ano, pracoval jsem na projektu se spolužáky ve virtuální místnosti.",
+    "accepted_answers": [
+      "Yes, I've worked on a project with classmates in a virtual room.",
+      "I've collaborated with classmates in virtual workspace.",
+      "Yes, I've done group work in virtual meeting spaces.",
+      "I've worked with others in VR collaborative environments.",
+      "Yes, I've participated in virtual team projects.",
+      "I've used VR for group collaboration with classmates."
+    ]
+  },
+  {
+    "alex": "Do you think VR will change how we work and learn in the future?",
+    "cz_reply": "Určitě ano, už teď vidím obrovský potenciál.",
+    "accepted_answers": [
+      "Definitely yes, I can already see huge potential.",
+      "Absolutely, the potential is already enormous.",
+      "For sure, I can see the massive possibilities already.",
+      "Certainly, the potential is already very clear.",
+      "Yes definitely, I can see incredible potential now.",
+      "Absolutely, the possibilities are already obvious."
+    ]
   }
 ]

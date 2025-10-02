@@ -4,23 +4,35 @@
     "cz_reply": "Jo, viděl jsem ji včera poprvé.",
     "accepted_answers": [
       "Yeah, I saw her for the first time yesterday.",
-      "Yes, I have seen her yesterday."
+      "Yes, I have seen her yesterday.",
+      "Yes, I saw her yesterday for the first time.",
+      "Yeah, I've seen her yesterday.",
+      "I saw her for the first time yesterday.",
+      "Yes, I noticed her yesterday."
     ]
   },
   {
     "alex": "She seems interesting. Have you talked to her?",
     "cz_reply": "Ne, ještě jsem s ní nemluvil.",
     "accepted_answers": [
-      "No, I haven’t talked to her yet.",
-      "I have not spoken to her yet."
+      "No, I haven't talked to her yet.",
+      "I have not spoken to her yet.",
+      "No, I haven't spoken to her yet.",
+      "I haven't talked to her yet.",
+      "No, not yet.",
+      "I haven't had a chance to talk to her yet."
     ]
   },
   {
-    "alex": "Why not? You’ve had the chance, right?",
+    "alex": "Why not? You've had the chance, right?",
     "cz_reply": "Ano, měl jsem šanci, ale byl jsem moc nervózní.",
     "accepted_answers": [
-      "Yes, I’ve had the chance but I was too nervous.",
-      "I’ve had the chance, but I was really nervous."
+      "Yes, I've had the chance but I was too nervous.",
+      "I've had the chance, but I was really nervous.",
+      "Yes, I had the chance but I was too nervous.",
+      "I've had opportunities but I was nervous.",
+      "Yeah, I've had chances but I got nervous.",
+      "I had the chance but I was too anxious."
     ]
   },
   {
@@ -28,55 +40,83 @@
     "cz_reply": "Ne, byl jsem příliš nervózní na to, abych se usmál.",
     "accepted_answers": [
       "No, I was too nervous to smile.",
-      "No, I haven’t even smiled at her."
+      "No, I haven't even smiled at her.",
+      "I haven't smiled at her.",
+      "No, I was too anxious to smile.",
+      "I was too nervous to even smile.",
+      "No, I couldn't even smile at her."
     ]
   },
   {
-    "alex": "That’s tough. Have you followed her on social media?",
+    "alex": "That's tough. Have you followed her on social media?",
     "cz_reply": "Jo, přidal jsem si ji včera.",
     "accepted_answers": [
-      "Yeah, I’ve added her yesterday.",
-      "Yes, I have added her on social media."
+      "Yeah, I've added her yesterday.",
+      "Yes, I have added her on social media.",
+      "Yes, I added her yesterday.",
+      "I've followed her yesterday.",
+      "Yeah, I sent her a friend request yesterday.",
+      "I added her on social media yesterday."
     ]
   },
   {
     "alex": "Has she accepted the request?",
     "cz_reply": "Ne, zatím ne.",
     "accepted_answers": [
-      "No, she hasn’t accepted it yet.",
-      "She hasn’t accepted it."
+      "No, she hasn't accepted it yet.",
+      "She hasn't accepted it.",
+      "No, not yet.",
+      "She hasn't accepted my request yet.",
+      "No, she hasn't responded yet.",
+      "Not yet, no."
     ]
   },
   {
-    "alex": "Maybe she’s just busy. Have you sent her a message?",
+    "alex": "Maybe she's just busy. Have you sent her a message?",
     "cz_reply": "Jo, napsal jsem jí krátký pozdrav.",
     "accepted_answers": [
-      "Yeah, I’ve sent her a short greeting.",
-      "I have messaged her a quick hello."
+      "Yeah, I've sent her a short greeting.",
+      "I have messaged her a quick hello.",
+      "Yes, I sent her a short greeting.",
+      "I've sent her a quick hello.",
+      "Yeah, I messaged her briefly.",
+      "I sent her a short message."
     ]
   },
   {
     "alex": "And has she replied?",
     "cz_reply": "Ne, ještě mi neodpověděla.",
     "accepted_answers": [
-      "No, she hasn’t replied yet.",
-      "She has not answered yet."
+      "No, she hasn't replied yet.",
+      "She has not answered yet.",
+      "No, she hasn't responded yet.",
+      "She hasn't replied.",
+      "No response yet.",
+      "She hasn't answered me yet."
     ]
   },
   {
-    "alex": "It’s okay, man. Have you talked to anyone else about it?",
+    "alex": "It's okay, man. Have you talked to anyone else about it?",
     "cz_reply": "Ne, jenom tobě.",
     "accepted_answers": [
       "No, only to you.",
-      "No, I’ve only told you."
+      "No, I've only told you.",
+      "Just you.",
+      "Only you.",
+      "No, you're the only one I've told.",
+      "I've only talked to you about it."
     ]
   },
   {
-    "alex": "Maybe you’ve overthought it too much.",
+    "alex": "Maybe you've overthought it too much.",
     "cz_reply": "Možná máš pravdu, moc jsem nad tím přemýšlel.",
     "accepted_answers": [
-      "Maybe you’re right, I’ve thought about it too much.",
-      "I’ve overthought it."
+      "Maybe you're right, I've thought about it too much.",
+      "I've overthought it.",
+      "You're probably right, I've overthought it.",
+      "Yeah, I think I've overthought this.",
+      "I've been thinking about it too much.",
+      "You might be right, I've analyzed it too much."
     ]
   },
   {
@@ -84,15 +124,23 @@
     "cz_reply": "Jo, už se mi to stalo několikrát.",
     "accepted_answers": [
       "Yeah, it has happened to me several times.",
-      "Yes, it’s happened to me a few times."
+      "Yes, it's happened to me a few times.",
+      "This has happened to me before.",
+      "Yeah, I've experienced this before.",
+      "It's happened to me multiple times.",
+      "Yes, this has happened several times."
     ]
   },
   {
-    "alex": "That sucks… But at least you’ve tried.",
+    "alex": "That sucks… But at least you've tried.",
     "cz_reply": "Jo, ale pořád se cítím trochu zklamaně.",
     "accepted_answers": [
       "Yeah, but I still feel a bit disappointed.",
-      "I still feel kind of sad."
+      "I still feel kind of sad.",
+      "But I'm still disappointed.",
+      "I feel a bit let down though.",
+      "Yeah, but I'm still feeling disappointed.",
+      "I'm still a little sad about it."
     ]
   },
   {
@@ -100,39 +148,11 @@
     "cz_reply": "Ano, měl bych být víc sebevědomý.",
     "accepted_answers": [
       "Yes, I should be more confident.",
-      "I’ve learned I need to be more confident."
-    ]
-  },
-  {
-    "alex": "That’s the spirit. Have you ever succeeded in situations like this?",
-    "cz_reply": "Ne, nikdy jsem v tom nebyl dobrý.",
-    "accepted_answers": [
-      "No, I’ve never been good at it.",
-      "I have never succeeded in this."
-    ]
-  },
-  {
-    "alex": "You will. You’ve already made progress just by trying.",
-    "cz_reply": "Díky, to mi trochu pomáhá.",
-    "accepted_answers": [
-      "Thanks, that helps a bit.",
-      "That’s comforting. Thanks."
-    ]
-  },
-  {
-    "alex": "Want to grab some food later? You’ve earned a break.",
-    "cz_reply": "Jasně, to zní dobře.",
-    "accepted_answers": [
-      "Sure, that sounds good.",
-      "Yeah, I’d like that."
-    ]
-  },
-  {
-    "alex": "Cool. And next time, you’ll know what to do.",
-    "cz_reply": "Jo, příště budu odvážnější.",
-    "accepted_answers": [
-      "Yeah, I’ll be braver next time.",
-      "Next time, I’ll have more courage."
+      "I've learned I need to be more confident.",
+      "Yeah, I need more confidence.",
+      "I should have more self-confidence.",
+      "I've learned to be braver.",
+      "Yes, I need to work on my confidence."
     ]
   }
 ]

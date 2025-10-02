@@ -1,130 +1,122 @@
 [
   {
-    "alex": "Have you ever tried VR games?",
-    "cz_reply": "Ne, ještě nikdy.",
+    "alex": "Have you tried virtual reality yet?",
+    "cz_reply": "Ano, zkusil jsem VR brýle u kamaráda.",
     "accepted_answers": [
-      "No, never.",
-      "No, I haven’t tried them."
+      "Yes, I've tried VR headset at my friend's.",
+      "I've tried VR goggles at a friend's place.",
+      "Yes, I tested VR headset at my friend's house.",
+      "I've experienced VR at my friend's.",
+      "Yes, I've used VR glasses at a friend's.",
+      "I tried VR equipment at my friend's place."
     ]
   },
   {
-    "alex": "You should! It’s amazing.",
-    "cz_reply": "Vážně? Co je na tom tak super?",
+    "alex": "What did you think about it?",
+    "cz_reply": "Bylo to úžasné! Cítil jsem se jako v jiném světě.",
     "accepted_answers": [
-      "Really? What’s so cool about it?",
-      "Really? What’s good about it?"
+      "It was amazing! I felt like I was in another world.",
+      "It was incredible! I felt like being in a different world.",
+      "Amazing! It felt like I was in another reality.",
+      "It was fantastic! I felt transported to another world.",
+      "Incredible! It was like being in a completely different place.",
+      "It was awesome! I felt like I was somewhere else entirely."
     ]
   },
   {
-    "alex": "You feel like you are inside the game.",
-    "cz_reply": "To zní fakt dobře!",
+    "alex": "Have you played any specific VR games?",
+    "cz_reply": "Ano, hrál jsem Beat Saber a nějakou střílečku.",
     "accepted_answers": [
-      "That sounds really good!",
-      "Sounds great!"
+      "Yes, I've played Beat Saber and some shooter game.",
+      "I played Beat Saber and a shooting game.",
+      "Yes, I've tried Beat Saber and some action game.",
+      "I've played Beat Saber and a first-person shooter.",
+      "Yes, Beat Saber and some combat game.",
+      "I experienced Beat Saber and a shooting game."
     ]
   },
   {
-    "alex": "I played a space game yesterday.",
-    "cz_reply": "Letěl jsi ve vesmíru?",
+    "alex": "Have you considered buying your own VR headset?",
+    "cz_reply": "Ano, ale je to zatím moc drahé.",
     "accepted_answers": [
-      "Did you fly in space?",
-      "Were you flying in space?"
+      "Yes, but it's too expensive for now.",
+      "I've thought about it, but it's too costly.",
+      "Yes, but the price is too high right now.",
+      "I've considered it, but it's beyond my budget.",
+      "Yes, but I can't afford it yet.",
+      "I'd like to, but it's too expensive currently."
     ]
   },
   {
-    "alex": "Yes! And I fought aliens too.",
-    "cz_reply": "To musela být sranda.",
+    "alex": "Have you seen any VR videos on YouTube?",
+    "cz_reply": "Ano, sledoval jsem recenze a gameplay videa.",
     "accepted_answers": [
-      "That must have been fun.",
-      "It was probably fun."
+      "Yes, I've watched reviews and gameplay videos.",
+      "I've seen review videos and game footage.",
+      "Yes, I've watched VR reviews and gaming videos.",
+      "I've viewed reviews and gameplay demonstrations.",
+      "Yes, I've seen review content and game videos.",
+      "I've watched evaluation videos and game footage."
     ]
   },
   {
-    "alex": "I screamed when they jumped at me!",
-    "cz_reply": "Haha, to bych se taky lekl.",
+    "alex": "Have you heard about the metaverse?",
+    "cz_reply": "Ano, ale pořád tomu úplně nerozumím.",
     "accepted_answers": [
-      "Haha, I would be scared too.",
-      "Haha, I would scream too."
+      "Yes, but I still don't fully understand it.",
+      "I've heard of it, but I don't completely get it.",
+      "Yes, but I'm still confused about what it is.",
+      "I've heard about it, but it's not entirely clear to me.",
+      "Yes, but I don't grasp the concept completely.",
+      "I know about it, but I'm still learning what it means."
     ]
   },
   {
-    "alex": "Do you have a VR headset?",
-    "cz_reply": "Ne, ale chci si ho koupit.",
+    "alex": "Have you tried any VR social experiences?",
+    "cz_reply": "Ne, zatím jen hry. Ale zní to zajímavě.",
     "accepted_answers": [
-      "No, but I want to buy one.",
-      "No, but I want one."
+      "No, just games so far. But it sounds interesting.",
+      "I haven't, only games. But that sounds intriguing.",
+      "No, only gaming. But it sounds fascinating.",
+      "Not yet, just games. But that sounds cool.",
+      "I haven't tried social VR, only games. Sounds interesting though.",
+      "No, I've only done gaming. But that sounds appealing."
     ]
   },
   {
-    "alex": "They’re not cheap, though.",
-    "cz_reply": "Já vím, šetřím si peníze.",
+    "alex": "Have you experienced any motion sickness in VR?",
+    "cz_reply": "Trochu ano, hlavně při rychlém pohybu.",
     "accepted_answers": [
-      "I know, I’m saving money.",
-      "Yes, I’m saving up."
+      "A little bit, especially during fast movement.",
+      "Yes, somewhat, particularly with rapid motion.",
+      "A bit, mainly when moving quickly.",
+      "Slightly, especially during fast-paced scenes.",
+      "A little, particularly with quick movements.",
+      "Yes, a bit, especially when there's rapid motion."
     ]
   },
   {
-    "alex": "There are cool apps too, not just games.",
-    "cz_reply": "Jako třeba co?",
+    "alex": "Have you heard about VR fitness apps?",
+    "cz_reply": "Ano, slyšel jsem, že se při tom dá i cvičit.",
     "accepted_answers": [
-      "Like what?",
-      "For example?"
+      "Yes, I've heard you can exercise with them.",
+      "I've heard that you can work out using VR.",
+      "Yes, I know you can exercise through VR apps.",
+      "I've heard VR can be used for fitness.",
+      "Yes, I've learned you can get fit with VR.",
+      "I've heard VR offers workout opportunities."
     ]
   },
   {
-    "alex": "Like VR travel, painting, and concerts!",
-    "cz_reply": "To je šílený, chci to zkusit.",
+    "alex": "Do you think VR will become more popular in the future?",
+    "cz_reply": "Určitě ano, technologie se stále zlepšuje.",
     "accepted_answers": [
-      "That’s crazy, I want to try it.",
-      "Sounds crazy, I want to try."
-    ]
-  },
-  {
-    "alex": "We can play together when you get one!",
-    "cz_reply": "Fakt? To by bylo super.",
-    "accepted_answers": [
-      "Really? That would be great.",
-      "Yes! That would be awesome."
-    ]
-  },
-  {
-    "alex": "We could explore VR cities!",
-    "cz_reply": "To zní jako výlet z gauče.",
-    "accepted_answers": [
-      "That sounds like a couch trip.",
-      "It’s like a trip from the sofa."
-    ]
-  },
-  {
-    "alex": "Exactly! Who needs a car?",
-    "cz_reply": "Haha, jen VR brýle a je to.",
-    "accepted_answers": [
-      "Haha, just VR glasses and done.",
-      "Haha, only VR headset and go!"
-    ]
-  },
-  {
-    "alex": "I hope you get yours soon!",
-    "cz_reply": "Já taky. Už se těším.",
-    "accepted_answers": [
-      "Me too. I can’t wait.",
-      "I’m excited too."
-    ]
-  },
-  {
-    "alex": "Let’s look at prices later?",
-    "cz_reply": "Jo, po škole to projdeme.",
-    "accepted_answers": [
-      "Yes, we’ll check after school.",
-      "Sure, we can look after school."
-    ]
-  },
-  {
-    "alex": "Deal! See you later!",
-    "cz_reply": "Čau, díky za tipy!",
-    "accepted_answers": [
-      "Bye, thanks for the tips!",
-      "See you, thanks for the ideas!"
+      "Definitely yes, the technology keeps improving.",
+      "Absolutely, technology is constantly getting better.",
+      "For sure, the tech is continuously advancing.",
+      "Certainly, technology keeps evolving.",
+      "Yes definitely, technology is always improving.",
+      "Absolutely, technological progress continues."
     ]
   }
 ]
