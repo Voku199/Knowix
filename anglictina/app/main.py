@@ -36,6 +36,7 @@ from vlastni_music import vlastni_music_bp
 from proc import proc_bp
 from security_ext import init_security
 from AI_poslech import ai_poslech_bp
+from uvidet import uvidet  # QR landing page blueprint
 
 # -------- Matematiky --------------------
 # from math_main import math_main_bp
@@ -128,6 +129,7 @@ app.register_blueprint(admin_bp)
 app.register_blueprint(vlastni_music_bp)
 app.register_blueprint(proc_bp)
 app.register_blueprint(ai_poslech_bp)
+app.register_blueprint(uvidet)  # /uvidet a /qr
 
 # -------- Matematiky --------------------
 # app.register_blueprint(math_main_bp)

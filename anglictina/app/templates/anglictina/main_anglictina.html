@@ -51,6 +51,65 @@
 }
 </script>
 
+    <!-- Desktop rozdělení: levá = Psaní (bílé pozadí), pravá = Poslech -->
+    <style>
+      @media (min-width: 992px) {
+        .info {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 28px; /* +4px */
+          align-items: start;
+        }
+        .info-column {
+          display: grid;
+          grid-auto-rows: minmax(0, auto);
+          gap: 20px; /* +4px */
+          padding: 20px; /* +4px */
+          border-radius: 18px; /* +2px */
+        }
+        .info-left {
+          background: #ffffff;
+          box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 8px 24px rgba(0,0,0,0.06);
+        }
+        .info-right {
+          background: #f6f7fb;
+          box-shadow: 0 0 0 1px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.08);
+        }
+        .info .column-title {
+          font-weight: 600;
+          font-size: 1.25rem; /* +0.1rem */
+          margin: 4px 8px 6px;
+          opacity: 0.85;
+        }
+        /* Jemné zvětšení aktivit jen na desktopu */
+        .info .activity-bubble {
+          padding: 18px; /* přidá trochu prostoru uvnitř bubliny */
+          gap: 14px;
+        }
+        .info .activity-bubble img {
+          width: clamp(64px, 7.5vw, 88px);
+          height: auto;
+        }
+        .info .activity-bubble .bubble-text h3 {
+          font-size: 1.25rem;
+          line-height: 1.25;
+        }
+        .info .activity-bubble .bubble-text p {
+          font-size: 1.05rem;
+          line-height: 1.35;
+        }
+      }
+      @media (max-width: 991.98px) {
+        /* Na mobilech ponecháme původní chování – wrappery jsou "průchozí" */
+        .info { display: block; }
+        .info-column { display: contents; padding: 0; }
+        .info .column-title { display: none; }
+      }
+      /* Dark mode doladění kontrastu */
+      .dark-mode .info-left { background: #121212; box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 12px 28px rgba(0,0,0,0.35); }
+      .dark-mode .info-right { background: #181a1b; box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 12px 28px rgba(0,0,0,0.4); }
+    </style>
+
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
@@ -98,7 +157,7 @@
                 </button>
             </li>
         </ul>
-        {% if session['user_name'] %}
+        {% if session.get('user_name') %}
         <div class="user-profile">
             <div class="profile-container">
                 {% if session.get('profile_pic') %}
@@ -142,84 +201,93 @@
 
     <section class="info">
 
-        <a href="/ai-poslech" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/ai-mluveni.png') }}" alt="Slovesa">
-            <div class="bubble-text">
-                <h3>AI Mluvení</h3>
-                <p style="color: inherit;">Chceš se naučit mluvit? Lepší způsob nenajdeš.</p>
-            </div>
-        </a>
-        <a href="/ai/chats" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/ai-chat.png') }}" alt="Slovesa">
-            <div class="bubble-text">
-                <h3>AI chat</h3>
-                <p style="color: inherit;">Chceš se naučit trošku angličtinu? Lepší způsob nenajdeš.</p>
-            </div>
-        </a>
+        <div class="info-column info-left" aria-labelledby="col-writing">
+            <div class="column-title" id="col-writing">Psaní</div>
 
-        <a href="/dnd" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/dnd.png') }}" alt="Slovesa">
-            <div class="bubble-text">
-                <h3>Dungeons And Dragons</h3>
-                <p style="color: inherit;">Slovní příběhovka kterou si buduješ sám...</p>
-            </div>
-        </a>
+            <a href="/ai/chats" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+                <img src="{{ url_for('static', filename='pic/ai-chat.png') }}" alt="AI chat">
+                <div class="bubble-text">
+                    <h3>AI chat</h3>
+                    <p style="color: inherit;">Chceš se naučit trošku angličtinu? Lepší způsob nenajdeš.</p>
+                </div>
+            </a>
 
-        <a href="/song-selection" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/music.webp') }}" alt="Slovesa">
-            <div class="bubble-text">
-                <h3>Hudba</h3>
-                <p style="color: inherit;">Procvič si všechny hudby formy nepravidelných sloves!</p>
-            </div>
-        </a>
+            <a href="/psani" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+                <img src="{{ url_for('static', filename='pic/writing.png') }}" alt="Psaní">
+                <div class="bubble-text">
+                    <h3>Psaní</h3>
+                    <p style="color: inherit;">Píšeš něco v angličtině podle tvých představ.</p>
+                </div>
+            </a>
 
-        <a href="/roleplaying" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/mic.png') }}" alt="Slovesa">
-            <div class="bubble-text">
-                <h3>Mluvení</h3>
-                <p style="color: inherit;">Mluvení, kde si můžeš procvičit své mluvení!</p>
-            </div>
-        </a>
+            <a href="/dnd" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+                <img src="{{ url_for('static', filename='pic/dnd.png') }}" alt="Dungeons And Dragons">
+                <div class="bubble-text">
+                    <h3>Dungeons And Dragons</h3>
+                    <p style="color: inherit;">Slovní příběhovka kterou si buduješ sám...</p>
+                </div>
+            </a>
 
-        <a href="/listening" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/talking.webp') }}" alt="Slovesa">
-            <div class="bubble-text">
-                <h3>Poslouchání</h3>
-                <p style="color: inherit;">Procvič si normalní bázi poslouchaní konverzací!</p>
-            </div>
-        </a>
+            <a href="/hangman" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+                <img src="{{ url_for('static', filename='pic/hangman.webp') }}" alt="Hangman">
+                <div class="bubble-text">
+                    <h3>Hangman</h3>
+                    <p style="color: inherit;">Klasická hra ve který si můžeš procvičit slovní zásobu!</p>
+                </div>
+            </a>
 
-        <a href="/psani" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/writing.png') }}" alt="Slovesa">
-            <div class="bubble-text">
-                <h3>Psaní</h3>
-                <p style="color: inherit;">Píšeš něco v angličtině podle tvých představ.</p>
-            </div>
-        </a>
+            <a href="/gramatika" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+                <img src="{{ url_for('static', filename='pic/grammary.webp') }}" alt="Gramatika">
+                <div class="bubble-text">
+                    <h3>Gramatika</h3>
+                    <p style="color: inherit;">Gramatika, kde si můžeš procvičit svojí gramatiku zábavnou formou!</p>
+                </div>
+            </a>
+        </div>
 
+        <div class="info-column info-right" aria-labelledby="col-listening">
+            <div class="column-title" id="col-listening">Poslech</div>
 
-        <a href="/hangman" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/hangman.webp') }}" alt="Slovesa">
-            <div class="bubble-text">
-                <h3>Hangman</h3>
-                <p style="color: inherit;">Klasická hra ve který si můžeš procvičit slovní zásobu!</p>
-            </div>
-        </a>
+            <a href="/ai-poslech" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+                <img src="{{ url_for('static', filename='pic/ai-mluveni.png') }}" alt="AI Mluvení">
+                <div class="bubble-text">
+                    <h3>AI Mluvení</h3>
+                    <p style="color: inherit;">Chceš se naučit mluvit? Lepší způsob nenajdeš.</p>
+                </div>
+            </a>
 
-        <a href="/gramatika" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
-            <img src="{{ url_for('static', filename='pic/grammary.webp') }}" alt="Slovesa">
-            <div class="bubble-text">
-                <h3>Gramatika</h3>
-                <p style="color: inherit;">Gramatika, kde si můžeš procvičit svojí gramatiku zábavnou formou!</p>
-            </div>
-        </a>
-<!--        <a href="/pexeso" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">-->
-<!--            <img src="{{ url_for('static', filename='pic/pexeso.png') }}" alt="Slovesa">-->
-<!--            <div class="bubble-text">-->
-<!--                <h3>Pexeso (Multiplayer)</h3>-->
-<!--                <p style="color: inherit;">Pexeso kde hraješ s ostatními! (Beta verze)</p>-->
-<!--            </div>-->
-<!--        </a>-->
+            <a href="/roleplaying" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+                <img src="{{ url_for('static', filename='pic/mic.png') }}" alt="Mluvení">
+                <div class="bubble-text">
+                    <h3>Mluvení</h3>
+                    <p style="color: inherit;">Mluvení, kde si můžeš procvičit své mluvení!</p>
+                </div>
+            </a>
+
+            <a href="/listening" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+                <img src="{{ url_for('static', filename='pic/talking.webp') }}" alt="Poslouchání">
+                <div class="bubble-text">
+                    <h3>Poslouchání</h3>
+                    <p style="color: inherit;">Procvič si normalní bázi poslouchaní konverzací!</p>
+                </div>
+            </a>
+
+            <a href="/song-selection" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+                <img src="{{ url_for('static', filename='pic/music.webp') }}" alt="Hudba">
+                <div class="bubble-text">
+                    <h3>Hudba</h3>
+                    <p style="color: inherit;">Procvič si všechny hudby formy nepravidelných sloves!</p>
+                </div>
+            </a>
+        </div>
+
+        <!--        <a href="/pexeso" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">-->
+        <!--            <img src="{{ url_for('static', filename='pic/pexeso.png') }}" alt="Slovesa">-->
+        <!--            <div class="bubble-text">-->
+        <!--                <h3>Pexeso (Multiplayer)</h3>-->
+        <!--                <p style="color: inherit;">Pexeso kde hraješ s ostatními! (Beta verze)</p>-->
+        <!--            </div>-->
+        <!--        </a>-->
     </section>
 
 </main>
@@ -240,28 +308,31 @@
         const profileMenu = document.getElementById('profileMenu');
         const trigger = document.getElementById('profileMenuTrigger');
 
-        if (!trigger.contains(e.target) && !profileMenu.contains(e.target)) {
+        if (trigger && profileMenu && !trigger.contains(e.target) && !profileMenu.contains(e.target)) {
             profileMenu.style.opacity = '0';
             profileMenu.style.visibility = 'hidden';
             profileMenu.style.transform = 'translateY(10px)';
         }
     });
 
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-        fetch('/set_theme', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
-            body: JSON.stringify({
-                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark',
-                csrf_token: CSRF_TOKEN
-            })
-        }).then(r => {
-            if (r.ok) {
-                document.body.classList.toggle('dark-mode');
-                sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-            }
-        });
-    });
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+          fetch('/set_theme', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
+              body: JSON.stringify({
+                  theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark',
+                  csrf_token: CSRF_TOKEN
+              })
+          }).then(r => {
+              if (r.ok) {
+                  document.body.classList.toggle('dark-mode');
+                  sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+              }
+          });
+      });
+    }
 </script>
 </body>
 </html>
