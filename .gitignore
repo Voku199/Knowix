@@ -1,1 +1,5 @@
 .idea/copilotDiffState.xml
+__pycache__
+test.py
+test_ai.py
+test
