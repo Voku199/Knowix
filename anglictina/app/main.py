@@ -37,7 +37,6 @@ from proc import proc_bp
 from security_ext import init_security
 from AI_poslech import ai_poslech_bp
 from uvidet import uvidet  # QR landing page blueprint
-from shadow_ml import shadow_ml_bp  # Nový import pro Shadowing mode
 
 # -------- Matematiky --------------------
 # from math_main import math_main_bp
@@ -131,7 +130,6 @@ app.register_blueprint(vlastni_music_bp)
 app.register_blueprint(proc_bp)
 app.register_blueprint(ai_poslech_bp)
 app.register_blueprint(uvidet)  # /uvidet a /qr
-# app.register_blueprint(shadow_ml_bp)  # Nově registrovaný blueprint pro Shadowing mode
 
 # -------- Matematiky --------------------
 # app.register_blueprint(math_main_bp)
