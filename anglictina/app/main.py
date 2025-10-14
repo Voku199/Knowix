@@ -350,7 +350,7 @@ def add_security_headers(response):
 # serve(app, host="0.0.0.0", port=8080, threads=24, backlog=100)
 
 
-# === Spuštění aplikace ===
+# === Spuštění aplikace ===+%
 from waitress import serve
 
 serve(app, host="0.0.0.0", port=8080, threads=24, backlog=100)
