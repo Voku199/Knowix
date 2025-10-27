@@ -1,8 +1,38 @@
 from db import get_db_connection
-from datetime import datetime
+
+
+def _ensure_extended_columns():
+    """Zajistí nové sloupce pro shadow a podcast statistiky (idempotentně)."""
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        # MySQL/MariaDB: IF NOT EXISTS je podporováno v novějších verzích; pokud ne, chybu ignorujeme.
+        alter_cmds = [
+            "ALTER TABLE user_stats ADD COLUMN IF NOT EXISTS shw_cor INT NOT NULL DEFAULT 0",
+            "ALTER TABLE user_stats ADD COLUMN IF NOT EXISTS shw_mb INT NOT NULL DEFAULT 0",
+            "ALTER TABLE user_stats ADD COLUMN IF NOT EXISTS shw_wr INT NOT NULL DEFAULT 0",
+            "ALTER TABLE user_stats ADD COLUMN IF NOT EXISTS pds_cor INT NOT NULL DEFAULT 0",
+            "ALTER TABLE user_stats ADD COLUMN IF NOT EXISTS pds_wr INT NOT NULL DEFAULT 0",
+        ]
+        for sql in alter_cmds:
+            try:
+                cur.execute(sql)
+            except Exception:
+                # fallback pro starší verze bez IF NOT EXISTS – pokus bez něj, případně ignoruj duplicitní chybu
+                try:
+                    base_sql = sql.replace(" IF NOT EXISTS", "")
+                    cur.execute(base_sql)
+                except Exception:
+                    pass
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception:
+        pass
 
 
 def ensure_user_stats_exists(user_id):
+    _ensure_extended_columns()
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("SELECT id FROM user_stats WHERE user_id = %s", (user_id,))
@@ -47,11 +77,14 @@ def set_first_activity_if_needed(user_id):
 def update_user_stats(user_id, correct=0, wrong=0, lesson_done=False, psani_words=0, hangman_words_guessed=0,
                       irregular_verbs_guessed=0, irregular_verbs_wrong=0, pp_wrong=0, pp_maybe=0, pp_correct=0,
                       roleplaying_cr=0, roleplaying_mb=0, roleplaying_wr=0, lis_cor=0, lis_wr=0, at_cor=0, at_wr=0,
-                      learning_time=None, set_first_activity=False, ai_poslech_minut=0, ai_poslech_seconds=0):
+                      learning_time=None, set_first_activity=False, ai_poslech_minut=0, ai_poslech_seconds=0,
+                      shw_cor=0, shw_mb=0, shw_wr=0, pds_cor=0, pds_wr=0):
     """
     Aktualizuje statistiky uživatele v user_stats.
     Důležité inkrementy: total_learning_time (sekundy), AI_poslech_seconds (sekundy pro AI Poslech), AI_poslech_minut (zpětná kompatibilita).
+    Nové sloupce: shw_cor/shw_mb/shw_wr pro Shadow, pds_cor/pds_wr pro Podcast.
     """
+    _ensure_extended_columns()
     ensure_user_stats_exists(user_id)
     conn = get_db_connection()
     cur = conn.cursor()
@@ -108,15 +141,33 @@ def update_user_stats(user_id, correct=0, wrong=0, lesson_done=False, psani_word
     if at_wr:
         updates.append("at_wr = at_wr + %s")
         params.append(int(at_wr))
-    if learning_time is not None:
-        updates.append("total_learning_time = total_learning_time + %s")
-        params.append(int(learning_time))
     if ai_poslech_seconds:
         updates.append("AI_poslech_seconds = AI_poslech_seconds + %s")
         params.append(int(ai_poslech_seconds))
     if ai_poslech_minut:
         updates.append("AI_poslech_minut = AI_poslech_minut + %s")
         params.append(int(ai_poslech_minut))
+
+    # Nové: Shadow a Podcast sloupce
+    if shw_cor:
+        updates.append("shw_cor = shw_cor + %s")
+        params.append(int(shw_cor))
+    if shw_mb:
+        updates.append("shw_mb = shw_mb + %s")
+        params.append(int(shw_mb))
+    if shw_wr:
+        updates.append("shw_wr = shw_wr + %s")
+        params.append(int(shw_wr))
+    if pds_cor:
+        updates.append("pds_cor = pds_cor + %s")
+        params.append(int(pds_cor))
+    if pds_wr:
+        updates.append("pds_wr = pds_wr + %s")
+        params.append(int(pds_wr))
+
+    if learning_time is not None:
+        updates.append("total_learning_time = total_learning_time + %s")
+        params.append(int(learning_time))
 
     updates.append("last_active = NOW()")
 

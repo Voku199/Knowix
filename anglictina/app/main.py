@@ -1,7 +1,8 @@
 # --- Flask and SocketIO imports ---
 from dotenv import load_dotenv
 from flask import Flask, render_template, session, send_from_directory, request, redirect, jsonify, g
-from flask_session import Session
+# from flask_session import Session
+import importlib
 from streak import get_user_streak
 import traceback
 import redis
@@ -37,6 +38,10 @@ from proc import proc_bp
 from security_ext import init_security
 from AI_poslech import ai_poslech_bp
 from uvidet import uvidet  # QR landing page blueprint
+from shadow_ml import shadow_ml_bp
+from podcast import podcast_bp
+from slovni_fotbal import slovni_bp
+from daily_quest import daily_bp, get_daily_quests_for_user
 
 # -------- Matematiky --------------------
 # from math_main import math_main_bp
@@ -56,6 +61,12 @@ load_dotenv(dotenv_path=".env")
 app.secret_key = os.getenv("SECRET_KEY")
 if not app.secret_key:
     raise RuntimeError("SECRET_KEY is missing. Set SECRET_KEY in environment.")
+
+# Pokus o dynamický import Flask-Session, který obejde případný konflikt s lokální složkou "flask_session"
+try:
+    FlaskSession = importlib.import_module('flask_session').Session
+except Exception:
+    FlaskSession = None
 
 app.config.update(
     SESSION_COOKIE_NAME=os.getenv('SESSION_COOKIE_NAME', 'knowix_session'),
@@ -101,7 +112,8 @@ if app.config['SESSION_TYPE'] == 'filesystem':
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 
 # Initialize session after all config is set
-Session(app)
+if FlaskSession:
+    FlaskSession(app)
 
 # === Registrace blueprintů ===
 app.register_blueprint(main_bp)
@@ -130,6 +142,10 @@ app.register_blueprint(vlastni_music_bp)
 app.register_blueprint(proc_bp)
 app.register_blueprint(ai_poslech_bp)
 app.register_blueprint(uvidet)  # /uvidet a /qr
+app.register_blueprint(shadow_ml_bp)
+app.register_blueprint(podcast_bp)
+app.register_blueprint(slovni_bp)
+app.register_blueprint(daily_bp)
 
 # -------- Matematiky --------------------
 # app.register_blueprint(math_main_bp)
@@ -260,6 +276,14 @@ def inject_xp_info():
             user_xp_in_level=xp_in_level
         )
     return {}
+
+
+@app.context_processor
+def inject_daily_quests_cp():
+    user_id = session.get('user_id')
+    if user_id:
+        return dict(daily_quests=get_daily_quests_for_user(user_id))
+    return dict(daily_quests=None)
 
 
 # === Error handler (HTML nebo JSON) ===

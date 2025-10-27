@@ -92,6 +92,20 @@ def init_security(app):
             if sent_token is None:
                 sent_token = request.form.get('csrf_token') or request.headers.get('X-CSRFToken')
             if not session_token or not sent_token or session_token != sent_token:
+                # Debug info for failed CSRF checks (neukládáme tokeny)
+                try:
+                    info = {
+                        'endpoint': request.endpoint,
+                        'method': request.method,
+                        'has_session_token': bool(session_token),
+                        'has_sent_token': bool(sent_token),
+                        'form_keys': list(request.form.keys()),
+                        'headers_contain_csrf': bool(request.headers.get('X-CSRFToken'))
+                    }
+                    # tisk pouze na konzoli serveru
+                    print('[CSRF DEBUG] CSRF validation failed:', info)
+                except Exception:
+                    pass
                 abort(400)
 
     # Exempt limiter pro prefixy + explicitní endpointy

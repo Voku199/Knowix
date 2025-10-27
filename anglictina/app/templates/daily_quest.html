@@ -1,0 +1,94 @@
+{# Fragment pro zobrazení denních úkolů #}
+<div class="daily-quests-card">
+  <h3 class="dq-title">Denní úkoly</h3>
+  {% if daily_quests %}
+    <ul class="dq-list">
+      {% for q in daily_quests %}
+        <li class="dq-item {{ 'dq-complete' if q.complete else '' }}">
+          <div class="dq-row">
+            <div class="dq-main">
+              <div class="dq-hx">{{ q.title }}</div>
+              <div class="dq-desc">{{ q.desc }}</div>
+              <div class="dq-progress">
+                <div class="dq-bar-bg">
+                  <div class="dq-bar" style="width: {{ (q.progress / q.target * 100) if q.target else 0 }}%"></div>
+                </div>
+                <span class="dq-progress-label">{{ q.progress }}/{{ q.target }}</span>
+              </div>
+              {# CTA do obchodu: pokud úkol uděluje klíče a je splněn nebo vybrán #}
+              {% set rk = q.reward_keys or 0 %}
+              {% if rk > 0 and (q.complete or q.claimed) %}
+                <div class="dq-cta">
+                  Máš klíč{% if rk > 1 %}e{% endif %}? Jdi do <a href="{{ url_for('obchod.obchod') }}">Obchodu</a> a roztoč kolo štěstí.
+                </div>
+              {% endif %}
+            </div>
+            <div class="dq-actions">
+              {% set rk = q.reward_keys or 0 %}
+              {% if q.complete and not q.claimed %}
+                <button class="dq-claim" data-qid="{{ q.id }}">
+                  Vybrat +{{ q.reward_xp }} XP{% if rk > 0 %} +{{ rk }} klíč{% if rk == 1 %}{% else %}ů{% endif %}{% endif %}
+                </button>
+              {% elif q.claimed %}
+                <span class="dq-claimed">Splněno ✓</span>
+              {% else %}
+                <span class="dq-reward">Odměna: +{{ q.reward_xp }} XP{% if rk > 0 %} +{{ rk }} klíč{% if rk == 1 %}{% else %}ů{% endif %}{% endif %}</span>
+              {% endif %}
+            </div>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="dq-empty">Přihlas se pro denní úkoly.</p>
+  {% endif %}
+</div>
+
+<style>
+  .daily-quests-card { border-radius: 14px; padding: 16px; background: #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.06), 0 8px 20px rgba(0,0,0,0.06); margin: 8px 0; }
+  .dark-mode .daily-quests-card { background: #121212; box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 8px 24px rgba(0,0,0,0.35); }
+  .dq-title { margin: 0 0 8px; font-size: 1.2rem; font-weight: 600; }
+  .dq-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .dq-item { padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,0.02); }
+  .dark-mode .dq-item { background: rgba(255,255,255,0.05); }
+  .dq-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .dq-hx { font-weight: 600; margin-bottom: 2px; }
+  .dq-desc { font-size: .95rem; opacity: .8; margin-bottom: 6px; }
+  .dq-progress { display: flex; align-items: center; gap: 8px; }
+  .dq-bar-bg { width: 160px; height: 8px; background: #e0e0e0; border-radius: 8px; overflow: hidden; }
+  .dq-bar { height: 100%; background: linear-gradient(90deg, #4CAF50 60%, #43a047 100%); }
+  .dark-mode .dq-bar-bg { background: #2a2a2a; }
+  .dq-claim { border: none; background: #4CAF50; color: #fff; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+  .dq-claim:hover { filter: brightness(0.95); }
+  .dq-claimed { color: #4CAF50; font-weight: 700; }
+  .dq-reward { opacity: .9; font-weight: 600; }
+  .dq-item.dq-complete { outline: 2px solid rgba(76,175,80,0.25); }
+  .dq-cta { margin-top: 6px; font-size: .9rem; color: #374151; }
+  .dark-mode .dq-cta { color: #d1d5db; }
+  .dq-cta a { font-weight: 700; }
+</style>
+
+<script>
+(function(){
+  function claimQuest(qid){
+    if (!qid) return;
+    fetch('/daily/claim', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': (typeof CSRF_TOKEN !== 'undefined' ? CSRF_TOKEN : '') },
+      body: JSON.stringify({ quest_id: qid, csrf_token: (typeof CSRF_TOKEN !== 'undefined' ? CSRF_TOKEN : '') })
+    }).then(r => r.json()).then(data => {
+      if (data && data.ok){
+        // Refresh celé stránky kvůli přepočtu XP, klíčů a stavu
+        location.reload();
+      }
+    }).catch(()=>{});
+  }
+  document.addEventListener('click', function(ev){
+    const btn = ev.target.closest('.dq-claim');
+    if (btn){
+      ev.preventDefault();
+      claimQuest(btn.getAttribute('data-qid'));
+    }
+  });
+})();
+</script>

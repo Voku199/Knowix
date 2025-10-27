@@ -1,474 +1,642 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Procvičuj si angličtinu zábavně s Knowixem – chaty, písničky, překlady a hry.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Procvičuj si angličtinu zábavně s Knowixem – chaty, písničky, překlady a hry.">
+  <title>DND | Knowix</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/mobile_header.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+  </noscript>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-W1EN990JKP');
+  </script>
+  <style>
+    .chat-layout { display:flex; gap:16px; max-width: 1000px; margin: 40px auto; }
+    .chat-container { flex:1; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); padding: 24px 16px 16px 16px; font-family: 'League Spartan', sans-serif; }
+    .sidebar { width: 300px; background:#fff; border-radius:12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding:16px; height: fit-content; }
+    .chat-header { font-size: 1.5rem; font-weight: 600; margin-bottom: 12px; text-align: center; color: #2c3e50; display:flex; align-items:center; justify-content:space-between; }
+    .inventory-bar { margin-bottom: 16px; text-align: center; background: #e8f5e9; border-radius: 8px; padding: 8px 0; color: #388e3c; font-size: 0.9rem; }
+    .chat-history { max-height: 400px; overflow-y: auto; margin-bottom: 16px; padding: 10px; background: #fafafa; border-radius: 8px; }
+    .message { margin-bottom: 16px; display: flex; align-items: flex-start; }
+    .message.user { flex-direction: row-reverse; }
+    .avatar { width: 38px; height: 38px; border-radius: 50%; margin: 0 8px; object-fit: cover; background: #eee; border: 1px solid #ddd; flex-shrink: 0; }
+    .bubble { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 1rem; line-height: 1.5; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); word-break: break-word; }
+    .message.user .bubble { background: #bbdefb; color: #0d47a1; border-bottom-right-radius: 4px; }
+    .message.ai .bubble { background: #f5f5f5; color: #212121; border-bottom-left-radius: 4px; display: block; position: relative; }
+    .message.ai .bubble .action-buttons { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
 
-    <title>DND | Knowix</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="stylesheet" href="/static/mobile_header.css">
-    <!-- Preconnect zrychlí DNS a spojení -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Font načti až po načtení stránky -->
-    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
-          media="print" onload="this.media='all'">
-    <noscript>
-        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
-    </noscript>
-
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-W1EN990JKP');
-</script>
-<style>
-    .chat-container {
-        max-width: 600px;
-        margin: 40px auto;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        padding: 24px 16px 16px 16px;
-        font-family: 'League Spartan', sans-serif;
+    /* Obecné akční tlačítko v AI bublině – neaplikovat na .speak-button */
+    .message.ai .bubble button:not(.speak-button) {
+      display: block;
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: 6px;
+      border: none;
+      background: #4caf50;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-align: left;
     }
+    .message.ai .bubble button:not(.speak-button):hover { background: #388e3c; }
 
-    .chat-header {
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin-bottom: 12px;
-        text-align: center;
-        color: #2c3e50;
+    /* Malé tlačítko přehrávání pod textem */
+    .message.ai .bubble .speak-button {
+      position: static;
+      background: #0ea5e9;
+      border: none;
+      border-radius: 16px;
+      width: 22px !important;
+      height: 22px !important;
+      cursor: pointer;
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      line-height: 1;
+      margin-top: 6px;
+      padding: 0 !important;
     }
-
-    .inventory-bar {
-        margin-bottom: 16px;
-        text-align: center;
-        background: #e8f5e9;
-        border-radius: 8px;
-        padding: 8px 0;
-        color: #388e3c;
-        font-size: 0.9rem;
-    }
-
-    .chat-history {
-        max-height: 400px;
-        overflow-y: auto;
-        margin-bottom: 16px;
-        padding: 10px;
-        background: #fafafa;
-        border-radius: 8px;
-    }
-
-    .message {
-        margin-bottom: 16px;
-        display: flex;
-        align-items: flex-start;
-    }
-
-    .message.user {
-        flex-direction: row-reverse;
-    }
-
-    .avatar {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        margin: 0 8px;
-        object-fit: cover;
-        background: #eee;
-        border: 1px solid #ddd;
-        flex-shrink: 0;
-    }
-
-    .bubble {
-        max-width: 75%;
-        padding: 12px 16px;
-        border-radius: 18px;
-        font-size: 1rem;
-        line-height: 1.5;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        word-break: break-word;
-    }
-
-    .message.user .bubble {
-        background: #bbdefb;
-        color: #0d47a1;
-        border-bottom-right-radius: 4px;
-    }
-
-    .message.ai .bubble {
-        background: #f5f5f5;
-        color: #212121;
-        border-bottom-left-radius: 4px;
-        display: block; /* Zajistí, že obsah bude blokový */
-    }
-
-    /* Styly pro tlačítka v AI zprávách */
-    .message.ai .bubble .action-buttons {
-        margin-top: 12px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .message.ai .bubble button {
-        display: block;
-        width: 100%;
-        padding: 10px 16px;
-        border-radius: 6px;
-        border: none;
-        background: #4caf50;
-        color: white;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s;
-        text-align: left;
-    }
-
-    .message.ai .bubble button:hover {
-        background: #388e3c;
-    }
-
-    .chat-input-row {
-        display: flex;
-        gap: 8px;
-        margin-top: 16px;
-    }
-
-    .chat-input-row input[type="text"] {
-        flex: 1;
-        padding: 12px 16px;
-        border-radius: 24px;
-        border: 1px solid #ddd;
-        font-size: 1rem;
-        font-family: inherit;
-    }
-
-    .chat-input-row button {
-        padding: 12px 20px;
-        border-radius: 24px;
-        border: none;
-        background: #388e3c;
-        color: #fff;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
-
-    .chat-input-row button:hover {
-        background: #2e7d32;
-    }
-
-    /* Tlačítko restartu */
-    #restart-btn {
-        float: right;
-        font-size: 0.85em;
-        padding: 6px 14px;
-        border-radius: 8px;
-        border: none;
-        background: #f44336;
-        color: #fff;
-        cursor: pointer;
-        margin-left: 16px;
-        transition: background 0.2s;
-    }
-
-    #restart-btn:hover {
-        background: #d32f2f;
-    }
-
-    /* Sticky footer layout */
+    .message.ai .bubble .speak-button:hover { background: #0c8fd1; }
+    .message.ai .bubble .speak-button.playing { background: #4caf50; }
     html, body { height: 100%; }
-    body {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-    }
+    body { min-height: 100vh; display: flex; flex-direction: column; }
     header { flex-shrink: 0; }
     .page-content { flex: 1 0 auto; display: block; }
     footer { flex-shrink: 0; }
-</style>
+
+    /* Nové styly pro tlačítko přehrávání */
+    .speak-button {
+      /* bylo: absolute top-right; nyní jako malý inline prvek pod textem */
+      position: static;
+      background: #0ea5e9;
+      border: none;
+      border-radius: 16px;
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      line-height: 1;
+      margin-top: 6px;
+    }
+    .speak-button:hover { background: #0c8fd1; }
+    .speak-button.playing { background: #4caf50; }
+
+    .audio-controls { display: flex; gap: 8px; align-items: center; }
+    .play-all-button, .stop-button {
+      background: #0ea5e9;
+      border: none;
+      border-radius: 16px;
+      /* dříve: width/height pro ikonu; nyní tlačeta s textem */
+      padding: 6px 10px;
+      color: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .play-all-button:hover { background: #0c8fd1; }
+    .play-all-button.playing { background: #4caf50; }
+    .stop-button { background: #ff6b35; }
+    .stop-button:hover { background: #e55a2b; }
+    .stop-button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Sidebar: Moje příběhy */
+    .sidebar h3 { margin: 0 0 8px; font-size: 1.05rem; font-weight: 700; color: #2c3e50; }
+    .stories { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; max-height: 420px; overflow: auto; }
+    .stories li { margin: 0; }
+    .stories a { display: block; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; text-decoration: none; color: #374151; background: #fff; transition: background 0.2s, border-color 0.2s, box-shadow 0.2s; }
+    .stories a:hover { background: #f9fafb; border-color: #d1d5db; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .stories a .meta { display:block; margin-top: 2px; font-size: 12px; color: #6b7280; }
+    .stories a.active { background: #e3f2fd; color: #0d47a1; border-color: #90caf9; }
+
+    /* Chat input row */
+    .chat-input-row { display: flex; gap: 10px; margin-top: 8px; }
+    #user_input { flex: 1; padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; color: #111827; font-size: 1rem; }
+    #user_input:focus { outline: none; border-color: #0ea5e9; box-shadow: 0 0 0 3px rgba(14,165,233,0.2); }
+    .chat-input-row button[type="submit"] { background: #0ea5e9; border: none; border-radius: 12px; padding: 0 16px; min-width: 110px; color: #fff; font-weight: 700; font-size: 1rem; cursor: pointer; transition: background 0.2s; }
+    .chat-input-row button[type="submit"]:hover { background: #0c8fd1; }
+
+    /* Dark mode overrides */
+    body.dark-mode .sidebar h3 { color: #e5e7eb; }
+    body.dark-mode .stories a { background: #111827; border-color: #374151; color: #e5e7eb; }
+    body.dark-mode .stories a:hover { background: #0f172a; border-color: #4b5563; }
+    body.dark-mode .stories a .meta { color: #9ca3af; }
+    body.dark-mode #user_input { background: #111827; color: #e5e7eb; border-color: #374151; }
+
+    /* A11y utility */
+    .visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
+
+    /* Jemná žárovka s tipem u user zprávy */
+    .correction-tip { display:inline-block; margin-left:8px; font-size:16px; color:#f59e0b; cursor: help; vertical-align: middle; }
+    /* Bublina s opravou (vlastní tooltip) */
+    .message.user .bubble { position: relative; }
+    .correction-tooltip {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      right: 8px;
+      background: #111827;
+      color: #f9fafb;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      line-height: 1.3;
+      max-width: 260px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+      z-index: 10;
+      display: none;
+      white-space: normal;
+      word-break: break-word;
+    }
+    .correction-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      right: 14px;
+      border-width: 6px;
+      border-style: solid;
+      border-color: #111827 transparent transparent transparent;
+    }
+    body.dark-mode .correction-tooltip { background: #0b1220; color: #e5e7eb; }
+    body.dark-mode .correction-tooltip::after { border-color: #0b1220 transparent transparent transparent; }
+
+    /* Mobilní rozložení */
+    @media (max-width: 768px) {
+      .chat-layout { flex-direction: column; gap: 10px; margin: 10px auto; padding: 0 8px; }
+      .sidebar { width: 100%; padding: 10px; order: 2; }
+      .chat-container { order: 1; padding: 12px; display: flex; flex-direction: column; min-height: 70vh; }
+      .chat-history { flex: 1; max-height: none; min-height: 50vh; overflow-y: auto; }
+      .chat-input-row { position: sticky; bottom: 0; background: #fff; padding: 8px 0 calc(env(safe-area-inset-bottom) + 6px); z-index: 5; }
+      body.dark-mode .chat-input-row { background: #111827; }
+      #user_input { font-size: 16px; padding: 14px; }
+      .chat-input-row button[type="submit"] { padding: 12px 16px; font-size: 16px; }
+      .message .avatar { width: 34px; height: 34px; }
+      .bubble { font-size: 1rem; }
+      .speak-button, .message.ai .bubble .speak-button { width: 28px !important; height: 28px !important; font-size: 14px; }
+      /* Přepínač postranního panelu jen na mobilech */
+      #toggle-stories-btn { display: inline-flex; align-items: center; gap: 6px; background: #e5f2ff; color: #0d47a1; border: none; border-radius: 10px; padding: 6px 10px; font-weight: 600; }
+      body.dark-mode #toggle-stories-btn { background: #1e293b; color: #93c5fd; }
+      /* Tooltip žárovky pod bublinou na mobilech */
+      .correction-tooltip { top: calc(100% + 8px); bottom: auto; right: 8px; }
+      /* Skrytý sidebar na mobilech */
+      .sidebar.mobile-hidden { display: none; }
+    }
+  </style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
-    <div class="logo-streak-wrapper">
-        <div class="logo">
-            <a href="{{ url_for('main.index') }}">
-                <img src="{{ url_for('static', filename='profile_pics/logo.webp') }}" alt="Knowix Logo">
-            </a>
-        </div>
-        <span class="streak-badge">
-            <img src="/static/fire.svg" alt="Streak">
-            {{ user_streak }}
-        </span>
+  <div class="logo-streak-wrapper">
+    <div class="logo">
+      <a href="{{ url_for('main.index') }}">
+        <img src="{{ url_for('static', filename='profile_pics/logo.webp') }}" alt="Knowix Logo">
+      </a>
     </div>
-    <div class="nav-profile-wrapper">
-        <ul class="nav-right">
-            <li>
-                <a href="/anglictina" title="Angličtina">
-                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <a href="/feedback" title="Feedback">
-                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <a href="/news" title="Novinky">
-                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <a href="/obchod" title="Obchod">
-                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <a href="/zpravy" title="Zprávy">
-                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
-                </a>
-            </li>
-            <li>
-                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
-                    🌙
-                </button>
-            </li>
-        </ul>
-        {% if session['user_name'] %}
-        <div class="user-profile">
-            <div class="profile-container">
-                {% if session.get('profile_pic') %}
-                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
-                     alt="Profilová fotka" width="64" class="profile-pic">
-                {% else %}
-                <img src="{{ url_for('static', filename='profile_pics/default.jpg') }}" alt="Defaultní profilovka"
-                     class="profile-pic" id="profileMenuTrigger">
-                {% endif %}
-                <div class="profile-menu" id="profileMenu">
-                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
-                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
-                </div>
-                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
-            </div>
-            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
-            <div class="xp-header-bar">
-                <div class="xp-header-bar-labels">
-                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
-                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
-                </div>
-                <div class="xp-header-bar-progress-bg">
-                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
-                </div>
-            </div>
-            {% endif %}
-        </div>
+    <span class="streak-badge">
+      <img src="/static/fire.svg" alt="Streak"> {{ user_streak }}
+    </span>
+  </div>
+  <div class="nav-profile-wrapper">
+    <ul class="nav-right">
+      <li><a href="/anglictina" title="Angličtina"><img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon"></a></li>
+      <li><a href="/feedback" title="Feedback"><img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon"></a></li>
+      <li><a href="/news" title="Novinky"><img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon"></a></li>
+      <li><a href="/obchod" title="Obchod"><img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon"></a></li>
+      <li><a href="/zpravy" title="Zprávy"><img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon"></a></li>
+      <li><button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;"> 🌙 </button></li>
+    </ul>
+    {% if session['user_name'] %}
+    <div class="user-profile">
+      <div class="profile-container">
+        {% if session.get('profile_pic') %}
+          <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}" alt="Profilová fotka" width="64" class="profile-pic">
         {% else %}
-<div class="auth-links">
-    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
-    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
-</div>
+          <img src="{{ url_for('static', filename='profile_pics/default.jpg') }}" alt="Defaultní profilovka" class="profile-pic" id="profileMenuTrigger">
         {% endif %}
+        <div class="profile-menu" id="profileMenu">
+          <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+          <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+        </div>
+        <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+      </div>
+      {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+      <div class="xp-header-bar">
+        <div class="xp-header-bar-labels">
+          <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+          <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+        </div>
+        <div class="xp-header-bar-progress-bg">
+          <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+        </div>
+      </div>
+      {% endif %}
     </div>
+    {% else %}
+    <div class="auth-links">
+      <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+      <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+    </div>
+    {% endif %}
+  </div>
 </header>
 <main class="page-content">
-<div class="chat-container">
-    <div class="chat-header">D&D Adventure
-        <button id="restart-btn" style="float:right;font-size:0.85em;padding:4px 14px;border-radius:8px;border:none;background:#f44336;color:#fff;cursor:pointer;margin-left:16px;">Restartovat příběh</button>
-    </div>
-    <div class="inventory-bar">
-        <strong>Inventory:</strong>
-        {% if inventory and inventory|length > 0 %}
-        {{ inventory|join(', ') }}
-        {% else %}
-        nothing
-        {% endif %}
-    </div>
-    <div class="chat-history" id="chat-history">
-        {% for msg in history %}
-        <div class="message {{ 'user' if msg.sender in ['users', 'user'] else 'ai' }}">
-            {% if msg.sender in ['users', 'user'] %}
-            <img class="avatar" src="{{ url_for('static', filename='profile_pics/default.jpg') }}" alt="User">
-            <div class="bubble">{{ msg.content }}</div>
-            {% else %}
-            <img class="avatar" src="{{ url_for('static', filename='profile_pics/danndas.png') }}" alt="AI">
-            <div class="bubble">{{ msg.content|safe }}</div>
-            {% endif %}
-        </div>
+  <div class="chat-layout">
+    <aside class="sidebar" id="stories-sidebar">
+      <h3>Moje příběhy</h3>
+      <ul class="stories">
+        {% for s in stories_meta %}
+          <li>
+            <a href="{{ url_for('ai_bp.dnd') }}?story={{ s.story_id }}"
+               class="{{ 'active' if selected_index == s.story_id else '' }}">
+              {{ s.title }}
+              {% if s.created_at %}
+                <div class="meta">
+                  {% if s.created_at is string %}
+                    {{ s.created_at }}
+                  {% else %}
+                    {{ s.created_at.strftime('%d.%m.%Y %H:%M') }}
+                  {% endif %}
+                </div>
+              {% endif %}
+            </a>
+          </li>
         {% endfor %}
-    </div>
-    <form class="chat-input-row" id="chat-form" autocomplete="off">
-        {% if session.get('_csrf_token') %}
-        <input type="hidden" name="csrf_token" value="{{ session._csrf_token }}">
+        {% if not stories_meta %}
+          <li><span class="meta">Zatím žádné příběhy</span></li>
         {% endif %}
-        <input type="text" id="user_input" name="user_input" placeholder="What will you do?" required autofocus>
-        <button type="submit">Send</button>
-    </form>
-</div>
+      </ul>
+      <form method="POST" style="margin-top:12px;">
+        {% if session.get('_csrf_token') %}
+          <input type="hidden" name="csrf_token" value="{{ session._csrf_token }}">
+        {% endif %}
+        <input type="hidden" name="new" value="1">
+        <button class="chat-input-row button btn-secondary" type="submit" style="width:100%;">Nový příběh</button>
+      </form>
+    </aside>
+
+    <div class="chat-container">
+      <div class="chat-header">
+        <span>D&D Adventure</span>
+        <div class="audio-controls">
+          <!-- tlačítko pro mobilní zobrazení/schování postranního panelu -->
+          <button id="toggle-stories-btn" type="button" title="Zobrazit/skrýt příběhy" aria-label="Zobrazit/skrýt příběhy" style="display:none;">📚 Příběhy</button>
+          <button class="play-all-button" id="play-all-btn" type="button" title="Přehrát celý příběh" aria-label="Přehrát celý příběh">🔊 <span>Přehrát příběh</span></button>
+          <button class="stop-button" id="stop-btn" type="button" title="Zastavit přehrávání" aria-label="Zastavit">⏹️ <span>Zastavit</span></button>
+        </div>
+      </div>
+      <div class="inventory-bar">
+        <strong>Inventář:</strong>
+        {% if inventory and inventory|length > 0 %}
+          {{ inventory|join(', ') }}
+        {% else %}
+          nic
+        {% endif %}
+      </div>
+
+      <div class="chat-history" id="chat-history">
+        {% set msgs = history_selected if history_selected is defined and history_selected else history %}
+        {% for msg in msgs %}
+          <div class="message {{ 'user' if msg.sender in ['users', 'user'] else 'ai' }}">
+            {% if msg.sender in ['users', 'user'] %}
+              <img class="avatar" src="{{ url_for('static', filename='profile_pics/default.jpg') }}" alt="User">
+              <div class="bubble">{{ msg.content }}</div>
+            {% else %}
+              <img class="avatar" src="{{ url_for('static', filename='profile_pics/danndas.png') }}" alt="AI">
+              <div class="bubble">
+                {{ msg.content|safe }}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <form class="chat-input-row" id="chat-form" autocomplete="off">
+        {% if session.get('_csrf_token') %}
+          <input type="hidden" name="csrf_token" value="{{ session._csrf_token }}">
+        {% endif %}
+        <label for="user_input" class="visually-hidden">Co uděláš?</label>
+        <input type="text" id="user_input" name="user_input" placeholder="Co uděláš?" required autofocus>
+        <button type="submit">Odeslat</button>
+      </form>
+    </div>
+  </div>
 </main>
 <footer>
-    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
-    <p class="footer-signature">
-        Made with ❤️ by
-        <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
-        and lot of ☕
-    </p>
+  <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+  <p class="footer-signature"> Made with ❤️ by <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a> and lot of ☕ </p>
 </footer>
 <script>
-    const CSRF_TOKEN = "{{ csrf_token() }}";
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-        fetch('/set_theme', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
-            body: JSON.stringify({
-                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark',
-                csrf_token: CSRF_TOKEN
-            })
-        }).then(r => {
-            if (r.ok) {
-                document.body.classList.toggle('dark-mode');
-                sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-            }
-        });
-    });
+  const CSRF_TOKEN = "{{ csrf_token() }}";
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    fetch('/set_theme', {
+      method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
+      body: JSON.stringify({ theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark', csrf_token: CSRF_TOKEN })
+    }).then(r => { if (r.ok) { document.body.classList.toggle('dark-mode'); sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); } });
+  });
 
-    window.currentUserProfilePic = "{{ session.get('profile_pic', 'default.jpg') }}";
-    window.userAvatarUrl = window.currentUserProfilePic === 'default.jpg'
-        ? "{{ url_for('static', filename='profile_pics/default.jpg') }}"
-        : "{{ url_for('static', filename='profile_pics/') }}" + window.currentUserProfilePic;
-    window.aiAvatarUrl = "{{ url_for('static', filename='pic/danndas.png') }}";
+  window.currentUserProfilePic = "{{ session.get('profile_pic', 'default.jpg') }}";
+  window.userAvatarUrl = window.currentUserProfilePic === 'default.jpg' ? "{{ url_for('static', filename='profile_pics/default.jpg') }}" : "{{ url_for('static', filename='profile_pics/') }}" + window.currentUserProfilePic;
+  window.aiAvatarUrl = "{{ url_for('static', filename='pic/danndas.png') }}";
 
-    const chatHistory = document.getElementById('chat-history');
-    const chatForm = document.getElementById('chat-form');
-    const userInput = document.getElementById('user_input');
-    const inventoryBar = document.querySelector('.inventory-bar');
-    const restartBtn = document.getElementById('restart-btn');
+  const chatHistory = document.getElementById('chat-history');
+  const chatForm = document.getElementById('chat-form');
+  const userInput = document.getElementById('user_input');
+  const inventoryBar = document.querySelector('.inventory-bar');
+  const playAllBtn = document.getElementById('play-all-btn');
+  const stopBtn = document.getElementById('stop-btn');
+  const sidebarEl = document.getElementById('stories-sidebar');
+  const toggleStoriesBtn = document.getElementById('toggle-stories-btn');
 
+  // Proměnné pro správu přehrávání
+  let currentSpeech = null;
+  let isPlaying = false;
 
+  // Funkce pro přehrávání textu
+  function speakText(button, text) {
+    // Pokud už něco hraje, zastav to
+    if (currentSpeech) {
+      window.speechSynthesis.cancel();
+      document.querySelectorAll('.speak-button').forEach(btn => {
+        btn.classList.remove('playing');
+      });
+      if (playAllBtn) playAllBtn.classList.remove('playing');
+      isPlaying = false;
 
-    function addMessage(role, content) {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'message ' + (role === 'user' ? 'user' : 'ai');
-        const avatar = document.createElement('img');
-        avatar.className = 'avatar';
-        avatar.src = role === 'user' ? window.userAvatarUrl : window.aiAvatarUrl;
-        avatar.alt = role === 'user' ? 'Uživatel' : 'AI';
-        const bubble = document.createElement('div');
-        bubble.className = 'bubble';
-
-        // Pro AI zprávy použij innerHTML, pro user zprávy textContent
-        if (role === 'ai') {
-            bubble.innerHTML = content;
-        } else {
-            bubble.textContent = content;
-        }
-
-        if (role === 'user') {
-            msgDiv.appendChild(bubble);
-            msgDiv.appendChild(avatar);
-        } else {
-            msgDiv.appendChild(avatar);
-            msgDiv.appendChild(bubble);
-        }
-        chatHistory.appendChild(msgDiv);
-        chatHistory.scrollTop = chatHistory.scrollHeight;
+      // Pokud klikneme na stejné tlačítko, jen zastavíme
+      if (button && button.classList.contains('playing')) {
+        return;
+      }
     }
 
-    chatForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const text = userInput.value.trim();
-        if (!text) return;
-        addMessage('user', text);
-        userInput.value = '';
-        addMessage('ai', '...');
+    const cleanText = text.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+    if (!cleanText) return;
 
-        // Získej CSRF token z formuláře
-        const csrfToken = document.querySelector('input[name="csrf_token"]');
-        let body = 'user_input=' + encodeURIComponent(text);
-        if (csrfToken) {
-            body += '&csrf_token=' + encodeURIComponent(csrfToken.value);
-        }
+    const speech = new SpeechSynthesisUtterance(cleanText);
+    speech.lang = 'en-US';
+    speech.rate = 0.9;
+    speech.pitch = 1;
+    speech.volume = 1;
 
-        fetch('{{ url_for("ai_bp.dnd") }}', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: body
-        })
-            .then(response => {
-                // Kontrola, zda je odpověď JSON
-                const contentType = response.headers.get('content-type');
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                if (contentType && contentType.includes('application/json')) {
-                    return response.json();
-                } else {
-                    throw new Error('Server nevrátil JSON odpověď');
-                }
-            })
-            .then(data => {
-                const aiMessage = chatHistory.children[chatHistory.children.length - 1];
-                // Použij innerHTML pro správné zobrazení HTML obsahu
-                aiMessage.querySelector('.bubble').innerHTML = data.response || 'Error!';
-                // Aktualizace inventáře v horním panelu
-                if (data.inventory !== undefined) {
-                    let inv = data.inventory;
-                    if (Array.isArray(inv) && inv.length > 0) {
-                        inventoryBar.innerHTML = '<strong>Inventory:</strong> ' + inv.join(', ');
-                    } else {
-                        inventoryBar.innerHTML = '<strong>Inventory:</strong> nothing';
-                    }
-                }
-            })
-            .catch(error => {
-                const aiMessage = chatHistory.children[chatHistory.children.length - 1];
-                aiMessage.querySelector('.bubble').textContent = 'Chyba: ' + error.message;
-                console.error('Fetch error:', error);
-            });
+    speech.onstart = function() {
+      isPlaying = true;
+      if (button) button.classList.add('playing');
+      if (stopBtn) stopBtn.disabled = false;
+    };
+
+    speech.onend = function() {
+      isPlaying = false;
+      if (button) button.classList.remove('playing');
+      currentSpeech = null;
+      if (stopBtn) stopBtn.disabled = true;
+    };
+
+    speech.onerror = function(event) {
+      if (event && (event.error === 'interrupted' || event.error === 'canceled')) {
+        isPlaying = false;
+        if (button) button.classList.remove('playing');
+        currentSpeech = null;
+        if (stopBtn) stopBtn.disabled = true;
+        return;
+      }
+      console.error('Speech synthesis error:', event);
+      isPlaying = false;
+      if (button) button.classList.remove('playing');
+      currentSpeech = null;
+      if (stopBtn) stopBtn.disabled = true;
+      alert('Chyba při přehrávání. Zkontrolujte, zda máte podporu pro text-to-speech.');
+    };
+
+    currentSpeech = speech;
+    window.speechSynthesis.speak(speech);
+  }
+
+  // Přehraj celý příběh
+  function playEntireStory() {
+    const aiMessages = document.querySelectorAll('.message.ai .bubble');
+    let allText = '';
+
+    aiMessages.forEach(bubble => {
+      // Zkopíruj bublinu a odstraň ovládací prvky, aby se nečetly
+      const clone = bubble.cloneNode(true);
+      clone.querySelectorAll('.speak-button').forEach(el => el.remove());
+      const text = (clone.textContent || '').trim();
+      if (text) allText += text + '. ';
     });
 
-    restartBtn.addEventListener('click', function() {
-        if (!confirm('Opravdu chceš restartovat příběh? Všechny zprávy budou smazány.')) return;
+    if (!allText.trim()) {
+      alert('Žádný příběh k přehrání.');
+      return;
+    }
 
-        // Získej CSRF token
-        const csrfToken = document.querySelector('input[name="csrf_token"]');
-        let body = 'restart=1';
-        if (csrfToken) {
-            body += '&csrf_token=' + encodeURIComponent(csrfToken.value);
+    speakText(playAllBtn, allText);
+  }
+
+  // Stop přehrávání
+  function stopSpeech() {
+    if (currentSpeech) {
+      window.speechSynthesis.cancel();
+      document.querySelectorAll('.speak-button').forEach(btn => btn.classList.remove('playing'));
+      if (playAllBtn) playAllBtn.classList.remove('playing');
+      isPlaying = false;
+      currentSpeech = null;
+      if (stopBtn) stopBtn.disabled = true;
+    }
+  }
+
+  // Handlery
+  playAllBtn.addEventListener('click', playEntireStory);
+  stopBtn.addEventListener('click', stopSpeech);
+  // Disable stop by default
+  stopBtn.disabled = true;
+
+  function addMessage(role, content) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'message ' + (role === 'user' ? 'user' : 'ai');
+    const avatar = document.createElement('img');
+    avatar.className = 'avatar';
+    avatar.src = role === 'user' ? window.userAvatarUrl : window.aiAvatarUrl;
+    avatar.alt = role === 'user' ? 'Uživatel' : 'AI';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+
+    if (role === 'ai') {
+      bubble.innerHTML = content;
+      if (content && content !== '...') {
+        const speakBtn = document.createElement('button');
+        speakBtn.className = 'speak-button';
+        speakBtn.innerHTML = '🔊';
+        speakBtn.title = 'Přehrát zprávu';
+        speakBtn.onclick = function() {
+          speakText(this, content.replace(/<[^>]*>/g, ''));
+        };
+        bubble.appendChild(speakBtn);
+      }
+      msgDiv.appendChild(avatar);
+      msgDiv.appendChild(bubble);
+    } else {
+      bubble.textContent = content;
+      msgDiv.appendChild(bubble);
+      msgDiv.appendChild(avatar);
+    }
+
+    chatHistory.appendChild(msgDiv);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+    return msgDiv;
+  }
+
+  chatForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const text = userInput.value.trim();
+    if (!text) return;
+    const userMsg = addMessage('user', text);
+    userInput.value = '';
+    addMessage('ai', '...');
+    const csrfToken = document.querySelector('input[name="csrf_token"]');
+    let body = 'user_input=' + encodeURIComponent(text);
+    if (csrfToken) { body += '&csrf_token=' + encodeURIComponent(csrfToken.value); }
+    fetch('{{ url_for("ai_bp.dnd") }}', { method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: body })
+      .then(response => {
+        const contentType = response.headers.get('content-type');
+        if (!response.ok) { throw new Error('HTTP ' + response.status + ': ' + response.statusText); }
+        if (contentType && contentType.includes('application/json')) { return response.json(); }
+        else { throw new Error('Server nevrátil JSON odpověď'); }
+      })
+      .then(data => {
+        const aiMessage = chatHistory.children[chatHistory.children.length - 1];
+        const bubble = aiMessage.querySelector('.bubble');
+        const html = data.response || 'Error!';
+        bubble.innerHTML = html;
+
+        // Přidáme/obnovíme tlačítko přehrávání k nejnovější AI zprávě
+        let speakBtn = bubble.querySelector('.speak-button');
+        if (!speakBtn) {
+          speakBtn = document.createElement('button');
+          speakBtn.className = 'speak-button';
+          speakBtn.innerHTML = '🔊';
+          speakBtn.title = 'Přehrát zprávu';
+          speakBtn.onclick = function() {
+            speakText(this, html.replace(/<[^>]*>/g, ''));
+          };
+          bubble.appendChild(speakBtn);
         }
 
-        // Zobraz loading indikátor
-        restartBtn.textContent = 'Restartování...';
-        restartBtn.disabled = true;
+        // Jemná korekce pro uživatelskou zprávu – žárovka s tooltipem
+        try {
+          if (data.correction) {
+            const userBubble = userMsg.querySelector('.bubble');
+            if (userBubble && !userBubble.querySelector('.correction-tip')) {
+              const tip = document.createElement('span');
+              tip.className = 'correction-tip';
+              tip.textContent = '💡';
+              tip.setAttribute('aria-label', 'Tip');
+              tip.setAttribute('role', 'button');
+              tip.setAttribute('tabindex', '0');
 
-        fetch('{{ url_for("ai_bp.dnd") }}', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: body
-        })
-        .then(response => {
-            if (response.ok) {
-                window.location.reload();
-            } else {
-                throw new Error('Chyba při restartování');
+              const tooltip = document.createElement('div');
+              tooltip.className = 'correction-tooltip';
+              tooltip.setAttribute('role', 'tooltip');
+              tooltip.setAttribute('aria-hidden', 'true');
+              tooltip.textContent = data.correction;
+
+              const show = () => { tooltip.style.display = 'block'; tooltip.setAttribute('aria-hidden', 'false'); };
+              const hide = () => { tooltip.style.display = 'none'; tooltip.setAttribute('aria-hidden', 'true'); };
+              tip.addEventListener('mouseenter', show);
+              tip.addEventListener('mouseleave', hide);
+              tip.addEventListener('focus', show);
+              tip.addEventListener('blur', hide);
+              tip.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                if (tooltip.style.display === 'block') hide(); else show();
+              });
+              tip.addEventListener('keydown', (kev) => {
+                if (kev.key === 'Enter' || kev.key === ' ') {
+                  kev.preventDefault();
+                  if (tooltip.style.display === 'block') hide(); else show();
+                }
+              });
+              document.addEventListener('click', function onDocClick(e2) {
+                if (!userBubble.contains(e2.target)) { hide(); document.removeEventListener('click', onDocClick); }
+              });
+
+              userBubble.appendChild(tip);
+              userBubble.appendChild(tooltip);
             }
-        })
-        .catch(error => {
-            console.error('Restart error:', error);
-            restartBtn.textContent = 'Restartovat příběh';
-            restartBtn.disabled = false;
-            alert('Chyba při restartování příběhu. Zkus to znovu.');
-        });
+          }
+        } catch (e) { console.warn('Correction tip render failed', e); }
+
+        // Automaticky přehraj nejnovější AI zprávu
+        const plain = html.replace(/<[^>]*>/g, '').trim();
+        if (plain) {
+          speakText(speakBtn, plain);
+        }
+
+        if (data.inventory !== undefined) {
+          let inv = data.inventory;
+          if (Array.isArray(inv) && inv.length > 0) { inventoryBar.innerHTML = '<strong>Inventář:</strong> ' + inv.join(', '); }
+          else { inventoryBar.innerHTML = '<strong>Inventář:</strong> nic'; }
+        }
+      })
+      .catch(error => {
+        const aiMessage = chatHistory.children[chatHistory.children.length - 1];
+        aiMessage.querySelector('.bubble').textContent = 'Chyba: ' + error.message;
+        console.error('Fetch error:', error);
+      });
+  });
+
+  // Při scrollu historie schovej případné tooltipy (když už nejsou pod kurzorem)
+  document.getElementById('chat-history').addEventListener('scroll', () => {
+    document.querySelectorAll('.correction-tooltip').forEach(el => {
+      el.style.display = 'none';
+      el.setAttribute('aria-hidden', 'true');
     });
+  });
+
+  // Zastavíme přehrávání při opuštění stránky
+  window.addEventListener('beforeunload', stopSpeech);
+
+  function applyMobileSidebarState() {
+    try {
+      if (window.matchMedia('(max-width: 768px)').matches) {
+        // na mobilech tlačítko zobraz a sidebar standardně skryj
+        toggleStoriesBtn.style.display = 'inline-flex';
+        if (!sidebarEl.classList.contains('mobile-hidden')) sidebarEl.classList.add('mobile-hidden');
+      } else {
+        // na desktopech tlačítko skryj a sidebar zobraz
+        toggleStoriesBtn.style.display = 'none';
+        sidebarEl.classList.remove('mobile-hidden');
+      }
+    } catch (e) { /* no-op */ }
+  }
+
+  applyMobileSidebarState();
+  window.addEventListener('resize', applyMobileSidebarState);
+
+  if (toggleStoriesBtn) {
+    toggleStoriesBtn.addEventListener('click', () => {
+      sidebarEl.classList.toggle('mobile-hidden');
+      if (!sidebarEl.classList.contains('mobile-hidden')) {
+        // při otevření lehce posuň nahoru, ať je panel vidět
+        sidebarEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }
 </script>
 </body>
 </html>

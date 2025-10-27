@@ -122,6 +122,25 @@
         background: linear-gradient(90deg, #2e7d32 60%, #1b5e20 100%);
     }
 
+    /* Fixní panel denních úkolů vpravo uprostřed */
+    .daily-quests-fixed {
+        position: fixed;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: min(360px, 85vw);
+        z-index: 1000;
+    }
+
+    @media (max-width: 991.98px) {
+        .daily-quests-fixed {
+            position: static;
+            transform: none;
+            width: auto;
+            margin: 0 16px;
+        }
+    }
+
 </style>
 
 <main>
@@ -130,6 +149,8 @@
         <!--        <span class="alpha-badge">ALPHA VERZE</span>-->
         <h2 class="motto">Každý pád je krok vpřed</h2>
     </section>
+
+    {# Denní úkoly přesunuty do fixního pravého panelu níže #}
 
     <section class="info">
 
@@ -163,6 +184,10 @@
             </div>
         </div>
     </section>
+
+    <div class="daily-quests-fixed">
+        {% include 'daily_quest.html' %}
+    </div>
 </main>
 <script>const CSRF_TOKEN = "{{ csrf_token() }}";</script>
 <script>
@@ -195,5 +220,3 @@
 </script>
 
 {% endblock %}
-
-

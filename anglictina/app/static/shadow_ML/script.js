@@ -1,5 +1,6 @@
 class ShadowingApp {
     constructor() {
+        this.DEBUG = true;
         this.userLevel = window.userEnglishLevel;
         this.currentLevel = this.userLevel;
         this.currentSentence = '';
@@ -50,11 +51,15 @@ class ShadowingApp {
             this.elements.recordingIndicator.classList.add('active');
             this.elements.recordBtn.style.display = 'none';
             this.elements.stopBtn.style.display = 'inline-flex';
+            this.elements.stopBtn.disabled = false;
             this.isRecording = true;
         };
 
         this.recognition.onresult = (event) => {
             const userSpeech = event.results[0][0].transcript;
+            if (this.DEBUG) {
+                console.log('[Shadowing] onresult transcript:', userSpeech);
+            }
             this.processResult(userSpeech);
         };
 
@@ -113,7 +118,6 @@ class ShadowingApp {
 
     startRecording() {
         if (!this.recognition || this.isRecording) return;
-
         this.hideResult();
         this.recognition.start();
     }
@@ -122,6 +126,7 @@ class ShadowingApp {
         this.elements.recordingIndicator.classList.remove('active');
         this.elements.recordBtn.style.display = 'inline-flex';
         this.elements.stopBtn.style.display = 'none';
+        this.elements.stopBtn.disabled = true;
         this.isRecording = false;
     }
 
@@ -129,13 +134,30 @@ class ShadowingApp {
         this.elements.loading.classList.add('show');
 
         try {
-            // Výpočet přesnosti pomocí jednoduchého algoritmu
-            const accuracy = this.calculateAccuracy(this.currentSentence, userSpeech);
+            if (!this.currentSentence || typeof userSpeech !== 'string') {
+                if (this.DEBUG) {
+                    console.warn('[Shadowing] Missing data for accuracy', {
+                        currentSentence: this.currentSentence,
+                        userSpeech
+                    });
+                }
+                this.showResult(userSpeech || '', 0);
+                return;
+            }
 
-            // Uložení výsledku
+            let accuracy = this.calculateAccuracy(this.currentSentence, userSpeech);
+            if (!Number.isFinite(accuracy) || Number.isNaN(accuracy)) {
+                if (this.DEBUG) {
+                    console.warn('[Shadowing] Computed accuracy is invalid, coercing to 0', {accuracy});
+                }
+                accuracy = 0;
+            }
+            accuracy = Math.max(0, Math.min(100, Math.round(accuracy)));
+            if (this.DEBUG) {
+                console.log('[Shadowing] Calculated accuracy:', accuracy);
+            }
+
             await this.saveResult(userSpeech, accuracy);
-
-            // Zobrazení výsledku
             this.showResult(userSpeech, accuracy);
 
         } catch (error) {
@@ -146,13 +168,28 @@ class ShadowingApp {
     }
 
     calculateAccuracy(original, spoken) {
+        // Ošetření vstupů
+        if (typeof original !== 'string' || typeof spoken !== 'string') return 0;
+        const o = original.trim();
+        const s = spoken.trim();
+        if (!o && !s) return 0;
+
         // Jednoduchý algoritmus pro porovnání podobnosti
-        const originalWords = original.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
-        const spokenWords = spoken.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
+        const originalWords = o.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter(Boolean);
+        const spokenWords = s.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter(Boolean);
+        const maxLength = Math.max(originalWords.length, spokenWords.length);
+        if (this.DEBUG) {
+            console.log('[Shadowing] Accuracy inputs:', {
+                original: o,
+                spoken: s,
+                originalWords,
+                spokenWords,
+                maxLength
+            });
+        }
+        if (maxLength === 0) return 0;
 
         let matches = 0;
-        const maxLength = Math.max(originalWords.length, spokenWords.length);
-
         for (let i = 0; i < Math.min(originalWords.length, spokenWords.length); i++) {
             if (originalWords[i] === spokenWords[i]) {
                 matches++;
@@ -161,11 +198,16 @@ class ShadowingApp {
             }
         }
 
-        return Math.round((matches / maxLength) * 100);
+        const percent = (matches / maxLength) * 100;
+        if (this.DEBUG) {
+            console.log('[Shadowing] Accuracy calc matches:', {matches, percent});
+        }
+        return percent;
     }
 
     areSimilar(word1, word2) {
         // Jednoduché porovnání podobnosti slov
+        if (!word1 || !word2) return false;
         if (Math.abs(word1.length - word2.length) > 2) return false;
 
         let differences = 0;
@@ -180,22 +222,42 @@ class ShadowingApp {
 
     async saveResult(userSpeech, accuracy) {
         try {
+            const safeAccuracy = (Number.isFinite(accuracy) && !Number.isNaN(accuracy)) ? accuracy : 0;
+            const payload = {
+                sentence: this.currentSentence || '',
+                user_speech: typeof userSpeech === 'string' ? userSpeech : '',
+                accuracy: safeAccuracy,
+                level: this.currentLevel,
+                csrf_token: window.CSRF_TOKEN || (document.querySelector('meta[name="csrf-token"]')?.content || '')
+            };
+            if (this.DEBUG) {
+                console.log('[Shadowing] Sending /shadow/save_result payload:', payload);
+            }
             const response = await fetch('/shadow/save_result', {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRFToken': window.CSRF_TOKEN || (document.querySelector('meta[name="csrf-token"]')?.content || '')
                 },
-                body: JSON.stringify({
-                    sentence: this.currentSentence,
-                    user_speech: userSpeech,
-                    accuracy: accuracy,
-                    level: this.currentLevel
-                })
+                body: JSON.stringify(payload)
             });
 
-            const data = await response.json();
+            let data;
+            const isJson = response.headers.get('content-type')?.includes('application/json');
+            if (!response.ok) {
+                const text = isJson ? JSON.stringify(await response.json()) : await response.text();
+                console.error(`[Shadowing] Save result failed: ${response.status} ${response.statusText}`, text);
+                this.elements.feedback.textContent = `Chyba ukládání (${response.status}): ${text}`;
+                return;
+            }
 
-            if (data.xp_gained) {
+            data = isJson ? await response.json() : {};
+            if (this.DEBUG) {
+                console.log('[Shadowing] Save result response:', data);
+            }
+
+            if (data && data.xp_gained) {
                 this.showXPGain(data.xp_gained);
             }
 
@@ -232,8 +294,8 @@ class ShadowingApp {
 
         // Zobrazení porovnání
         this.elements.comparison.style.display = 'grid';
-        this.elements.originalText.textContent = this.currentSentence;
-        this.elements.spokenText.textContent = userSpeech;
+        this.elements.originalText.textContent = this.currentSentence || '';
+        this.elements.spokenText.textContent = userSpeech || '';
     }
 
     showXPGain(xp) {

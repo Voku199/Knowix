@@ -177,6 +177,21 @@ def fill_word():
         if user_id and question_id not in answered:
             if is_correct:
                 update_user_stats(user_id, at_cor=1)
+                # --- OKAMŽITÉ PŘIPSÁNÍ XP a aktualizace streaku při správné odpovědi ---
+                try:
+                    # Připíšeme 1 XP za správnou odpověď
+                    try:
+                        add_result = add_xp_to_user(user_id, 1)
+                    except Exception:
+                        add_result = None
+                    # Aktualizujeme streak (pokud modul existuje)
+                    try:
+                        streak_info = update_user_streak(user_id)
+                    except Exception:
+                        streak_info = None
+                except Exception:
+                    # Nezáležitá chyba při přidávání XP/streaku
+                    streak_info = None
             else:
                 update_user_stats(user_id, at_wr=1)
 

@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <meta name="description" content="Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam.">
+  <meta name="keywords" content="angličtina, procvičování, písničky, testy, chat, výuka, zdarma, knowix, zábava, škola">
+  <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Knowix – Procvičování angličtiny zdarma">
+<meta property="og:description" content="Procvičuj angličtinu zábavně pomocí písniček, chatu a testů. Bez reklam, zdarma.">
+<meta property="og:url" content="https://www.knowix.cz">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://knowix.cz/static/og-banner.png">
+
+    <link rel="canonical" href="https://www.knowix.cz">
+
+
+    <title>Knowix - Slovní Fotbal</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/mobile_header.css">
+
+    <!-- Preconnect zrychlí DNS a spojení -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Font načti až po načtení stránky -->
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    </noscript>
+
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-W1EN990JKP');
+</script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Knowix",
+  "url": "https://www.knowix.cz",
+  "description": "Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam."
+}
+</script>
+<style>
+/* Moderní styling pro sekci slovního fotbalu (zvětšené rozměry pro lepší čitelnost) */
+.sl-fotball-container{
+  max-width:880px;
+  margin:18px auto 32px auto;
+  padding:28px;
+  background: linear-gradient(180deg,#ffffff,#fbfbfd);
+  box-shadow: 0 10px 36px rgba(20,20,50,0.07);
+  border-radius:14px;
+  font-family: inherit;
+}
+
+/* Styl nadpisu stránky */
+h1{
+  text-align:center;
+  font-size:2.2rem;
+  margin:10px auto 12px auto;
+  font-weight:800;
+  letter-spacing:0.6px;
+  max-width:880px;
+  line-height:1.02;
+  background: linear-gradient(90deg,#6366f1,#06b6d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+}
+
+h1::after{
+  content:"";
+  display:block;
+  width:72px;
+  height:5px;
+  margin:12px auto 0;
+  background:linear-gradient(90deg,#6366f1,#06b6d4);
+  border-radius:4px;
+  opacity:0.98;
+}
+
+/* Zvětšené flash zprávy */
+.flash-messages{ display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
+.flash{ padding:12px 16px; border-radius:10px; font-weight:700; font-size:1rem; }
+.flash.success{ background:#ecfdf5; color:#065f46; border:1px solid #bbf0d0; }
+.flash.error{ background:#fff1f2; color:#9b1c17; border:1px solid #f6c2c7; }
+.flash.info{ background:#eef2ff; color:#1e3a8a; border:1px solid #d9e2ff; }
+
+.chain h2{ margin:0 0 10px 0; font-size:1.2rem; color:#0f172a; }
+.word-chain{ padding:14px; border-radius:10px; background:linear-gradient(90deg,#f8fafc,#ffffff); list-style-position:inside; max-height:320px; overflow:auto; display:flex; flex-direction:column; gap:8px; }
+.word-chain li{ padding:12px 14px; border-radius:8px; background:#ffffff; border:1px solid #eef2ff; color:#0f172a; font-weight:600; font-size:1.05rem; }
+.muted{ color:#6b7280; font-size:1rem; }
+
+.word-form{ display:flex; flex-direction:column; gap:12px; margin-top:16px; }
+.word-form label{ font-weight:700; color:#0f172a; font-size:1.05rem; }
+.word-form input[type="text"], .word-form input{ padding:14px; border-radius:10px; border:1px solid #e6e9ef; background:#fff; box-shadow: inset 0 1px 0 rgba(0,0,0,0.02); font-size:1rem; }
+.form-actions{ display:flex; gap:12px; margin-top:8px; }
+button[type="submit"], .button-link{ padding:10px 18px; border-radius:10px; border:none; background:#4f46e5; color:white; font-weight:700; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; font-size:1rem; }
+.button-link{ background:transparent; color:#374151; border:1px solid #e6e9ef; }
+button[type="submit"]:hover{ transform:translateY(-1px); box-shadow:0 8px 20px rgba(79,70,229,0.12); }
+
+.cache-info{ margin-top:12px; color:#374151; font-size:1rem; }
+
+/* Timer a leaderboards */
+.timer-wrapper{ display:flex; justify-content:center; margin-bottom:12px; }
+.timer{ background:linear-gradient(90deg,#eef2ff,#ffffff); padding:10px 16px; border-radius:999px; box-shadow:0 6px 18px rgba(15,23,42,0.06); font-weight:700; color:#0f172a; }
+.timer .seconds{ color:#4f46e5; margin-left:6px; }
+.leaderboard{ margin-top:18px; }
+.leaderboard h3{ margin:0 0 8px 0; font-size:1.05rem; color:#0f172a; }
+.lb-list{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
+.lb-item{ display:flex; gap:12px; align-items:center; padding:8px 10px; border-radius:8px; background:#fff; border:1px solid #eef2ff; }
+.lb-item .rank{ font-weight:800; color:#4f46e5; width:28px; }
+.lb-item .name{ flex:1; font-weight:700; }
+.lb-item .points{ color:#f59e0b; font-weight:800; }
+.lb-item .best{ margin-left:8px; color:#06b6d4; font-weight:700; }
+
+@media (max-width:480px){ .timer{ padding:8px 12px; } .lb-item{ padding:8px; } }
+</style>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
+<header>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
+    </div>
+    <div class="nav-profile-wrapper">
+        <ul class="nav-right">
+            <li>
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
+            </li>
+        </ul>
+        {% if session['user_name'] %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%;"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
+</header>
+<h1>Slovní fotbal</h1>
+
+<!-- vizuální timer pod nadpisem -->
+<div class="timer-wrapper">
+  <div style="display:flex;gap:10px;align-items:center;">
+    <form id="timerForm" class="timer-form" style="display:flex;gap:8px;align-items:center;" onsubmit="return false;">
+      <label for="timerSelect" style="font-weight:700;color:#0f172a;">Délka kola:</label>
+      <select id="timerSelect" style="padding:6px;border-radius:8px;border:1px solid #e6e9ef;">
+        <option value="0" {{ 'selected' if timer_seconds is defined and timer_seconds == 0 else '' }}>Bez časování (psát bez soutěže)</option>
+        <option value="60" {{ 'selected' if timer_seconds is defined and timer_seconds == 60 else '' }}>1 minuta</option>
+        <option value="90" {{ 'selected' if timer_seconds is defined and timer_seconds == 90 else '' }}>1 minuta 30 s</option>
+        <option value="120" {{ 'selected' if timer_seconds is defined and timer_seconds == 120 else '' }}>2 minuty</option>
+      </select>
+      <button id="setTimerBtn" type="button" class="button-link" style="padding:8px 12px;">Nastavit</button>
+    </form>
+    <div class="timer">Zbývá: <span id="timeLeft">{{ timer_seconds if timer_seconds is defined else 60 }}</span>s</div>
+  </div>
+</div>
+
+<div id="silentRefreshMarker"></div>
+
+<div class="sl-fotball-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, msg in messages %}
+        <div class="flash {{ category|e }}">{{ msg }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <section class="chain">
+        <h2>Řetěz slov</h2>
+        <ol class="word-chain">
+            {% if chain %}
+                {% for w in chain %}
+                    <li>{{ w }}</li>
+                {% endfor %}
+            {% else %}
+                <li class="muted">Zatím prázdné. Zadej první slovo.</li>
+            {% endif %}
+        </ol>
+    </section>
+
+    <form action="{{ url_for('slovni_fotbal.slovni_play') }}" method="post" class="word-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="word">Nové slovo</label>
+        <input id="word" name="word" autocomplete="off" required placeholder="Napiš slovo a stiskni Odeslat">
+        <div class="form-actions">
+            <button type="submit">Odeslat</button>
+            <a id="resetLink" class="button-link" href="{{ url_for('slovni_fotbal.slovni_reset') }}">Resetovat hru</a>
+        </div>
+    </form>
+
+    {% if cache_count is defined %}
+    <p class="cache-info">Slov v cache: {{ cache_count }}</p>
+    {% endif %}
+
+    <!-- Leaderboards -->
+    {% if leaderboards is defined %}
+    <section class="leaderboard">
+      <h3>Leaderboard — 1 minuta</h3>
+      <ol id="lb-60" class="lb-list">
+        {% for row in leaderboards.get('60', []) %}
+        <li class="lb-item">
+          <span class="rank">{{ loop.index }}.</span>
+          <span class="name">{{ row.display }}</span>
+          <span class="points">⚡ {{ row.slovni_quick_points or 0 }}</span>
+          {% if row.slovni_best_time %}<span class="best">⏱ {{ '%.2f'|format(row.slovni_best_time) }}s</span>{% endif %}
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+    <section class="leaderboard">
+      <h3>Leaderboard — 1:30</h3>
+      <ol id="lb-90" class="lb-list">
+        {% for row in leaderboards.get('90', []) %}
+        <li class="lb-item">
+          <span class="rank">{{ loop.index }}.</span>
+          <span class="name">{{ row.display }}</span>
+          <span class="points">⚡ {{ row.slovni_quick_points or 0 }}</span>
+          {% if row.slovni_best_time %}<span class="best">⏱ {{ '%.2f'|format(row.slovni_best_time) }}s</span>{% endif %}
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+    <section class="leaderboard">
+      <h3>Leaderboard — 2 minuty</h3>
+      <ol id="lb-120" class="lb-list">
+        {% for row in leaderboards.get('120', []) %}
+        <li class="lb-item">
+          <span class="rank">{{ loop.index }}.</span>
+          <span class="name">{{ row.display }}</span>
+          <span class="points">⚡ {{ row.slovni_quick_points or 0 }}</span>
+          {% if row.slovni_best_time %}<span class="best">⏱ {{ '%.2f'|format(row.slovni_best_time) }}s</span>{% endif %}
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+    {% endif %}
+
+</div>
+<footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p class="footer-signature">
+        Made with ❤️ by
+        <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+        and lot of ☕
+    </p>
+</footer>
+<!-- Game end modal -->
+<div id="gameEndModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:9999;">
+  <div style="background:white;border-radius:12px;max-width:720px;width:90%;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,0.25);">
+    <h2 style="margin-top:0;color:#0f172a;">Dobrá práce! 🎉</h2>
+    <p id="gameEndMessage" style="color:#374151;">Skončilo kolo. Získal(a) jsi XP za slova.</p>
+    <div style="margin:12px 0;">
+      <strong>Řetěz slov:</strong>
+      <ol id="gameEndChain" style="max-height:200px;overflow:auto;padding-left:20px;margin-top:6px;color:#0f172a;"></ol>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+      <button id="playNextBtn" class="button-link" style="background:#4f46e5;color:white;">Hrát další</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const timeEl = document.getElementById('timeLeft');
+  let remaining = Number(timeEl ? (timeEl.textContent || '').trim() : '60');
+  let untimed = false;
+   const input = document.getElementById('word');
+   const submitBtn = document.querySelector('button[type="submit"]');
+   if(input) input.focus();
+
+  // Load persisted timer (user preference)
+  const timerSelect = document.getElementById('timerSelect');
+  const _allowedTimerVals = ['0','60','90','120'];
+  try{
+    const saved = localStorage.getItem('slovni_timer_seconds');
+    // only apply saved value if it's one of the allowed options (prevents arbitrary custom values)
+    if(saved && timerSelect && _allowedTimerVals.includes(String(saved))){ timerSelect.value = String(saved); }
+  }catch(e){ /* ignore localStorage errors */ }
+  // determine untimed initial state
+  try{
+    if(timerSelect && String(timerSelect.value) === '0'){
+      untimed = true;
+      if(timeEl) timeEl.textContent = 'Bez časování';
+    }
+  }catch(e){}
+
+  // Helper: update chain DOM (only when safe)
+  function renderChain(chain){
+    const ol = document.querySelector('.word-chain');
+    if(!ol) return;
+    if(!chain || chain.length === 0){
+      ol.innerHTML = '<li class="muted">Zatím prázdné. Zadej první slovo.</li>';
+      return;
+    }
+    ol.innerHTML = '';
+    chain.forEach(w=>{
+      const li = document.createElement('li');
+      li.textContent = w;
+      ol.appendChild(li);
+    });
+  }
+
+  // Helper: append single word to chain if not present (optimistic update)
+  function appendWordToChain(word){
+    if(!word) return;
+    const ol = document.querySelector('.word-chain');
+    if(!ol) return;
+    // remove placeholder if present
+    const first = ol.querySelector('li.muted');
+    if(first) first.remove();
+    // check duplicates
+    const existing = Array.from(ol.querySelectorAll('li')).map(n=>n.textContent);
+    if(existing.includes(word)) return;
+    const li = document.createElement('li');
+    li.textContent = word;
+    ol.appendChild(li);
+  }
+
+  // Helper: render all leaderboards by timer
+  function renderLeaderboards(lbmap){
+    if(!lbmap) return;
+    const spec = [ ['60','lb-60'], ['90','lb-90'], ['120','lb-120'] ];
+    spec.forEach(([key, elid])=>{
+      const list = document.getElementById(elid);
+      if(!list) return;
+      const lb = lbmap[key] || [];
+      list.innerHTML = '';
+      lb.forEach((r, idx)=>{
+        const li = document.createElement('li');
+        li.className = 'lb-item';
+        li.innerHTML = `<span class="rank">${idx+1}.</span><span class="name">${r.display}</span><span class="points">⚡ ${r.slovni_quick_points || 0}</span>${r.slovni_best_time?('<span class="best">⏱ '+(Number(r.slovni_best_time).toFixed(2))+'s</span>'):''}`;
+        list.appendChild(li);
+      });
+    });
+  }
+
+  // Helper: update cache/info
+  function setCacheCount(n){
+    const el = document.querySelector('.cache-info');
+    if(el) el.textContent = 'Slov v cache: ' + n;
+  }
+
+  // Helper: small toast notification
+  function showToast(msg, timeout=3000){
+    try{
+      let t = document.getElementById('slovniToast');
+      if(!t){
+        t = document.createElement('div');
+        t.id = 'slovniToast';
+        t.style.position = 'fixed';
+        t.style.top = '16px';
+        t.style.right = '16px';
+        t.style.background = 'linear-gradient(90deg,#4f46e5,#06b6d4)';
+        t.style.color = 'white';
+        t.style.padding = '10px 14px';
+        t.style.borderRadius = '10px';
+        t.style.boxShadow = '0 6px 20px rgba(15,23,42,0.15)';
+        t.style.zIndex = 10000;
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      t.style.display = 'block';
+      clearTimeout(t._hideTimer);
+      t._hideTimer = setTimeout(()=>{ try{ t.style.display = 'none'; }catch(e){} }, timeout);
+    }catch(e){ console.warn('toast', e); }
+  }
+
+  // Poll server state silently every 5s
+  async function pollState(){
+    try{
+      const res = await fetch('/slovni-fotbal/state', {credentials: 'same-origin'});
+      if(!res.ok) return;
+      const data = await res.json();
+
+      // update remaining/time
+      if(data.remaining_seconds !== undefined){
+        const serverRem = Number(data.remaining_seconds);
+        // serverRem < 0 indicates untimed
+        if(serverRem < 0){
+          untimed = true;
+          if(timeEl) timeEl.textContent = 'Bez časování';
+        } else {
+          untimed = false;
+        }
+         // only accept server value if it is less than or equal to local remaining (server ahead)
+         // or if we don't have a valid local remaining yet; ignore increases to avoid resetting timer to full on actions
+        if(!untimed){
+          if(typeof remaining !== 'number' || isNaN(remaining)){
+            remaining = serverRem;
+            if(timeEl) timeEl.textContent = remaining;
+          } else if(serverRem <= remaining){
+            remaining = serverRem;
+            if(timeEl) timeEl.textContent = remaining;
+          } else {
+            // server reports a larger remaining time (e.g. full timer) — ignore to prevent reset
+            // but still keep server value if local expired (edge case)
+            if(remaining <= 0){
+              remaining = serverRem;
+              if(timeEl) timeEl.textContent = remaining;
+            }
+          }
+        }
+       }
+
+      // If server indicates time expired, show modal (once) with server-provided chain if available
+      if(!untimed && typeof remaining === 'number' && remaining <= 0 && !modalShownForCurrentRound){
+        try{ showGameEndModal({ chain: data.chain || sessionChainFromDOM() }); }catch(e){ console.warn('modal poll', e); }
+      }
+
+      // decide if it's safe to update chain (don't overwrite while user types)
+      const userTyping = document.activeElement === input && input.value && input.value.trim().length > 0;
+      if(!userTyping){
+        if(data.chain !== undefined){ renderChain(data.chain); }
+      } else {
+        // If userTyping we still try to append only truly new elements (best-effort)
+        if(data.chain !== undefined){
+          try{
+            const ol = document.querySelector('.word-chain');
+            if(ol){
+              const existing = Array.from(ol.querySelectorAll('li')).map(n=>n.textContent);
+              const toAdd = data.chain.slice(existing.length);
+              toAdd.forEach(w=>{ const li = document.createElement('li'); li.textContent = w; ol.appendChild(li); });
+            }
+          }catch(e){ /* ignore */ }
+        }
+      }
+
+      // update cache
+      if(data.cache_count !== undefined){ setCacheCount(data.cache_count); }
+      // update leaderboards
+      if(data.leaderboards !== undefined){ renderLeaderboards(data.leaderboards); }
+
+      // enable/disable input according to remaining but avoid interrupting typing
+      const formInput = document.getElementById('word');
+      const sendBtn = document.querySelector('button[type="submit"]');
+      if(!untimed && remaining <= 0){
+        if(sendBtn) sendBtn.disabled = true;
+        if(formInput) formInput.disabled = true;
+      } else {
+        if(sendBtn) sendBtn.disabled = false;
+        if(formInput) formInput.disabled = false;
+      }
+    }catch(e){
+      // ignore network errors silently
+      console.warn('poll error', e);
+    }
+  }
+
+  // Initial sync: if we have local stored timer/start, use it and send to server once to keep session aligned
+  async function initialSync(){
+    try{
+      const savedTimer = parseInt(localStorage.getItem('slovni_timer_seconds'),10);
+      const savedStart = parseFloat(localStorage.getItem('slovni_local_start'));
+      const now = Date.now()/1000;
+      if(savedTimer && savedStart && (now - savedStart) < (savedTimer + 2)){
+        // compute remaining locally and show it immediately
+        remaining = Math.max(0, Math.ceil(savedTimer - (now - savedStart)));
+        if(timeEl) timeEl.textContent = remaining;
+        // Notify server to restore same timer/start in session (one-time)
+        try{
+          await fetch('/slovni-fotbal/set_timer', {
+            method: 'POST', credentials: 'same-origin',
+            headers: {'Content-Type':'application/x-www-form-urlencoded','X-CSRFToken':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'},
+            body: 'seconds='+encodeURIComponent(savedTimer)+'&start_ts='+encodeURIComponent(String(savedStart))+'&csrf_token='+encodeURIComponent('{{ csrf_token() }}')
+          });
+        }catch(e){ /* ignore network errors, UI still preserved locally */ }
+      } else {
+        // fallback to server state
+        const res = await fetch('/slovni-fotbal/state', {credentials:'same-origin'});
+        if(res.ok){
+          const s = await res.json();
+          remaining = Number(s.remaining_seconds || remaining);
+          if(timeEl) timeEl.textContent = remaining;
+          // only accept server timer if it's one of allowed values
+          const srvTimer = Number(s.timer_seconds);
+          if(!isNaN(srvTimer) && [0,60,90,120].includes(srvTimer) && timerSelect){ timerSelect.value = String(srvTimer); }
+          try{
+            if(!isNaN(srvTimer) && [0,60,90,120].includes(srvTimer)){
+              localStorage.setItem('slovni_timer_seconds', String(srvTimer));
+            } else {
+              localStorage.setItem('slovni_timer_seconds', String(remaining));
+            }
+          }catch(_){ }
+          // render leaderboards from initial state
+          if(s.leaderboards){ renderLeaderboards(s.leaderboards); }
+        }
+      }
+    }catch(e){ console.warn('initialSync', e); }
+  }
+
+  // Poll and local countdown start AFTER initial sync — jednorázově. Neprovádíme pravidelný polling, aby se stránka automaticky neaktualizovala.
+  (async ()=>{ await initialSync(); pollState(); })();
+
+  // Local countdown animation (keeps UX snappy between polls)
+  setInterval(()=>{
+    if(!untimed && typeof remaining === 'number' && remaining > 0){
+      remaining = Math.max(0, remaining-1);
+      if(timeEl) timeEl.textContent = remaining;
+      // when timer just expired locally, show game-end modal once
+      if(remaining === 0 && !modalShownForCurrentRound){
+        try{ showGameEndModal({ chain: sessionChainFromDOM() }); }catch(e){ console.warn('modal show', e); }
+      }
+    }
+  }, 1000);
+
+  // set timer via AJAX and persist locally so UI stays consistent
+  const timerForm = document.getElementById('timerForm');
+  const setTimerBtn = document.getElementById('setTimerBtn');
+  if(timerForm && timerSelect && setTimerBtn){
+    setTimerBtn.addEventListener('click', async (e)=>{
+      e.preventDefault();
+      let val = parseInt(timerSelect.value,10);
+      // allowed: 0,60,90,120
+      const allowed = [0,60,90,120];
+      if(!allowed.includes(val)) val = 60;
+      untimed = (val === 0);
+      // persist locally immediately
+      const start_ts = Date.now()/1000;
+      try{ localStorage.setItem('slovni_timer_seconds', String(val)); localStorage.setItem('slovni_local_start', String(start_ts)); }catch(_){ }
+      try{
+        const res = await fetch('/slovni-fotbal/set_timer', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type':'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token() }}',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: 'seconds='+encodeURIComponent(val) + '&start_ts=' + encodeURIComponent(String(start_ts)) + '&csrf_token=' + encodeURIComponent('{{ csrf_token() }}')
+         });
+        if(!res.ok){
+           // try to show server error, but still keep local change so it doesn't disappear
+           const err = await res.json().catch(()=>({}));
+           alert(err.error || 'Chyba při nastavování času. Hodnota bude uložena lokálně.');
+           remaining = val;
+           if(untimed){ if(timeEl) timeEl.textContent = 'Bez časování'; } else { if(timeEl) timeEl.textContent = remaining; }
+           return;
+         }
+         const j = await res.json();
+         if(j.ok){
+          remaining = Number(j.timer_seconds || val);
+          if(Number(remaining) < 0){ untimed = true; if(timeEl) timeEl.textContent = 'Bez časování'; }
+          else { untimed = false; if(timeEl) timeEl.textContent = remaining; }
+           // run a one-time state poll pro aktualizaci leaderboard/chain/cache
+           pollState();
+         }
+      }catch(err){
+        console.warn('set timer error', err);
+        // network error: keep local value so it doesn't 'zmizet'
+        remaining = val;
+        if(untimed){ if(timeEl) timeEl.textContent = 'Bez časování'; } else { if(timeEl) timeEl.textContent = remaining; }
+      }
+    });
+  }
+
+  // AJAX submit for new words to avoid full page reload (který resetuje timer)
+  const wordForm = document.querySelector('form.word-form');
+  if(wordForm){
+    wordForm.addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+      const val = input.value && input.value.trim();
+      if(!val) return;
+      submitBtn.disabled = true;
+      try{
+        const url = wordForm.action;
+        const body = new URLSearchParams();
+        body.append('word', val);
+        body.append('csrf_token', '{{ csrf_token() }}');
+        const res = await fetch(url, {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': '{{ csrf_token() }}' , 'X-Requested-With': 'XMLHttpRequest' },
+          body: body.toString()
+        });
+        // always try to parse JSON body even on non-2xx responses
+        const j = await res.json().catch(()=>null);
+        console.debug('slovni_play response', res.status, j);
+        if(!res.ok){
+          // update chain if provided
+          if(j && j.chain !== undefined){ renderChain(j.chain); }
+          // If time expired -> show game end modal
+          // show modal only if server explicitly asks for it
+          if(j && j.show_modal){
+            try{ showGameEndModal(j); }catch(e){ console.warn('modal', e); }
+            return;
+          }
+          const errMsg = (j && (j.error || (j.ai_result === 'NO' ? 'AI odmítla slovo.' : null))) || 'Chyba při odesílání slova';
+          alert(errMsg + (j && j.ai_note ? '\nAI: ' + j.ai_note : ''));
+          // refresh leaderboards if present
+          if(j && j.leaderboards){ renderLeaderboards(j.leaderboards); }
+          return;
+        }
+        // res.ok === true, j should be parsed
+        if(!j){ alert('Neplatná odpověď serveru'); return; }
+        // always handle JSON body; update UI if server provided fields (even empty arrays)
+        if(j.chain !== undefined){ renderChain(j.chain); }
+        if(j.leaderboards !== undefined){ renderLeaderboards(j.leaderboards); }
+        if(j.cache_count !== undefined){ setCacheCount(j.cache_count); }
+
+        if(j.ok){
+          // clear input only if AI accepted or not present
+          if(j.ai_result === 'YES' || j.ok){
+            // if server didn't return chain, optimistically append submitted word
+            if(j.chain === undefined){ appendWordToChain(val); }
+            input.value = '';
+          } else {
+            // show specific server message if present
+            const msg = j.error || (j.ai_result === 'NO' ? 'AI odmítla slovo.' : 'Slovo nebylo přijato');
+            alert(msg + (j.ai_note ? '\nAI: ' + j.ai_note : ''));
+          }
+        } else {
+          // show specific server message if present
+          const msg = j.error || (j.ai_result === 'NO' ? 'AI odmítla slovo.' : 'Slovo nebylo přijato');
+          alert(msg + (j.ai_note ? '\nAI: ' + j.ai_note : ''));
+        }
+        // jednorázové obnovení stavu
+        pollState();
+      }catch(e){
+        console.warn('submit word error', e);
+        alert('Chyba sítě při odesílání slova');
+      }finally{ submitBtn.disabled = false; input.focus(); }
+    });
+  }
+
+  // Modal helpers
+  const modal = document.getElementById('gameEndModal');
+  const gameEndChain = document.getElementById('gameEndChain');
+  const gameEndMessage = document.getElementById('gameEndMessage');
+  const playNextBtn = document.getElementById('playNextBtn');
+  // avoid auto-showing modal multiple times per round
+  let modalShownForCurrentRound = false;
+
+  function showGameEndModal(data){
+    // data.chain expected
+    if(modalShownForCurrentRound) return; // already shown for this round
+    modalShownForCurrentRound = true;
+    // reset local disabled state (we'll re-enable after playNext)
+    const sendBtn = document.querySelector('button[type="submit"]');
+    const formInput = document.getElementById('word');
+    if(sendBtn) sendBtn.disabled = true;
+    if(formInput) formInput.disabled = true;
+    const chain = (data && data.chain) || sessionChainFromDOM();
+    gameEndChain.innerHTML = '';
+    if(chain && chain.length){
+      chain.forEach(w=>{ const li = document.createElement('li'); li.textContent = w; gameEndChain.appendChild(li); });
+      gameEndMessage.textContent = `Získal(a) jsi ${chain.length} XP. Klikni "Hrát další" pro nové kolo.`;
+    } else {
+      gameEndMessage.textContent = 'Kolo skončilo.';
+      gameEndChain.innerHTML = '<li class="muted">Řetěz je prázdný.</li>';
+    }
+    modal.style.display = 'flex';
+  }
+
+  function hideGameEndModal(){ modal.style.display = 'none'; }
+
+  function sessionChainFromDOM(){ const ol = document.querySelector('.word-chain'); if(!ol) return []; return Array.from(ol.querySelectorAll('li')).map(n=>n.textContent); }
+
+  // play next: call reset (AJAX) then set new start via set_timer
+  async function playNext(){
+    // allow modal to show again in future rounds
+    modalShownForCurrentRound = false;
+    try{
+      const res = await fetch('/slovni-fotbal/reset', {credentials:'same-origin', headers:{'X-Requested-With':'XMLHttpRequest'}});
+      const j = await res.json().catch(()=>null);
+      // if server returned awarded XP, show toast and update leaderboard
+      if(j){
+        if(j.xp_awarded){
+          showToast('Získal(a) jsi ' + j.xp_awarded + ' XP');
+        }
+        if(j.new_quick_points !== undefined && j.new_quick_points !== null){
+          // optionally update any quick points display; we update leaderboards below
+        }
+        if(j.leaderboards !== undefined){
+          try{ renderLeaderboards(j.leaderboards); }catch(e){/*ignore*/}
+        }
+      }
+      // set local start and notify server via set_timer
+      const sel = document.getElementById('timerSelect');
+      let seconds = Number(sel ? sel.value : ({{ timer_seconds if timer_seconds is defined else 60 }}));
+      if(![0,60,90,120].includes(Number(seconds))){ seconds = 60; }
+      const start_ts = Date.now()/1000;
+      try{ localStorage.setItem('slovni_timer_seconds', String(seconds)); localStorage.setItem('slovni_local_start', String(start_ts)); }catch(_){ }
+      await fetch('/slovni-fotbal/set_timer', {
+        method: 'POST', credentials: 'same-origin',
+        headers: {'Content-Type':'application/x-www-form-urlencoded','X-CSRFToken':'{{ csrf_token() }}','X-Requested-With':'XMLHttpRequest'},
+        body: 'seconds='+encodeURIComponent(seconds)+'&start_ts='+encodeURIComponent(String(start_ts))+'&csrf_token='+encodeURIComponent('{{ csrf_token() }}')
+      }).catch(()=>{});
+      // update UI: clear chain
+      renderChain([]);
+      remaining = seconds;
+      if(Number(remaining) < 0){ untimed = true; if(timeEl) timeEl.textContent = 'Bez časování'; } else { untimed = false; if(timeEl) timeEl.textContent = remaining; }
+      // reload page so header/XP values update for the user
+      try{ setTimeout(()=>{ window.location.reload(); }, 500); }catch(e){}
+    }catch(e){ console.warn('playNext', e); }
+    hideGameEndModal();
+  }
+
+  playNextBtn.addEventListener('click', (e)=>{ e.preventDefault(); playNext(); });
+
+  // intercept manual reset link to show modal instead of full reload
+  const resetLink = document.getElementById('resetLink');
+  if(resetLink){
+    resetLink.addEventListener('click', async (ev)=>{
+      ev.preventDefault();
+      try{
+        const res = await fetch(resetLink.href, {credentials:'same-origin', headers:{'X-Requested-With':'XMLHttpRequest'}});
+        const j = await res.json().catch(()=>null);
+        // show modal only when user explicitly clicked reset
+        showGameEndModal(j || {});
+      }catch(e){
+        // fallback to normal navigation
+        window.location.href = resetLink.href;
+      }
+    });
+  }
+
+})();
+</script>
+</body>
+</html>

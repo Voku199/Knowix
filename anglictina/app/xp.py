@@ -1,13 +1,11 @@
 """
-Backendový systém pro správu XP, levelů a achievementů pro uživatele.
+Backendový systém pro správu XP a achievementů pro uživatele.
 Používá MySQL a je určen pro integraci do Flask aplikace.
 """
 
-from flask import Blueprint, jsonify, request, session
+from flask import Blueprint, session
 from db import get_db_connection
 import math
-from datetime import date
-from streak import update_user_streak
 
 # streak_info = {"streak": 5, "status": "continued"}
 
@@ -82,12 +80,67 @@ def _ensure_ai_achievements_seeded():
         pass
 
 
+def _ensure_core_achievements_seeded():
+    """Seed základních achievementů (XP, streak, obsahové metriky) idempotentně."""
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        seeds = [
+            # XP milníky
+            ("XP_100", "100 XP", "Získej celkem 100 XP.", "xp", 100),
+            ("XP_500", "500 XP", "Získej celkem 200 XP.", "xp", 200),
+            # ("XP_1000", "1000 XP", "Získej celkem 1000 XP.", "xp", 1000),
+            # Streak
+            ("STRK_3", "Streak 3", "Udrž si streak 3 dny.", "streak", 3),
+            ("STRK_7", "Streak 7", "Udrž si streak 7 dní.", "streak", 7),
+            ("STRK_30", "Streak 30", "Udrž si streak 1 celý měsíc!", "streak", 30),
+            # Obsahové metriky (user_stats)
+            ("LESSONS_10", "10 lekcí", "Dokonči 10 lekcí.", "total_lessons_done", 10),
+            ("LESSONS_50", "50 lekcí", "Dokonči 50 lekcí.", "total_lessons_done", 50),
+            ("HANG_20", "Šibenice: 20 slov", "Uhodni 20 slov v Hangmanu.", "hangman_words_guessed", 20),
+            ("WRITE_1000", "Psaní: 1000 slov", "Napiš 1000 slov v Psaní.", "total_psani_words", 1000),
+            ("SLOVNI_100", "Slovní Fotbal: 100 bodů", "Získej 100 bodů ve Slovní Fotbale.", "slovni_quick_points", 100),
+            # Gramatika (předložky, present perfect) – více úrovní
+            ("GRAM_AT_50", "Gramatika: Předložky 15", "Získej 15 správně v At/On/In.", "at_cor", 15),
+            # ("GRAM_AT_200", "Gramatika: Předložky 200", "Získej 200 správně v At/On/In.", "at_cor", 200),
+            # ("GRAM_AT_500", "Gramatika: Předložky 500", "Získej 500 správně v At/On/In.", "at_cor", 500),
+            ("GRAM_PP_50", "Gramatika: Present Perfect 10", "Získej 10 správně v Present Perfect.", "pp_correct", 10),
+            # ("GRAM_PP_200", "Gramatika: Present Perfect 200", "Získej 200 správně v Present Perfect.", "pp_correct",
+            #  200),
+            # Podcast – více úrovní
+            ("PODCAST_20", "Podcast: 6 správně", "Získej 6 správně v kvízu u podcastů.", "pds_cor", 6),
+            # ("PODCAST_100", "Podcast: 100 správně", "Získej 100 správně v kvízu u podcastů.", "pds_cor", 100),
+            # ("PODCAST_300", "Podcast: 300 správně", "Získej 300 správně v kvízu u podcastů.", "pds_cor", 300),
+        ]
+        for code, name, desc, ctype, cval in seeds:
+            try:
+                cur.execute("SELECT id FROM achievements WHERE code = %s", (code,))
+                exists = cur.fetchone()
+                if not exists:
+                    cur.execute(
+                        """
+                        INSERT INTO achievements (code, name, description, condition_type, condition_value)
+                        VALUES (%s, %s, %s, %s, %s)
+                        """,
+                        (code, name, desc, ctype, int(cval))
+                    )
+            except Exception:
+                conn.rollback()
+                continue
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception:
+        pass
+
+
 def get_all_achievements():
     """
     Vrátí všechna achievementy jako seznam slovníků.
     """
-    # Zajisti, že AI achievementy jsou nasemínované (bezpečně a idempotentně)
+    # Zajisti seed obou sad (AI i core)
     _ensure_ai_achievements_seeded()
+    _ensure_core_achievements_seeded()
     conn = get_db_connection()
     cur = conn.cursor(dictionary=True)
     cur.execute("SELECT * FROM achievements")
@@ -166,31 +219,33 @@ def check_and_award_achievements(user_id, new_xp=None):
     cur.close()
     conn.close()
 
-    # Získání pořadí v žebříčku (pro leaderboard achievement)
-    def is_first_in_leaderboard(user_id):
-        top_users = get_top_users(1)
-        return top_users and top_users[0]['id'] == user_id
+    # Načti user_stats jednou (pro obsahové metriky)
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(dictionary=True)
+        cur.execute("SELECT * FROM user_stats WHERE user_id = %s", (user_id,))
+        stats_row = cur.fetchone() or {}
+        cur.close()
+        conn.close()
+    except Exception:
+        stats_row = {}
 
     for ach in all_achievements:
         if ach['code'] in user_achievement_codes:
             continue  # Už má
 
-        # XP achievement
-        if ach['condition_type'] == 'xp':
-            xp_value = new_xp if new_xp is not None else user_xp_level['xp']
-            if xp_value >= ach['condition_value']:
-                add_achievement_to_user(user_id, ach['id'])
-                unlocked.append(ach)
+        ctype = ach.get('condition_type')
+        cval = int(ach.get('condition_value') or 0)
 
-        # Level achievement
-        elif ach['condition_type'] == 'lvl':
-            level_value = user_xp_level['level']
-            if level_value >= ach['condition_value']:
+        # XP achievement
+        if ctype == 'xp':
+            xp_value = new_xp if new_xp is not None else user_xp_level['xp']
+            if xp_value >= cval:
                 add_achievement_to_user(user_id, ach['id'])
                 unlocked.append(ach)
 
         # --- AI-specific: nasbírané sekundy z AI Poslech ---
-        elif ach['condition_type'] == 'ai_poslech_seconds':
+        elif ctype == 'ai_poslech_seconds':
             try:
                 conn = get_db_connection()
                 cur = conn.cursor()
@@ -201,12 +256,12 @@ def check_and_award_achievements(user_id, new_xp=None):
                 secs = int(row[0]) if row and row[0] is not None else 0
             except Exception:
                 secs = 0
-            if secs >= int(ach['condition_value'] or 0):
+            if secs >= cval:
                 add_achievement_to_user(user_id, ach['id'])
                 unlocked.append(ach)
 
         # --- AI-specific: počet zpráv v komunitních AI chatech ---
-        elif ach['condition_type'] == 'ai_chat_messages':
+        elif ctype == 'ai_chat_messages':
             try:
                 conn = get_db_connection()
                 cur = conn.cursor()
@@ -220,78 +275,30 @@ def check_and_award_achievements(user_id, new_xp=None):
                 conn.close()
             except Exception:
                 count = 0
-            if count >= int(ach['condition_value'] or 0):
+            if count >= cval:
                 add_achievement_to_user(user_id, ach['id'])
                 unlocked.append(ach)
 
-        elif ach['condition_type'] == 'feedback':
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute("SELECT COUNT(*) FROM feedback WHERE user_id = %s", (user_id,))
-            count = cur.fetchone()[0]
-            print(
-                f"DEBUG: Uživatel {user_id} má {count} feedbacků, potřebuje {ach['condition_value']} pro achievement {ach['code']}")
-            cur.close()
-            conn.close()
-            if count >= ach['condition_value']:
+        # --- Streak ---
+        elif ctype == 'streak':
+            try:
+                s = int(user_row.get('streak') or 0)
+            except Exception:
+                s = 0
+            if s >= cval:
                 add_achievement_to_user(user_id, ach['id'])
                 unlocked.append(ach)
 
-        # Feedback rating achievement (uživatel napsal recenzi s určitým ratingem, např. 5 hvězd)
-        elif ach['condition_type'] == 'feedback_rating':
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute("SELECT COUNT(*) FROM feedback WHERE user_id = %s AND rating = %s",
-                        (user_id, ach['condition_value']))
-            count = cur.fetchone()[0]
-            cur.close()
-            conn.close()
-            if count >= 1:
+        # --- Obecně: libovolný sloupec v user_stats ---
+        else:
+            try:
+                val = int(stats_row.get(ctype) or 0)
+            except Exception:
+                val = 0
+            if val >= cval:
                 add_achievement_to_user(user_id, ach['id'])
                 unlocked.append(ach)
 
-        elif ach['condition_type'] == 'feedback_edited':
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute("SELECT COUNT(*) FROM feedback WHERE user_id = %s AND is_edited = 1", (user_id,))
-            count = cur.fetchone()[0]
-            cur.close()
-            conn.close()
-            if count >= ach['condition_value']:
-                add_achievement_to_user(user_id, ach['id'])
-                unlocked.append(ach)
-
-        # Profil achievement (uživatel nahrál profilovku)
-        elif ach['condition_type'] == 'profile':
-            if user_row and user_row.get('profile_pic') and user_row['profile_pic'] != 'default.jpg':
-                add_achievement_to_user(user_id, ach['id'])
-                unlocked.append(ach)
-
-        # Theme achievement (uživatel nastavil tmavý režim)
-        elif ach['condition_type'] == 'theme':
-            if user_row and user_row.get('theme_mode') == 'dark':
-                add_achievement_to_user(user_id, ach['id'])
-                unlocked.append(ach)
-
-        # Leaderboard achievement (uživatel je první v žebříčku)
-        elif ach['condition_type'] == 'leaderboard':
-            if is_first_in_leaderboard(user_id):
-                add_achievement_to_user(user_id, ach['id'])
-                unlocked.append(ach)
-
-        # Easter egg: datum narození shodné s majitelem (např. 2010-10-15)
-        elif ach['condition_type'] == 'easter_birthday':
-            if user_row and str(user_row.get('birthdate')) == '2010-10-15':
-                add_achievement_to_user(user_id, ach['id'])
-                unlocked.append(ach)
-
-        # Easter egg: profilovka houdek.jpg
-        elif ach['condition_type'] == 'easter_houdek':
-            if user_row and user_row.get('profile_pic') == 'houdek.jpg':
-                add_achievement_to_user(user_id, ach['id'])
-                unlocked.append(ach)
-
-        # Další typy lze přidat zde...
     return unlocked
 
 
@@ -324,171 +331,114 @@ def inject_xp_info():
     if user_id:
         user_data = get_user_xp_and_level(user_id)
         xp = user_data.get("xp", 0)
-        level = user_data.get("level", 1)
-        xp_in_level = xp % 50
-        percent = int((xp_in_level / 50) * 100)
-        level_name = get_level_name(level)
+        # Levely skrýváme: nevracíme je do kontextu, aby se v UI nezobrazovaly
         return dict(
-            user_xp=xp,
-            user_level=level,
-            user_level_name=level_name,
-            user_progress_percent=percent,
-            user_xp_in_level=xp_in_level
+            user_xp=xp
         )
     return {}
 
 
-def add_xp_to_user(user_id, amount):
+def add_xp_to_user(user_id, amount, reason=None):
     """
-    Přidá XP uživateli, aktualizuje level a zkontroluje achievementy.
+    Přidá XP uživateli a zkontroluje achievementy.
+    Parametr `reason` je volitelný (pro kompatibilitu), aktuálně pouze ignorován.
     Pokud má uživatel aktivní XP booster, XP se násobí dvěma.
-    Vrací nový stav XP, level a případné nové achievementy.
+    Vrací nový stav XP a případné nové achievementy.
     """
     # Zjisti, zda má uživatel aktivní booster
     if is_xp_booster_active(user_id):
         amount = amount * 2
 
+    current_level = 1
+    current_xp = 0
+    new_xp = None
+
     conn = get_db_connection()
     cur = conn.cursor()
-    # Získání aktuálních XP
-    cur.execute("SELECT xp FROM users WHERE id = %s", (user_id,))
-    row = cur.fetchone()
-    if not row:
-        cur.close()
-        conn.close()
-        return {"error": "User not found"}
+    try:
+        # Načti aktuální XP a level
+        cur.execute("SELECT xp, level FROM users WHERE id = %s", (user_id,))
+        row = cur.fetchone()
+        if not row:
+            cur.close()
+            conn.close()
+            return {"error": "user_not_found"}
+        current_xp, current_level = int(row[0] or 0), int(row[1] or 1)
+        gain = int(amount or 0)
+        if gain <= 0:
+            return {"xp": current_xp, "level": current_level, "new_achievements": []}
 
-    old_xp = row[0]
-    new_xp = old_xp + amount
-    new_level = calculate_level(new_xp)
+        new_xp = current_xp + gain
+        # Levely již neřešíme – ponecháme beze změny
+        cur.execute("UPDATE users SET xp = %s WHERE id = %s", (new_xp, user_id))
+        conn.commit()
+    finally:
+        try:
+            cur.close()
+            conn.close()
+        except Exception:
+            pass
 
-    # Aktualizace XP a levelu
-    cur.execute("UPDATE users SET xp = %s, level = %s WHERE id = %s", (new_xp, new_level, user_id))
-    conn.commit()
-    cur.close()
-    conn.close()
-
-    # Kontrola achievementů
-    unlocked = check_and_award_achievements(user_id, new_xp=new_xp)
-
+    # Zkontroluj a uděl nově splněné achievementy
+    newly_unlocked = check_and_award_achievements(user_id, new_xp=new_xp if new_xp is not None else current_xp) or []
     return {
-        "xp": new_xp,
-        "level": new_level,
-        "new_achievements": unlocked
+        "xp": new_xp if new_xp is not None else current_xp,
+        "level": current_level,  # pro kompatibilitu vracíme beze změny
+        "new_achievements": newly_unlocked
     }
 
 
-def is_xp_booster_active(user_id):
-    """
-    Vrací True, pokud má uživatel dnes aktivní XP booster.
-    """
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT COUNT(*) FROM user_xp_booster
-        WHERE user_id = %s AND active = TRUE AND start_date <= %s AND end_date >= %s
-    """,
-        (user_id, date.today(), date.today()),
-    )
-    result = cur.fetchone()
-    cur.close()
-    conn.close()
-    return result[0] > 0
+def is_xp_booster_active(user_id, on_date=None):
+    """Vrátí True, pokud má uživatel aktivní XP booster k danému dni (default dnes)."""
+    from datetime import date as _date
+    conn = None
+    cur = None
+    on_date = on_date or _date.today()
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(dictionary=True)
+        cur.execute(
+            """
+            SELECT COUNT(*) AS c FROM user_xp_booster
+            WHERE user_id = %s AND active = TRUE AND start_date <= %s AND end_date >= %s
+            """,
+            (user_id, on_date, on_date)
+        )
+        row = cur.fetchone()
+        return (row and int(row.get('c', 0)) > 0)
+    except Exception:
+        return False
+    finally:
+        try:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+        except Exception:
+            pass
 
 
 def get_top_users(limit=10):
-    """
-    Vrátí seznam top uživatelů podle XP, včetně streaku.
-    """
-    conn = get_db_connection()
-    cur = conn.cursor(dictionary=True)
-    cur.execute(
-        """
-        SELECT id, first_name, last_name, xp, level, profile_pic, streak
-        FROM users
-        ORDER BY xp DESC, id ASC
-        LIMIT %s
-    """,
-        (limit,),
-    )
-    users = cur.fetchall()
-    cur.close()
-    conn.close()
-    return users
-
-
-@xp_bp.route('/api/top-users', methods=['GET'])
-def api_top_users():
-    """
-    Vrátí top 10 uživatelů podle XP.
-    """
-    users = get_top_users(10)
-    # Sestavíme display_name a profilovku
-    for u in users:
-        u['display_name'] = f"{u['first_name']} {u['last_name']}"
-        u['profile_pic'] = u.get('profile_pic') or 'default.jpg'
-    return jsonify({"top_users": users})
-
-
-# =======================
-# API endpointy (volitelné)
-# =======================
-
-
-@xp_bp.route('/api/user/xp', methods=['POST'])
-def api_add_xp():
-    """
-    Přidá XP uživateli (vyžaduje user_id v session).
-    JSON: { "amount": 50 }
-    """
-    user_id = session.get('user_id')
-    if not user_id:
-        return jsonify({"error": "Not logged in"}), 401
-
-    data = request.get_json()
-    amount = int(data.get('amount', 0))
-    if amount <= 0:
-        return jsonify({"error": "Invalid XP amount"}), 400
-
-    result = add_xp_to_user(user_id, amount)
-    return jsonify(result)
-
-
-@xp_bp.route('/api/user/achievements', methods=['GET'])
-def api_get_achievements():
-    """
-    Vrátí seznam achievementů uživatele.
-    """
-    user_id = session.get('user_id')
-    if not user_id:
-        return jsonify({"error": "Not logged in"}), 401
-
-    achievements = get_user_achievements(user_id)
-    return jsonify({"achievements": achievements})
-
-
-@xp_bp.route('/api/achievements', methods=['GET'])
-def api_all_achievements():
-    """
-    Vrátí všechna achievementy v systému.
-    """
-    return jsonify({"achievements": get_all_achievements()})
-
-# =======================
-# Příklad použití v aplikaci:
-# =======================
-# from xp_system import xp_bp
-# app.register_blueprint(xp_bp)
-#
-# # Přidání XP uživateli:
-# add_xp_to_user(user_id, 50)
-#
-# # Získání achievementů:
-# get_user_achievements(user_id)
-#
-# # Přidání XP přes API:
-# POST /api/user/xp  { "amount": 50 }
-#
-# # Získání achievementů uživatele:
-# GET /api/user/achievements
+    """Vrátí top uživatele podle XP jako list dictů: id, first_name, last_name, xp."""
+    limit = int(limit or 10)
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(dictionary=True)
+        cur.execute(
+            "SELECT id, first_name, last_name, xp FROM users ORDER BY xp DESC LIMIT %s",
+            (limit,)
+        )
+        rows = cur.fetchall() or []
+        return rows
+    except Exception:
+        return []
+    finally:
+        try:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+        except Exception:
+            pass

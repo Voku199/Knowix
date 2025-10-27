@@ -35,7 +35,11 @@ def ensure_user_stats_exists(user_id):
                 lis_cor,
                 lis_wr,
                 at_cor,
-                at_wr
+                at_wr,
+                AI_poslech_minut,
+                AI_poslech_seconds,
+                slovni_best_time,
+                slovni_quick_points,
             ) VALUES (
                 %s, 0, 0, 0, 0, %s, 0, %s,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -73,7 +77,11 @@ def get_simple_stats(user_id):
             lis_cor,
             lis_wr,
             at_cor,
-            at_wr
+            at_wr,
+            AI_poslech_minut,
+            AI_poslech_seconds,
+            slovni_best_time,
+            slovni_quick_points,
         FROM user_stats WHERE user_id = %s
         """,
         (user_id,)
@@ -111,6 +119,10 @@ def my_stats():
             'lis_cor': 0,
             'lis_wr': 0,
             'at_cor': 0,
-            'at_wr': 0
+            'at_wr': 0,
+            'AI_poslech_minut': 0,
+            'AI_poslech_seconds': 0,
+            'slovni_best_time': 0,
+            'slovni_quick_points': 0,
         }
     return render_template('stats/stats.html', stats=stats)

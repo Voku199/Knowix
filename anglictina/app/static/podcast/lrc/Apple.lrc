@@ -1,0 +1,315 @@
+[00:00.093] Welcome to the Deep Dive.
+[00:01.495] Today, we're looking at, well, the very beginning of a tech giant.
+[00:04.898] We're going back to the Apple I.
+[00:06.887] Right. It's funny.
+[00:07.888] You think Apple, now you think sleek, polished, expensive design.
+[00:12.292] iPhones, MacBooks.
+[00:13.894] Exactly. But the Apple I from 1976, it was basically just a circuit board, a bare board.
+[00:20.10] It really was. And that's the fascinating part.
+[00:22.489] It wasn't some blockbuster product.
+[00:23.997] They only made about 200 of them.
+[00:25.492] Only 200. Wow.
+[00:27.294] Yeah. And our sources say maybe only 20 or so are actually known to be fully working today.
+[00:32.499] Super rare.
+[00:33.30] So not a huge commercial hit then.
+[00:35.195] Not at all.
+[00:36.196] But this very modest, almost sort of amateur piece of kit set the stage for everything Apple became.
+[00:43.19] It was about making computing personal accessible.
+[00:46.099] Taking it from those giant corporate machines to something different.
+[00:49.089] Exactly. And the start was incredibly humble.
+[00:51.091] I mean, to get the money for those first boards, Steve Jobs sold his VW van.
+[00:54.988] His van.
+[00:56.096] Steve Wozniak sold his really fancy HP 65 calculator.
+[01:00.10] They were literally scraping pennies together.
+[01:01.795] True bootstrapping.
+[01:02.889] Totally. So our mission today is really to dig into how these two Steves, Wozniak, the engineering whiz, and Jobs, the marketing visionary.
+[01:13.393] Right.
+[01:14.194] How their, let's say, unconventional choices let them crack into this super technical, expensive world with a product built on limitations.
+[01:24.097] Okay, let's do it.
+[01:25.405] And just to check, we're talking about the very first Apple computer here.
+[01:29.396] Based on what we just discussed, what year was the Apple I initially released?
+[01:33.093] We'll pause for a moment there.
+[01:34.187] Right. So think back to that starting date we mentioned.
+[01:36.696] Okay, moving on.
+[01:38.698] To really get the Apple I, you need to understand what computing was like before it.
+[01:43.69] The landscape in, say, the early 70s.
+[01:46.693] Oh, it was completely different.
+[01:47.894] Think mainframes. Giant machines, sometimes the size of a living room, often from IBM.
+[01:52.592] And they needed their own special rooms, right?
+[01:54.394] Yeah.
+[01:54.594] Air-conditioned, the whole deal.
+[01:55.889] Absolutely. These were serious enterprise tools, not something you'd have at home or even really interact with directly unless you were, you know, an operator.
+[02:03.296] And getting information in and out, that sounds like a nightmare compared to today.
+[02:07.30] We're not talking keyboards and screens.
+[02:09.195] No way.
+[02:10.49] Input was often flipping dozens of switches, watching lights blink on the actual machine.
+[02:14.694] Okay.
+[02:15.388] And output, often magnetic tape rolls, or even more common, stacks of punch cards, paper cards with holes punched in them.
+[02:22.796] Punch cards, I've heard about those.
+[02:24.691] Sounds tedious.
+[02:25.999] It was a real pain, especially for hobbyists.
+[02:28.588] Make one tiny mistake, you might have to reprint the whole stack.
+[02:32.498] Slow, frustrating, just cumbersome.
+[02:36.396] So basically, unless you worked for a big company or a university, computing was pretty much off-limits.
+[02:42.388] Largely, yes.
+[02:44.39] But there was a key technological trend starting to change things, making hardware smaller.
+[02:49.289] That would be Moore's Law.
+[02:50.597] That's the one.
+[02:51.798] The idea that the number of transistors you can fit on a microchip roughly doubles every two years.
+[02:56.589] Which means more power in less space.
+[02:58.898] Exactly.
+[02:59.699] That relentless shrinking, that miniaturization, is what eventually made computers small enough to even think about putting one on a desk.
+[03:05.892] Okay, so things were getting smaller.
+[03:07.493] But even in the early 70s, personal computing wasn't like we know it.
+[03:11.591] It was a different world.
+[03:12.392] Oh, completely.
+[03:13.393] It was the domain of the hobbyist, the DIY enthusiast.
+[03:16.996] Right, people who liked tinkering.
+[03:18.598] Precisely.
+[03:19.492] Yeah.
+[03:19.892] You didn't buy a computer.
+[03:20.987] You bought a kit, like the Altair 8800, which was quite famous.
+[03:24.991] A kit.
+[03:25.698] So a box of parts.
+[03:27.10] Yep, a box of components, circuit boards, wires.
+[03:29.595] You had to assemble it all yourself.
+[03:31.197] Soldering, wiring, everything.
+[03:33.092] So you needed serious technical skills just to get started.
+[03:36.496] You absolutely did.
+[03:37.897] You basically had to be an engineer or a serious electronics buff just to see if the thing would even power on.
+[03:44.197] It was a huge barrier for most people.
+[03:46.492] Okay, another quick check for everyone listening.
+[03:48.694] We mentioned that early computing was dominated by these huge machines.
+[03:53.392] What was that key technological principle, the one about transistors doubling, that helped make computers smaller over time?
+[04:00.399] Take a second to recall that term.
+[04:01.787] It's a fundamental concept in computing history.
+[04:03.789] All right, so the challenge was size, complexity, and cost.
+[04:07.30] And this is where Steve Wozniak really enters the picture.
+[04:10.89] His goal wasn't the same as IBM's.
+[04:12.798] Not at all.
+[04:14.20] Wozniak was driven by something different.
+[04:16.295] You want to build a good computer, sure.
+[04:18.097] But his focus was really twofold.
+[04:20.993] Make it easy to use and make it affordable.
+[04:22.995] Inspired by things like the Altair, but wanting to take it further?
+[04:26.799] Yeah.
+[04:27.493] He looked at the Altair and thought, okay, this is cool.
+[04:29.989] But I want something where you could just type on a keyboard and see the output on a screen easily without needing an electronics lab in your garage.
+[04:38.197] And affordability was key.
+[04:39.692] What was the biggest cost holding hobbyists back then?
+[04:43.095] It's interesting.
+[04:43.589] It wasn't always the main computer board itself.
+[04:46.392] The real killer was often the display terminal.
+[04:48.888] The screen.
+[04:49.688] Yeah, but more than just the screen.
+[04:51.197] You needed this dedicated external box with all the special circuitry to interpret the computer signals and show them as text or graphics.
+[04:59.298] In mid-70s money, that terminal could easily cost $900 or more.
+[05:03.596] Wow, that's a huge chunk of change back then.
+[05:06.198] Prohibitive for most people.
+[05:07.693] Definitely.
+[05:08.587] And that's where Wozniak had his breakthrough moment, his genius shortcut.
+[05:12.791] How did he get around that massive cost?
+[05:15.194] He did something pretty radical for the time.
+[05:17.489] He essentially built the video display circuitry and the keyboard interface directly onto the Apple iMotherboard itself.
+[05:24.496] Ah, so it was all integrated.
+[05:26.191] Exactly.
+[05:26.992] Which meant the user didn't need that expensive dedicated terminal anymore.
+[05:30.889] They could connect the Apple iBoard to something much, much cheaper and more common.
+[05:34.987] Something they probably already had in their house.
+[05:37.296] Precisely.
+[05:38.39] A standard television set.
+[05:40.099] A TV.
+[05:41.994] That seems so obvious now, but I guess it wasn't then.
+[05:44.089] Not at all.
+[05:45.09] In fact, it was seen as totally unprofessional.
+[05:48.20] Wozniak was working at Hewlett-Packard HP at the time.
+[05:51.39] He took his designs, his schematics to his bosses there.
+[05:54.193] And they loved it.
+[05:55.487] They rejected it.
+[05:56.688] Five times, apparently.
+[05:58.397] They just couldn't get their heads around using a regular TV, a consumer item for serious computing.
+[06:03.388] It wasn't professional enough.
+[06:04.99] That's incredible.
+[06:05.791] That rejection basically defined Apple's early ethos, didn't it?
+[06:09.394] That unprofessional approach became the selling point.
+[06:12.291] It really did.
+[06:13.398] And that kind of attitude extended even to the price.
+[06:15.988] That famous $666.66.
+[06:19.298] Yeah, why that specific number?
+[06:20.699] It seems a bit odd.
+[06:21.70] Wozniak just said he liked repeating digits.
+[06:24.196] Apparently, it was roughly a one-third markup on the $500 or so it cost him to make the board.
+[06:29.094] Simple as that.
+[06:29.988] Huh.
+[06:30.789] But Jobs saw something more in it, didn't he?
+[06:32.991] Beyond just the clever engineering.
+[06:34.70] Oh, absolutely.
+[06:36.194] Wozniak solved the technical problem, making it affordable.
+[06:39.398] But Jobs saw the market shift.
+[06:42.094] He realized the future user wasn't necessarily the hobbyist who enjoyed soldering.
+[06:45.897] Right. It was someone who just wanted the machine to work.
+[06:48.193] Exactly.
+[06:49.287] And crucially, the Apple Air.
+[06:53.091] I wasn't sold as a kit like the Altair.
+[06:55.694] It was sold as a fully assembled motherboard.
+[06:58.19] So the hard part was done.
+[06:59.591] Most of it, yeah.
+[07:00.699] Still had to add your own keyboard, power supply, and, you know, a case if you wanted one.
+[07:05.197] But the complex soldering, the assembly of the main board, that was done.
+[07:10.095] Jobs figured out they could get the boards assembled fairly cheaply.
+[07:12.791] Making it way more accessible.
+[07:14.192] Instantly.
+[07:15.193] It opened the door for people who were interested in computing, but maybe didn't have the deep electronic skills.
+[07:20.599] It established that core Apple idea.
+[07:22.894] Yeah.
+[07:23.789] We handle the tricky stuff.
+[07:25.19] You just use it.
+[07:26.298] Okay, time for our next quick question.
+[07:28.793] Thinking about Wozniak's clever solution to avoid the costly display terminal,
+[07:33.892] what common household item did he design the Apple Eye to connect to instead?
+[07:38.79] We'll give you a moment.
+[07:39.698] It was something most homes already had back then.
+[07:41.70] All right.
+[07:42.193] So the Apple, I wasn't a kit.
+[07:44.396] It was an assembled board.
+[07:45.891] That accessibility was the key.
+[07:47.893] It was the spark, you could say.
+[07:49.494] Definitely the spark.
+[07:50.695] But the Apple II, which came out just a year later in 1977, that was the inferno.
+[07:55.794] How was the Apple II different?
+[07:57.289] It took everything.
+[07:59.397] I pioneered the integrated video, the focus on ease of use, and put it in a complete package.
+[08:05.39] A sleek plastic case, a built-in keyboard, even color graphics, which was huge then.
+[08:10.889] So it looked like a finished product, not a project board.
+[08:13.398] Exactly.
+[08:13.892] It looked almost like a home appliance.
+[08:15.60] Friendly, approachable, and it was a massive hit.
+[08:18.496] Sold something like 6 million units over its lifespan.
+[08:21.499] It really launched Apple as a major company.
+[08:24.089] But the path wasn't always smooth after that, was it?
+[08:26.291] I remember hearing about the Apple III, not such a success story.
+[08:29.988] Oh, the Apple III was kind of a disaster initially.
+[08:33.805] It showed what happened when they lost sight of those core principles of simplicity and solid engineering.
+[08:38.49] What went wrong?
+[08:39.197] Well, Jobs was really focused on the aesthetics, wanting this very sleek, professional look.
+[08:45.59] And he made a critical decision.
+[08:47.899] No cooling fan.
+[08:48.90] No fan.
+[08:49.487] In a computer?
+[08:50.995] He believed the heat should just dissipate through the metal case, which, from an engineering standpoint, was optimistic, let's say.
+[08:59.297] I'm guessing it didn't work out well.
+[09:00.792] Not at all.
+[09:01.392] The machines overheated constantly.
+[09:03.795] The chips inside would actually get so hot they'd start to loosen from the motherboard sockets.
+[09:07.999] Seriously.
+[09:09.00] So what did they tell people?
+[09:10.388] This is the infamous part.
+[09:12.19] Apple support apparently told customers to lift the computer about six inches off the desk and drop it.
+[09:17.889] You're kidding.
+[09:18.596] Drop the computer.
+[09:19.597] To try and reseat the chips.
+[09:20.798] Yeah.
+[09:21.292] For a machine that cost thousands of dollars, it was terrible advice and really damaged their reputation.
+[09:25.79] Aesthetics overfunction.
+[09:26.991] Big mistake.
+[09:27.699] Wow.
+[09:28.70] Okay, fast forward a bit to 1984.
+[09:31.089] The Macintosh.
+[09:32.196] Hugely influential, right?
+[09:33.798] Bringing the graphical interface and the mouse to the masses.
+[09:36.494] Absolutely revolutionary in terms of user experience.
+[09:39.19] Pointing, clicking, windows.
+[09:41.592] It changed everything.
+[09:42.794] But it failed that other Apple, I'd test.
+[09:45.196] Affordability.
+[09:46.29] Bingo.
+[09:47.598] The Mac was brilliant, but it was expensive.
+[09:50.294] Launched at nearly $2,500.
+[09:52.497] And businesses, which were the main computer buyers then, found it too weird, too unorthodox.
+[09:58.996] They were mostly sticking with IBM and text-based interfaces.
+[10:02.693] So amazing tech, but not accessible enough in the market.
+[10:05.99] Pretty much.
+[10:06.697] It struggled commercially at first.
+[10:08.499] And that contributed to the internal conflicts that eventually led to Steve Jobs being pushed out of Apple in 1985.
+[10:14.492] And then came the wilderness years for Apple.
+[10:17.588] Yeah.
+[10:17.895] The 90s.
+[10:18.696] Yeah, the 90s were tough.
+[10:19.697] Apple kind of lost its way.
+[10:20.698] They were losing the window battle.
+[10:22.593] Windows PCs were getting cheaper and better.
+[10:24.795] Apple had this confusing product line.
+[10:26.597] Lots of different Macs.
+[10:27.692] None really standing out.
+[10:28.799] They were reportedly getting close to bankruptcy.
+[10:30.695] Until Jobs came back in 1997.
+[10:32.897] Right.
+[10:33.391] And his return was dramatic.
+[10:34.992] He came back with a ruthless clarity, almost echoing that initial focus of the Apple A-days.
+[10:39.49] What did he do first?
+[10:40.798] Major shakeup.
+[10:41.999] Fired thousands of people.
+[10:43.294] Reportedly slashed about 70% of the projects Apple was working on.
+[10:46.897] Said he needed to bring back the soul of the company.
+[10:49.30] Simplify.
+[10:50.394] Focus.
+[10:51.088] And he launched that Think Different ad campaign, too.
+[10:53.597] Yes.
+[10:54.492] Connecting the brand back to creativity, innovation, that counterculture vibe.
+[10:58.696] Rebuilding the image.
+[11:01.098] But then came the product that really turned things around.
+[11:03.888] The one that combined that original accessibility idea with Jobs' now highly refined design sense?
+[11:10.187] That's the one.
+[11:11.095] The iMac G3 launched in 1998.
+[11:14.298] Ah, the colorful ones.
+[11:15.793] The blobby Macs.
+[11:16.594] Exactly.
+[11:17.488] Translucent plastic.
+[11:18.796] Bright colors.
+[11:19.49] That all-in-one design with the handle on top.
+[11:22.092] It was the spiritual successor to the Apple I and II in many ways.
+[11:24.989] How so?
+[11:25.789] It was simple.
+[11:26.697] Easy to set up.
+[11:27.698] Literally plug it in, connect to the internet, and go.
+[11:31.488] And crucially, it was affordable again for consumers.
+[11:33.998] It looked fun.
+[11:35.292] Not intimidating.
+[11:36.20] And it worked?
+[11:36.894] Big time.
+[11:37.695] Sold 800,000 units in just the first five months.
+[11:40.097] It made Apple profitable again almost overnight.
+[11:42.90] It proved that combining ease of use, approachability, and bold design was the winning formula.
+[11:47.598] A lesson traceable all the way back to that $666 board.
+[11:51.695] Let's pause for our final question.
+[11:54.191] After Steve Jobs returned to Apple, he launched a really distinctive, colorful, all-in-one computer that was a huge hit,
+[12:02.493] selling 800,000 units quickly and helping save the company.
+[12:06.497] What was the name of that computer?
+[12:07.791] Just take a moment to think.
+[12:09.099] It really marked Apple's comeback.
+[12:10.794] Okay.
+[12:11.488] So looking back, the whole Apple story really hinges on that initial spark from the Apple I.
+[12:16.693] Wozniak's engineering brilliance.
+[12:18.589] That simple, clever hack of using a TV.
+[12:21.191] That was the foundation, making complex technology accessible.
+[12:24.394] And then Jobs taking that core idea that accessibility and user experience matter,
+[12:28.799] maybe even more than raw specs or professionalism, and applying his relentless drive for design and marketing.
+[12:34.698] Absolutely.
+[12:35.699] The Apple I itself wasn't the big moneymaker.
+[12:37.995] It was the blueprint.
+[12:39.396] It showed that you could enter a complex market by fundamentally changing who the product was for.
+[12:43.40] It was the small step that enabled the giant leaps later.
+[12:46.496] Exactly.
+[12:47.097] The Apple II, the iMac, the iPod, the iPhone.
+[12:49.993] They all build on that foundation of making technology personal and easy to use.
+[12:54.398] The Apple I kind of walked, so the Apple II could run, you know?
+[12:57.494] It really makes you think.
+[12:58.789] Sometimes the most revolutionary ideas aren't the most complex or powerful ones initially.
+[13:04.288] Sometimes they're the ones that just cleverly sidestep a barrier,
+[13:07.691] making something exclusive suddenly available to everyone.
+[13:11.094] They took a risk with that unprofessional TV connection, and it changed everything.
+[13:15.592] So perhaps a final thought for you listening.
+[13:17.888] What simple, maybe even unprofessional-seeming shortcut or readily available tool are you overlooking right now?
+[13:24.895] What accessible idea, maybe dismissed by the mainstream, could actually be the key to your own breakthrough?
+[13:30.887] It's worth considering.
+[13:31.995] It's a powerful lesson from a humble circuit board.

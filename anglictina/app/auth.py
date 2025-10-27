@@ -46,17 +46,7 @@ def inject_xp_info():
     if user_id:
         user_data = get_user_xp_and_level(user_id)
         xp = user_data.get("xp", 0)
-        level = user_data.get("level", 1)
-        xp_in_level = xp % 50
-        percent = int((xp_in_level / 50) * 100)
-        level_name = get_level_name(level)
-        return dict(
-            user_xp=xp,
-            user_level=level,
-            user_level_name=level_name,
-            user_progress_percent=percent,
-            user_xp_in_level=xp_in_level
-        )
+        return dict(user_xp=xp)
     return {}
 
 

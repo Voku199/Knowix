@@ -18,31 +18,11 @@ try:
     _GTTS_AVAILABLE = True
 except Exception:
     _GTTS_AVAILABLE = False
+from xp import add_xp_to_user  # přidávání XP
+from streak import update_user_streak  # denní streak
+from xp import check_and_award_achievements
 
-# --- XP / Streak integrace (bezpečné importy) ---
-try:
-    from xp import add_xp_to_user  # přidávání XP
-except Exception:
-    add_xp_to_user = None
-
-try:
-    from streak import update_user_streak  # denní streak
-except Exception:
-    update_user_streak = None
-
-# --- Achievementy: bezpečný import kontroly ---
-try:
-    from xp import check_and_award_achievements
-except Exception:
-    check_and_award_achievements = None
-
-# Statistika do DB – sjednoceno s ai.py
-try:
-    from user_stats import add_learning_time, update_user_stats, set_first_activity_if_needed
-except Exception:
-    add_learning_time = None
-    update_user_stats = None
-    set_first_activity_if_needed = None
+from user_stats import add_learning_time, update_user_stats, set_first_activity_if_needed
 
 # Vytvoření blueprintu pro AI Poslech (mluvený AI chat)
 ai_poslech_bp = Blueprint('ai_poslech', __name__, template_folder='templates')
@@ -55,7 +35,7 @@ HTTP_SESSION = requests.Session()
 HISTORY_LIMIT = 16  # počet posledních zpráv (role+content) ze session, které pošleme modelu
 
 # --- Streak práh ---
-STREAK_TALK_MS = 150_000  # 2.5 min
+STREAK_TALK_MS = 120_000  # 2.5 min
 
 # Detekce češtiny a sprostých slov (stejné jako v ai.py)
 CZECH_CHARS = set("ěščřžýáíéúůďťňóĚŠČŘŽÝÁÍÉÚŮĎŤŇÓ")

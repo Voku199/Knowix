@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
           <meta name="description" content="Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam.">
   <meta name="keywords" content="angličtina, procvičování, písničky, testy, chat, výuka, zdarma, knowix, zábava, škola">
   <meta name="robots" content="index, follow">
@@ -215,8 +216,9 @@
     </p>
 </footer>
 <script>
-    // Předání uživatelské úrovně do JavaScriptu
+    // Předání uživatelské úrovně do JavaScriptu a CSRF tokenu
     window.userEnglishLevel = '{{ user_english_level }}';
+    window.CSRF_TOKEN = '{{ csrf_token() }}';
 </script>
 <script src="{{ url_for('static', filename='shadow_ML/script.js') }}"></script>
 </body>

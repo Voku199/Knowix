@@ -61,10 +61,12 @@
             font-weight: 500;
             color: #8b7a60;
         }
+        .xp-status .keys-badge { display:inline-block; margin-left:10px; padding:2px 8px; border-radius:999px; background:#e7e1d6; color:#6b5d4f; font-weight:700; }
         body.dark-mode .xp-status {
             background: #3a342a;
             color: #d4c4a8;
         }
+        body.dark-mode .xp-status .keys-badge { background:#4a4135; color:#e8dcc5; }
         .shop-items {
             display: flex;
             flex-wrap: wrap;
@@ -182,6 +184,27 @@
             color: #f0eee9;
         }
 
+        /* Wheel of fortune */
+        .wheel-card{ margin-top:2em; padding:1.2em; border-radius:14px; background:#f5f3f0; box-shadow:0 2px 10px rgba(0,0,0,0.08); }
+        body.dark-mode .wheel-card{ background:#3a342a; }
+        .wheel-title{ margin:0 0 .6em 0; font-size:1.3em; font-weight:700; color:#8b7a60; }
+        body.dark-mode .wheel-title{ color:#d4c4a8; }
+        .wheel-row{ display:flex; align-items:center; gap:16px; justify-content:space-between; flex-wrap:wrap; }
+        .wheel{ width:160px; height:160px; border-radius:50%; background:
+            conic-gradient(#ffd966 0 51.43deg,#b6d7a8 0 102.86deg,#a2c4c9 0 154.29deg,#d5a6bd 0 205.72deg,#f4cccc 0 257.15deg,#cfe2f3 0 308.58deg,#f9cb9c 0 360deg);
+            border:6px solid #e7e1d6; position:relative; box-shadow:0 6px 16px rgba(0,0,0,0.12);
+        }
+        body.dark-mode .wheel{ border-color:#4a443a; }
+        .wheel::after{ content:""; position:absolute; top:-18px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:10px solid transparent; border-right:10px solid transparent; border-bottom:18px solid #e07a5f; }
+        .spin-anim{ animation: spin 2.2s cubic-bezier(.2,.8,.2,1) forwards; }
+        @keyframes spin{ from{ transform:rotate(0); } to{ transform:rotate(1020deg); } }
+        .wheel-info{ flex:1; min-width:220px; color:#6b5d4f; }
+        body.dark-mode .wheel-info{ color:#e8dcc5; }
+        .wheel-btn{ background:#e07a5f; color:white; border:none; padding:.7em 1.2em; border-radius:10px; font-weight:700; cursor:pointer; }
+        .wheel-btn:disabled{ opacity:.6; cursor:not-allowed; }
+        .keys-inline{ font-weight:700; }
+        .wheel-result{ margin-top:.6em; font-weight:700; }
+
         /* Mobilní optimalizace */
         @media (max-width: 768px) {
             .shop-container {
@@ -190,55 +213,7 @@
                 border-radius: 12px;
                 max-width: calc(100% - 2em);
             }
-
-            .shop-container h1 {
-                font-size: 1.8em;
-                margin-bottom: 1em;
-                text-align: center;
-            }
-
-            .xp-status {
-                font-size: 1em;
-                margin-bottom: 1.5em;
-                padding: 0.6em;
-            }
-
-            .shop-items {
-                flex-direction: column;
-                gap: 1.5em;
-            }
-
-            .shop-item {
-                min-width: unset;
-                max-width: 100%;
-                padding: 1.2em 1em;
-            }
-
-            .shop-item h2 {
-                font-size: 1.2em;
-                margin-bottom: 0.4em;
-            }
-
-            .shop-item p {
-                font-size: 0.95em;
-                margin: 0.4em 0 0.8em 0;
-            }
-
-            .shop-item .buy-btn {
-                font-size: 1em;
-                padding: 0.8em 1.2em;
-                max-width: 100%;
-            }
-
-            .shop-item .freeze-count, .shop-item .booster-status {
-                font-size: 0.9em;
-            }
-
-            a {
-                margin-top: 1.5em;
-                text-align: center;
-                display: block;
-            }
+            .wheel-row{ flex-direction:column; align-items:center; }
         }
 
         /* Velmi malé mobily */
@@ -248,56 +223,11 @@
                 padding: 1em 0.8em;
                 border-radius: 8px;
             }
-
-            .shop-container h1 {
-                font-size: 1.6em;
-            }
-
-            .xp-status {
-                font-size: 0.95em;
-                padding: 0.5em;
-            }
-
-            .shop-items {
-                gap: 1.2em;
-            }
-
-            .shop-item {
-                padding: 1em 0.8em;
-                border-radius: 8px;
-            }
-
-            .shop-item h2 {
-                font-size: 1.1em;
-            }
-
-            .shop-item p {
-                font-size: 0.9em;
-            }
-
-            .shop-item .buy-btn {
-                font-size: 0.95em;
-                padding: 0.7em 1em;
-            }
         }
 
         /* Landscape mobily */
         @media (max-width: 900px) and (orientation: landscape) {
-            .shop-container {
-                margin: 1em auto;
-                padding: 1.2em;
-            }
-
-            .shop-items {
-                flex-direction: row;
-                gap: 1em;
-            }
-
-            .shop-item {
-                flex: 1;
-                min-width: 200px;
-                max-width: 300px;
-            }
+            .shop-container { margin: 1em auto; padding: 1.2em; }
         }
     </style>
 </head>
@@ -388,6 +318,7 @@
     <h1>Obchod</h1>
     <div class="xp-status">
         <strong>Tvůj XP stav:</strong> {{ shop_status['xp'] }} XP
+        <span class="keys-badge" id="keysBadge">Klíče: {{ shop_status['key_count'] or 0 }}</span>
     </div>
     <div class="shop-items">
         <div class="shop-item">
@@ -429,6 +360,21 @@
             <div class="booster-status">XP Booster je {% if shop_status['xp_booster_active'] %}<strong>aktivní</strong>{% else %}neaktivní{% endif %}.</div>
         </div>
     </div>
+
+    <!-- Kolo štěstí -->
+    <section class="wheel-card" aria-label="Kolo štěstí">
+        <h2 class="wheel-title">🎡 Kolo štěstí</h2>
+        <div class="wheel-row">
+            <div class="wheel" id="wheel"></div>
+            <div class="wheel-info">
+                <p>Roztoč kolo a vyhraj: 1× freeze, 1× XP boost, +100 XP, náhodný achievement, +1 klíč, nic, +1 streak.</p>
+                <p>Klíče k dispozici: <span class="keys-inline" id="keysInline">{{ shop_status['key_count'] or 0 }}</span></p>
+                <button class="wheel-btn" id="spinBtn">Roztočit (1 klíč)</button>
+                <div class="wheel-result" id="spinResult"></div>
+            </div>
+        </div>
+    </section>
+
     <a href="{{ url_for('main.index') }}">← Zpět na hlavní stránku</a>
 </main>
 
@@ -488,6 +434,46 @@
             }
         });
     }
+
+    // Kolo štěstí – spin
+    (function(){
+      const btn = document.getElementById('spinBtn');
+      const wheel = document.getElementById('wheel');
+      const resEl = document.getElementById('spinResult');
+      const keysInline = document.getElementById('keysInline');
+      const keysBadge = document.getElementById('keysBadge');
+
+      function setKeys(n){
+        if(keysInline) keysInline.textContent = String(n);
+        if(keysBadge) keysBadge.textContent = 'Klíče: ' + String(n);
+      }
+
+      btn?.addEventListener('click', async ()=>{
+        if (!btn) return;
+        if (btn.disabled) return;
+        const have = parseInt((keysInline?.textContent||'0'),10) || 0;
+        if (have <= 0){ alert('Nemáš dostatek klíčů.'); return; }
+        btn.disabled = true; resEl.textContent='';
+        try{
+          // vizuální spin
+          wheel?.classList.remove('spin-anim'); void wheel?.offsetWidth; wheel?.classList.add('spin-anim');
+          const r = await fetch('/spin_wheel', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':window.csrfToken}, body: '{}' });
+          const data = await r.json();
+          // počkej chvilku, ať animace doběhne
+          setTimeout(()=>{
+            if(data && data.status === 'success'){
+              resEl.textContent = data.message || 'Hotovo.';
+              if(typeof data.key_count === 'number'){ setKeys(data.key_count); }
+            } else {
+              resEl.textContent = (data && data.message) ? data.message : 'Nepodařilo se roztočit.';
+            }
+            btn.disabled = false;
+          }, 1200);
+        }catch(e){
+          resEl.textContent = 'Chyba sítě.'; btn.disabled=false;
+        }
+      });
+    })();
 </script>
 <script>const CSRF_TOKEN = "{{ csrf_token() }}";</script>
 <script>

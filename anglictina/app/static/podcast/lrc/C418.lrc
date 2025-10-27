@@ -1,0 +1,318 @@
+[00:00.094] Welcome to the Deep Dive.
+[00:02.298] If you've ever been building something huge in Minecraft,
+[00:05.851] maybe just a dirt hut,
+[00:07.173] and that really simple, beautiful piano music
+[00:09.458] just sort of floats in.
+[00:10.50] Then yeah, you know C418's work,
+[00:12.209] even if you don't know the name Daniel Rosenfeld.
+[00:14.133] Exactly.
+[00:15.135] And today we're doing a deep dive into him, C418.
+[00:18.327] He's the musical mind
+[00:19.89] behind that iconic Minecraft soundtrack.
+[00:22.415] And it's more than just game music, right?
+[00:24.058] It's really a story about
+[00:26.129] sticking to your guns artistically,
+[00:28.012] being clever with tech limitations,
+[00:30.577] and honestly, fighting for your work against,
+[00:32.968] well, corporate giants.
+[00:34.33] Yeah, our mission today is to track that journey.
+[00:36.294] He went from intense manual labor
+[00:39.807] to being globally recognized.
+[00:41.29] We wanna really get into the genius of his ambient sound.
+[00:44.897] And also that big legal fight,
+[00:46.727] the one that means there's a whole finished album
+[00:48.971] we've never actually heard in the game.
+[00:50.454] Right, we've looked at biographies, musical analyses,
+[00:53.58] stuff written about the cultural impact,
+[00:56.091] trying to piece together why this music
+[00:57.974] is just so, so enduring.
+[00:59.738] Okay, so to really get it,
+[01:00.94] we need to start at the beginning, right?
+[01:02.81] The contrast is pretty stark.
+[01:04.854] It really is.
+[01:06.056] Daniel Rosenfeld, born 1989 in Chemnitz, Germany.
+[01:10.251] He wasn't living some artist's dream life.
+[01:12.415] He had this job, described as an awful manufacturing job.
+[01:16.008] 10 hours a day.
+[01:17.651] Backbreaking manual labor on an assembly line.
+[01:20.977] That's intense.
+[01:22.019] Super intense.
+[01:23.048] And that context, I think, is key.
+[01:25.172] Music wasn't just a profession waiting to happen.
+[01:27.656] It was his escape.
+[01:29.179] His brother Harry encouraged him, but it was a hobby.
+[01:31.811] You can almost imagine the repetition of that factory work.
+[01:36.339] Maybe that's why ambient music appealed.
+[01:38.129] That sense of space, something different.
+[01:40.373] Yeah, I think that makes a lot of sense.
+[01:41.615] It was his mental out.
+[01:43.098] And this independence, this personal space,
+[01:45.89] it kind of connects to how he approached things later.
+[01:48.495] So this hobby leads him online to Tigsource,
+[01:51.607] the indie game forum.
+[01:52.489] Exactly, and that's where he bumps into Marcus Person,
+[01:55.682] who's making Minecraft.
+[01:57.017] Notch had a problem.
+[01:57.939] Music, right.
+[01:58.767] He couldn't find anything that worked.
+[02:00.17] Yeah, anything traditional, anything loop-based.
+[02:02.053] It just felt, quote, cheap and out of place
+[02:04.057] for this weird, blocky, open-world thing he was building.
+[02:07.45] Okay, so C-418 steps in, offers his ambient stuff,
+[02:11.698] and this is the crucial moment, isn't it?
+[02:14.53] The deal.
+[02:15.372] The absolute key.
+[02:16.734] Minecraft was tiny then.
+[02:18.297] Pay was minimal.
+[02:19.619] But the agreement they made, it was huge creatively.
+[02:23.453] C-418 keeps 100% of the rights and royalties,
+[02:26.779] full creative freedom.
+[02:28.129] 100%.
+[02:29.451] He wasn't an employee making music for hire.
+[02:32.497] He was licensing his art, his escape to the project.
+[02:35.85] That changes everything.
+[02:37.092] Because he didn't have to follow the trends.
+[02:38.815] The whole pixelated indie game thing
+[02:40.498] usually meant chiptunes back then.
+[02:41.847] Right, and he specifically rejected that.
+[02:44.052] He said he disliked the style,
+[02:45.654] and also, very honestly, that he sucked at making it.
+[02:49.168] Okay, so instead of matching the blocky look
+[02:50.971] with blocky sounds.
+[02:52.093] He did the opposite.
+[02:53.683] Minimalist, ambient stuff, piano, strings, synths.
+[02:56.755] Very acoustic feeling, very calm.
+[02:58.318] It creates this amazing contrast
+[03:00.789] with the sometimes stressful gameplay.
+[03:02.953] Was that a big risk, though,
+[03:03.969] going against the visual grain like that?
+[03:05.558] Oh, for sure.
+[03:06.44] But it worked incredibly well.
+[03:07.709] The minimalism was partly philosophy,
+[03:09.432] partly dealing with tech limits.
+[03:10.995] Ah, right, the Minecraft sound engine back then
+[03:13.453] was super basic, couldn't loop properly.
+[03:15.67] Right.
+[03:16.512] No location-specific audio.
+[03:17.995] Exactly, couldn't do smooth loops,
+[03:19.598] couldn't trigger music based on where you were.
+[03:21.868] So how do you score a potentially infinite world
+[03:25.195] with those limits?
+[03:26.116] What did he do?
+[03:27.078] His brilliant idea was silence.
+[03:29.99] Use silence.
+[03:30.912] Make the music play randomly, sporadically,
+[03:33.637] sometimes long gaps with nothing.
+[03:35.788] So the limitations became a feature.
+[03:38.753] Totally, it wasn't just a workaround.
+[03:40.276] It was a design choice.
+[03:41.358] You're just mining away,
+[03:42.48] maybe feeling a bit bored or lonely,
+[03:44.417] and then suddenly, this gentle piano track
+[03:47.155] like Sweden fades in.
+[03:49.159] And it makes that moment feel significant,
+[03:52.338] it elevates the mundane,
+[03:53.794] it creates that feeling of instant nostalgia
+[03:55.918] people talk about.
+[03:56.76] It's because the music wasn't wallpaper,
+[03:58.47] it was an event.
+[03:59.392] Wow.
+[04:00.233] Okay, so that leads into the actual albums.
+[04:01.996] Volume Alpha came out in 2011.
+[04:03.88] That's the core sound, isn't it?
+[04:05.59] That's the foundation.
+[04:07.059] Simple, often piano-led, lots of ambience.
+[04:10.599] Analyses often mention tracks like Sweden or Minecraft.
+[04:13.631] They capture this feeling of melancholy,
+[04:17.078] maybe loneliness, but also wonder.
+[04:20.03] The sound of being alone in this huge, empty world.
+[04:23.677] That really nails the early Minecraft vibe.
+[04:26.268] Then Volume Beta in 2013.
+[04:28.953] The game was much bigger by then.
+[04:30.716] And the album reflected that.
+[04:32.119] It's huge, 140 minutes, 30 tracks,
+[04:34.831] nearly double Alpha,
+[04:36.273] and the music starts getting a bit more specific.
+[04:39.119] How so?
+[04:39.947] Well, it's still often random,
+[04:41.029] but you start getting music
+[04:42.191] tied to certain conditions or dimensions.
+[04:44.475] Main menu has its own theme.
+[04:46.399] Overworld, creative mode, the nether, the end.
+[04:50.66] Let's talk about creative mode.
+[04:51.595] The music there feels different, more active.
+[04:52.797] Yes, tracks like Aria Math.
+[04:54.935] That's the first time C418 really brought in
+[04:56.952] percussion drums, drum kits, into the main soundtrack.
+[04:59.476] Why there?
+[05:00.318] Think about it.
+[05:01.133] In Survival, a driving beat might be distracting,
+[05:02.99] maybe stressful, but in Creative,
+[05:04.673] where you're just building limitlessly,
+[05:06.115] that rhythm, that tempo, it actually helps you focus,
+[05:08.988] keeps you in the zone.
+[05:10.07] Like a soundtrack for pure creation.
+[05:12.314] That makes sense.
+[05:13.396] And the dimensions.
+[05:15.239] The nether must have been tricky.
+[05:16.668] Definitely.
+[05:17.51] The nether tracks are generally ominous, dissonant.
+[05:20.676] They sound like this dangerous, fiery place.
+[05:23.668] But crucially, they often have these
+[05:25.151] robust, hopeful mid-sections in the nether.
+[05:28.798] Yeah, it captures that balance, right?
+[05:30.588] It's terrifying, but you're there for a reason
+[05:32.952] to find valuable stuff, fortresses, treasure.
+[05:36.011] It's terror mixed with the hope of reward.
+[05:38.229] And then there's the end.
+[05:39.591] That final boss fight music.
+[05:40.873] Oh, the end track.
+[05:41.835] It's epic, 15 minutes long.
+[05:43.719] And what it does is weave in these distorted,
+[05:47.272] evocative remixes of nearly every single track
+[05:50.237] you've heard on your journey.
+[05:51.319] So it's like your whole Minecraft life
+[05:53.23] flashing before your ears.
+[05:54.672] Pretty much.
+[05:55.514] It makes that final confrontation
+[05:56.716] feel genuinely transcendent.
+[05:58.159] A culmination of everything.
+[05:59.348] It's genius sound design.
+[06:00.977] Speaking of sound design, fun fact, huh?
+[06:03.596] Yeah, a great one.
+[06:04.678] C418 did the sound effects too, not just the music.
+[06:07.229] You know, the ghast, that horrible crying sound it makes.
+[06:10.395] Unforgettable, yeah.
+[06:11.477] That's his pet cat.
+[06:12.559] Just, you know, heavily processed recordings of his cat.
+[06:15.752] No way, that's amazing.
+[06:17.435] Taking something familiar and making it utterly alien.
+[06:21.135] Okay, so this period seems like peak creative control,
+[06:24.314] peak success, but then things change.
+[06:27.587] Big change.
+[06:28.428] 2014, Microsoft buys Minecraft, buys Mojang.
+[06:32.636] And this immediately creates friction
+[06:34.319] with C418's deal, doesn't it?
+[06:36.029] Immediately.
+[06:36.951] Because C418 owns his music 100%.
+[06:40.117] Microsoft, like most big companies,
+[06:42.294] prefers the standard work-for-hire model.
+[06:44.391] They pay you to make something,
+[06:45.914] and then they own it outright.
+[06:47.237] So C418 was essentially licensing his music to Minecraft,
+[06:51.511] but Microsoft wanted to own
+[06:53.194] any new music he made for Minecraft.
+[06:55.118] That's the core of it.
+[06:56.467] The sources say Microsoft told him
+[06:57.91] he couldn't keep composing for the game
+[06:59.473] unless he gave up those rights entirely.
+[07:01.276] And for him, that was a non-starter
+[07:03.12] based on that original deal he made with Notch.
+[07:05.11] Absolutely, so stalemate.
+[07:06.553] And the cost of that stalemate is huge, musically.
+[07:09.077] Massive.
+[07:09.919] C418 has confirmed he had an entire finished third album
+[07:13.192] ready to go into the game, fully done.
+[07:15.035] But because of the rights dispute,
+[07:16.518] it's never been added to Minecraft.
+[07:17.987] It just sits there, unreleased in the game context.
+[07:20.953] Yeah.
+[07:21.794] He did manage to get three final tracks in
+[07:24.319] for the 1.13 Aquatic update in 2018.
+[07:27.912] That was the end of his official involvement.
+[07:29.676] And since then, Microsoft has brought in other composers.
+[07:32.788] Yep, talented people like Lena Raine, Kumi Tanioka.
+[07:36.795] But crucially, the music they compose
+[07:39.00] is owned by Microsoft Studios.
+[07:40.99] It fits the standard corporate model.
+[07:43.154] And the style feels different, too, doesn't it?
+[07:45.278] The newer music often seems more tied
+[07:47.148] to specific places, like biomes.
+[07:49.593] It generally is, more biome-specific, as you say.
+[07:52.318] Which is a valid approach, of course,
+[07:53.64] but it's different from C418's original idea
+[07:56.192] of the music being this universal,
+[07:57.955] sort of ambiguous atmosphere for the whole world.
+[08:00.907] So he stuck to his principles on ownership,
+[08:03.552] but it meant he couldn't continue
+[08:04.995] with the game he helped define.
+[08:06.437] That's the trade-off.
+[08:07.68] But, and this is fascinating,
+[08:09.269] that insistence on ownership seems to have given his work
+[08:11.994] this incredible cultural staying power,
+[08:14.439] independent of the game's current owners.
+[08:16.63] You mean like the Library of Congress recognition?
+[08:18.794] Exactly.
+[08:19.635] In 2023, Minecraft Vol. Alpha gets added
+[08:22.427] to the U.S. Library of Congress's
+[08:24.11] National Recording Registry.
+[08:25.633] That's huge.
+[08:26.715] Wow, what do they say about it?
+[08:28.478] Recognized for its gentle electronic music
+[08:31.39] and its power to create instant nostalgia.
+[08:34.516] It was only the second video game soundtrack album
+[08:37.108] ever added, after the original Mario theme.
+[08:39.953] And because he owns it?
+[08:41.436] Because he owns it.
+[08:42.357] All that recognition, all the historical weight,
+[08:44.708] it accrues directly to him, the artist.
+[08:47.393] Not to Mojang, not to Microsoft.
+[08:49.397] It cements his independent legacy.
+[08:51.748] That independence seems to define his next steps, too.
+[08:54.633] He didn't just keep making music.
+[08:56.036] Well, he is, but he's also diversified.
+[08:58.307] He co-founded an independent game studio, Ivy Road,
+[09:01.914] partnered with Debi Reading, who made The Stanley Parable,
+[09:04.478] and Carla Zamanja.
+[09:05.747] Interesting, what are they working on?
+[09:07.23] Their first game is called WanderStop.
+[09:09.234] It's slated for 2025, described as a cozy simulator
+[09:13.108] themed around burnout.
+[09:14.51] Huh.
+[09:15.552] A game about burnout from the guy who started in a factory
+[09:18.438] and fought corporate ownership?
+[09:20.308] Feels fitting.
+[09:21.31] Very fitting, and he's composing the soundtrack for it,
+[09:23.754] naturally.
+[09:24.596] And Beyond Games.
+[09:25.437] He seems quite outspoken now, too.
+[09:27.067] Yeah, he's based in Austin, Texas now,
+[09:29.031] and has used his platform pretty strongly
+[09:31.475] for human rights advocacy.
+[09:33.145] He's spoken out for transgender rights, black rights,
+[09:35.95] making clear statements like transgender lives matter
+[09:38.395] and anything else is unacceptable.
+[09:39.998] So using his voice beyond just the music,
+[09:43.19] and commercially, he's still doing well.
+[09:44.553] Oh, yeah.
+[09:45.475] In 2023, he actually hit number one
+[09:47.759] on Billboard's Emerging Artists chart.
+[09:50.471] So the music still resonates commercially,
+[09:52.635] even years after his main Minecraft contributions ended.
+[09:55.867] Okay, so let's wrap this up.
+[09:57.069] We've got this artist, C418.
+[09:59.594] His unique ambient sound came out of personal taste,
+[10:02.80] but also technical limits,
+[10:04.55] and this incredibly rare deal for total ownership.
+[10:07.756] Right.
+[10:08.598] That deal let him create something truly groundbreaking
+[10:11.51] that defined a generation of gaming.
+[10:13.553] And even though it led to conflict
+[10:15.197] with a massive corporation later.
+[10:17.04] That very conflict and his refusal to give up ownership
+[10:20.553] might be why his work now
+[10:22.116] has this incredible historical weight,
+[10:24.627] like the Library of Congress recognition.
+[10:26.831] It's protected, in a way.
+[10:28.274] It really seems that way.
+[10:29.196] His independence secured its legacy.
+[10:30.959] It's a powerful story about artistic integrity.
+[10:33.551] Which leads us to a final thought for you, the listener.
+[10:36.997] In this world where huge companies
+[10:38.947] often want to own everything outright,
+[10:41.873] does an artist holding onto 100% ownership,
+[10:44.478] like C418 did, actually make their work more likely to last?
+[10:48.231] Does it give it kind of cultural permanence,
+[10:49.914] making it significant beyond just its corporate use?
+[10:52.84] Something to definitely think about.
+[10:54.149] Thanks for joining us on this deep dive.

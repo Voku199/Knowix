@@ -104,10 +104,21 @@
         .info { display: block; }
         .info-column { display: contents; padding: 0; }
         .info .column-title { display: none; }
+        .daily-quests-fixed { position: static; transform: none; width: auto; margin: 0 16px; }
       }
       /* Dark mode doladění kontrastu */
       .dark-mode .info-left { background: #121212; box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 12px 28px rgba(0,0,0,0.35); }
       .dark-mode .info-right { background: #181a1b; box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 12px 28px rgba(0,0,0,0.4); }
+
+      /* Fixní panel denních úkolů vpravo uprostřed */
+      .daily-quests-fixed {
+        position: fixed;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: min(360px, 85vw);
+        z-index: 1000;
+      }
     </style>
 
 </head>
@@ -212,6 +223,14 @@
                 </div>
             </a>
 
+            <a href="/dnd" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+                <img src="{{ url_for('static', filename='pic/dnd.png') }}" alt="Dungeons And Dragons">
+                <div class="bubble-text">
+                    <h3>Dungeons And Dragons</h3>
+                    <p style="color: inherit;">Slovní příběhovka kterou si buduješ sám...</p>
+                </div>
+            </a>
+
             <a href="/psani" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
                 <img src="{{ url_for('static', filename='pic/writing.png') }}" alt="Psaní">
                 <div class="bubble-text">
@@ -220,11 +239,11 @@
                 </div>
             </a>
 
-            <a href="/dnd" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+            <a href="/slovni-fotbal" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
                 <img src="{{ url_for('static', filename='pic/dnd.png') }}" alt="Dungeons And Dragons">
                 <div class="bubble-text">
-                    <h3>Dungeons And Dragons</h3>
-                    <p style="color: inherit;">Slovní příběhovka kterou si buduješ sám...</p>
+                    <h3>Slovní Fotbal</h3>
+                    <p style="color: inherit;">Slovní fotbal jenom podle tebe!</p>
                 </div>
             </a>
 
@@ -247,6 +266,7 @@
 
         <div class="info-column info-right" aria-labelledby="col-listening">
             <div class="column-title" id="col-listening">Poslech</div>
+
 
             <a href="/ai-poslech" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
                 <img src="{{ url_for('static', filename='pic/ai-mluveni.png') }}" alt="AI Mluvení">
@@ -279,6 +299,20 @@
                     <p style="color: inherit;">Procvič si všechny hudby formy nepravidelných sloves!</p>
                 </div>
             </a>
+            <a href="/shadow" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+                <img src="{{ url_for('static', filename='pic/ai-mluveni.png') }}" alt="AI Mluvení">
+                <div class="bubble-text">
+                    <h3>Shadow Speaking</h3>
+                    <p style="color: inherit;">Procvičovaní paměti a zároveň i výslovnosti.</p>
+                </div>
+            </a>
+            <a href="/podcast" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">
+                <img src="{{ url_for('static', filename='pic/ai-mluveni.png') }}" alt="AI Mluvení">
+                <div class="bubble-text">
+                    <h3>Podcast</h3>
+                    <p style="color: inherit;">Procvičovat poslech zábavnou formou</p>
+                </div>
+            </a>
         </div>
 
         <!--        <a href="/pexeso" class="bubble activity-bubble" style="text-decoration: none; color: inherit;">-->
@@ -291,6 +325,10 @@
     </section>
 
 </main>
+
+<div class="daily-quests-fixed">
+  {% include 'daily_quest.html' %}
+</div>
 
 <footer>
     <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>

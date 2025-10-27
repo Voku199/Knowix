@@ -395,12 +395,32 @@
 
         let recognition = null;
         let listening = false;
+        let shouldRestart = true;
         let ccOn = (localStorage.getItem('ai_cc') === '1');
         let lastAIText = '';
         let gender = (localStorage.getItem('ai_gender') || 'male');
         let recStart = 0;
         let lastSpokenMs = 0;
         const STREAK_MS = 150000; // 2.5 min
+
+        // track last processed and last sent transcript to avoid duplicates
+        let lastProcessedIndex = 0;
+        let lastSentTranscript = '';
+
+        // Vrátí poslední dostupný transcript (final nebo interim) z recognition.results
+        function getLastTranscript() {
+            try {
+                if (!recognition || !recognition.results) return '';
+                for (let i = recognition.results.length - 1; i >= 0; i--) {
+                    const res = recognition.results[i];
+                    if (res && res[0] && res[0].transcript) {
+                        const t = res[0].transcript.trim();
+                        if (t) return t;
+                    }
+                }
+            } catch (_) {}
+            return '';
+        }
 
         updateCCUI();
         applyGender(gender);
@@ -678,49 +698,88 @@
             }
             recognition = new SR();
             recognition.lang = 'en-US';
-            recognition.interimResults = false;
-            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.continuous = true;
             recognition.onstart = () => {
                 listening = true;
                 recStart = performance.now();
                 lastSpokenMs = 0;
                 micBtn.classList.add('listening');
                 micBtn.setAttribute('aria-pressed', 'true');
-                setStatus('Poslouchám...');
+                setStatus('Poslouchám... (stiskni znovu pro zastavení)');
+                // reset index when starting
+                lastProcessedIndex = 0;
             };
+            
             recognition.onresult = (evt) => {
-                const t = evt.results[0][0].transcript;
-                // odhad doby mluvení do okamžiku výsledku
-                if (recStart) {
-                    lastSpokenMs = Math.max(0, performance.now() - recStart);
+                 // Zpracuj pouze nové finální výsledky
+                for (let i = lastProcessedIndex; i < evt.results.length; i++) {
+                    if (evt.results[i].isFinal) {
+                        const t = evt.results[i][0].transcript.trim();
+                        if (t) {
+                            // odhad doby mluvení
+                            if (recStart) {
+                                lastSpokenMs = Math.max(0, performance.now() - recStart);
+                            }
+                            // zabráníme duplicitnímu odeslání
+                            if (t !== lastSentTranscript) {
+                                lastSentTranscript = t;
+                                sendToAI(t, lastSpokenMs);
+                            }
+                            recStart = performance.now(); // Reset pro další větu
+                        }
+                        lastProcessedIndex = i + 1;
+                    }
                 }
-                setStatus('');
-                sendToAI(t, lastSpokenMs);
-            };
-            recognition.onerror = (e) => {
-                setStatus('Mikrofon: ' + (e.error || 'chyba'));
-            };
-            recognition.onend = () => {
-                listening = false;
-                micBtn.classList.remove('listening');
-                micBtn.setAttribute('aria-pressed', 'false');
-                if (statusEl.textContent === 'Poslouchám...') setStatus('');
-                recStart = 0;
-            };
-        }
+             };
+             recognition.onerror = (e) => {
+                 if (e.error !== 'no-speech') {
+                     setStatus('Mikrofon: ' + (e.error || 'chyba'));
+                 }
+             };
+             recognition.onend = () => {
+                 // Pokud má restartovat, restartuj
+                 if (shouldRestart && listening) {
+                     try {
+                         recognition.start();
+                         lastProcessedIndex = 0;
+                     } catch (_) {}
+                 } else {
+                     // Uživatel vypnul mikrofon - ukliď UI
+                     listening = false;
+                     micBtn.classList.remove('listening');
+                     micBtn.setAttribute('aria-pressed', 'false');
+                     if (statusEl.textContent.includes('Poslouchám')) setStatus('');
+                     recStart = 0;
+                 }
+             };
+         }
 
-        micBtn.addEventListener('click', async () => {
-            if (!recognition) return;
-            try {
-                if (!listening) {
-                    await ensureMicPermission();
-                    recognition.start();
-                } else {
+         micBtn.addEventListener('click', async () => {
+             if (!recognition) return;
+             try {
+                 if (!listening) {
+                     shouldRestart = true;
+                     await ensureMicPermission();
+                     recognition.start();
+                 } else {
+                    // Před zastavením zkus odeslat poslední dostupný (i interim) transcript
+                    const last = getLastTranscript();
+                    if (last) {
+                        // odhad doby mluvení
+                        const spokenMsNow = recStart ? Math.max(0, performance.now() - recStart) : 0;
+                        if (last !== lastSentTranscript) {
+                            lastSentTranscript = last;
+                            await sendToAI(last, spokenMsNow);
+                        }
+                    }
+                    // Zastav automatický restart a ukonči recognition
+                    shouldRestart = false;
                     recognition.stop();
-                }
-            } catch (_) {
-            }
-        });
+                 }
+             } catch (_) {
+             }
+         });
         ccBtn.addEventListener('click', () => {
             ccOn = !ccOn;
             localStorage.setItem('ai_cc', ccOn ? '1' : '0');

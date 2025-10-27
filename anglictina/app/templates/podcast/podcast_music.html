@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam.">
+    <meta name="keywords" content="angličtina, procvičování, písničky, testy, chat, výuka, zdarma, knowix, zábava, škola">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Knowix – Procvičování angličtiny zdarma">
+    <meta property="og:description" content="Procvičuj angličtinu zábavně pomocí písniček, chatu a testů. Bez reklam, zdarma.">
+    <meta property="og:url" content="https://www.knowix.cz">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://knowix.cz/static/og-banner.png">
+
+    <link rel="canonical" href="https://www.knowix.cz">
+
+    <title>{% block title %}knowix{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/mobile_header.css">
+     <link rel="stylesheet" href="/static/podcast/style2.css">
+
+    <!-- Preconnect zrychlí DNS a spojení -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Font načti až po načtení stránky -->
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    </noscript>
+
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-W1EN990JKP');
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Knowix",
+        "url": "https://www.knowix.cz",
+        "description": "Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam."
+    }
+    </script>
+</head>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
+    <header>
+        <div class="logo-streak-wrapper">
+            <div class="logo">
+                <a href="{{ url_for('main.index') }}">
+                    <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+                </a>
+            </div>
+            <span class="streak-badge">
+                <img src="/static/fire.svg" alt="Streak">
+                {{ user_streak }}
+            </span>
+        </div>
+        <div class="nav-profile-wrapper">
+            <ul class="nav-right">
+                <li>
+                    <a href="/anglictina" title="Angličtina">
+                        <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                    </a>
+                </li>
+                <li>
+                    <a href="/feedback" title="Feedback">
+                        <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                    </a>
+                </li>
+                <li>
+                    <a href="/news" title="Novinky">
+                        <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                    </a>
+                </li>
+                <li>
+                    <a href="/obchod" title="Obchod">
+                        <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                    </a>
+                </li>
+                <li>
+                    <a href="/zpravy" title="Zprávy">
+                        <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                    </a>
+                </li>
+                <li>
+                    <button id="theme-toggle" title="Přepnout téma" class="theme-toggle-btn">
+                        🌙
+                    </button>
+                </li>
+            </ul>
+            {% if session['user_name'] %}
+            <div class="user-profile">
+                <div class="profile-container">
+                    {% if session.get('profile_pic') %}
+                    <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                         alt="Profilová fotka" width="64" class="profile-pic"
+                         onerror="this.onerror=null; this.src='{{ url_for('static', filename='pic/default.webp') }}';">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                         class="profile-pic" id="profileMenuTrigger">
+                    {% endif %}
+                    <div class="profile-menu" id="profileMenu">
+                        <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                        <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                    </div>
+                    <span class="greeting">Ahoj {{ session['user_name'].split()[0] }}!</span>
+                </div>
+                {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+                <div class="xp-header-bar">
+                    <div class="xp-header-bar-labels">
+                        <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                        <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                    </div>
+                    <div class="xp-header-bar-progress-bg">
+                        <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="auth-links">
+                <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+                <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+            </div>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- ODEBRÁN DRUHÝ BODY TAG A PŘIDÁN DIV -->
+    <div class="podcast-container">
+        <a class="back-link" href="{{ url_for('podcast_bp.podcast_main') }}">← Back to podcasts</a>
+
+        <div class="podcast-hero">
+            <img src="{{ url_for('static', filename='podcast/images/' ~ item.id ~ '.png') }}"
+                 alt="{{ item.title }}"
+                 class="podcast-hero-image"
+                 onerror="this.src='{{ url_for('static', filename='podcast/images/default.png') }}'">
+            <div class="podcast-hero-content">
+                <h1 class="podcast-title">{{ item.title | capitalize }}</h1>
+                <div class="podcast-meta">
+                    {% if item.has_lrc %}<span class="cc-badge">Closed Captions</span>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="audio-player-container">
+            <audio id="audio" controls preload="metadata"
+                   src="{{ url_for('static', filename=item.mp3) }}"
+                   class="audio-player"></audio>
+        </div>
+
+        {% if item.has_lrc %}
+        <div class="captions-container">
+            <details open class="captions-details">
+                <summary>Lyrics & Captions</summary>
+                <div class="lrc-box" id="lrcBox"></div>
+            </details>
+        </div>
+        {% endif %}
+
+        {% if questions and questions|length %}
+        <div class="quiz-container">
+            <h2>Test Your Understanding</h2>
+            <form id="quizForm" class="quiz-form" method="POST" action="{{ url_for('podcast_bp.check_answers', podcast_id=item.id) }}">
+                {% for q in questions %}
+                <div class="question">
+                    <label for="q{{ q.id }}">{{ q.id }}. {{ q.q }}</label>
+                    {% if q.answer_type == 'mcq' %}
+                        <select id="q{{ q.id }}" name="q{{ q.id }}" class="quiz-select">
+                            {% for opt in q.options %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    {% else %}
+                        <input type="text" id="q{{ q.id }}" name="q{{ q.id }}"
+                               placeholder="Your answer here..." class="quiz-input" />
+                    {% endif %}
+                </div>
+                {% endfor %}
+                <button type="submit" class="submit-btn">Check Answers</button>
+            </form>
+            <div class="result" id="result"></div>
+        </div>
+        {% endif %}
+    </div>
+<footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p class="footer-signature">
+        Made with ❤️ by
+        <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+        and lot of ☕
+    </p>
+</footer>
+    <script>
+    (function(){
+        const audio = document.getElementById('audio');
+        const lrcBox = document.getElementById('lrcBox');
+        const hasLrc = !!lrcBox;
+
+        // Simple LRC loader + highlighter
+        async function loadLRC(){
+            if(!hasLrc) return;
+            const url = '{{ url_for('static', filename=item.lrc) if item.lrc else '' }}';
+            if(!url) return;
+            try {
+                const res = await fetch(url);
+                if(!res.ok) return;
+                const text = await res.text();
+                const entries = [];
+                const lines = text.split(/\r?\n/);
+                for (const line of lines) {
+                    const match = line.match(/\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)/);
+                    if(match){
+                        const min = parseInt(match[1], 10);
+                        const sec = parseInt(match[2], 10);
+                        const ms = parseInt(match[3].padEnd(3,'0'), 10);
+                        const t = min*60 + sec + ms/1000;
+                        const text = match[4].trim();
+                        entries.push({ t, text });
+                    }
+                }
+                entries.sort((a,b)=>a.t-b.t);
+                lrcBox.innerHTML = entries.map((e,i)=>`<div class="line" data-i="${i}">${e.text}</div>`).join('');
+                function highlight(){
+                    const ct = audio.currentTime;
+                    let idx = entries.findIndex((e,i)=> ct < (entries[i+1]?.t ?? Infinity) && ct >= e.t);
+                    if(idx === -1) idx = entries.length-1;
+                    [...lrcBox.children].forEach((el,i)=>{
+                        el.classList.toggle('active', i===idx);
+                        if(i===idx){ el.scrollIntoView({block:'nearest'}); }
+                    });
+                }
+                audio.addEventListener('timeupdate', highlight);
+            } catch(e){ console.warn(e); }
+        }
+        loadLRC();
+
+        // Quiz
+        const form = document.getElementById('quizForm');
+        const result = document.getElementById('result');
+
+        console.log('Quiz script loaded');
+        console.log('Form element:', form);
+        console.log('Result element:', result);
+
+        if(form){
+            console.log('Adding form submit listener');
+
+            form.addEventListener('submit', async (ev)=>{
+                console.log('Form submit event triggered');
+                ev.preventDefault();
+
+                const data = new FormData(form);
+                const payload = { answers: {} };
+
+                for (const [k,v] of data.entries()){
+                    const id = k.replace(/^q/, '');
+                    payload.answers[id] = v;
+                    console.log(`Question ${id}: ${v}`);
+                }
+
+                // Přidej CSRF token
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+                console.log('CSRF Token:', csrfToken);
+
+                try {
+                    console.log('Sending request to server...');
+                    const res = await fetch('{{ url_for('podcast_bp.check_answers', podcast_id=item.id) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    console.log('Response status:', res.status);
+
+                    if (!res.ok) {
+                        const errorText = await res.text();
+                        console.error('Server error:', res.status, errorText);
+                        result.textContent = 'Error: ' + res.status;
+                        return;
+                    }
+
+                    const json = await res.json();
+                    console.log('Server response:', json);
+
+                    if(!json.ok){
+                        result.textContent = 'Error: ' + (json.error || 'Unknown error');
+                        return;
+                    }
+
+                    if(json.results){
+                        result.innerHTML = '';
+                        for (const [qid, ok] of Object.entries(json.results)){
+                            const p = document.createElement('div');
+                            p.className = ok ? 'ok' : 'bad';
+                            p.textContent = `${qid}. ${ok ? 'Correct' : 'Try again'}`;
+                            result.appendChild(p);
+                        }
+                        if(json.all_correct){
+                            const p = document.createElement('div');
+                            p.className = 'ok';
+                            p.textContent = 'All answers correct! +10 XP';
+                            result.appendChild(p);
+                        }
+                    } else {
+                        result.textContent = 'Submitted.';
+                    }
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                    result.textContent = 'Network error: ' + error.message;
+                }
+            });
+        } else {
+            console.log('Form not found!');
+        }
+    })(); // PŘIDÁNA CHYBĚJÍCÍ UZAVÍRACÍ ZÁVORKA
+    </script>
+</body>
+</html>

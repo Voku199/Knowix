@@ -1,0 +1,312 @@
+[
+  {
+    "id": "LESSON_1",
+    "title": "Dokonči 1 lekci",
+    "desc": "Dokonči dnes alespoň 1 lekci.",
+    "stat": "total_lessons_done",
+    "target": 1,
+    "mode": "delta",
+    "reward_xp": 20,
+    "reward_keys": 0
+  },
+  {
+    "id": "LESSON_3",
+    "title": "Dokonči 3 lekce",
+    "desc": "Dokonči dnes alespoň 3 lekce.",
+    "stat": "total_lessons_done",
+    "target": 3,
+    "mode": "delta",
+    "reward_xp": 50,
+    "reward_keys": 1
+  },
+  {
+    "id": "CORRECT_20",
+    "title": "20 správných odpovědí",
+    "desc": "Získej dnes 20 správných odpovědí napříč aktivitami.",
+    "stat": "correct_answers",
+    "target": 20,
+    "mode": "delta",
+    "reward_xp": 25,
+    "reward_keys": 1
+  },
+  {
+    "id": "PSANI_100",
+    "title": "Psaní: 100 slov",
+    "desc": "Napiš dnes 100 slov v Psaní.",
+    "stat": "total_psani_words",
+    "target": 100,
+    "mode": "delta",
+    "reward_xp": 40,
+    "reward_keys": 1
+  },
+  {
+    "id": "HANGMAN_5",
+    "title": "Šibenice: 5 slov",
+    "desc": "Uhodni dnes 5 slov v Hangmanu.",
+    "stat": "hangman_words_guessed",
+    "target": 5,
+    "mode": "delta",
+    "reward_xp": 20,
+    "reward_keys": 1
+  },
+  {
+    "id": "IRREGULAR_10",
+    "title": "Nepravidelná slovesa: 10 správně",
+    "desc": "Získej dnes 10 správných u nepravidelných sloves.",
+    "stat": "irregular_verbs_guessed",
+    "target": 10,
+    "mode": "delta",
+    "reward_xp": 30,
+    "reward_keys": 1
+  },
+  {
+    "id": "PP_CORRECT_15",
+    "title": "Present Perfect: 15 správně",
+    "desc": "Získej dnes 15 správných v Present Perfect.",
+    "stat": "pp_correct",
+    "target": 15,
+    "mode": "delta",
+    "reward_xp": 35,
+    "reward_keys": 0
+  },
+  {
+    "id": "LISTEN_10",
+    "title": "Poslech: 10 správně",
+    "desc": "Získej dnes 10 správných odpovědí v poslechu.",
+    "stat": "lis_cor",
+    "target": 10,
+    "mode": "delta",
+    "reward_xp": 25,
+    "reward_keys": 1
+  },
+  {
+    "id": "AT_COR_10",
+    "title": "At/On/In: 10 správně",
+    "desc": "Získej dnes 10 správných odpovědí v cvičení At/On/In.",
+    "stat": "at_cor",
+    "target": 10,
+    "mode": "delta",
+    "reward_xp": 20,
+    "reward_keys": 0
+  },
+  {
+    "id": "AI_POSLECH_300S",
+    "title": "AI poslech: 5 min",
+    "desc": "Strav dnes 5 minut v AI poslechu.",
+    "stat": "AI_poslech_seconds",
+    "target": 300,
+    "mode": "delta",
+    "reward_xp": 30,
+    "reward_keys": 1
+  },
+  {
+    "id": "LEARNING_TIME_600S",
+    "title": "Učení: 10 min",
+    "desc": "Uč se dnes 10 minut (jakákoli aktivita).",
+    "stat": "total_learning_time",
+    "target": 600,
+    "mode": "delta",
+    "reward_xp": 35,
+    "reward_keys": 1
+  },
+  {
+    "id": "ROLEPLAY_10",
+    "title": "Mluvení: 10 správně",
+    "desc": "Získej dnes 10 správných v rolových hrách.",
+    "stat": "roleplaying_cr",
+    "target": 10,
+    "mode": "delta",
+    "reward_xp": 25,
+    "reward_keys": 0
+  },
+  {
+    "id": "LISTEN_15",
+    "title": "Poslech: 15 správně",
+    "desc": "Získej dnes 15 správných v poslechu.",
+    "stat": "lis_cor",
+    "target": 15,
+    "mode": "delta",
+    "reward_xp": 40,
+    "reward_keys": 0
+  },
+  {
+    "id": "QUICK_POINTS_50",
+    "title": "Rychlá hra: 50 bodů",
+    "desc": "Nasbírej dnes 50 bodů v rychlé hře.",
+    "stat": "slovni_quick_points",
+    "target": 50,
+    "mode": "delta",
+    "reward_xp": 30,
+    "reward_keys": 1
+  },
+  {
+    "id": "AT_COR_20",
+    "title": "At/On/In: 20 správně",
+    "desc": "Získej dnes 20 správných odpovědí v cvičení At/On/In.",
+    "stat": "at_cor",
+    "target": 20,
+    "mode": "delta",
+    "reward_xp": 45,
+    "reward_keys": 1
+  },
+  {
+    "id": "SHADOW_5",
+    "title": "Shadow: 5× správně",
+    "desc": "Dokonči 5 shadow pokusů s přesností ≥ 80%.",
+    "stat": "shw_cor",
+    "target": 5,
+    "mode": "delta",
+    "reward_xp": 35,
+    "reward_keys": 0
+  },
+  {
+    "id": "PODCAST_3",
+    "title": "Podcast: 3 správné odpovědi",
+    "desc": "Získej 3 správné odpovědi v kvízu u podcastu.",
+    "stat": "pds_cor",
+    "target": 3,
+    "mode": "delta",
+    "reward_xp": 25,
+    "reward_keys": 1
+  },
+  {
+    "id": "LESSON_5",
+    "title": "Dokonči 5 lekcí",
+    "desc": "Dokonči dnes alespoň 5 lekcí.",
+    "stat": "total_lessons_done",
+    "target": 5,
+    "mode": "delta",
+    "reward_xp": 30,
+    "reward_keys": 0
+  },
+  {
+    "id": "CORRECT_50",
+    "title": "50 správných odpovědí",
+    "desc": "Získej dnes 50 správných odpovědí napříč aktivitami.",
+    "stat": "correct_answers",
+    "target": 50,
+    "mode": "delta",
+    "reward_xp": 60,
+    "reward_keys": 0
+  },
+  {
+    "id": "PSANI_200",
+    "title": "Psaní: 200 slov",
+    "desc": "Napiš dnes 200 slov v Psaní.",
+    "stat": "total_psani_words",
+    "target": 200,
+    "mode": "delta",
+    "reward_xp": 70,
+    "reward_keys": 0
+  },
+  {
+    "id": "HANGMAN_10",
+    "title": "Šibenice: 10 slov",
+    "desc": "Uhodni dnes 10 slov v Hangmanu.",
+    "stat": "hangman_words_guessed",
+    "target": 10,
+    "mode": "delta",
+    "reward_xp": 50,
+    "reward_keys": 0
+  },
+  {
+    "id": "LISTEN_25",
+    "title": "Poslech: 25 správně",
+    "desc": "Získej dnes 25 správných v poslechu.",
+    "stat": "lis_cor",
+    "target": 25,
+    "mode": "delta",
+    "reward_xp": 60,
+    "reward_keys": 0
+  },
+  {
+    "id": "IRREGULAR_20",
+    "title": "Nepravidelná slovesa: 20 správně",
+    "desc": "Získej dnes 20 správných u nepravidelných sloves.",
+    "stat": "irregular_verbs_guessed",
+    "target": 20,
+    "mode": "delta",
+    "reward_xp": 55,
+    "reward_keys": 0
+  },
+  {
+    "id": "PP_CORRECT_30",
+    "title": "Present Perfect: 30 správně",
+    "desc": "Získej dnes 30 správných v Present Perfect.",
+    "stat": "pp_correct",
+    "target": 30,
+    "mode": "delta",
+    "reward_xp": 70,
+    "reward_keys": 0
+  },
+  {
+    "id": "AI_POSLECH_900S",
+    "title": "AI poslech: 15 min",
+    "desc": "Strav dnes 15 minut v AI poslechu.",
+    "stat": "AI_poslech_seconds",
+    "target": 900,
+    "mode": "delta",
+    "reward_xp": 60,
+    "reward_keys": 0
+  },
+  {
+    "id": "LEARNING_TIME_1800S",
+    "title": "Učení: 30 min",
+    "desc": "Uč se dnes 30 minut (jakákoli aktivita).",
+    "stat": "total_learning_time",
+    "target": 1800,
+    "mode": "delta",
+    "reward_xp": 70,
+    "reward_keys": 2
+  },
+  {
+    "id": "ROLEPLAY_20",
+    "title": "Mluvení: 5 správně",
+    "desc": "Získej dnes 5 správných v rolových hrách. (Mluvení)",
+    "stat": "roleplaying_cr",
+    "target": 5,
+    "mode": "delta",
+    "reward_xp": 55,
+    "reward_keys": 0
+  },
+  {
+    "id": "QUICK_POINTS_100",
+    "title": "Slovní Fotbal: 100 bodů",
+    "desc": "Nasbírej dnes 100 bodů ve slovní fotbale",
+    "stat": "slovni_quick_points",
+    "target": 100,
+    "mode": "delta",
+    "reward_xp": 60,
+    "reward_keys": 0
+  },
+  {
+    "id": "AT_COR_30",
+    "title": "At/On/In: 30 správně",
+    "desc": "Získej dnes 30 správných odpovědí v cvičení At/On/In.",
+    "stat": "at_cor",
+    "target": 30,
+    "mode": "delta",
+    "reward_xp": 70,
+    "reward_keys": 0
+  },
+  {
+    "id": "SHADOW_10",
+    "title": "Shadow: 10× správně",
+    "desc": "Dokonči 10 shadow speaking pokusů s přesností větší než 80%.",
+    "stat": "shw_cor",
+    "target": 10,
+    "mode": "delta",
+    "reward_xp": 60,
+    "reward_keys": 0
+  },
+  {
+    "id": "PODCAST_5",
+    "title": "Podcast: 5 správných",
+    "desc": "Získej dnes 5 správných v kvízu u podcastu.",
+    "stat": "pds_cor",
+    "target": 5,
+    "mode": "delta",
+    "reward_xp": 40,
+    "reward_keys": 0
+  }
+]
