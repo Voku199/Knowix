@@ -1,4 +1,3 @@
-
 .container {
     max-width: 900px;
     margin: 0 auto;
@@ -47,6 +46,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Nový styl pro časovač odpočtu */
+.countdown-timer {
+    margin-top: 8px;
+    margin-bottom: 12px;
+    font-size: 0.95em;
+    color: #6c757d;
 }
 
 .controls {

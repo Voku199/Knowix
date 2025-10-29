@@ -7,6 +7,9 @@ class ShadowingApp {
         this.recognition = null;
         this.synthesis = window.speechSynthesis;
         this.isRecording = false;
+        // Countdown state
+        this.countdownIntervalId = null;
+        this.countdownEndsAt = null;
 
         this.initElements();
         this.initSpeechRecognition();
@@ -29,7 +32,8 @@ class ShadowingApp {
             comparison: document.getElementById('comparison'),
             originalText: document.getElementById('originalText'),
             spokenText: document.getElementById('spokenText'),
-            feedback: document.getElementById('feedback')
+            feedback: document.getElementById('feedback'),
+            countdownTimer: document.getElementById('countdownTimer')
         };
     }
 
@@ -83,6 +87,15 @@ class ShadowingApp {
 
     async getNewSentence() {
         try {
+            // Pokud náhodou běží nahrávání, zastav ho
+            if (this.isRecording && this.recognition) {
+                try {
+                    this.recognition.stop();
+                } catch {
+                }
+                this.stopRecording();
+            }
+
             const response = await fetch(`/shadow/get_sentence?level=${this.currentLevel}`);
             const data = await response.json();
 
@@ -92,9 +105,14 @@ class ShadowingApp {
 
             this.currentSentence = data.sentence;
             this.elements.sentenceDisplay.textContent = data.sentence;
+            this.elements.sentenceDisplay.style.visibility = 'visible';
             this.elements.playBtn.disabled = false;
-            this.elements.recordBtn.disabled = false;
+            // Během zobrazení věty zakázat nahrávání
+            this.elements.recordBtn.disabled = true;
             this.hideResult();
+
+            // Start a fresh countdown based on sentence length
+            this.startCountdown(this.computeVisibleSeconds(this.currentSentence));
 
         } catch (error) {
             console.error('Chyba při načítání věty:', error);
@@ -104,6 +122,11 @@ class ShadowingApp {
 
     playSentence() {
         if (!this.currentSentence) return;
+        // Block play if sentence visibility expired
+        if (!this.isSentenceVisible()) {
+            this.elements.playBtn.disabled = true;
+            return;
+        }
 
         // Zastavit všechny předchozí syntézy
         this.synthesis.cancel();
@@ -118,6 +141,10 @@ class ShadowingApp {
 
     startRecording() {
         if (!this.recognition || this.isRecording) return;
+        // Pokud je věta stále viditelná, nahrávání nepovol
+        if (this.isSentenceVisible()) {
+            return;
+        }
         this.hideResult();
         this.recognition.start();
     }
@@ -323,6 +350,72 @@ class ShadowingApp {
 
     hideResult() {
         this.elements.resultArea.classList.remove('show');
+    }
+
+    // ===== Countdown logic =====
+    computeVisibleSeconds(sentence) {
+        try {
+            const words = String(sentence || '').trim().split(/\s+/).filter(Boolean).length;
+            // 5s base + 0.5s per word, clamped 4-14s
+            const secs = 5 + words * 0.5;
+            return Math.max(4, Math.min(14, Math.round(secs)));
+        } catch {
+            return 7;
+        }
+    }
+
+    startCountdown(seconds) {
+        // Clear any previous countdown
+        if (this.countdownIntervalId) {
+            clearInterval(this.countdownIntervalId);
+            this.countdownIntervalId = null;
+        }
+        const now = Date.now();
+        this.countdownEndsAt = now + seconds * 1000;
+
+        // Ensure sentence is visible and UI reset
+        this.elements.sentenceDisplay.style.visibility = 'visible';
+        this.elements.playBtn.disabled = false;
+        this.updateCountdown();
+        this.elements.countdownTimer.style.display = 'block';
+
+        this.countdownIntervalId = setInterval(() => {
+            this.updateCountdown();
+        }, 250);
+    }
+
+    updateCountdown() {
+        if (!this.countdownEndsAt) return;
+        const remainingMs = Math.max(0, this.countdownEndsAt - Date.now());
+        const remainingSec = Math.ceil(remainingMs / 1000);
+        // Update label
+        this.elements.countdownTimer.textContent = `Věta zmizí za ${remainingSec}s`;
+
+        if (remainingMs <= 0) {
+            this.expireSentence();
+        }
+    }
+
+    isSentenceVisible() {
+        return this.countdownEndsAt && Date.now() < this.countdownEndsAt;
+    }
+
+    expireSentence() {
+        if (this.countdownIntervalId) {
+            clearInterval(this.countdownIntervalId);
+            this.countdownIntervalId = null;
+        }
+        this.countdownEndsAt = null;
+        // Po vypršení zobrazit výzvu k řeči
+        this.elements.sentenceDisplay.textContent = 'And now, say the sentence!';
+        this.elements.sentenceDisplay.style.visibility = 'visible';
+        // Disable play and stop any ongoing TTS
+        this.synthesis.cancel();
+        this.elements.playBtn.disabled = true;
+        // Povolit nahrávání až po vypršení
+        this.elements.recordBtn.disabled = false;
+        // Hide timer
+        this.elements.countdownTimer.style.display = 'none';
     }
 }
 
