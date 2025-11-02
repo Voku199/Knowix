@@ -163,6 +163,14 @@
     <!-- Cvičení: dvě kolony (doplňování / překlady) -->
     <section class="exercises-section">
         <div class="exercises-grid">
+            <div style="grid-column: 1 / -1; margin-bottom: 10px; text-align:right;">
+                {% set _show = request.args.get('show_solutions') in ('1','true','yes') %}
+                {% if not _show %}
+                <a href="{{ request.path }}?show_solutions=1" style="font-size:.95rem; text-decoration:underline;">Zobrazit řešení na stránce</a>
+                {% else %}
+                <a href="{{ request.path }}" style="font-size:.95rem; text-decoration:underline;">Skrýt řešení</a>
+                {% endif %}
+            </div>
             <div class="exercise-col">
                 <h2>Doplň chybějící slovo</h2>
                 {% for exercise in missing_exercises %}
@@ -171,6 +179,11 @@
                     <p class="blank-sentence">{{ exercise.with_blank | safe }}</p>
                     <input type="text" name="missing_word_{{ loop.index0 }}" class="exercise-input" placeholder="Napiš chybějící slovo..." data-correct="{{ exercise.answer }}">
                     <div class="feedback" aria-live="polite"></div>
+                    {% if request.args.get('show_solutions') in ('1', 'true', 'yes') %}
+                    <div class="inline-solution" style="margin-top:6px;color:#0a7;font-size:.95rem;">
+                        Správně: <strong>{{ exercise.answer }}</strong>
+                    </div>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
@@ -183,6 +196,11 @@
                     <p class="original-sentence"><em>"{{ exercise.original }}"</em></p>
                     <input type="text" name="translation_{{ loop.index0 }}" class="exercise-input translation-input" placeholder="Tvůj překlad..." data-correct="{{ exercise.translated }}" data-original="{{ exercise.original }}">
                     <div class="feedback" aria-live="polite"></div>
+                    {% if request.args.get('show_solutions') in ('1', 'true', 'yes') %}
+                    <div class="inline-solution" style="margin-top:6px;color:#0a7;font-size:.95rem;">
+                        Správný překlad: <strong>{{ exercise.translated }}</strong>
+                    </div>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
@@ -290,3 +308,4 @@ document.addEventListener('DOMContentLoaded', ()=>{
 </script>
 </body>
 </html>
+

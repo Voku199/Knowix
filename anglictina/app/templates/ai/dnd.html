@@ -310,6 +310,18 @@
         {% endif %}
       </div>
 
+      {% if not session.get('user_name') %}
+      <div class="level-picker" style="margin:8px 0 12px;">
+        <label for="level_select" style="font-weight:600;">Vyber si úroveň angličtiny:</label>
+        <select id="level_select" name="level" style="margin-left:8px; padding:6px 10px; border-radius:8px; border:1px solid #e5e7eb;">
+          {% set levels = ['A1','A2','B1','B2','C1','C2'] %}
+          {% for lvl in levels %}
+            <option value="{{ lvl }}" {{ 'selected' if (current_level or 'A2') == lvl else '' }}>{{ lvl }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
       <div class="chat-history" id="chat-history">
         {% set msgs = history_selected if history_selected is defined and history_selected else history %}
         {% for msg in msgs %}
@@ -510,6 +522,9 @@
     addMessage('ai', '...');
     const csrfToken = document.querySelector('input[name="csrf_token"]');
     let body = 'user_input=' + encodeURIComponent(text);
+    // pokud je anonym, pošli i level
+    const levelSel = document.getElementById('level_select');
+    if (levelSel) { body += '&level=' + encodeURIComponent(levelSel.value); }
     if (csrfToken) { body += '&csrf_token=' + encodeURIComponent(csrfToken.value); }
     fetch('{{ url_for("ai_bp.dnd") }}', { method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: body })
       .then(response => {

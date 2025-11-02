@@ -39,10 +39,11 @@ def ensure_user_stats_exists(user_id):
                 AI_poslech_minut,
                 AI_poslech_seconds,
                 slovni_best_time,
-                slovni_quick_points,
+                slovni_quick_points
             ) VALUES (
                 %s, 0, 0, 0, 0, %s, 0, %s,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0
             )
             """,
             (user_id, now, now)
@@ -82,6 +83,8 @@ def get_simple_stats(user_id):
             AI_poslech_seconds,
             slovni_best_time,
             slovni_quick_points,
+            COALESCE(ai_gram_cor, 0) AS ai_gram_cor,
+            COALESCE(ai_gram_wr, 0) AS ai_gram_wr
         FROM user_stats WHERE user_id = %s
         """,
         (user_id,)
@@ -124,5 +127,7 @@ def my_stats():
             'AI_poslech_seconds': 0,
             'slovni_best_time': 0,
             'slovni_quick_points': 0,
+            'ai_gram_cor': 0,
+            'ai_gram_wr': 0,
         }
     return render_template('stats/stats.html', stats=stats)

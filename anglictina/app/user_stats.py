@@ -13,6 +13,9 @@ def _ensure_extended_columns():
             "ALTER TABLE user_stats ADD COLUMN IF NOT EXISTS shw_wr INT NOT NULL DEFAULT 0",
             "ALTER TABLE user_stats ADD COLUMN IF NOT EXISTS pds_cor INT NOT NULL DEFAULT 0",
             "ALTER TABLE user_stats ADD COLUMN IF NOT EXISTS pds_wr INT NOT NULL DEFAULT 0",
+            # Nové: AI‑gramatika agregace
+            "ALTER TABLE user_stats ADD COLUMN IF NOT EXISTS ai_gram_cor INT NOT NULL DEFAULT 0",
+            "ALTER TABLE user_stats ADD COLUMN IF NOT EXISTS ai_gram_wr INT NOT NULL DEFAULT 0",
         ]
         for sql in alter_cmds:
             try:
@@ -78,11 +81,12 @@ def update_user_stats(user_id, correct=0, wrong=0, lesson_done=False, psani_word
                       irregular_verbs_guessed=0, irregular_verbs_wrong=0, pp_wrong=0, pp_maybe=0, pp_correct=0,
                       roleplaying_cr=0, roleplaying_mb=0, roleplaying_wr=0, lis_cor=0, lis_wr=0, at_cor=0, at_wr=0,
                       learning_time=None, set_first_activity=False, ai_poslech_minut=0, ai_poslech_seconds=0,
-                      shw_cor=0, shw_mb=0, shw_wr=0, pds_cor=0, pds_wr=0):
+                      shw_cor=0, shw_mb=0, shw_wr=0, pds_cor=0, pds_wr=0,
+                      ai_gram_cor=0, ai_gram_wr=0):
     """
     Aktualizuje statistiky uživatele v user_stats.
     Důležité inkrementy: total_learning_time (sekundy), AI_poslech_seconds (sekundy pro AI Poslech), AI_poslech_minut (zpětná kompatibilita).
-    Nové sloupce: shw_cor/shw_mb/shw_wr pro Shadow, pds_cor/pds_wr pro Podcast.
+    Nové sloupce: shw_cor/shw_mb/shw_wr pro Shadow, pds_cor/pds_wr pro Podcast, ai_gram_cor/ai_gram_wr pro AI‑gramatiku.
     """
     _ensure_extended_columns()
     ensure_user_stats_exists(user_id)
@@ -164,6 +168,14 @@ def update_user_stats(user_id, correct=0, wrong=0, lesson_done=False, psani_word
     if pds_wr:
         updates.append("pds_wr = pds_wr + %s")
         params.append(int(pds_wr))
+
+    # Nové: AI‑gramatika agregace
+    if ai_gram_cor:
+        updates.append("ai_gram_cor = ai_gram_cor + %s")
+        params.append(int(ai_gram_cor))
+    if ai_gram_wr:
+        updates.append("ai_gram_wr = ai_gram_wr + %s")
+        params.append(int(ai_gram_wr))
 
     if learning_time is not None:
         updates.append("total_learning_time = total_learning_time + %s")

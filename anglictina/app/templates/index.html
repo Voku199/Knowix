@@ -122,7 +122,7 @@
         background: linear-gradient(90deg, #2e7d32 60%, #1b5e20 100%);
     }
 
-    /* Fixní panel denních úkolů vpravo uprostřed */
+    /* Fixní panel denních úkolů vpravo uprostřed (desktop) */
     .daily-quests-fixed {
         position: fixed;
         right: 20px;
@@ -132,13 +132,17 @@
         z-index: 1000;
     }
 
+    /* Na mobilu se má zobrazit dole (přirozený tok dokumentu) */
     @media (max-width: 991.98px) {
         .daily-quests-fixed {
             position: static;
             transform: none;
             width: auto;
-            margin: 0 16px;
+            margin: 12px 16px 24px 16px; /* trocha vzduchu nahoře i dole */
         }
+        /* Ujisti se, že blok je vizuálně oddělený a na konci */
+        .daily-quests-fixed { order: 99; }
+        main { display: flex; flex-direction: column; }
     }
 
 </style>

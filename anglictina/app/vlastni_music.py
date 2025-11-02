@@ -221,6 +221,25 @@ def deepl_detect_language(text: str) -> str | None:
         return None
 
 
+def _deepl_post(params: list[tuple[str, str]]):
+    """Low-level volání DeepL s fallbackem na free endpoint. Vrací JSON dict nebo None."""
+    api_key = _get_deepl_key()
+    if not api_key:
+        return None
+    payload = params + [('auth_key', api_key)]
+    try:
+        resp = requests.post("https://api.deepl.com/v2/translate", data=payload, timeout=15)
+        if resp.status_code == 403 and 'Wrong endpoint' in (resp.text or ''):
+            resp = requests.post("https://api-free.deepl.com/v2/translate", data=payload, timeout=15)
+        if resp.status_code != 200:
+            print('DeepL _post error', resp.status_code, resp.text)
+            return None
+        return resp.json()
+    except Exception as e:
+        print('DeepL _post exception', e)
+        return None
+
+
 def deepl_translate(texts: list[str], target_lang: str = 'CS') -> list[str]:
     api_key = _get_deepl_key()
     if not api_key or not texts:
@@ -244,6 +263,130 @@ def deepl_translate(texts: list[str], target_lang: str = 'CS') -> list[str]:
     except Exception as e:
         print('DeepL translate exception', e)
         return []
+
+
+def deepl_translate_variants(text: str, target_lang: str = 'CS', source_lang: str | None = 'EN',
+                             include_default: bool = True) -> list[str]:
+    """
+    Vrátí několik variant překladu jednoho textu pomocí různých nastavení (formality).
+    Není garantováno, že DeepL vrátí odlišné výstupy, ale deduplikujeme a zachováme pořadí.
+    """
+    if not text:
+        return []
+    variants: list[str] = []
+    # Různé varianty formality
+    formalities = ['default', 'prefer_more', 'prefer_less']
+    seen = set()
+
+    for formality in formalities:
+        params: list[tuple[str, str]] = [('text', text), ('target_lang', target_lang)]
+        if source_lang:
+            params.append(('source_lang', source_lang))
+        if formality != 'default':
+            params.append(('formality', formality))
+        data = _deepl_post(params)
+        if not data:
+            continue
+        trs = data.get('translations') or []
+        if not trs:
+            continue
+        out = trs[0].get('text') or ''
+        norm = _normalize(out)
+        if out and norm not in seen:
+            seen.add(norm)
+            variants.append(out)
+
+    # Pokud nic nevyšlo a chceme zahrnout i defaultní cestu přes standardní helper
+    if include_default and not variants:
+        try:
+            base = deepl_translate([text], target_lang=target_lang)
+            for t in base:
+                norm = _normalize(t)
+                if t and norm not in seen:
+                    seen.add(norm)
+                    variants.append(t)
+        except Exception:
+            pass
+    return variants
+
+
+def deepl_back_translate(text_cs: str, pivot_lang: str = 'EN') -> str | None:
+    """Přeloží text z libovolného jazyka do pivot_lang (typicky EN). Využito pro back-translation."""
+    if not text_cs:
+        return None
+    data = _deepl_post([('text', text_cs), ('target_lang', pivot_lang)])
+    if not data:
+        return None
+    trs = data.get('translations') or []
+    return trs[0].get('text') if trs else None
+
+
+# === OpenAI (AI hodnocení překladu) ===
+try:
+    from openai import OpenAI  # type: ignore
+except Exception:
+    OpenAI = None  # fallback, pokud knihovna není
+
+
+def _get_openai_key() -> str | None:
+    load_dotenv(dotenv_path=".env")
+    return os.getenv('OPENAI_API_KEY')
+
+
+def _get_openai_model() -> str:
+    load_dotenv(dotenv_path=".env")
+    return os.getenv('OPENAI_MODEL') or 'gpt-4o-mini'
+
+
+def ai_judge_translation(original_en: str, user_cs: str) -> dict | None:
+    """
+    AI rozhodčí pro EN->CS překlady. Vrátí {verdict: correct|almost|incorrect, reason: str} nebo None při chybě.
+    """
+    key = _get_openai_key()
+    if not key or OpenAI is None:
+        return None
+    if not original_en or not user_cs:
+        return None
+    try:
+        client = OpenAI(api_key=key)
+        sys_msg = (
+            "You are a strict bilingual evaluator for English->Czech translations. "
+            "Decide if the Czech candidate means the same as the English source. "
+            "Allow minor style/word-order differences. If mostly correct but with minor issues, use 'almost'. "
+            "If key meaning is wrong or missing, use 'incorrect'. Return strict JSON: {verdict, reason}."
+        )
+        user_msg = (
+            "Evaluate the Czech translation. Return JSON only.\n"
+            f"EN: {original_en}\n"
+            f"CS: {user_cs}"
+        )
+        completion = client.chat.completions.create(
+            model=_get_openai_model(),
+            temperature=0.0,
+            response_format={"type": "json_object"},
+            messages=[
+                {"role": "system", "content": sys_msg},
+                {"role": "user", "content": user_msg},
+            ],
+        )
+        content = completion.choices[0].message.content if completion and completion.choices else None
+        if not content:
+            return None
+        try:
+            data = json.loads(content)
+        except Exception:
+            m = re.search(r"\{.*\}", content, re.DOTALL)
+            data = json.loads(m.group(0)) if m else None
+        if not isinstance(data, dict):
+            return None
+        verdict = str(data.get('verdict', '')).lower().strip()
+        if verdict not in ('correct', 'almost', 'incorrect'):
+            return None
+        reason = str(data.get('reason') or '')
+        return {"verdict": verdict, "reason": reason}
+    except Exception as e:
+        print('AI judge error:', e)
+        return None
 
 
 def genius_search_song(query: str) -> dict | None:
@@ -420,7 +563,7 @@ def inject_meta():
     if get_user_xp_and_level and uid:
         try:
             data = get_user_xp_and_level(uid)
-            xp = data.get('xp', 0);
+            xp = data.get('xp', 0)
             level = data.get('level', 1)
             xp_in_level = xp % 50
             out.update(
@@ -503,33 +646,117 @@ def check_answer():
 
         # Translations
         stored_translations = session.get("translation_exercises", []) or []
+        stored_alts = session.get('translation_alternatives', []) or []
         for idx, ex in enumerate(data.get("translations", [])):
+            # pre-init kvůli linteru
+            flag = False
+            sim = 0.0
+            feedback = None
             user_raw = (ex.get("user") or "").strip()
             correct_translation = stored_translations[idx].get('translated', '') if idx < len(
                 stored_translations) else ''
             original = stored_translations[idx].get('original', '') if idx < len(stored_translations) else ''
-            ratio_to_tr = _similarity(user_raw, correct_translation) if correct_translation else 0.0
-            ratio_to_orig = _similarity(user_raw, original) if original else 0.0
-            sim = max(ratio_to_tr, ratio_to_orig)
-            # NOVĚ: pokud je odpověď totožná s originální anglickou větou (po normalizaci), dáme speciální feedback
+
+            # Nejprve: rychlé zamítnutí, pokud opisuje originál EN
             if correct_translation and _normalize(user_raw) == _normalize(original):
                 flag = False
+                sim = 0.0
                 feedback = f"Nemůžeš jen opsat anglickou větu. Správný překlad: '{correct_translation}'."
-            elif sim >= 0.85:
+                results['translations'].append(flag)
+                results['details']['translations'].append({
+                    'user': user_raw,
+                    'correct': correct_translation,
+                    'similarity': sim,
+                    'feedback': feedback,
+                    'ai': None
+                })
+                continue
+
+            # AI hodnocení jako primární
+            ai_res = None
+            try:
+                ai_res = ai_judge_translation(original, user_raw) if original and user_raw else None
+            except Exception:
+                ai_res = None
+
+            if ai_res:
+                verdict = ai_res.get('verdict')
+                reason = ai_res.get('reason')
+                if verdict == 'correct':
+                    flag = True
+                    sim = 1.0
+                    feedback = None
+                elif verdict == 'almost':
+                    flag = 'almost'
+                    sim = 0.82
+                    prefer = correct_translation
+                    # Zkus použít nejbližší alternativu pro lepší feedback
+                    alts = stored_alts[idx] if idx < len(stored_alts) else []
+                    if alts:
+                        best_alt = max(alts, key=lambda c: _similarity(user_raw, c) if c else 0)
+                        if best_alt and _normalize(best_alt) != _normalize(prefer or ''):
+                            prefer = best_alt
+                    feedback = f"Skoro. {reason or ''} Správně např.: '{prefer}'.".strip()
+                else:  # incorrect
+                    # Přejdeme na fallback heuristiku, aby byl výsledek konzistentní
+                    ai_note = reason or 'AI: incorrect'
+                    # Fallback níže
+                    pass
+                if verdict in ('correct', 'almost'):
+                    results['translations'].append(flag)
+                    results['details']['translations'].append({
+                        'user': user_raw,
+                        'correct': correct_translation,
+                        'similarity': sim,
+                        'feedback': feedback,
+                        'ai': ai_res
+                    })
+                    continue  # AI už rozhodla pozitivně, další logika není třeba
+            # === Fallback: původní heuristika (alternativy + back-translation) ===
+            ratio_to_tr = _similarity(user_raw, correct_translation) if correct_translation else 0.0
+            ratio_to_orig = _similarity(user_raw, original) if original else 0.0
+            alts = stored_alts[idx] if idx < len(stored_alts) else []
+            ratio_to_any_alt = 0.0
+            matched_alt = None
+            for cand in alts:
+                r = _similarity(user_raw, cand)
+                if r > ratio_to_any_alt:
+                    ratio_to_any_alt = r
+                    matched_alt = cand
+            sim = max(ratio_to_tr, ratio_to_orig, ratio_to_any_alt)
+            back_info = None
+            if sim < 0.8 and original:
+                try:
+                    bt = deepl_back_translate(user_raw, pivot_lang='EN')
+                    if bt:
+                        r_bt = _similarity(bt, original)
+                        if r_bt > sim:
+                            sim = r_bt
+                            back_info = bt
+                except Exception:
+                    pass
+            if sim >= 0.85:
                 flag = True
                 feedback = None
             elif sim >= 0.8:
                 flag = 'almost'
-                feedback = f"Tvoje odpověď není úplně přesná. Správně: '{correct_translation}'."
+                prefer = matched_alt or correct_translation
+                feedback = f"Tvoje odpověď není úplně přesná. Správně: '{prefer}'."
             else:
                 flag = False
                 feedback = f"Správný překlad: '{correct_translation}'."
+                if matched_alt and _normalize(matched_alt) != _normalize(correct_translation):
+                    feedback += f" Alternativně: '{matched_alt}'."
+                if back_info:
+                    feedback += " (Podobný význam dle back-translation, ale pod prahem.)"
             results['translations'].append(flag)
             results['details']['translations'].append({
                 'user': user_raw,
                 'correct': correct_translation,
                 'similarity': sim,
-                'feedback': feedback
+                'feedback': feedback,
+                'ai': ai_res or None,
+                'matched_alt': matched_alt
             })
 
         # Pairs
@@ -545,18 +772,17 @@ def check_answer():
         results['pairs'] = all(pair_results) and len(user_pairs) == len(correct_pairs_dict) and len(
             correct_pairs_dict) > 0
 
-        # Celkový výsledek (almost se počítá jako splněno, úspěch při >=80%)
-        # --- NOVÉ HODNOCENÍ ---
+        # Celkové skóre (almost se počítá jako splněno)
         total_pairs = len(correct_pairs_dict)
         correct_missing_cnt = sum(1 for x in results['missing'] if x in (True, 'almost'))
         correct_trans_cnt = sum(1 for x in results['translations'] if x in (True, 'almost'))
         correct_pairs_cnt = sum(1 for ok in pair_results if ok)
-        total_items = len(stored_missing) + len(stored_translations) + total_pairs if (
-                len(stored_missing) or len(stored_translations) or total_pairs) else 1
+        total_items = len(session.get('missing_exercises', [])) + len(
+            session.get('translation_exercises', [])) + total_pairs
+        if total_items <= 0:
+            total_items = 1
         score = (correct_missing_cnt + correct_trans_cnt + correct_pairs_cnt) / total_items
-        success = score >= 0.80
-        # Původní all_correct zachováme pro kompatibilitu, bude aliasem success
-        all_correct = success
+        success = score >= 0.70
 
         # Statistiky
         if 'user_id' in session and update_user_stats:
@@ -597,14 +823,15 @@ def check_answer():
 
         debug_payload = {
             'session_keys': {
-                'missing_exercises': bool(stored_missing),
-                'translation_exercises': bool(stored_translations),
+                'missing_exercises': bool(session.get('missing_exercises')),
+                'translation_exercises': bool(session.get('translation_exercises')),
                 'current_exercise_pairs': bool(correct_pairs_dict),
             },
-            'missing_session_corrects': [m.get('missing_word') or m.get('answer') for m in stored_missing],
+            'missing_session_corrects': [m.get('missing_word') or m.get('answer') for m in
+                                         session.get('missing_exercises', [])],
             'translations_session': {
-                'originals': [t.get('original', '') for t in stored_translations],
-                'translated': [t.get('translated', '') for t in stored_translations],
+                'originals': [t.get('original', '') for t in session.get('translation_exercises', [])],
+                'translated': [t.get('translated', '') for t in session.get('translation_exercises', [])],
             },
             'pairs_expected': list(correct_pairs_dict.items()),
             'pairs_user_count': len(user_pairs),
@@ -635,6 +862,8 @@ def check_answer():
         print('CHECK_ANSWER UNCAUGHT ERROR:', e)
         print(traceback.format_exc())
         return jsonify({'error': 'internal_error', 'message': str(e)}), 500
+
+    # end check_answer
 
 
 @vlastni_music_bp.route('/vlastni_music', methods=['GET', 'POST'])
@@ -728,9 +957,26 @@ def index():
                 fixed.append(t)
             translations_cs = fixed
         translation_exercises = []
+        # NOVĚ: k jednotlivým překladům předpočítáme alternativy (formality) a uložíme do session
+        translation_alternatives: list[list[str]] = []
         for i, p in enumerate(trans_pick):
-            translation_exercises.append(
-                {'original': p, 'translated': translations_cs[i] if i < len(translations_cs) else ''})
+            main_tr = translations_cs[i] if i < len(translations_cs) else ''
+            # předpočítej alternativy (bez duplicit, včetně hlavní pokud odlišná)
+            alts = []
+            try:
+                alts = deepl_translate_variants(p, target_lang='CS', source_lang='EN', include_default=False)
+            except Exception:
+                alts = []
+            # vlož i hlavní překlad na začátek, pokud není
+            all_opts = []
+            seen_norm = set()
+            for cand in [main_tr, *alts]:
+                n = _normalize(cand)
+                if cand and n not in seen_norm:
+                    seen_norm.add(n)
+                    all_opts.append(cand)
+            translation_alternatives.append(all_opts)
+            translation_exercises.append({'original': p, 'translated': main_tr})
 
         # Matching vocab – promíchat pořadí EN i CS sloupců nezávisle
         def extract_candidate_words(text_lines: list[str]) -> list[str]:
@@ -759,6 +1005,7 @@ def index():
             session['training_start'] = time.time()
             session['missing_exercises'] = missing_exercises
             session['translation_exercises'] = translation_exercises
+            session['translation_alternatives'] = translation_alternatives  # uložit varianty
             session['current_exercise_pairs'] = {p['en']: p['cs'] for p in matching_pairs if
                                                  p.get('en') and p.get('cs')}
         except Exception as e:

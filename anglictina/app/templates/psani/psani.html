@@ -313,6 +313,29 @@ li {
   {% endif %}
 {% endwith %}
 
+{% if ai_feedback is defined and ai_feedback %}
+<div class="alert" style="max-width: 700px; margin: 12px auto; text-align: left;">
+  <strong>Výsledky kontroly:</strong>
+  <ul style="margin-top:8px;">
+    {% for item in ai_feedback %}
+      {% if item.ok %}
+        <li style="margin-bottom:6px; color:#065f46;">
+          ✅ {{ item.sentence }}
+        </li>
+      {% else %}
+        <li style="margin-bottom:10px;">
+          <div style="font-weight:600; color:#b91c1c;">⚠️ {{ item.sentence }}</div>
+          {% if item.issue %}<div style="color:#b45309;">Problém: {{ item.issue }}</div>{% endif %}
+          {% if item.suggestion %}<div style="color:#111827;">Návrh: <em>{{ item.suggestion }}</em></div>{% endif %}
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+</div>
+{% elif ai_feedback is defined %}
+<div class="alert" style="max-width: 700px; margin: 12px auto;">Analýza nevrátila žádná data.</div>
+{% endif %}
+
 <form method="POST" id="psani-form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div id="toolbar">

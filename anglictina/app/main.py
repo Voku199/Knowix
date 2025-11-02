@@ -42,6 +42,7 @@ from shadow_ml import shadow_ml_bp
 from podcast import podcast_bp
 from slovni_fotbal import slovni_bp
 from daily_quest import daily_bp, get_daily_quests_for_user
+from AI_gramatika import ai_gramatika_bp
 
 # -------- Matematiky --------------------
 # from math_main import math_main_bp
@@ -146,6 +147,7 @@ app.register_blueprint(shadow_ml_bp)
 app.register_blueprint(podcast_bp)
 app.register_blueprint(slovni_bp)
 app.register_blueprint(daily_bp)
+app.register_blueprint(ai_gramatika_bp)
 
 # -------- Matematiky --------------------
 # app.register_blueprint(math_main_bp)

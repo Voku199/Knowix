@@ -165,6 +165,18 @@
     <div class="chart-container">
         <canvas id="listeningAtChart"></canvas>
     </div>
+    <!-- AI‑gramatika správně/špatně -->
+    <div class="chart-container">
+        <canvas id="aiGrammarChart"></canvas>
+    </div>
+    <!-- AI Poslech (minuty celkem) -->
+    <div class="chart-container">
+        <canvas id="aiListeningChart"></canvas>
+    </div>
+    <!-- Slovní Fotbal -->
+    <div class="chart-container">
+        <canvas id="slovniChart"></canvas>
+    </div>
 </div>
 
 <div style="text-align:center;">
@@ -219,6 +231,14 @@
     const atWr = {{ stats.at_wr|default(0) }};
     const firstActivityRaw = "{{ stats.first_activity or '' }}";
     const lastActiveRaw = "{{ stats.last_active or '' }}";
+    // Nové: AI‑gramatika
+    const aiGramCor = {{ stats.ai_gram_cor|default(0) }};
+    const aiGramWr = {{ stats.ai_gram_wr|default(0) }};
+    // Nové: AI Poslech + Slovní fotbal
+    const aiPoslechMinut = {{ stats.AI_poslech_minut|default(0) }};
+    const aiPoslechSeconds = {{ stats.AI_poslech_seconds|default(0) }};
+    const slovniBestTime = {{ stats.slovni_best_time|default(0) }};
+    const slovniQuickPoints = {{ stats.slovni_quick_points|default(0) }};
 
     // Správné a špatné odpovědi dělíme dvěma
     const correct = Math.floor(correctRaw / 2);
@@ -379,8 +399,58 @@
                 }
             }
         });
+
+        // 7. AI‑gramatika (správně/špatně)
+        new Chart(document.getElementById('aiGrammarChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['AI‑gram: správně', 'AI‑gram: špatně'],
+                datasets: [{
+                    data: [aiGramCor, aiGramWr],
+                    backgroundColor: ['#34d399', '#fb7185'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: true, position: 'bottom' },
+                    title: { display: true, text: 'AI‑gramatika – správně vs. špatně', font: { size: 18 } }
+                },
+                cutout: '65%'
+            }
+        });
+
+        // 8. AI Poslech – zobraz celkové minuty (minuty + seconds/60)
+        const aiPoslechTotalMin = Math.round((aiPoslechMinut || 0) + (aiPoslechSeconds || 0) / 60);
+        new Chart(document.getElementById('aiListeningChart'), {
+            type: 'bar',
+            data: {
+                labels: ['AI Poslech (minuty celkem)'],
+                datasets: [{ data: [aiPoslechTotalMin], backgroundColor: ['#3b82f6'], borderRadius: 6 }]
+            },
+            options: {
+                plugins: { legend: { display: false }, title: { display: true, text: 'AI Poslech – celkový čas', font: { size: 18 } } },
+                indexAxis: 'y',
+                scales: { x: { beginAtZero: true } }
+            }
+        });
+
+        // 9. Slovní Fotbal – best time a quick points
+        new Chart(document.getElementById('slovniChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Best time (s)', 'Quick points'],
+                datasets: [{ data: [slovniBestTime || 0, slovniQuickPoints || 0], backgroundColor: ['#10b981', '#f59e0b'], borderRadius: 6 }]
+            },
+            options: {
+                plugins: { legend: { display: false }, title: { display: true, text: 'Slovní Fotbal', font: { size: 18 } } },
+                indexAxis: 'y',
+                scales: { x: { beginAtZero: true } }
+            }
+        });
     });
 </script>
 
 </body>
 </html>
+
