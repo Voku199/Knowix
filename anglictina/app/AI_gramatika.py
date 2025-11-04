@@ -32,12 +32,81 @@ SUGGESTED_TOPICS = [
     "Countable vs uncountable",
 ]
 
+# --- Jednoduchá perzistentní cache pro generovaná cvičení ---
+_CACHE_FILE = os.path.join(os.path.dirname(__file__), 'cache', 'ai_gramatika_items_cache.json')
+_CACHE_MAX = 200  # max počet záznamů
+_CACHE_TTL_S = 7 * 24 * 3600  # 7 dní
+_items_cache_mem = None  # lazy load
 
-def _get_user_id():
-    # Jednoduchý helper bez závislosti na ai.get_or_create_user
-    if 'user_id' not in session:
-        session['user_id'] = random.randint(100000, 999999)
-    return session['user_id']
+
+def _now_ts() -> int:
+    return int(time.time())
+
+
+def _load_items_cache() -> dict:
+    global _items_cache_mem
+    if _items_cache_mem is not None:
+        return _items_cache_mem
+    try:
+        with open(_CACHE_FILE, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        if not isinstance(data, dict):
+            data = {}
+    except Exception:
+        data = {}
+    _items_cache_mem = data
+    return _items_cache_mem
+
+
+def _save_items_cache(data: dict):
+    try:
+        os.makedirs(os.path.dirname(_CACHE_FILE), exist_ok=True)
+        with open(_CACHE_FILE, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False)
+    except Exception:
+        pass
+
+
+def _cache_key(topic: str, count: int, weak_hint: str) -> str:
+    t = (topic or '').strip().lower()
+    return f"{t}|{int(count)}|{weak_hint.strip().lower()}"
+
+
+def _items_cache_get(topic: str, count: int, weak_hint: str):
+    data = _load_items_cache()
+    entry = (data.get('data') or {}).get(_cache_key(topic, count, weak_hint))
+    if not entry:
+        return None
+    ts = entry.get('ts') or 0
+    if _now_ts() - ts > _CACHE_TTL_S:
+        # expirováno
+        try:
+            del data['data'][_cache_key(topic, count, weak_hint)]
+            _save_items_cache(data)
+        except Exception:
+            pass
+        return None
+    return entry.get('items')
+
+
+def _items_cache_put(topic: str, count: int, weak_hint: str, items: list):
+    if not items:
+        return
+    data = _load_items_cache()
+    if 'data' not in data or not isinstance(data['data'], dict):
+        data['data'] = {}
+    key = _cache_key(topic, count, weak_hint)
+    data['data'][key] = {'items': items, 'ts': _now_ts()}
+    # prune
+    try:
+        if len(data['data']) > _CACHE_MAX:
+            # seřaď podle ts a odstraň nejstarší
+            sorted_items = sorted(data['data'].items(), key=lambda kv: kv[1].get('ts') or 0)
+            for k, _ in sorted_items[: max(0, len(data['data']) - _CACHE_MAX)]:
+                del data['data'][k]
+    except Exception:
+        pass
+    _save_items_cache(data)
 
 
 # --- Normalizace vět pro porovnání ---
@@ -51,15 +120,134 @@ def _normalize_sentence(s: str) -> str:
     # sjednotit apostrofy
     for k, v in _WORD_APOS.items():
         t = t.replace(k, v)
-    # odstranit okolní uvozovky
-    t = t.strip('"'"' ")
-    # zmenšit písmena kromě I na začátku věty neřešíme – pro srovnání vše lower-case
+    # odstranit okolní uvozovky a mezery
+    t = t.strip(' "\'')
+    # zmenšit písmena
     t = t.lower()
-    # odstranit závěrečnou tečku/otazník/vykřičník
-    t = re.sub(r"[.!?]+$", "", t)
+    # odstranit většinu interpunkce (ponecháme apostrof kvůli kontrakcím)
+    t = re.sub(r"[^a-z0-9' ]+", " ", t)
     # zkolabovat whitespace
     t = re.sub(r"\s+", " ", t)
-    return t
+    return t.strip()
+
+
+# Heuristiky pro kontrakce a malé překlepy
+_CONTRACTIONS = {
+    "i'm": ["i am"],
+    "you're": ["you are"],
+    "we're": ["we are"],
+    "they're": ["they are"],
+    "he's": ["he is", "he has"],
+    "she's": ["she is", "she has"],
+    "it's": ["it is", "it has"],
+    "that's": ["that is"],
+    "there's": ["there is"],
+    "i've": ["i have"],
+    "you've": ["you have"],
+    "we've": ["we have"],
+    "they've": ["they have"],
+    "i'd": ["i would", "i had"],
+    "you'd": ["you would", "you had"],
+    "he'd": ["he would", "he had"],
+    "she'd": ["she would", "she had"],
+    "we'd": ["we would", "we had"],
+    "they'd": ["they would", "they had"],
+    "i'll": ["i will"],
+    "you'll": ["you will"],
+    "he'll": ["he will"],
+    "she'll": ["she will"],
+    "we'll": ["we will"],
+    "they'll": ["they will"],
+    "can't": ["cannot"],
+    "won't": ["will not"],
+    "don't": ["do not"],
+    "doesn't": ["does not"],
+    "didn't": ["did not"],
+    "isn't": ["is not"],
+    "aren't": ["are not"],
+    "wasn't": ["was not"],
+    "weren't": ["were not"],
+    "haven't": ["have not"],
+    "hasn't": ["has not"],
+    "hadn't": ["had not"],
+    "shouldn't": ["should not"],
+    "wouldn't": ["would not"],
+    "couldn't": ["could not"],
+    "mustn't": ["must not"],
+}
+
+
+def _variant_normalizations(s: str, max_variants: int = 32) -> set[str]:
+    base = _normalize_sentence(s)
+    tokens = base.split()
+    variants = set()
+
+    def backtrack(i: int, cur: list[str]):
+        if len(variants) >= max_variants:
+            return
+        if i >= len(tokens):
+            variants.add(" ".join(cur))
+            return
+        tok = tokens[i]
+        # bez změny
+        backtrack(i + 1, cur + [tok])
+        # kontrakce -> expanze
+        if tok in _CONTRACTIONS:
+            for exp in _CONTRACTIONS[tok]:
+                backtrack(i + 1, cur + exp.split())
+
+    backtrack(0, [])
+    return variants or {base}
+
+
+def _levenshtein(a: str, b: str) -> int:
+    if a == b:
+        return 0
+    if not a:
+        return len(b)
+    if not b:
+        return len(a)
+    # Udrž paměť O(min(n,m))
+    if len(a) < len(b):
+        a, b = b, a
+    prev = list(range(len(b) + 1))
+    for i, ca in enumerate(a, 1):
+        cur = [i]
+        for j, cb in enumerate(b, 1):
+            cost = 0 if ca == cb else 1
+            cur.append(min(
+                prev[j] + 1,  # delete
+                cur[j - 1] + 1,  # insert
+                prev[j - 1] + cost  # replace
+            ))
+        prev = cur
+    return prev[-1]
+
+
+def _is_answer_ok(user_ans: str, gold: str) -> bool:
+    # rychlá zkratka
+    if _normalize_sentence(user_ans) == _normalize_sentence(gold):
+        return True
+    # kontrakce – pokud se některá varianta shoduje, bereme jako OK
+    uvars = _variant_normalizations(user_ans)
+    gvars = _variant_normalizations(gold)
+    if uvars.intersection(gvars):
+        return True
+    # drobný překlep u delší věty
+    ua = _normalize_sentence(user_ans)
+    ga = _normalize_sentence(gold)
+    if len(ua) >= 15 and len(ga) >= 15:
+        dist = _levenshtein(ua, ga)
+        if dist <= 1:
+            return True
+    return False
+
+
+def _get_user_id():
+    # Jednoduchý helper bez závislosti na ai.get_or_create_user
+    if 'user_id' not in session:
+        session['user_id'] = random.randint(100000, 999999)
+    return session['user_id']
 
 
 # --- Adaptivní profil v session ---
@@ -98,11 +286,19 @@ def _call_aiml(messages, temperature=0.7, max_tokens=400):
 
 
 def _generate_items(topic: str, count: int, profile: dict):
-    """Vygeneruje položky: [{incorrect, correct, explanation, tags}]"""
+    """Vygeneruje položky: [{incorrect, correct, explanation, tags}] s cache dle topic/count/weak_hint"""
     count = max(5, min(10, int(count or 5)))
     # seřadit top slabiny pro prompt
     weak_tags = sorted(profile.items(), key=lambda kv: kv[1], reverse=True)[:3]
     weak_hint = ", ".join([f"{t}:{v}" for t, v in weak_tags]) if weak_tags else "none"
+
+    # Zkus cache
+    try:
+        cached = _items_cache_get(topic, count, weak_hint)
+        if cached and isinstance(cached, list) and len(cached) >= count:
+            return cached[:count]
+    except Exception:
+        pass
 
     sys = (
         "You are an English grammar tutor. Generate short practice items with typical mistakes for a given topic. "
@@ -143,6 +339,13 @@ def _generate_items(topic: str, count: int, profile: dict):
             "explanation": "Use past simple with yesterday, not present perfect.",
             "tags": ["past simple vs present perfect"]
         })
+
+    # Ulož do cache
+    try:
+        _items_cache_put(topic, count, weak_hint, norm_items[:count])
+    except Exception:
+        pass
+
     return norm_items[:count]
 
 
@@ -240,7 +443,7 @@ def ai_gramatika_submit():
     for idx, it in enumerate(items):
         user_ans = request.form.get(f'answer_{idx}', '').strip()
         gold = it.get('correct', '')
-        ok = _normalize_sentence(user_ans) == _normalize_sentence(gold)
+        ok = _is_answer_ok(user_ans, gold)
         if ok:
             correct_total += 1
         # uprav adaptivní profil
