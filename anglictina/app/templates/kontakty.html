@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <title>Proč jít s námi? | Knowix</title>
+    <title>Kontakty | Knowix</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <meta name="description" content="Knowix je moderní, zábavná platforma pro praktickou angličtinu zdarma. Streaky, XP, odznaky a cvičení, která děti baví i reálně naučí.">
@@ -32,7 +32,38 @@
     </script>
 
     <style>
-
+        .social-card .emoji{font-size:1.6rem;line-height:1;}
+        /* HERO BOX */
+        .contact-hero{padding:3.8rem 0 2.2rem;position:relative;overflow:hidden;}
+        .contact-hero:before{content:"";display:none !important;}
+        .contact-hero-box{max-width:980px;margin:0 auto;padding:2.6rem 2.4rem;background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(246,248,255,.90));backdrop-filter:blur(8px);border:1px solid #e2e6f2;border-radius:38px;position:relative;box-shadow:0 12px 30px -14px rgba(0,0,0,.25);}
+        body.dark-mode .contact-hero-box{background:linear-gradient(135deg,rgba(34,36,42,.90),rgba(26,27,31,.88));border-color:#2e323a;}
+        .contact-hero-box h1{font-size:clamp(2.5rem,5.2vw,3.7rem);margin:0 0 .85rem;line-height:1.05;font-weight:700;letter-spacing:-1px;text-align:center;}
+        .contact-hero-box .lead{max-width:60ch;margin:0 auto 1.4rem;font-size:clamp(1.05rem,2.1vw,1.26rem);color:#444;text-align:center;}
+        body.dark-mode .contact-hero-box .lead{color:#d5d5d5;}
+        .contact-chips{justify-content:center;display:flex;flex-wrap:wrap;gap:.75rem;margin-top:.4rem;}
+        .contact-chip{background:#fff;border:1px solid #e2e2e7;padding:.55rem .95rem;border-radius:999px;font-size:.78rem;font-weight:600;letter-spacing:.5px;display:flex;align-items:center;gap:.45rem;box-shadow:0 2px 4px rgba(0,0,0,.05);}
+        body.dark-mode .contact-chip{background:#222;border-color:#333;color:#eee;}
+        .grad-word{background:linear-gradient(60deg,#4e60ff,#ff6cc5);-webkit-background-clip:text;color:transparent;}
+        /* SOCIAL SECTION */
+        .social-links{padding:2.6rem 0 3.4rem;}
+        .social-section-box{max-width:1150px;margin:0 auto;padding:2.4rem 2.3rem;background:#fff;border:1px solid #e3e6ee;border-radius:34px;box-shadow:0 10px 26px -14px rgba(0,0,0,.20);}
+        body.dark-mode .social-section-box{background:#1f1f24;border-color:#2d3038;}
+        .social-section-box h2,.social-section-box p{text-align:center;margin-left:auto;margin-right:auto;}
+        .social-grid{display:grid;gap:1.4rem;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));margin-top:1.6rem;}
+        .social-card{display:flex;flex-direction:column;gap:.4rem;padding:1.05rem 1.15rem;border:1px solid #e2e2e4;border-radius:20px;text-decoration:none;background:#fff;transition:.28s box-shadow,.28s transform;min-height:140px;color:#1c1f25;position:relative;overflow:hidden;align-items:center;justify-content:center;text-align:center;}
+        .social-card:focus-visible,.social-card:hover{box-shadow:0 12px 30px -12px rgba(0,0,0,.25);transform:translateY(-5px);}
+        .social-card .label{font-weight:600;font-size:1.05rem;letter-spacing:.2px;}
+        .social-card .handle{font-size:.82rem;opacity:.75;}
+        body.dark-mode .social-card{background:#272a31;border-color:#343840;color:#eee;}
+        /* Special backgrounds (override base) */
+        .social-card.instagram{background:linear-gradient(135deg,#f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);color:#fff;border:none;padding:.75rem .85rem !important;min-height:120px !important;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;}
+        .social-card.tiktok{background:linear-gradient(135deg,#111 0%,#222 100%);color:#fff;}
+        .social-card.discord{background:linear-gradient(135deg,#5865F2 0%,#4752C4 100%);color:#fff;border:none;}
+        .social-card.owner{background:linear-gradient(135deg,#4e54c8 0%,#8f94fb 100%);color:#fff;border:none;}
+        .social-card.designer{background:linear-gradient(135deg,#ffcf6b 0%,#ff9f43 100%);color:#3a2705;border:none;}
+        body.dark-mode .social-card.designer{color:#fff;}
+        .social-note{font-size:.85rem;opacity:.7;margin-top:1.4rem;text-align:center;}
     </style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
@@ -77,7 +108,7 @@
             </li>
             <li>
                 <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
-                    🌙
+                    <span id="theme-icon" aria-hidden="true">🌙</span>
                 </button>
             </li>
         </ul>
@@ -119,106 +150,52 @@
 </header>
 <main>
     <!-- Hero -->
-    <section class="why-hero container">
-        <h1>Proč jít s námi?</h1>
-        <p class="lead">
-            Jsme moderní, zábavná platforma pro <span class="highlight">praktickou angličtinu</span>. Projekt vytvořil
-            <span class="highlight">Vojtěch Kurinec</span> – student 15 letý s cílem, aby se mohl učit <span class="highlight">každý zdarma</span>.
-        </p>
-        <div class="badge-row" aria-label="Klíčové vlastnosti">
-            <span class="pill">Zdarma</span>
-            <span class="pill secondary">Zábavné</span>
-            <span class="pill">Efektivní</span>
-            <span class="pill neutral">Pro děti i školy</span>
-        </div>
-        <div class="cta" role="group" aria-label="Hlavní akce">
-            <a class="cta-primary" href="{{ url_for('auth.register') }}">🚀 Začít zdarma</a>
-            <a class="cta-secondary" href="/anglictina">🎧 Vyzkoušet cvičení</a>
+    <section class="contact-hero container">
+        <div class="contact-hero-box">
+            <h1>Kontakty & <span class="grad-word">Komunita</span></h1>
+            <p class="lead">Všechny cesty jak se spojit s projektem Knowix: sleduj novinky, napiš nápad, nahlas chybu nebo se přidej na Discord. Čím víc zpětné vazby, tím rychleji roste obsah.</p>
+            <div class="contact-chips" aria-label="Rychlé přehledy kanálů">
+                <div class="contact-chip">📸 Instagram</div>
+                <div class="contact-chip">🎵 TikTok</div>
+                <div class="contact-chip">💬 Discord</div>
+                <div class="contact-chip">🧪 Bug report</div>
+                <div class="contact-chip">💡 Nápady</div>
+                <div class="contact-chip">☕ Podpora</div>
+            </div>
         </div>
     </section>
 
-    <section class="why-container">
-        <div class="container">
-            <h2>Co je Knowix?</h2>
-            <p>
-                Knowix je web zaměřený na <span class="highlight">praktickou angličtinu</span> – to, co děti využijí v běžných situacích.
-                Najdete tu i několik náročnějších <span class="highlight">gramatických cvičení</span>, ale těžiště je v poslechu, porozumění
-                a použití v praxi. Krátká cvičení, jasný postup a okamžitá zpětná vazba.
-            </p>
-
-            <div class="grid-3" role="list">
-                <div class="card" role="listitem">
-                    <h3>🎯 Prakticky a rychle</h3>
-                    <p>Učíme to, co dává smysl v reálném životě. Minimum klikání, maximum pochopení.</p>
-                </div>
-                <div class="card" role="listitem">
-                    <h3>🔥 Motivace hrou</h3>
-                    <p>Streaky, XP a odznaky drží motivaci – něco mezi UmímeTo a Duolingem, ale po česku a zdarma.</p>
-                </div>
-                <div class="card" role="listitem">
-                    <h3>💸 Vždy zdarma</h3>
-                    <p>Učit se má možnost <span class="highlight">každý</span>. Bez paywallu, bez licencí.</p>
-                </div>
-            </div>
-
-            <h2>Jak vznikl Knowix</h2>
-            <div class="story">
-                <p>
-                    Inspiroval mě táta, který během covidu vytvořil Počítejsám – jednoduchý web na procvičování matematiky
-                    pro 1.–3. třídu. Ve škole jsme řešili licence na UmímeTo.org a napadlo mě:
-                    <em>Co kdyby existoval web podobný, ale nejdřív jen na angličtinu – a zdarma?</em>
-                </p>
-                <p>
-                    A tak jsem začal. Design, backend, frontend, databáze, hosting i doména – to všechno řeším sám,
-                    s pomocí AI a občasnou radou od táty. <span class="highlight">Knowix není firma – je to projekt jednoho člověka</span>,
-                    který chce dát vzdělávání všem.
-                </p>
-                <div class="blockquote">
-                    „Začali jsme angličtinou a hudbou (písničky). Cíl je porozumění – rozumět, používat, zvládat reálné situace.“
-                </div>
-            </div>
-
-            <h2>V čem jsme jiní</h2>
-            <div class="grid-3">
-                <div class="card">
-                    <h3>🧠 Důraz na porozumění</h3>
-                    <p>Ne biflování, ale <span class="highlight">pochopení a použití</span>. Psané i mluvené situace z praxe.</p>
-                </div>
-                <div class="card">
-                    <h3>🏆 Herní prvky</h3>
-                    <p>XP, streaky a odměny pomáhají u učení vydržet – každý den kousek dopředu.</p>
-                </div>
-                <div class="card">
-                    <h3>🛠️ Jednoduché pro školy</h3>
-                    <p>Skvělé jako doplněk do výuky: rychlé, přehledné a bez papírování navíc.</p>
-                </div>
-            </div>
-
-            <h2>Stručně a jasně</h2>
-            <div class="stats" aria-label="Shrnutí výhod">
-                <div class="stat">
-                    <span class="num">Zdarma</span>
-                    <span>Pro každého žáka</span>
-                </div>
-                <div class="stat">
-                    <span class="num">Baví a motivuje</span>
-                    <span>Streaky, XP, odznaky</span>
-                </div>
-                <div class="stat">
-                    <span class="num">Praktická angličtina</span>
-                    <span>Smysluplné situace</span>
-                </div>
-            </div>
-
-            <h2>Hlavní cíl</h2>
-            <p>
-                Chceme, aby se žák naučil angličtinu tak, aby ji <span class="highlight">dokázal používat</span>,
-                rozuměl jí a věděl, o čem se lidé baví. Nejen testy, ale <span class="highlight">reálné situace</span>.
-            </p>
-
-            <div class="cta">
-                <a class="cta-primary" href="{{ url_for('auth.register') }}">🆓 Vytvořit účet</a>
-                <a class="cta-secondary" href="{{ url_for('main.index') }}">🏠 Zpět na domov</a>
+    <!-- Sociální odkazy -->
+    <section class="social-links container" aria-labelledby="social-heading">
+        <div class="social-section-box">
+            <h2 id="social-heading">Sociální sítě & komunitní kanály</h2>
+            <p>Komentáře, návrhy nebo chceš jen sledovat novinky? Přidej se ↓</p>
+            <div class="social-grid" role="list">
+                <a class="social-card instagram" role="listitem" href="https://www.instagram.com/knowixcz" target="_blank" rel="noopener noreferrer" aria-label="Instagram Knowix">
+                    <span class="emoji" aria-hidden="true">📸</span>
+                    <span class="label">Instagram</span>
+                    <span class="handle">@knowixcz</span>
+                </a>
+                <a class="social-card tiktok" role="listitem" href="https://www.tiktok.com/@knowix85" target="_blank" rel="noopener noreferrer" aria-label="TikTok Knowix">
+                    <span class="emoji" aria-hidden="true">🎵</span>
+                    <span class="label">TikTok</span>
+                    <span class="handle">@knowix85</span>
+                </a>
+                <a class="social-card discord" role="listitem" href="https://discord.gg/dC8x5DuD8c" target="_blank" rel="noopener noreferrer" aria-label="Discord server Knowix">
+                    <span class="emoji" aria-hidden="true">💬</span>
+                    <span class="label">Discord</span>
+                    <span class="handle">Invite link</span>
+                </a>
+                <a class="social-card owner" role="listitem" href="https://www.instagram.com/voku199" target="_blank" rel="noopener noreferrer" aria-label="Instagram autora Vojtěch Kurinec (@voku199)">
+                    <span class="emoji" aria-hidden="true">👤</span>
+                    <span class="label">Autor projektu</span>
+                    <span class="handle">@voku199</span>
+                </a>
+                <a class="social-card designer" role="listitem" href="https://www.instagram.com/th3cooki" target="_blank" rel="noopener noreferrer" aria-label="Instagram design podpory (@th3cooki)">
+                    <span class="emoji" aria-hidden="true">🎨</span>
+                    <span class="label">Designerka Discordu</span>
+                    <span class="handle">@th3cooki</span>
+                </a>
             </div>
         </div>
     </section>

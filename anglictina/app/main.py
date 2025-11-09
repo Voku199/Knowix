@@ -26,7 +26,6 @@ from present_perfect import chat_bp
 from review import review_bp
 from roleplaying import roleplaying_bp
 from theme import theme_bp
-from pexeso import pexeso_bp
 from xp import get_user_xp_and_level
 from xp import xp_bp
 from drawing import drawing_bp
@@ -134,7 +133,6 @@ app.register_blueprint(obchod_bp)
 app.register_blueprint(zpravy_bp)
 app.register_blueprint(roleplaying_bp)
 app.register_blueprint(ai_bp)
-app.register_blueprint(pexeso_bp)
 app.register_blueprint(drawing_bp)
 app.register_blueprint(psani_bp)
 app.register_blueprint(user_stats_bp)
@@ -164,6 +162,11 @@ init_security(app)
 @app.route('/sitemap.xml')
 def sitemap():
     return send_from_directory('templates', 'sitemap.xml')
+
+
+@app.route('/kontakty')
+def kontakty():
+    return render_template('kontakty.html')
 
 
 @app.route('/robots.txt')

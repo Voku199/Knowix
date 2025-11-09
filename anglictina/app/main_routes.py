@@ -10,6 +10,13 @@ def index():
                            profile_pic=session.get("profile_pic", "static/profile_pics/default.jpg"))
 
 
+@main_bp.route('/kontakty')
+def kontakty():
+    return render_template('kontakty.html',
+                           user_name=session.get("user_name"),
+                           profile_pic=session.get("profile_pic", "static/profile_pics/default.jpg"))
+
+
 @main_bp.route('/anglictina')
 def anglictina():
     return render_template('anglictina/main_anglictina.html',
