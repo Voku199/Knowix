@@ -67,3 +67,12 @@ def reject_teacher_request(request_id):
     except Exception as e:
         print("Chyba při zamítání učitele:", e)
         return jsonify({'success': False, 'error': 'Chyba serveru.'})
+
+
+# === Správa připomínek – admin UI ===
+@admin_bp.route('/admin/reminders')
+def admin_reminders_page():
+    if session.get('user_id') != 1:
+        flash('Přístup zamítnut.', 'error')
+        return redirect(url_for('main.index'))
+    return render_template('admin/admin_reminders.html')

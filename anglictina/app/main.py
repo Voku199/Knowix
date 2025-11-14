@@ -42,6 +42,7 @@ from podcast import podcast_bp
 from slovni_fotbal import slovni_bp
 from daily_quest import daily_bp, get_daily_quests_for_user
 from AI_gramatika import ai_gramatika_bp
+from reminders import reminders_bp, start_reminder_scheduler  # Přidán import připomínkového systému
 
 # -------- Matematiky --------------------
 # from math_main import math_main_bp
@@ -146,6 +147,7 @@ app.register_blueprint(podcast_bp)
 app.register_blueprint(slovni_bp)
 app.register_blueprint(daily_bp)
 app.register_blueprint(ai_gramatika_bp)
+app.register_blueprint(reminders_bp)  # Registrace blueprintu pro unsubscribe a ruční scan
 
 # -------- Matematiky --------------------
 # app.register_blueprint(math_main_bp)
@@ -156,6 +158,7 @@ app.register_blueprint(ai_gramatika_bp)
 # app.register_blueprint(prevodky_bp)
 
 init_security(app)
+start_reminder_scheduler(app)  # Spuštění vlákenného scheduleru (idempotentní)
 
 
 # === Sitemap & robots ===

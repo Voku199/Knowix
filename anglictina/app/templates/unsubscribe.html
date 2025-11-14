@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Odhlášení e-mailů</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background: #f7f7f7;
+        }
+
+        .box {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        a {
+            color: #0a66c2;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    {% if status == 'done' %}
+    <h2>Úspěšně odhlášeno</h2>
+    <p>Už vám nebudeme posílat připomínkové e-maily. Pokud si to rozmyslíte, přihlaste se na Knowix a znovu je aktivujte
+        (zatím přes podporu).</p>
+    {% elif status == 'already' %}
+    <h2>Již odhlášeno</h2>
+    <p>Tento účet už má připomínky vypnuté.</p>
+    {% elif status == 'invalid' %}
+    <h2>Neplatný odkaz</h2>
+    <p>Token nenalezen. Možná byl odkaz chybný nebo vypršel.</p>
+    {% elif status == 'error' %}
+    <h2>Chyba</h2>
+    <p>Při zpracování došlo k chybě. Zkuste to znovu později.</p>
+    {% else %}
+    <h2>Stav neznámý</h2>
+    <p>Nepodařilo se určit stav požadavku.</p>
+    {% endif %}
+    <p><a href="/">Zpět na Knowix</a></p>
+</div>
+</body>
+</html>
+

@@ -102,6 +102,30 @@ def send_email(to_email, subject, body):
         print(f"Error sending email: {e}")
         return False
 
+
+# Nové: odeslání e-mailu s HTML i textovou částí (multipart/alternative)
+def send_email_html(to_email, subject, text_body, html_body):
+    from_email = "knowixcz@gmail.com"
+    from_password = os.getenv("EMAIL_PASSWORD")
+    msg = MIMEMultipart('alternative')
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+    # text fallback
+    msg.attach(MIMEText(text_body or '', 'plain', 'utf-8'))
+    # html část
+    msg.attach(MIMEText(html_body or '', 'html', 'utf-8'))
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(from_email, from_password)
+        server.sendmail(from_email, to_email, msg.as_string())
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"Error sending HTML email: {e}")
+        return False
+
     # profile_pic=session['profile_pic'])
 
 
