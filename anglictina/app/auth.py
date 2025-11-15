@@ -651,7 +651,9 @@ def register():
                 conn.commit()
                 print(f"[auth.register] user insert ok email={email}")
                 flash("Registrace úspěšná! Nyní se můžete přihlásit.", "success")
-                return redirect(url_for('auth.login'))
+                # Nově: stránka s nabídkou instalace PWA
+                session['just_registered'] = True
+                return render_template('registration_success.html')
             except mysql.connector.IntegrityError:
                 print(f"[auth.register] IntegrityError for email={email}")
                 flash("Tento e-mail je již zaregistrován!", "error")
@@ -1050,3 +1052,9 @@ def edit_assignment(assignment_id):
             cur.close()
         if db:
             db.close()
+
+
+@auth_bp.route('/register_finalize', methods=['POST'])
+def register_finalize():
+    session.pop('just_registered', None)
+    return jsonify({'success': True})

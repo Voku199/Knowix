@@ -28,3 +28,5 @@ redis==6.2.0
 flask-limiter==3.12
 
 gTTS==2.5.3
+pywebpush==1.14.0
+cryptography==42.0.5

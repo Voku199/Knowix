@@ -11,10 +11,13 @@
 <meta property="og:image" content="https://www.knowix.cz/static/og-banner.png">
 <meta property="og:url" content="https://www.knowix.cz">
 <meta property="og:type" content="website">
-
+    <!-- PWA manifest & theme -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0d1117">
+    <!-- CSRF token pro JS -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link rel="canonical" href="https://www.knowix.cz">
-
 
     <title>{% block title %}knowix{% endblock %}</title>
     <link rel="stylesheet" href="/static/style.css">
@@ -51,6 +54,37 @@
   "description": "Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam."
 }
 </script>
+    <style>
+        /* Zvýrazněná tlačítka pro PWA a notifikace */
+        .pwa-action-btn {
+            display:none; /* zůstává, JS přepne na inline-block */
+            background: linear-gradient(135deg,#2d7ff9,#6aa9ff);
+            color:#fff;
+            border:none;
+            cursor:pointer;
+            padding:6px 14px;
+            font-size:14px;
+            font-weight:600;
+            border-radius:999px;
+            font-family:inherit;
+            position:relative;
+            box-shadow:0 4px 12px rgba(0,0,0,.15);
+            transition:background .3s, transform .15s, box-shadow .3s;
+        }
+        .pwa-action-btn[data-type="notif"] {background: linear-gradient(135deg,#ff9600,#ffbf4d);}
+        .dark-mode .pwa-action-btn {box-shadow:0 4px 14px rgba(0,0,0,.5);}
+        .pwa-action-btn:hover {transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.25);}
+        .pwa-action-btn:active {transform:translateY(0); box-shadow:0 3px 10px rgba(0,0,0,.2);}
+        .pwa-action-btn:focus-visible {outline:2px solid #fff; outline-offset:3px;}
+        .pwa-action-btn .icon {margin-right:6px; font-size:16px;}
+        .pwa-action-btn .label {vertical-align:middle;}
+        /* Pulz při prvním zobrazení */
+        @keyframes pwaPulse {0%{box-shadow:0 0 0 0 rgba(45,127,249,.6);}70%{box-shadow:0 0 0 10px rgba(45,127,249,0);}100%{box-shadow:0 0 0 0 rgba(45,127,249,0);}}
+        @keyframes notifPulse {0%{box-shadow:0 0 0 0 rgba(255,150,0,.6);}70%{box-shadow:0 0 0 10px rgba(255,150,0,0);}100%{box-shadow:0 0 0 0 rgba(255,150,0,0);}}
+        .pwa-action-btn.pulse {animation:pwaPulse 2s ease-out 1;}
+        .pwa-action-btn[data-type="notif"].pulse {animation:notifPulse 2s ease-out 1;}
+    </style>
+</head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
     <div class="logo-streak-wrapper">
@@ -101,6 +135,19 @@
                     🌙
                 </button>
             </li>
+            <li>
+                <button id="enable-notifications" data-type="notif" aria-label="Povolit notifikace" title="Povolit notifikace" class="pwa-action-btn" style="display:none;">
+                    <span class="icon">🔔</span><span class="label">Notifikace</span>
+                </button>
+            </li>
+            <li>
+                <button id="install-app" data-type="pwa" aria-label="Instalovat aplikaci" title="Instalovat aplikaci" class="pwa-action-btn" style="display:none;">
+                    <span class="icon">⬇️</span><span class="label">Instalovat</span>
+                </button>
+            </li>
+<!--            <li>-->
+<!--                <button id="test-notif" title="Test notifikace" style="background:none;border:1px solid #444;border-radius:6px;cursor:pointer;padding:4px 8px;color:inherit;">Test notif</button>-->
+<!--            </li>-->
         </ul>
         {% if session['user_name'] %}
         <div class="user-profile">
@@ -150,6 +197,59 @@
         and lot of ☕
     </p>
 </footer>
+<script src="/static/js/pwa.js"></script>
+<script>
+(function(){
+  const btn = document.getElementById('test-notif');
+  if(!btn) return;
+  btn.addEventListener('click', async ()=>{
+    try {
+      if(Notification.permission === 'default') {
+        await Notification.requestPermission();
+      }
+      if(Notification.permission !== 'granted') {
+        alert('Notifikace nejsou povoleny v prohlížeči/OS.');
+        return;
+      }
+      const reg = await navigator.serviceWorker.ready;
+      // Preferuj PNG (Windows/Chrome často lépe zobrazí)
+      const iconPng = '/static/icons/bell.png';
+      await reg.showNotification('Test notifikace – Knowix', {
+        body: 'Pokud vidíš tento toast, notifikace fungují. (klikni pro otevření domů)',
+        icon: iconPng,
+        badge: iconPng,
+        requireInteraction: true,
+        renotify: true,
+        tag: 'knowix-test-1',
+        vibrate: [100, 50, 100],
+        data: { url: '/' }
+      });
+      // Fallback pro některá prostředí – vytvoří i ne-persistentní notifikaci
+      try { new Notification('Fallback notif', { body: 'Alternativní způsob zobrazení', icon: iconPng, tag: 'knowix-fallback-1', requireInteraction: true }); } catch(_){ }
+    } catch(e){ console.error('Test notifikace selhal', e); alert('Zobrazení notifikace selhalo – viz konzoli.'); }
+  });
+})();
+</script>
+<script>
+// Přidání pulzu po zobrazení tlačítek (pozoruje změnu display)
+(function(){
+  const notifBtn = document.getElementById('enable-notifications');
+  const installBtn = document.getElementById('install-app');
+  const observer = new MutationObserver(muts => {
+    muts.forEach(m => {
+      if (m.attributeName === 'style') {
+        if (installBtn && installBtn.style.display !== 'none' && !installBtn.classList.contains('pulse')) {
+          installBtn.classList.add('pulse');
+        }
+        if (notifBtn && notifBtn.style.display !== 'none' && !notifBtn.classList.contains('pulse')) {
+          notifBtn.classList.add('pulse');
+        }
+      }
+    });
+  });
+  if (installBtn) observer.observe(installBtn, {attributes:true});
+  if (notifBtn) observer.observe(notifBtn, {attributes:true});
+})();
+</script>
 </body>
 </html>
-

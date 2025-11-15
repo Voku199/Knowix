@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrace úspěšná | Knowix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="theme-color" content="#2d7ff9">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_reg_log.css') }}">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .info-box {
+            background: #fff;
+            padding: 2rem 2.2rem;
+            border-radius: 14px;
+            box-shadow: 0 6px 30px rgba(0, 0, 0, .12);
+            max-width: 460px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+
+        .actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            padding: .8rem 1.15rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #2d7ff9;
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+        }
+
+        .modal-bg {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-bg.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #fff;
+            padding: 1.8rem 2rem;
+            border-radius: 16px;
+            max-width: 390px;
+            width: 92%;
+            box-shadow: 0 4px 28px rgba(0, 0, 0, .25);
+            position: relative;
+            text-align: center;
+        }
+
+        .modal h3 {
+            margin: 0 0 .6rem;
+        }
+
+        .modal p {
+            margin: .6rem 0 1.2rem;
+            line-height: 1.4;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .small {
+            font-size: .8rem;
+            opacity: .7;
+            margin-top: 1rem;
+            line-height: 1.3;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .success-msg {
+            color: #1b8e2e;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .tutorial-bg {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1100;
+        }
+
+        .tutorial-bg.active {
+            display: flex;
+        }
+
+        .tutorial-box {
+            background: #ffffff;
+            padding: 1.6rem 1.9rem;
+            border-radius: 18px;
+            width: 95%;
+            max-width: 420px;
+            box-shadow: 0 6px 32px rgba(0, 0, 0, .25);
+            position: relative;
+        }
+
+        .tutorial-box h3 {
+            margin: .2rem 0 .8rem;
+            font-size: 1.25rem;
+        }
+
+        .tutorial-close {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .tutorial-steps {
+            margin: .6rem 0 .8rem;
+            padding-left: 1.1rem;
+            font-size: .92rem;
+        }
+
+        .tutorial-steps li {
+            margin: .35rem 0;
+            line-height: 1.3;
+        }
+
+        .tutorial-actions {
+            display: flex;
+            gap: .7rem;
+            flex-wrap: wrap;
+            margin-top: .9rem;
+        }
+
+        .btn-outline {
+            background: #fff;
+            border: 1px solid #2d7ff9;
+            color: #2d7ff9;
+        }
+    </style>
+    <script defer src="{{ url_for('static', filename='js/pwa.js') }}"></script>
+</head>
+<body>
+<div class="info-box">
+    <h1>Registrace úspěšná!</h1>
+    <p>Gratulujeme, účet je vytvořen. Chceš si aplikaci nainstalovat a používat ji jako PWA?</p>
+    <div class="actions">
+        <button id="btn-install-yes" class="btn-primary">Ano</button>
+        <button id="btn-install-no" class="btn-secondary">Ne</button>
+    </div>
+    <div id="install-result" class="success-msg hidden"></div>
+    <p class="small">Instalací získáš rychlejší načítání, offline režim a aplikaci na ploše.</p>
+    <div style="margin-top:1.2rem;">
+        <a href="{{ url_for('auth.login') }}">→ Pokračovat na přihlášení</a>
+    </div>
+</div>
+
+<!-- Modal potvrzení (zážitek) -->
+<div class="modal-bg" id="confirm-modal">
+    <div class="modal">
+        <button class="close" id="confirm-close" aria-label="Zavřít">×</button>
+        <h3>Opravdu nechceš lepší zážitek?</h3>
+        <p>PWA nabízí rychlejší načítání, ikonku na ploše a offline funkce. Zkus to – můžeš kdykoli odinstalovat.</p>
+        <div class="actions">
+            <button id="btn-confirm-no" class="btn-secondary">Ano, nechci</button>
+            <button id="btn-confirm-try" class="btn-primary">Ne, chci to vyzkoušet</button>
+        </div>
+    </div>
+</div>
+
+<!-- Tutorial popout -->
+<div class="tutorial-bg" id="tutorial-popout">
+    <div class="tutorial-box">
+        <button class="tutorial-close" id="tutorial-close" aria-label="Zavřít">×</button>
+        <h3>Jak nainstalovat aplikaci</h3>
+        <ul class="tutorial-steps">
+            <li><strong>Android Chrome:</strong> Menu ⋮ → Přidat na plochu / Instalovat aplikaci.</li>
+            <li><strong>iOS Safari:</strong> Sdílet → Přidat na plochu.</li>
+            <li><strong>Desktop Chrome/Edge:</strong> Ikona instalace v adresním řádku nebo Menu → Instalovat.</li>
+        </ul>
+        <p style="font-size:.85rem; opacity:.75;">Po instalaci najdeš ikonku mezi aplikacemi. Můžeš ji kdykoli odinstalovat.</p>
+        <div class="tutorial-actions">
+            <button id="tutorial-install" class="btn-primary">Spustit instalaci</button>
+            <button id="tutorial-later" class="btn-outline">Později</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const yesBtn = document.getElementById('btn-install-yes');
+        const noBtn = document.getElementById('btn-install-no');
+        const modalBg = document.getElementById('confirm-modal');
+        const closeConfirm = document.getElementById('confirm-close');
+        const confirmNo = document.getElementById('btn-confirm-no');
+        const confirmTry = document.getElementById('btn-confirm-try');
+        const resultEl = document.getElementById('install-result');
+        const tutorialBg = document.getElementById('tutorial-popout');
+        const tutorialClose = document.getElementById('tutorial-close');
+        const tutorialInstall = document.getElementById('tutorial-install');
+        const tutorialLater = document.getElementById('tutorial-later');
+        const csrf = document.querySelector('meta[name="csrf-token"]').content;
+
+        function isStandalone() {
+            return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+                || navigator.standalone === true
+                || (document.referrer && document.referrer.startsWith('android-app://'));
+        }
+
+        function finalize() {
+            fetch('/register_finalize', {method: 'POST', headers: {'X-CSRFToken': csrf}}).catch(() => {
+            });
+        }
+
+        function showSuccess(msg) {
+            resultEl.textContent = msg;
+            resultEl.classList.remove('hidden');
+        }
+
+        function showTutorial() {
+            tutorialBg.classList.add('active');
+        }
+
+        async function doPromptInstall() {
+            if (typeof window.tryPwaInstall === 'function') {
+                const accepted = await window.tryPwaInstall();
+                if (accepted) {
+                    showSuccess('Instalace úspěšná! Ikonka je na ploše.');
+                    finalize();
+                    tutorialBg.classList.remove('active');
+                } else {
+                    showSuccess('Instalaci můžeš spustit z menu prohlížeče.');
+                }
+            } else {
+                showSuccess('Není dostupný přímý instalátor – použij prosím manuální postup.');
+            }
+        }
+
+        // Pokud už jsme v PWA, rovnou informujeme
+        if (isStandalone()) {
+            showSuccess('Používáš PWA verzi – skvělé!');
+            finalize();
+        }
+
+        // Clicky
+        yesBtn.addEventListener('click', showTutorial);
+        noBtn.addEventListener('click', () => modalBg.classList.add('active'));
+        confirmTry.addEventListener('click', () => { modalBg.classList.remove('active'); showTutorial(); });
+        confirmNo.addEventListener('click', () => {
+            finalize();
+            window.location.href = '{{ url_for('auth.login') }}';
+        });
+        closeConfirm.addEventListener('click', () => modalBg.classList.remove('active'));
+
+        tutorialClose.addEventListener('click', () => tutorialBg.classList.remove('active'));
+        tutorialLater.addEventListener('click', () => { tutorialBg.classList.remove('active'); showSuccess('Můžeš instalovat kdykoli později.'); finalize(); });
+        tutorialInstall.addEventListener('click', () => {
+            showSuccess('Mám to');
+            finalize();
+            window.location.href = '{{ url_for('auth.login') }}';
+        });
+        tutorialBg.addEventListener('click', e => { if (e.target === tutorialBg) tutorialBg.classList.remove('active'); });
+
+    })();
+</script>
+</body>
+</html>

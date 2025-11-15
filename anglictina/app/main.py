@@ -8,6 +8,10 @@ import traceback
 import redis
 from werkzeug.middleware.proxy_fix import ProxyFix
 import os
+import mimetypes
+
+# Zajisti správný MIME typ pro WebP
+mimetypes.add_type('image/webp', '.webp')
 
 # Import všech blueprintů
 from A1_music import exercises_bp
@@ -43,6 +47,7 @@ from slovni_fotbal import slovni_bp
 from daily_quest import daily_bp, get_daily_quests_for_user
 from AI_gramatika import ai_gramatika_bp
 from reminders import reminders_bp, start_reminder_scheduler  # Přidán import připomínkového systému
+from push_notifications import push_bp  # PWA push notifikace blueprint
 
 # -------- Matematiky --------------------
 # from math_main import math_main_bp
@@ -148,6 +153,7 @@ app.register_blueprint(slovni_bp)
 app.register_blueprint(daily_bp)
 app.register_blueprint(ai_gramatika_bp)
 app.register_blueprint(reminders_bp)  # Registrace blueprintu pro unsubscribe a ruční scan
+app.register_blueprint(push_bp)
 
 # -------- Matematiky --------------------
 # app.register_blueprint(math_main_bp)
@@ -177,6 +183,12 @@ def robots_txt():
     return send_from_directory('templates', 'robots.txt')
 
 
+# === Offline fallback pro PWA ===
+@app.route('/offline')
+def offline_page():
+    return render_template('offline.html')
+
+
 # === BEFORE_REQUEST: doména, secure, redirect, refresh ===
 @app.before_request
 def handle_domain_and_session():
@@ -188,11 +200,18 @@ def handle_domain_and_session():
         print(
             f"[before_request] host={host} path={request.path} method={request.method} session_keys={list(session.keys())} sid={request.cookies.get(cookie_name)}")
 
+    # Privátní IP rozsahy pro lokální síť (mobil -> PC)
+    def _is_private_ip(h):
+        return any(h.startswith(prefix) for prefix in (
+            '192.168.', '10.', '172.16.', '172.17.', '172.18.', '172.19.', '172.20.', '172.21.', '172.22.', '172.23.',
+            '172.24.', '172.25.', '172.26.', '172.27.', '172.28.', '172.29.', '172.30.', '172.31.'))
+
     # Dynamicky přenastav cookie parametry – musí být stabilní pro daný host (www i root přesměrujeme na www)
     if host.endswith('knowix.cz'):
         app.config['SESSION_COOKIE_DOMAIN'] = '.knowix.cz'
         app.config['SESSION_COOKIE_SECURE'] = True
-    elif host in ('localhost', '127.0.0.1'):
+    elif host in ('localhost', '127.0.0.1') or _is_private_ip(host):
+        # Povolit nezabezpečené cookie pro lokální IP (HTTP přístup z mobilu)
         app.config['SESSION_COOKIE_DOMAIN'] = None
         app.config['SESSION_COOKIE_SECURE'] = False
     else:
@@ -356,7 +375,7 @@ def add_security_headers(response):
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.quilljs.com https://cdnjs.cloudflare.com; "
         "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
         "img-src 'self' data: https: blob: https://www.google-analytics.com https://ssl.google-analytics.com https://www.googletagmanager.com https://stats.g.doubleclick.net; "
-        "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com; "
+        "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com https://fonts.googleapis.com https://fonts.gstatic.com; "
         "frame-src https://open.spotify.com https://*.spotify.com https://www.youtube-nocookie.com https://www.youtube.com https://*.youtube.com; "
         "media-src 'self' blob:; "
         "object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests;"
@@ -373,6 +392,16 @@ def add_security_headers(response):
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
     return response
+
+
+# === Static SW na root cestě kvůli scope ===
+@app.route('/service-worker.js')
+def service_worker_file():
+    resp = send_from_directory('static', 'service-worker.js')
+    # Zajistí root scope bez chyb
+    resp.headers['Service-Worker-Allowed'] = '/'
+    resp.headers['Cache-Control'] = 'no-cache'
+    return resp
 
 
 # app.run(port=5000, debug=True)

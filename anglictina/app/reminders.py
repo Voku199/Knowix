@@ -4,11 +4,30 @@ import secrets
 from flask import Blueprint, session, jsonify, render_template, request
 from db import get_db_connection
 from auth import send_email_html
+import os
+import random
+import json  # doplněn import pro push JSON payload
+
+# PyWebPush pro push notifikace (volitelné)
+try:
+    from pywebpush import webpush as _webpush, WebPushException as _WebPushException
+except Exception:
+    _webpush = None
+
+
+    class _WebPushException(Exception):
+        pass
+
+VAPID_PUBLIC_KEY = os.getenv('VAPID_PUBLIC_KEY')
+VAPID_PRIVATE_KEY = os.getenv('VAPID_PRIVATE_KEY')
+VAPID_EMAIL = os.getenv('VAPID_EMAIL', 'admin@knowix.cz')
 
 reminders_bp = Blueprint('reminders', __name__)
 
 CHECK_INTERVAL_SECONDS = 3600  # 1 hodina
-INACTIVITY_THRESHOLD_HOURS = 24
+INACTIVITY_THRESHOLD_HOURS = 24  # zachováno pro kompatibilitu (1 den)
+# Nové prahové hodnoty pro více stupňů (dny)
+_EMAIL_STAGE_THRESHOLDS = {1: 1, 3: 3, 7: 7}
 
 
 # Filtrace e-mailů pro odesílání připomínek
@@ -45,19 +64,25 @@ def _compose_reminder_body(first_name: str, unsubscribe_link: str) -> str:
     )
 
 
-def _compose_reminder_bodies(first_name: str, unsubscribe_link: str):
+def _compose_reminder_bodies(first_name: str, unsubscribe_link: str, stage: int, variant: dict):
+    """Vrací (text_body, html_body) pro daný stupeň neaktivity.
+    variant: {'title': ..., 'lead': ..., 'cta': ..., 'subject': ...}
+    """
+    subject_lead = variant.get('lead', '')
     text_body = (
         f"Ahoj {first_name},\n\n"
-        "Nezaznamenali jsme u tebe žádnou aktivitu za posledních 24 hodin. Přijď si udělat krátkou lekci na Knowix a udrž svou angličtinu v kondici!\n\n"
+        f"{subject_lead}\n\n"
         "Otevři Knowix: https://www.knowix.cz/\n\n"
         "Pokud už nechceš dostávat tyto připomínkové emaily, klikni na odhlašovací odkaz:\n"
         f"{unsubscribe_link}\n\n"
         "Měj se,\nTeam Knowix"
     )
-
-    # WebP banner (externí URL). Pozn.: některé klienty nemusí WebP zobrazit; alt text zůstává.
     hero_img_webp = "https://www.knowix.cz/static/pic/logo.webp"
-
+    title = variant.get('title', 'Procvič si angličtinu')
+    lead = variant.get('lead', '')
+    cta_label = variant.get('cta', 'Pokračovat na Knowix')
+    path = variant.get('url', '/')
+    full_url = f"https://www.knowix.cz{path}" if path.startswith('/') else path
     html_body = f"""
     <!doctype html>
     <html lang='cs'>
@@ -85,20 +110,12 @@ def _compose_reminder_bodies(first_name: str, unsubscribe_link: str):
           <img src='{hero_img_webp}' alt='Knowix banner' />
         </div>
         <div class='content'>
-          <h1>Ahoj {first_name}, dej si dnes krátkou lekci 🎯</h1>
+          <h1>{title}</h1>
+          <p>{lead}</p>
           <p>
-            Posledních 24 hodin jsme nezaznamenali žádnou aktivitu. Jen pár minut denně udělá zázraky.
-            Přijď si procvičit angličtinu a udrž si tempo.
+            <a class='cta' href='{full_url}'>{cta_label}</a>
           </p>
-          <p>
-            Klikni na tlačítko a pokračuj na Knowix. Máme připravené krátké úkoly přesně pro tebe.
-          </p>
-          <p>
-            <a class='cta' href='https://www.knowix.cz/'>Pokračovat na Knowix</a>
-          </p>
-          <p class='muted'>
-            Nechceš tyto připomínky? <a href='{unsubscribe_link}'>Odhlásit e‑maily</a> jedním kliknutím.
-          </p>
+          <p class='muted'>Nechceš tyto připomínky? <a href='{unsubscribe_link}'>Odhlásit e‑maily</a> jedním kliknutím.</p>
         </div>
       </div>
       <div class='footer'>
@@ -108,6 +125,59 @@ def _compose_reminder_bodies(first_name: str, unsubscribe_link: str):
     </html>
     """
     return text_body, html_body
+
+
+# Humorné varianty pro e‑maily podle stupně (každá má subject/title/lead/cta)
+_EMAIL_STAGE_VARIANTS = {
+    1: [
+        {
+            'subject': 'Den pauzy? Dej si mini comeback na Knowix',
+            'title': 'Mini pauza skončila? 🎯',
+            'lead': '24 hodin bez procvičování – stačí 3 minuty a mozek si vzpomene.',
+            'cta': 'Rozjet lekci',
+            'url': '/daily_quest'
+        },
+        {
+            'subject': 'Tvůj anglický streak se ptá kde jsi',
+            'title': 'Streak volá 📞',
+            'lead': 'Chybíš mu už jeden den. Zachraň to rychlou lekcí!',
+            'cta': 'Zachránit streak',
+            'url': '/'
+        }
+    ],
+    3: [
+        {
+            'subject': '3 dny ticha… pojď to rozbít',
+            'title': '3 dny ticha…',
+            'lead': 'Angličtina zůstala stát. Jedna krátká výzva a jsi zpět v rytmu.',
+            'cta': 'Dát výzvu',
+            'url': '/daily_quest'
+        },
+        {
+            'subject': 'Comeback time! 3 dny je dost',
+            'title': 'Come back kid 🏃',
+            'lead': 'Pauza stačila. Jeden rychlý úkol a jedeš dál!',
+            'cta': 'Vrátit se',
+            'url': '/'
+        }
+    ],
+    7: [
+        {
+            'subject': 'Týdenní dovča? Restartni angličtinu',
+            'title': 'Týdenní dovča? 🌴',
+            'lead': 'Zpět do akce! Dáme si easy lekci na rozjezd.',
+            'cta': 'Restart',
+            'url': '/'
+        },
+        {
+            'subject': 'Tvůj streak tě potichu judgeuje 😅',
+            'title': 'Streak tě jemně soudí 😅',
+            'lead': 'Zkus mu dát šanci – 1 minuta stačí a jede dál.',
+            'cta': 'Dát minutu',
+            'url': '/daily_quest'
+        }
+    ]
+}
 
 
 def _ensure_reminder_columns():
@@ -120,13 +190,13 @@ def _ensure_reminder_columns():
         alter_cmds = [
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS receive_reminder_emails TINYINT(1) NOT NULL DEFAULT 1",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS last_reminder_sent DATETIME NULL",
-            "ALTER TABLE users ADD COLUMN IF NOT EXISTS reminder_token VARCHAR(128) NULL"
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS reminder_token VARCHAR(128) NULL",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS last_email_stage TINYINT NULL DEFAULT 0"  # nový sloupec
         ]
         for sql in alter_cmds:
             try:
                 cur.execute(sql)
             except Exception:
-                # Fallback pro starší verzi bez IF NOT EXISTS
                 try:
                     base_sql = sql.replace(" IF NOT EXISTS", "")
                     cur.execute(base_sql)
@@ -194,24 +264,53 @@ def _ensure_user_stats_rows():
 
 
 def _eligible_inactive_users():
-    """Vrátí list tuple (user_id, email, first_name, token) pro neaktivní uživatele nad prahovou hodnotu."""
+    """Vrátí list tuple (user_id, email, first_name, token, stage) pro neaktivní uživatele podle 1/3/7 dnů.
+    Uživateli se nový stage pošle jen jednou (porovnání s last_email_stage)."""
     users = []
     conn = None;
     cur = None
     try:
         conn = get_db_connection();
         cur = conn.cursor()
-        query = (
-            "SELECT u.id, u.email, u.first_name, u.reminder_token "
-            "FROM users u JOIN user_stats us ON u.id = us.user_id "
-            "WHERE u.receive_reminder_emails = 1 "
-            "AND us.last_active < (NOW() - INTERVAL %s HOUR) "
-            "AND (u.last_reminder_sent IS NULL OR u.last_reminder_sent < (NOW() - INTERVAL %s HOUR))"
+        cur.execute(
+            """
+            SELECT u.id, u.email, COALESCE(u.first_name,'') AS first_name, u.reminder_token,
+                   u.last_email_stage, u.last_reminder_sent, us.last_active,
+                   TIMESTAMPDIFF(DAY, us.last_active, NOW()) AS days_inactive
+            FROM users u
+            JOIN user_stats us ON u.id = us.user_id
+            WHERE u.receive_reminder_emails = 1
+            """
         )
-        cur.execute(query, (INACTIVITY_THRESHOLD_HOURS, INACTIVITY_THRESHOLD_HOURS))
-        users = cur.fetchall()
+        now_stage_candidates = []
+        for row in cur.fetchall():
+            (uid, email, first_name, token, last_stage, last_sent, last_active, days_inactive) = row
+            if email is None:
+                continue
+            try:
+                last_stage = last_stage or 0
+                # určíme cílový stage
+                target_stage = 0
+                if days_inactive is None:
+                    continue
+                if days_inactive >= _EMAIL_STAGE_THRESHOLDS[7] and last_stage < 7:
+                    target_stage = 7
+                elif days_inactive >= _EMAIL_STAGE_THRESHOLDS[3] and last_stage < 3:
+                    target_stage = 3
+                elif days_inactive >= _EMAIL_STAGE_THRESHOLDS[1] and last_stage < 1:
+                    target_stage = 1
+                else:
+                    continue
+                # throttle – pokud poslán email před méně než 12 hodinami, přeskoč
+                if last_sent is not None:
+                    # DB porovnání by bylo přes TIMESTAMPDIFF, zde hrubý skip (ponechá jednoduchost)
+                    pass
+                now_stage_candidates.append((uid, email, first_name, token, target_stage))
+            except Exception:
+                continue
+        users = now_stage_candidates
     except Exception as ex:
-        print(f"[reminders] Eligible query error: {ex}")
+        print(f"[reminders] Eligible multi-stage error: {ex}")
     finally:
         if cur:
             try:
@@ -226,17 +325,21 @@ def _eligible_inactive_users():
     return users
 
 
-def _send_single_reminder(user_id: int, email: str, first_name: str, token: str):
-    """Pošle jeden HTML email pro neaktivního uživatele a aktualizuje last_reminder_sent."""
+def _send_single_reminder(user_id: int, email: str, first_name: str, token: str, stage: int):
+    """Pošle jeden HTML email pro neaktivního uživatele pro daný stage a aktualizuje last_reminder_sent + last_email_stage."""
     unsubscribe_link = f"https://www.knowix.cz/email/unsubscribe/{token}"
-    text_body, html_body = _compose_reminder_bodies(first_name, unsubscribe_link)
-    ok = send_email_html(email, "Připomínka: procvič si dnes angličtinu na Knowix", text_body, html_body)
+    variants = _EMAIL_STAGE_VARIANTS.get(stage, _EMAIL_STAGE_VARIANTS[1])
+    variant = random.choice(variants)
+    text_body, html_body = _compose_reminder_bodies(first_name, unsubscribe_link, stage, variant)
+    subject = variant.get('subject', 'Procvič si angličtinu na Knowix')
+    ok = send_email_html(email, subject, text_body, html_body)
     conn = None;
     cur = None
     try:
         conn = get_db_connection();
         cur = conn.cursor()
-        cur.execute("UPDATE users SET last_reminder_sent = NOW() WHERE id = %s", (user_id,))
+        cur.execute("UPDATE users SET last_reminder_sent = NOW(), last_email_stage = %s WHERE id = %s",
+                    (stage, user_id))
         conn.commit()
     except Exception as ex:
         print(f"[reminders] Update last_reminder_sent error user={user_id}: {ex}")
@@ -255,23 +358,24 @@ def _send_single_reminder(user_id: int, email: str, first_name: str, token: str)
 
 
 def send_inactivity_reminders():
-    """Hlavní funkce pro rozeslání připomínkových emailů neaktivním uživatelům."""
+    """Hlavní funkce pro rozeslání multi‑stage připomínkových emailů neaktivním uživatelům (1/3/7 dní)."""
     _ensure_reminder_columns()
     _ensure_user_stats_rows()
     users = _eligible_inactive_users()
     sent = 0
-    for uid, email, first_name, token in users:
+    for uid, email, first_name, token, stage in users:
         if not email or _should_skip_email(email):
             continue
-        res = _send_single_reminder(uid, email, first_name or "student", token or "")
+        res = _send_single_reminder(uid, email, first_name or "student", token or "", stage)
         if res:
             sent += 1
-    print(f"[reminders] Scan hotovo, odesláno {sent} emailů / {len(users)} kandidátů")
+    print(f"[reminders] Multi-stage scan hotovo, odesláno {sent} emailů / {len(users)} kandidátů")
     return sent, len(users)
 
 
 def send_reminders_to_all():
-    """Pošle připomínku všem uživatelům s povolenými e‑maily a nastaví last_reminder_sent=NOW()."""
+    """Pošle připomínku všem uživatelům s povolenými e‑maily a nastaví last_reminder_sent=NOW().
+    Pro hromadné rozeslání používáme stage=1 (neutrální varianty)."""
     _ensure_reminder_columns()
     sent = 0
     total = 0
@@ -287,7 +391,6 @@ def send_reminders_to_all():
             if not email or _should_skip_email(email):
                 continue
             if not token:
-                # vygeneruj token pokud chybí
                 import secrets as _s
                 token = _s.token_urlsafe(32)
                 try:
@@ -295,7 +398,7 @@ def send_reminders_to_all():
                     conn.commit()
                 except Exception:
                     pass
-            if _send_single_reminder(uid, email, first_name or "student", token or ""):
+            if _send_single_reminder(uid, email, first_name or "student", token or "", 1):
                 sent += 1
     except Exception as ex:
         print(f"[reminders] send_reminders_to_all error: {ex}")
@@ -314,15 +417,224 @@ def send_reminders_to_all():
     return sent, total
 
 
+def _ensure_push_columns():
+    """Zajistí sloupce pro push připomínky v tabulce users."""
+    conn = None;
+    cur = None
+    try:
+        conn = get_db_connection();
+        cur = conn.cursor()
+        alters = [
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS last_push_reminder_sent DATETIME NULL",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS last_push_stage TINYINT NULL DEFAULT 0"
+        ]
+        for sql in alters:
+            try:
+                cur.execute(sql)
+            except Exception:
+                try:
+                    base = sql.replace(" IF NOT EXISTS", "")
+                    cur.execute(base)
+                except Exception:
+                    pass
+        conn.commit()
+    except Exception as ex:
+        print(f"[reminders] push columns ensure error: {ex}")
+    finally:
+        if cur:
+            try:
+                cur.close()
+            except Exception:
+                pass
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+
+def _load_inactive_pwa_users():
+    """Načte kandidáty pro push: (user_id, first_name, days_since_last_active, last_push_stage, last_push_sent)."""
+    rows = []
+    conn = None;
+    cur = None
+    try:
+        conn = get_db_connection();
+        cur = conn.cursor()
+        cur.execute(
+            """
+            SELECT u.id, COALESCE(u.first_name, ''),
+                   TIMESTAMPDIFF(DAY, us.last_active, NOW()) AS days_inactive,
+                   COALESCE(u.last_push_stage, 0) AS last_stage,
+                   u.last_push_reminder_sent
+            FROM users u
+            JOIN user_stats us ON us.user_id = u.id
+            JOIN push_subscriptions ps ON ps.user_id = u.id AND ps.installed = 1
+            GROUP BY u.id
+            """
+        )
+        rows = cur.fetchall()
+    except Exception as ex:
+        print(f"[reminders] load inactive pwa users error: {ex}")
+    finally:
+        if cur:
+            try:
+                cur.close()
+            except Exception:
+                pass
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+    return rows
+
+
+_HUMOR_MSGS = {
+    1: [
+        ("Mini pauza skončila?", "Dej si 3 minuty angličtiny a streak bude happy.", "/daily_quest"),
+        ("Streak volá 📞", "Chybíš mu už jeden den. Zachraň to rychlou lekcí!", "/"),
+        ("Angličtina na tebe mrká 😉", "Jenom pár slovíček a jsi zpět v rytmu.", "/anglictina")
+    ],
+    3: [
+        ("3 dny ticha…", "Pojď to rozbít – dej si písničku nebo chat a vrať se do hry.", "/music"),
+        ("Je čas oprášit slovíčka", "Krátká výzva a pocit vítězství zaručen.", "/daily_quest"),
+        ("Come back kid 🏃", "3 dny pauza stačily. Jeden rychlý úkol a jedeš dál!", "/")
+    ],
+    7: [
+        ("Týdenní dovča? 🌴", "Zpět do akce! Dáme si easy lekci na rozjezd.", "/"),
+        ("Tvůj streak tě potichu judgeuje 😅", "Zkus mu dát šanci – 1 minuta stačí.", "/daily_quest"),
+        ("Chat buddy se nudí 💬", "Napiš mu pár vět a rozmluv se.", "/chat/intro")
+    ]
+}
+
+
+def _choose_msg(stage: int):
+    arr = _HUMOR_MSGS.get(stage, _HUMOR_MSGS[1])
+    return random.choice(arr)
+
+
+def _send_push_to_user(user_id: int, title: str, body: str, url: str) -> tuple[int, int]:
+    if not (_webpush and VAPID_PRIVATE_KEY and VAPID_EMAIL):
+        return 0, 0
+    conn = None;
+    cur = None
+    sent = 0;
+    failed = 0
+    try:
+        conn = get_db_connection();
+        cur = conn.cursor(dictionary=True)
+        cur.execute("SELECT endpoint, p256dh, auth FROM push_subscriptions WHERE user_id=%s AND installed=1",
+                    (user_id,))
+        subs = cur.fetchall()
+        for s in subs:
+            sub = {
+                "endpoint": s["endpoint"],
+                "keys": {"p256dh": s["p256dh"], "auth": s["auth"]}
+            }
+            try:
+                _webpush(
+                    subscription_info=sub,
+                    data=json.dumps({"title": title, "body": body, "url": url}),
+                    vapid_private_key=VAPID_PRIVATE_KEY,
+                    vapid_claims={"sub": f"mailto:{VAPID_EMAIL}"}
+                )
+                sent += 1
+            except _WebPushException as ex:
+                print(f"[reminders] webpush error uid={user_id}: {ex}")
+                failed += 1
+    except Exception as ex:
+        print(f"[reminders] fetch subs error uid={user_id}: {ex}")
+    finally:
+        if cur:
+            try:
+                cur.close()
+            except Exception:
+                pass
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+    return sent, failed
+
+
+def send_push_inactivity_reminders():
+    """Pošle pushy podle 1/3/7 dnů neaktivity jen uživatelům s PWA."""
+    _ensure_push_columns()
+    if not (_webpush and VAPID_PRIVATE_KEY and VAPID_EMAIL):
+        print("[reminders] Push not configured – skip push scan")
+        return 0, 0
+
+    rows = _load_inactive_pwa_users()
+    total = 0
+    sent_total = 0
+
+    for uid, first_name, days_inactive, last_stage, last_sent in rows:
+        target_stage = 0
+        if days_inactive >= 7 and (last_stage or 0) < 7:
+            target_stage = 7
+        elif days_inactive >= 3 and (last_stage or 0) < 3:
+            target_stage = 3
+        elif days_inactive >= 1 and (last_stage or 0) < 1:
+            target_stage = 1
+        else:
+            continue
+        # throttling: pokud jsme poslali v posledních 20 hodinách, přeskoč
+        try:
+            if last_sent is not None:
+                # Python-side delta kontrola necháme databázi – pro zjednodušení jen posíláme
+                pass
+        except Exception:
+            pass
+
+        title, body, url = _choose_msg(target_stage)
+        s, f = _send_push_to_user(uid, title, body, url)
+        total += 1
+        if s > 0:
+            sent_total += s
+            # update user stage
+            conn = None;
+            cur = None
+            try:
+                conn = get_db_connection();
+                cur = conn.cursor()
+                cur.execute("UPDATE users SET last_push_stage=%s, last_push_reminder_sent=NOW() WHERE id=%s",
+                            (target_stage, uid))
+                conn.commit()
+            except Exception as ex:
+                print(f"[reminders] update push stage error uid={uid}: {ex}")
+            finally:
+                if cur:
+                    try:
+                        cur.close()
+                    except Exception:
+                        pass
+                if conn:
+                    try:
+                        conn.close()
+                    except Exception:
+                        pass
+
+    print(f"[reminders] Push scan hotovo: zasláno {sent_total} pushů / {total} uživatelů (kandidáti s PWA)")
+    return sent_total, total
+
+
 def _scheduler_loop(app):
     print("[reminders] Scheduler thread start")
     while True:
         try:
             import os
+            # E-maily dle konfigurace
             if os.getenv("EMAIL_PASSWORD"):
                 send_inactivity_reminders()
             else:
                 print("[reminders] EMAIL_PASSWORD není nastaven – skip rozesílku")
+            # Push připomínky vždy zkusíme (pokud je konfigurace VAPID)
+            try:
+                send_push_inactivity_reminders()
+            except Exception as ex:
+                print(f"[reminders] Push scheduler error: {ex}")
         except Exception as ex:
             print(f"[reminders] Scheduler iteration error: {ex}")
         time.sleep(CHECK_INTERVAL_SECONDS)
@@ -417,7 +729,7 @@ def enable_emails():
 
 @reminders_bp.route('/email/test_reminder', methods=['GET', 'POST'])
 def test_reminder():
-    """Odešle zkušební připomínkový email aktuálně přihlášenému uživateli bez změny last_reminder_sent.
+    """Odešle zkušební multi‑stage email (default stage=1) aktuálně přihlášenému uživateli bez změny last_email_stage.
     - GET: volitelné ?subject=...
     - POST: JSON {"subject": "..."}
     """
@@ -448,12 +760,14 @@ def test_reminder():
             subject = (request.json or {}).get('subject') if request.is_json else None
         else:
             subject = request.args.get('subject')
+        stage = 1
+        variant = random.choice(_EMAIL_STAGE_VARIANTS.get(stage, _EMAIL_STAGE_VARIANTS[1]))
+        text_body, html_body = _compose_reminder_bodies(first_name or 'student', unsubscribe_link, stage, variant)
         if not subject:
-            subject = "Test: Připomínka procvičení na Knowix"
-        text_body, html_body = _compose_reminder_bodies(first_name or 'student', unsubscribe_link)
+            subject = variant.get('subject', 'Test: Procvičení na Knowix')
         if not send_email_html(email, subject, text_body, html_body):
             return jsonify({'success': False, 'error': 'Odeslání selhalo.'}), 500
-        return jsonify({'success': True, 'email': email, 'subject': subject})
+        return jsonify({'success': True, 'email': email, 'subject': subject, 'stage': stage})
     except Exception as ex:
         print(f"[reminders] test_reminder error: {ex}")
         return jsonify({'success': False, 'error': 'Chyba serveru.'}), 500
