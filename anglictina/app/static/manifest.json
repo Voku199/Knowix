@@ -1,4 +1,5 @@
 {
+  "id": "cz.knowix.app",
   "name": "Knowix – Výuka angličtiny",
   "short_name": "Knowix",
   "description": "Procvičuj angličtinu pomocí písniček, chatů a testů. Offline základní režim.",
@@ -6,6 +7,10 @@
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
+  "display_override": [
+    "standalone",
+    "fullscreen"
+  ],
   "background_color": "#0d1117",
   "theme_color": "#0d1117",
   "orientation": "portrait-primary",
@@ -14,6 +19,18 @@
     "productivity"
   ],
   "icons": [
+    {
+      "src": "/static/pic/logo1.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/pic/logo1.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/static/pic/logo.webp",
       "sizes": "192x192",
@@ -32,6 +49,32 @@
       "sizes": "1200x630",
       "label": "Úvodní stránka"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Lekce",
+      "short_name": "Lekce",
+      "url": "/anglictina",
+      "icons": [
+        {
+          "src": "/static/pic/logo1.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Testy",
+      "short_name": "Testy",
+      "url": "/test",
+      "icons": [
+        {
+          "src": "/static/pic/logo1.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false
 }
-
