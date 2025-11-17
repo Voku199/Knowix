@@ -441,6 +441,9 @@ def send_notification_alias_root():
 
 
 # app.run(port=5000, debug=True, host='0.0.0.0')
+# from waitress import serve
+
+# serve(app, host='0.0.0.0', port=8080, threads=24, backlog=100)
 
 # === Spuštění aplikace ===
 from waitress import serve

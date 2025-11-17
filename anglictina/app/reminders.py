@@ -494,17 +494,21 @@ _HUMOR_MSGS = {
     1: [
         ("Mini pauza skončila?", "Dej si 3 minuty angličtiny a streak bude happy.", "/daily_quest"),
         ("Streak volá 📞", "Chybíš mu už jeden den. Zachraň to rychlou lekcí!", "/"),
-        ("Angličtina na tebe mrká 😉", "Jenom pár slovíček a jsi zpět v rytmu.", "/anglictina")
+        ("Angličtina na tebe mrká 😉", "Jenom pár slovíček a jsi zpět v rytmu.", "/anglictina"),
+        ("Mikro lekce?", "Dáš 5 odpovědí a máš hotovo. Easy win!", "/"),
+        ("Rychlý restart 🚀", "Jedna písnička a mozek se chytne.", "/song-selection")
     ],
     3: [
         ("3 dny ticha…", "Pojď to rozbít – dej si písničku nebo chat a vrať se do hry.", "/music"),
         ("Je čas oprášit slovíčka", "Krátká výzva a pocit vítězství zaručen.", "/daily_quest"),
-        ("Come back kid 🏃", "3 dny pauza stačily. Jeden rychlý úkol a jedeš dál!", "/")
+        ("Come back kid 🏃", "3 dny pauza stačily. Jeden rychlý úkol a jedeš dál!", "/"),
+        ("Nechceš přijít o formu?", "Dej 2 minuty – stačí. Zbytek přijde sám.", "/")
     ],
     7: [
         ("Týdenní dovča? 🌴", "Zpět do akce! Dáme si easy lekci na rozjezd.", "/"),
         ("Tvůj streak tě potichu judgeuje 😅", "Zkus mu dát šanci – 1 minuta stačí.", "/daily_quest"),
-        ("Chat buddy se nudí 💬", "Napiš mu pár vět a rozmluv se.", "/chat/intro")
+        ("Chat buddy se nudí 💬", "Napiš mu pár vět a rozmluv se.", "/ai/chats"),
+        ("Comeback level: legenda", "Začni zlehka – jedno cvičení a jsi zpět.", "/")
     ]
 }
 
@@ -699,8 +703,8 @@ def _nudge_hours_for_push():
 
 
 def _nudge_hours_for_email():
-    # 2 sloty pro 1–2 e‑maily denně
-    return [10, 18]
+    # 2 sloty pro 1–2 e‑maily denně (8:00 a 20:00)
+    return [8, 20]
 
 
 def _load_email_nudge_candidates(max_days_inactive: int = 30):
@@ -820,15 +824,11 @@ def send_daily_email_nudges():
     candidates = _load_email_nudge_candidates()
     total = 0;
     sent = 0
-    # Limit: max ~200 mailů na slot pro ochranu – lze upravit
     MAX_BATCH = 200
     for uid, email, first_name, last_active, days_inactive, sends_today, last_day in candidates:
         if _should_skip_email(email):
             continue
         if sends_today is not None and sends_today >= 2:
-            continue
-        # náhodná 50% šance, aby rozesílka nebyla vždy všem ve slotu 2/den
-        if sends_today == 1 and random.random() < 0.5:
             continue
         if total >= MAX_BATCH:
             break
@@ -918,25 +918,51 @@ def send_daily_push_nudges():
     _ensure_daily_quota_columns()
     _reset_daily_quotas_if_needed()
     hour_now = int(time.strftime('%H'))
-    if hour_now not in _nudge_hours_for_push():
+    slots = _nudge_hours_for_push()
+    if hour_now not in slots:
         return 0, 0
     candidates = _load_push_nudge_candidates()
     total = 0;
     sent = 0
-    # rozumné limity na dávku pro ochranu (push jsou levné, ale ať to nejde ve špičce moc naráz)
     MAX_BATCH = 500
     for uid, first_name, last_active, hours_inactive, pushes_today in candidates:
         if pushes_today is not None and pushes_today >= 5:
             continue
-        # Lehký random, aby někteří dostali méně (2–5 denně): pravděpodobnost klesá s počtem už poslaných
-        prob = 0.9 if pushes_today == 0 else (0.7 if pushes_today == 1 else (0.5 if pushes_today == 2 else 0.3))
-        if random.random() > prob:
+        constProb = 0.9 if pushes_today == 0 else (0.7 if pushes_today == 1 else (0.5 if pushes_today == 2 else 0.3))
+        if random.random() > constProb:
             continue
         if total >= MAX_BATCH:
             break
         if _send_push_nudge(uid, first_name):
             sent += 1
         total += 1
+
+    # Doplňovací kolo v posledním slotu – garantuj min. 2 pushy/den
+    try:
+        if hour_now == slots[-1]:
+            topped_total = 0
+            for uid, first_name, last_active, hours_inactive, pushes_today in candidates:
+                if pushes_today is None:
+                    pushes_today = 0
+                if pushes_today >= 2:
+                    continue
+                if hours_inactive < 6:
+                    continue
+                # Pošli tolik, kolik chybí do 2 (typicky 1 nebo 2)
+                missing = 2 - pushes_today
+                for _ in range(missing):
+                    if topped_total >= MAX_BATCH:
+                        break
+                    if _send_push_nudge(uid, first_name):
+                        sent += 1
+                        topped_total += 1
+                    else:
+                        break
+                if topped_total >= MAX_BATCH:
+                    break
+    except Exception as ex:
+        print(f"[reminders] Push top-up error: {ex}")
+
     print(f"[reminders] Push nudges: sent {sent}/{total} in hour {hour_now}")
     return sent, total
 
