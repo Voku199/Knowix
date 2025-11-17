@@ -14,8 +14,15 @@
     <!-- PWA manifest & theme -->
     <link rel="manifest" href="/static/manifest.json">
     <meta name="theme-color" content="#0d1117">
+    <!-- iOS PWA podpora -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Knowix">
+    <link rel="apple-touch-icon" href="/static/pic/logo1.png">
     <!-- CSRF token pro JS -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- Předej user_id do JS -->
+    <meta name="user-id" content="{{ session.get('user_id') or '' }}">
 
     <link rel="canonical" href="https://www.knowix.cz">
 
@@ -140,6 +147,19 @@
                     <span class="icon">🔔</span><span class="label">Notifikace</span>
                 </button>
             </li>
+            {% if session.user_id == 1 %}
+            <li>
+    <button id="test-push" title="Test push notifikací" style="background:none;border:1px solid #444;border-radius:6px;cursor:pointer;padding:4px 8px;color:inherit;font-size:12px;">
+        Test Push
+    </button>
+</li>
+
+<li>
+    <a href="/push/admin/subscriptions" title="Push Admin" style="color: #ff4444; font-weight: bold;">
+        🔧 Push Admin
+    </a>
+</li>
+{% endif %}
             <li>
                 <button id="install-app" data-type="pwa" aria-label="Instalovat aplikaci" title="Instalovat aplikaci" class="pwa-action-btn" style="display:none;">
                     <span class="icon">⬇️</span><span class="label">Instalovat</span>
@@ -198,6 +218,30 @@
     </p>
 </footer>
 <script src="/static/js/pwa.js"></script>
+<script>
+// Diagnostika push notifikací
+document.getElementById('test-push')?.addEventListener('click', async function() {
+    try {
+        const response = await fetch('/push/test-send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            },
+            body: JSON.stringify({
+                title: 'Test Knowix',
+                body: 'Pokud vidíš tuto zprávu, push notifikace fungují! 🎉',
+                url: '/'
+            })
+        });
+
+        const result = await response.json();
+        alert('Test výsledek:\n' + JSON.stringify(result, null, 2));
+    } catch (error) {
+        alert('Chyba testu: ' + error.message);
+    }
+});
+</script>
 <script>
 (function(){
   const btn = document.getElementById('test-notif');

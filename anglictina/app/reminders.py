@@ -620,6 +620,327 @@ def send_push_inactivity_reminders():
     return sent_total, total
 
 
+# === Denní kvóty a rozesílky (2–5 push / 1–2 e‑maily denně) ===
+
+def _ensure_daily_quota_columns():
+    conn = None;
+    cur = None
+    try:
+        conn = get_db_connection();
+        cur = conn.cursor()
+        alters = [
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS last_email_day DATE NULL",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS email_sends_today INT NOT NULL DEFAULT 0",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS last_push_day DATE NULL",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS push_sends_today INT NOT NULL DEFAULT 0"
+        ]
+        for sql in alters:
+            try:
+                cur.execute(sql)
+            except Exception:
+                try:
+                    cur.execute(sql.replace(" IF NOT EXISTS", ""))
+                except Exception:
+                    pass
+        conn.commit()
+    except Exception as ex:
+        print(f"[reminders] ensure daily quota cols error: {ex}")
+    finally:
+        if cur:
+            try:
+                cur.close()
+            except Exception:
+                pass
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+
+def _reset_daily_quotas_if_needed():
+    """Resetuje denní počitadla pro uživatele, kde se změnil den."""
+    conn = None;
+    cur = None
+    try:
+        conn = get_db_connection();
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE users SET last_email_day = CURRENT_DATE, email_sends_today = 0 WHERE last_email_day IS NULL OR last_email_day < CURRENT_DATE")
+        cur.execute(
+            "UPDATE users SET last_push_day = CURRENT_DATE, push_sends_today = 0 WHERE last_push_day IS NULL OR last_push_day < CURRENT_DATE")
+        conn.commit()
+    except Exception as ex:
+        print(f"[reminders] reset quotas error: {ex}")
+    finally:
+        if cur:
+            try:
+                cur.close()
+            except Exception:
+                pass
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+
+def _random_subset(seq, k):
+    if k <= 0:
+        return []
+    if len(seq) <= k:
+        return list(seq)
+    return random.sample(seq, k)
+
+
+def _nudge_hours_for_push():
+    # 5 slotů – pošleme max do počtu kvóty uživatele
+    return [10, 13, 16, 19, 21]
+
+
+def _nudge_hours_for_email():
+    # 2 sloty pro 1–2 e‑maily denně
+    return [10, 18]
+
+
+def _load_email_nudge_candidates(max_days_inactive: int = 30):
+    """Uživatelé s e‑mailem a zapnutými připomínkami, neaktivní aspoň 1 den."""
+    rows = []
+    conn = None;
+    cur = None
+    try:
+        conn = get_db_connection();
+        cur = conn.cursor()
+        cur.execute(
+            """
+            SELECT u.id, u.email, COALESCE(u.first_name,''), us.last_active,
+                   TIMESTAMPDIFF(DAY, us.last_active, NOW()) AS days_inactive,
+                   COALESCE(u.email_sends_today,0), u.last_email_day
+            FROM users u
+            JOIN user_stats us ON us.user_id = u.id
+            WHERE u.receive_reminder_emails = 1
+              AND us.last_active IS NOT NULL
+              AND TIMESTAMPDIFF(DAY, us.last_active, NOW()) >= 1
+              AND TIMESTAMPDIFF(DAY, us.last_active, NOW()) <= %s
+            """,
+            (max_days_inactive,)
+        )
+        rows = cur.fetchall()
+    except Exception as ex:
+        print(f"[reminders] load email nudge candidates error: {ex}")
+    finally:
+        if cur:
+            try:
+                cur.close()
+            except Exception:
+                pass
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+    return rows
+
+
+def _send_email_nudge(uid: int, email: str, first_name: str):
+    # Použije stage 1 varianty jako jemné připomenutí
+    # Získej nebo vytvoř a ulož reminder_token pro korektní unsubscribe odkaz
+    conn = None;
+    cur = None
+    token = None
+    try:
+        conn = get_db_connection();
+        cur = conn.cursor()
+        cur.execute("SELECT reminder_token FROM users WHERE id=%s", (uid,))
+        row = cur.fetchone()
+        if row and row[0]:
+            token = row[0]
+        else:
+            token = secrets.token_urlsafe(32)
+            try:
+                cur.execute("UPDATE users SET reminder_token=%s WHERE id=%s", (token, uid))
+                conn.commit()
+            except Exception:
+                pass
+    except Exception as ex:
+        print(f"[reminders] fetch/store token error uid={uid}: {ex}")
+    finally:
+        if cur:
+            try:
+                cur.close()
+            except Exception:
+                pass
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+    unsubscribe_link = f"https://www.knowix.cz/email/unsubscribe/{token or secrets.token_urlsafe(16)}"
+    variant = random.choice(_EMAIL_STAGE_VARIANTS.get(1))
+    text_body, html_body = _compose_reminder_bodies(first_name or 'student', unsubscribe_link, 1, variant)
+    subject = variant.get('subject', 'Procvič si angličtinu na Knowix')
+    ok = send_email_html(email, subject, text_body, html_body)
+    if not ok:
+        return False
+    conn = None;
+    cur = None
+    try:
+        conn = get_db_connection();
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE users SET last_reminder_sent = NOW(), last_email_day = CURRENT_DATE, email_sends_today = COALESCE(email_sends_today,0) + 1 WHERE id=%s",
+            (uid,))
+        conn.commit()
+    except Exception as ex:
+        print(f"[reminders] update email nudge counters error uid={uid}: {ex}")
+    finally:
+        if cur:
+            try:
+                cur.close()
+            except Exception:
+                pass
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+    return True
+
+
+def send_daily_email_nudges():
+    """Pošle 1–2 e‑maily/den v časech dle _nudge_hours_for_email(), jen pokud není překročena kvóta."""
+    if not os.getenv("EMAIL_PASSWORD"):
+        return 0, 0
+    _ensure_reminder_columns()
+    _ensure_daily_quota_columns()
+    _reset_daily_quotas_if_needed()
+    hour_now = int(time.strftime('%H'))
+    if hour_now not in _nudge_hours_for_email():
+        return 0, 0
+    candidates = _load_email_nudge_candidates()
+    total = 0;
+    sent = 0
+    # Limit: max ~200 mailů na slot pro ochranu – lze upravit
+    MAX_BATCH = 200
+    for uid, email, first_name, last_active, days_inactive, sends_today, last_day in candidates:
+        if _should_skip_email(email):
+            continue
+        if sends_today is not None and sends_today >= 2:
+            continue
+        # náhodná 50% šance, aby rozesílka nebyla vždy všem ve slotu 2/den
+        if sends_today == 1 and random.random() < 0.5:
+            continue
+        if total >= MAX_BATCH:
+            break
+        if _send_email_nudge(uid, email, first_name):
+            sent += 1
+        total += 1
+    print(f"[reminders] Email nudges: sent {sent}/{total} in hour {hour_now}")
+    return sent, total
+
+
+def _load_push_nudge_candidates(max_days_inactive: int = 30):
+    rows = []
+    conn = None;
+    cur = None
+    try:
+        conn = get_db_connection();
+        cur = conn.cursor()
+        cur.execute(
+            """
+            SELECT u.id, COALESCE(u.first_name,''), us.last_active,
+                   TIMESTAMPDIFF(HOUR, us.last_active, NOW()) AS hours_inactive,
+                   COALESCE(u.push_sends_today,0)
+            FROM users u
+            JOIN user_stats us ON us.user_id = u.id
+            JOIN push_subscriptions ps ON ps.user_id = u.id AND ps.installed = 1
+            GROUP BY u.id
+            HAVING hours_inactive >= 6  -- pošleme jen těm, kdo byli min. 6h neaktivní
+               AND hours_inactive <= %s*24
+            """,
+            (max_days_inactive,)
+        )
+        rows = cur.fetchall()
+    except Exception as ex:
+        print(f"[reminders] load push nudge candidates error: {ex}")
+    finally:
+        if cur:
+            try:
+                cur.close()
+            except Exception:
+                pass
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+    return rows
+
+
+def _send_push_nudge(uid: int, first_name: str):
+    if not (_webpush and VAPID_PRIVATE_KEY and VAPID_EMAIL):
+        return False
+    # lehká variace textu
+    title, body, url = random.choice(_HUMOR_MSGS[1])
+    s, f = _send_push_to_user(uid, title, body, url)
+    if s <= 0:
+        return False
+    conn = None;
+    cur = None
+    try:
+        conn = get_db_connection();
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE users SET last_push_reminder_sent = NOW(), last_push_day = CURRENT_DATE, push_sends_today = COALESCE(push_sends_today,0) + 1 WHERE id=%s",
+            (uid,))
+        conn.commit()
+    except Exception as ex:
+        print(f"[reminders] update push nudge counters error uid={uid}: {ex}")
+    finally:
+        if cur:
+            try:
+                cur.close()
+            except Exception:
+                pass
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+    return True
+
+
+def send_daily_push_nudges():
+    """Pošle jemné pushy 2–5× denně podle slotů a kvót. Respektuje minimálně 6h neaktivitu a kvóty uživatele."""
+    if not (_webpush and VAPID_PRIVATE_KEY and VAPID_EMAIL):
+        return 0, 0
+    _ensure_push_columns()
+    _ensure_daily_quota_columns()
+    _reset_daily_quotas_if_needed()
+    hour_now = int(time.strftime('%H'))
+    if hour_now not in _nudge_hours_for_push():
+        return 0, 0
+    candidates = _load_push_nudge_candidates()
+    total = 0;
+    sent = 0
+    # rozumné limity na dávku pro ochranu (push jsou levné, ale ať to nejde ve špičce moc naráz)
+    MAX_BATCH = 500
+    for uid, first_name, last_active, hours_inactive, pushes_today in candidates:
+        if pushes_today is not None and pushes_today >= 5:
+            continue
+        # Lehký random, aby někteří dostali méně (2–5 denně): pravděpodobnost klesá s počtem už poslaných
+        prob = 0.9 if pushes_today == 0 else (0.7 if pushes_today == 1 else (0.5 if pushes_today == 2 else 0.3))
+        if random.random() > prob:
+            continue
+        if total >= MAX_BATCH:
+            break
+        if _send_push_nudge(uid, first_name):
+            sent += 1
+        total += 1
+    print(f"[reminders] Push nudges: sent {sent}/{total} in hour {hour_now}")
+    return sent, total
+
+
 def _scheduler_loop(app):
     print("[reminders] Scheduler thread start")
     while True:
@@ -628,6 +949,11 @@ def _scheduler_loop(app):
             # E-maily dle konfigurace
             if os.getenv("EMAIL_PASSWORD"):
                 send_inactivity_reminders()
+                # Denní jemné nudges 1–2x denně (10 a 18h)
+                try:
+                    send_daily_email_nudges()
+                except Exception as ex:
+                    print(f"[reminders] Email nudge error: {ex}")
             else:
                 print("[reminders] EMAIL_PASSWORD není nastaven – skip rozesílku")
             # Push připomínky vždy zkusíme (pokud je konfigurace VAPID)
@@ -635,6 +961,11 @@ def _scheduler_loop(app):
                 send_push_inactivity_reminders()
             except Exception as ex:
                 print(f"[reminders] Push scheduler error: {ex}")
+            # Denní jemné push nudges 2–5x denně (10,13,16,19,21)
+            try:
+                send_daily_push_nudges()
+            except Exception as ex:
+                print(f"[reminders] Push nudge error: {ex}")
         except Exception as ex:
             print(f"[reminders] Scheduler iteration error: {ex}")
         time.sleep(CHECK_INTERVAL_SECONDS)

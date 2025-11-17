@@ -1,265 +1,291 @@
-import os
+# -*- coding: utf-8 -*-
+"""
+PWA Web Push – Flask blueprint
+
+Poskytuje REST endpointy pro:
+- /push/vapid-public-key (GET) – vrací veřejný VAPID klíč
+- /push/subscribe (POST) – uloží/aktualizuje subscription do DB (tabulka push_subscriptions)
+- /push/unsubscribe (POST) – odhlásí subscription podle endpointu
+- /push/csrf-token (GET) – vrací CSRF token pro SW (pushsubscriptionchange)
+- /push/test-send (POST) – odeslání testovací notifikace uživateli (admin může všem)
+- /push/admin/subscriptions (GET) – jednoduchý přehled uložených subscriptions (jen admin)
+- /send_notification (POST) – alias pro testovací odeslání, aby vyhověl požadavku
+
+Pozn.: DB tabulka push_subscriptions musí existovat se sloupci:
+  id (PK, AUTO_INCREMENT), user_id (INT NULL), endpoint (TEXT/ VARCHAR UNIQUE), p256dh (TEXT), auth (TEXT),
+  created_at (DATETIME), installed (TINYINT(1)), last_seen (DATETIME)
+
+Závislosti: pywebpush, cryptography, mysql-connector-python
+"""
+from __future__ import annotations
+
 import json
-from flask import Blueprint, request, jsonify, session
+import os
+import datetime as dt
+from typing import Optional, Dict, Any, List
+
+from flask import Blueprint, request, jsonify, session, abort
+from pywebpush import webpush, WebPushException
+
 from db import get_db_connection
+from security_ext import _ensure_csrf_token
 
-try:
-    from pywebpush import webpush, WebPushException
-except ImportError:
-    webpush = None
-
-
-    class WebPushException(Exception):
-        pass
-
+# Blueprint s prefixem /push
 push_bp = Blueprint('push_bp', __name__, url_prefix='/push')
 
-VAPID_PUBLIC_KEY = os.getenv('VAPID_PUBLIC_KEY')
-VAPID_PRIVATE_KEY = os.getenv('VAPID_PRIVATE_KEY')
-VAPID_EMAIL = os.getenv('VAPID_EMAIL', 'admin@knowix.cz')
-
-TABLE_SQL = """
-CREATE TABLE IF NOT EXISTS push_subscriptions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NULL,
-    endpoint VARCHAR(500) NOT NULL UNIQUE,
-    p256dh VARCHAR(150) NOT NULL,
-    auth VARCHAR(150) NOT NULL,
-    installed TINYINT(1) NOT NULL DEFAULT 0,
-    last_seen TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-"""
-
-ALTERS = (
-    "ALTER TABLE push_subscriptions ADD COLUMN installed TINYINT(1) NOT NULL DEFAULT 0",
-    "ALTER TABLE push_subscriptions ADD COLUMN last_seen TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+# VAPID klíče – načti z env, jinak použij zadané defaulty (pro dev)
+VAPID_PUBLIC_KEY = os.getenv(
+    'VAPID_PUBLIC_KEY'
 )
+VAPID_PRIVATE_KEY = os.getenv(
+    'VAPID_PRIVATE_KEY'
+)
+VAPID_EMAIL = os.getenv('VAPID_EMAIL')
 
 
-def ensure_table():
+# --- Pomocné funkce ---
+
+def _now_utc() -> dt.datetime:
+    return dt.datetime.utcnow()
+
+
+def _json_ok(**extra):
+    d = {'ok': True}
+    d.update(extra)
+    return jsonify(d)
+
+
+def _json_err(msg: str, code: int = 400, **extra):
+    d = {'ok': False, 'error': msg}
+    d.update(extra)
+    return jsonify(d), code
+
+
+def _current_user_id() -> Optional[int]:
     try:
-        conn = get_db_connection();
-        cur = conn.cursor();
-        cur.execute(TABLE_SQL);
+        uid = session.get('user_id')
+        if uid is None:
+            return None
+        return int(uid)
+    except Exception:
+        return None
+
+
+def _upsert_subscription(user_id: Optional[int], sub: Dict[str, Any], installed: bool) -> None:
+    endpoint = sub.get('endpoint')
+    keys = (sub.get('keys') or {})
+    p256dh = keys.get('p256dh')
+    auth = keys.get('auth')
+    if not endpoint or not p256dh or not auth:
+        raise ValueError('Invalid subscription payload')
+
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
+        # Najdi existující subscription podle endpointu
+        cur.execute("SELECT id FROM push_subscriptions WHERE endpoint = %s", (endpoint,))
+        row = cur.fetchone()
+        if row:
+            cur.execute(
+                """
+                UPDATE push_subscriptions
+                SET user_id = %s, p256dh = %s, auth = %s, installed = %s, last_seen = %s
+                WHERE id = %s
+                """,
+                (user_id, p256dh, auth, 1 if installed else 0, _now_utc(), row['id'])
+            )
+        else:
+            cur.execute(
+                """
+                INSERT INTO push_subscriptions (user_id, endpoint, p256dh, auth, created_at, installed, last_seen)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """,
+                (user_id, endpoint, p256dh, auth, _now_utc(), 1 if installed else 0, _now_utc())
+            )
         conn.commit()
-        # pokusné altery (ignoruj, pokud již existují)
-        for sql in ALTERS:
-            try:
-                cur.execute(sql)
-                conn.commit()
-            except Exception:
-                pass
-        cur.close();
+    finally:
+        try:
+            cur.close()
+        except Exception:
+            pass
         conn.close()
-    except Exception as ex:
-        print(f'[push] TABLE ensure error: {ex}')
 
 
-ensure_table()
-
-
-@push_bp.get('/vapid-public-key')
-def vapid_public_key():
-    return jsonify({'publicKey': VAPID_PUBLIC_KEY or ''})
-
-
-@push_bp.post('/subscribe')
-def subscribe():
-    # Uživatelské subscription chceme ukládat i bez VAPID/pywebpush (pro pozdější aktivaci)
+def _delete_subscription(endpoint: str, user_id: Optional[int]) -> int:
+    conn = get_db_connection()
     try:
-        data = request.get_json(force=True) or {}
-        subscription = data.get('subscription') or data
-        endpoint = subscription.get('endpoint')
-        keys = subscription.get('keys', {})
-        p256dh = keys.get('p256dh')
-        auth = keys.get('auth')
-        if not (endpoint and p256dh and auth):
-            return jsonify({'ok': False, 'error': 'Invalid subscription object'}), 400
-        user_id = session.get('user_id')
-        conn = get_db_connection();
         cur = conn.cursor()
-        sql = 'INSERT INTO push_subscriptions (user_id, endpoint, p256dh, auth) VALUES (%s,%s,%s,%s) ON DUPLICATE KEY UPDATE user_id=VALUES(user_id), p256dh=VALUES(p256dh), auth=VALUES(auth)'
-        cur.execute(sql, (user_id, endpoint, p256dh, auth))
-        conn.commit();
-        cur.close();
+        if user_id is not None:
+            cur.execute("DELETE FROM push_subscriptions WHERE endpoint = %s AND (user_id = %s OR user_id IS NULL)",
+                        (endpoint, user_id))
+        else:
+            cur.execute("DELETE FROM push_subscriptions WHERE endpoint = %s", (endpoint,))
+        deleted = cur.rowcount
+        conn.commit()
+        return deleted
+    finally:
+        try:
+            cur.close()
+        except Exception:
+            pass
         conn.close()
-        # Info zda je připraveno na odeslání
-        ready = bool(VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY and webpush)
-        return jsonify({'ok': True, 'ready_for_push': ready})
-    except Exception as ex:
-        return jsonify({'ok': False, 'error': str(ex)}), 500
 
 
-@push_bp.get('/count')
-def count_subscriptions():
+def _list_subscriptions(user_id: Optional[int] = None) -> List[Dict[str, Any]]:
+    conn = get_db_connection()
     try:
-        conn = get_db_connection();
-        cur = conn.cursor()
-        cur.execute('SELECT COUNT(*) FROM push_subscriptions')
-        total = cur.fetchone()[0]
-        cur.close();
+        cur = conn.cursor(dictionary=True)
+        if user_id is None:
+            cur.execute("SELECT * FROM push_subscriptions ORDER BY id DESC LIMIT 500")
+        else:
+            cur.execute("SELECT * FROM push_subscriptions WHERE user_id = %s ORDER BY id DESC LIMIT 200", (user_id,))
+        rows = cur.fetchall() or []
+        return rows
+    finally:
+        try:
+            cur.close()
+        except Exception:
+            pass
         conn.close()
-        return jsonify({'ok': True, 'count': total})
-    except Exception as ex:
-        return jsonify({'ok': False, 'error': str(ex)}), 500
 
 
-def _send_webpush(sub, payload: dict):
-    if not (VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY and webpush):
-        raise WebPushException('Push sending not configured (missing VAPID or pywebpush)')
+def _send_webpush(subscription: Dict[str, Any], payload: Dict[str, Any]):
+    """Odešle jednu notifikaci na daný subscription."""
     return webpush(
-        subscription=sub,
-        data=json.dumps(payload),
+        subscription_info=subscription,
+        data=json.dumps(payload, ensure_ascii=False),
         vapid_private_key=VAPID_PRIVATE_KEY,
-        vapid_public_key=VAPID_PUBLIC_KEY,
-        vapid_claims={"sub": f"mailto:{VAPID_EMAIL}"}
+        vapid_claims={"sub": f"mailto:{VAPID_EMAIL}"},
+        ttl=60
     )
 
 
-@push_bp.get('/broadcast')
-def broadcast_get_info():
-    return jsonify({'ok': False, 'error': 'Use POST',
-                    'hint': 'POST JSON {"title":"...","body":"...","url":"/..."} to /push/broadcast'}), 405
+# --- Endpointy ---
 
-
-@push_bp.post('/broadcast')
-def broadcast():
-    if 'user_id' not in session:
-        return jsonify({'ok': False, 'error': 'Auth required'}), 401
-    title = request.json.get('title', 'Knowix')
-    body = request.json.get('body', 'Nová lekce je dostupná!')
-    url = request.json.get('url', '/')
-    sent = 0;
-    failed = 0
-    try:
-        conn = get_db_connection();
-        cur = conn.cursor(dictionary=True)
-        cur.execute('SELECT endpoint, p256dh, auth FROM push_subscriptions')
-        rows = cur.fetchall();
-        cur.close();
-        conn.close()
-        ready = bool(VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY and webpush)
-        if not ready:
-            return jsonify(
-                {'ok': False, 'error': 'Push not configured', 'sent': 0, 'failed': 0, 'subscriptions': len(rows)})
-        for row in rows:
-            sub = {'endpoint': row['endpoint'], 'keys': {'p256dh': row['p256dh'], 'auth': row['auth']}}
-            try:
-                _send_webpush(sub, {'title': title, 'body': body, 'url': url})
-                sent += 1
-            except WebPushException as wex:
-                print(f'[push] send error: {wex}');
-                failed += 1
-        return jsonify({'ok': True, 'sent': sent, 'failed': failed, 'subscriptions': len(rows)})
-    except Exception as ex:
-        return jsonify({'ok': False, 'error': str(ex)}), 500
+@push_bp.get('/vapid-public-key')
+def get_vapid_public_key():
+    return jsonify({'publicKey': VAPID_PUBLIC_KEY})
 
 
 @push_bp.get('/csrf-token')
 def get_csrf_token():
-    token = session.get('_csrf_token')
-    return jsonify({'csrf_token': token or ''})
+    # Vrací CSRF token pro použití v SW při pushsubscriptionchange
+    token = _ensure_csrf_token()
+    return jsonify({'csrf_token': token})
 
 
-@push_bp.get('/test')
-def push_test_page():
-    return (
-        """<!doctype html><meta charset='utf-8'><title>Push test</title><body style='font-family:system-ui;padding:24px'><h1>Push broadcast test</h1><p>Musíte být přihlášeni. Odešle POST na /push/broadcast.</p><div id='info'></div><form id='f'><label>Title <input name='title' value='Knowix'></label><br><label>Body <input name='body' value='Nová lekce je dostupná!'></label><br><label>URL <input name='url' value='/'></label><br><button>Odeslat</button></form><pre id='out'></pre><script>let CSRF=null;fetch('/push/csrf-token').then(r=>r.json()).then(j=>{CSRF=j.csrf_token||null;});fetch('/push/count').then(r=>r.json()).then(j=>{document.getElementById('info').textContent='Subscriptions: '+(j.count||0);});document.getElementById('f').addEventListener('submit', async (e)=>{e.preventDefault();const fd=new FormData(e.target);const payload=Object.fromEntries(fd.entries());const headers={'Content-Type':'application/json'};if(CSRF) headers['X-CSRFToken']=CSRF;const res=await fetch('/push/broadcast',{method:'POST',headers,body:JSON.stringify(payload)});document.getElementById('out').textContent=await res.text();});</script></body>""")
+@push_bp.post('/subscribe')
+def subscribe_push():
+    if not request.is_json:
+        return _json_err('Expected application/json')
+    data = request.get_json(silent=True) or {}
+    subscription = data.get('subscription')
+    installed = bool(data.get('installed'))
+    if not isinstance(subscription, dict):
+        return _json_err('Missing subscription')
 
-
-@push_bp.post('/installed')
-def mark_installed():
     try:
-        data = request.get_json(force=True) or {}
-        endpoint = data.get('endpoint')
-        installed = 1 if data.get('installed') else 0
-        if not endpoint:
-            return jsonify({'ok': False, 'error': 'Missing endpoint'}), 400
-        conn = get_db_connection();
-        cur = conn.cursor()
-        cur.execute('UPDATE push_subscriptions SET installed=%s, last_seen=NOW() WHERE endpoint=%s',
-                    (installed, endpoint))
-        conn.commit();
-        cur.close();
-        conn.close()
-        return jsonify({'ok': True})
+        _upsert_subscription(_current_user_id(), subscription, installed)
+    except ValueError as ve:
+        return _json_err(str(ve))
     except Exception as ex:
-        return jsonify({'ok': False, 'error': str(ex)}), 500
+        return _json_err('DB error', 500, detail=str(ex))
+
+    return _json_ok()
 
 
-@push_bp.post('/ping')
-def ping_subscription():
+@push_bp.post('/unsubscribe')
+def unsubscribe_push():
+    if not request.is_json:
+        return _json_err('Expected application/json')
+    data = request.get_json(silent=True) or {}
+    endpoint = data.get('endpoint')
+    if not endpoint:
+        return _json_err('Missing endpoint')
     try:
-        data = request.get_json(force=True) or {}
-        endpoint = data.get('endpoint')
-        if not endpoint:
-            return jsonify({'ok': False, 'error': 'Missing endpoint'}), 400
-        conn = get_db_connection();
-        cur = conn.cursor()
-        cur.execute('UPDATE push_subscriptions SET last_seen=NOW() WHERE endpoint=%s', (endpoint,))
-        conn.commit();
-        cur.close();
-        conn.close()
-        return jsonify({'ok': True})
+        deleted = _delete_subscription(endpoint, _current_user_id())
     except Exception as ex:
-        return jsonify({'ok': False, 'error': str(ex)}), 500
+        return _json_err('DB error', 500, detail=str(ex))
+    return _json_ok(deleted=deleted)
 
 
-@push_bp.post('/to-user/<int:user_id>')
-def push_to_user(user_id: int):
-    title = request.json.get('title', 'Knowix')
-    body = request.json.get('body', 'Máte novou výzvu!')
-    url = request.json.get('url', '/')
-    if not (VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY and webpush):
-        return jsonify({'ok': False, 'error': 'Push not configured'}), 503
-    sent = 0;
-    failed = 0
-    try:
-        conn = get_db_connection();
-        cur = conn.cursor(dictionary=True)
-        cur.execute('SELECT endpoint, p256dh, auth FROM push_subscriptions WHERE user_id=%s AND installed=1',
-                    (user_id,))
-        rows = cur.fetchall();
-        cur.close();
-        conn.close()
-        for row in rows:
-            sub = {'endpoint': row['endpoint'], 'keys': {'p256dh': row['p256dh'], 'auth': row['auth']}}
-            try:
-                _send_webpush(sub, {'title': title, 'body': body, 'url': url})
-                sent += 1
-            except WebPushException as wex:
-                print(f'[push] send error: {wex}');
+@push_bp.post('/test-send')
+def test_send_push():
+    """
+    Pošle testovací push notifikaci.
+    - Pokud je přihlášen admin (user_id == 1), pošle všem.
+    - Jinak pošle jen aktuálnímu uživateli (pokud má subscription).
+    """
+    if not request.is_json:
+        return _json_err('Expected application/json')
+    payload = request.get_json(silent=True) or {}
+
+    title = payload.get('title') or 'Knowix'
+    body = payload.get('body') or 'Test notifikace z Knowix'
+    url = payload.get('url') or '/'
+
+    user_id = _current_user_id()
+    is_admin = (user_id == 1)
+
+    subs = _list_subscriptions(None if is_admin else user_id)
+    if not subs:
+        return _json_err('No subscriptions', 404)
+
+    sent, removed, failed = 0, 0, 0
+    for row in subs:
+        sub_obj = {
+            'endpoint': row['endpoint'],
+            'keys': {'p256dh': row['p256dh'], 'auth': row['auth']}
+        }
+        try:
+            _send_webpush(sub_obj, {
+                'title': title,
+                'body': body,
+                'url': url,
+                'tag': 'knowix-general'
+            })
+            sent += 1
+        except WebPushException as wpe:
+            status = getattr(wpe.response, 'status_code', None)
+            # 404/410 znamená, že endpoint expiroval – odebereme
+            if status in (404, 410):
+                try:
+                    _delete_subscription(row['endpoint'], None)
+                    removed += 1
+                except Exception:
+                    pass
+            else:
                 failed += 1
-        return jsonify({'ok': True, 'sent': sent, 'failed': failed})
-    except Exception as ex:
-        return jsonify({'ok': False, 'error': str(ex)}), 500
+        except Exception:
+            failed += 1
+
+    return _json_ok(sent=sent, removed=removed, failed=failed, total=len(subs))
 
 
-@push_bp.post('/broadcast-installed')
-def broadcast_installed():
-    title = request.json.get('title', 'Knowix')
-    body = request.json.get('body', 'Zpět do lekce?')
-    url = request.json.get('url', '/')
-    if not (VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY and webpush):
-        return jsonify({'ok': False, 'error': 'Push not configured'}), 503
-    sent = 0;
-    failed = 0
-    try:
-        conn = get_db_connection();
-        cur = conn.cursor(dictionary=True)
-        cur.execute('SELECT endpoint, p256dh, auth FROM push_subscriptions WHERE installed=1')
-        rows = cur.fetchall();
-        cur.close();
-        conn.close()
-        for row in rows:
-            sub = {'endpoint': row['endpoint'], 'keys': {'p256dh': row['p256dh'], 'auth': row['auth']}}
-            try:
-                _send_webpush(sub, {'title': title, 'body': body, 'url': url})
-                sent += 1
-            except WebPushException as wex:
-                print(f'[push] send error: {wex}');
-                failed += 1
-        return jsonify({'ok': True, 'sent': sent, 'failed': failed})
-    except Exception as ex:
-        return jsonify({'ok': False, 'error': str(ex)}), 500
+# Admin přehled – jednoduchý HTML/JSON
+@push_bp.get('/admin/subscriptions')
+def admin_list_subs():
+    user_id = _current_user_id()
+    if user_id != 1:
+        abort(403)
+    rows = _list_subscriptions(None)
+    # Vrátíme jednoduché HTML pro rychlou kontrolu v prohlížeči
+    html = [
+        '<h2>Push subscriptions</h2>',
+        f'<p>Celkem: {len(rows)}</p>',
+        '<table border="1" cellpadding="6" cellspacing="0">',
+        '<tr><th>ID</th><th>User</th><th>Endpoint</th><th>Installed</th><th>Last seen</th><th>Created</th></tr>'
+    ]
+    for r in rows:
+        html.append(
+            f"<tr><td>{r['id']}</td><td>{r.get('user_id')}</td><td style='max-width:520px;word-break:break-all'>{r.get('endpoint')}</td>"
+            f"<td>{'✓' if r.get('installed') else ''}</td><td>{r.get('last_seen')}</td><td>{r.get('created_at')}</td></tr>"
+        )
+    html.append('</table>')
+    return "\n".join(html)
+
+
+# Alias bez prefixu (splní požadavek na /send_notification)
+@push_bp.post('/send_notification')
+def send_notification_alias():
+    return test_send_push()

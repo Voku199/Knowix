@@ -47,7 +47,7 @@ from slovni_fotbal import slovni_bp
 from daily_quest import daily_bp, get_daily_quests_for_user
 from AI_gramatika import ai_gramatika_bp
 from reminders import reminders_bp, start_reminder_scheduler  # Přidán import připomínkového systému
-from push_notifications import push_bp  # PWA push notifikace blueprint
+from push_notifications import push_bp, test_send_push  # PWA push notifikace blueprint + test sender
 
 # -------- Matematiky --------------------
 # from math_main import math_main_bp
@@ -364,8 +364,21 @@ def add_security_headers(response):
         print(
             f"[after_request] host={request.host} path={request.path} status={response.status_code} set_cookie={'Set-Cookie' in response.headers} cookie_domain={app.config.get('SESSION_COOKIE_DOMAIN')} samesite={app.config.get('SESSION_COOKIE_SAMESITE')} secure={app.config.get('SESSION_COOKIE_SECURE')} set_cookie_header={set_cookie_header[:160] if set_cookie_header else None}")
 
-    # CSP (rozšířená o GA domény) – pokud něco chybí, doplnit zde
-    response.headers['Content-Security-Policy'] = (
+    # Detekce prostředí/domény
+    host = request.host.split(':')[0]
+
+    def _is_private_ip(h):
+        return any(h.startswith(prefix) for prefix in (
+            '192.168.', '10.', '172.16.', '172.17.', '172.18.', '172.19.', '172.20.', '172.21.', '172.22.', '172.23.',
+            '172.24.', '172.25.', '172.26.', '172.27.', '172.28.', '172.29.', '172.30.', '172.31.'))
+
+    is_localhost = host in ('localhost', '127.0.0.1')
+    is_private = _is_private_ip(host)
+    is_prod = host.endswith('knowix.cz')
+    is_https = bool(request.is_secure)
+
+    # CSP (rozšířená o GA domény) – bez upgrade-insecure-requests pro lokální/privátní, jinak přidáme
+    csp = (
         "default-src 'self'; "
         "base-uri 'self'; "
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' "
@@ -378,17 +391,34 @@ def add_security_headers(response):
         "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com https://fonts.googleapis.com https://fonts.gstatic.com; "
         "frame-src https://open.spotify.com https://*.spotify.com https://www.youtube-nocookie.com https://www.youtube.com https://*.youtube.com; "
         "media-src 'self' blob:; "
-        "object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests;"
+        "object-src 'none'; frame-ancestors 'none';"
     )
+    if is_prod and is_https:
+        csp += " upgrade-insecure-requests;"
+    response.headers['Content-Security-Policy'] = csp
+
+    # Permissions-Policy držíme univerzálně
     response.headers['Permissions-Policy'] = (
         'geolocation=(), microphone=(self), camera=(), '
         'fullscreen=(self "https://www.youtube.com" "https://www.youtube-nocookie.com"), '
         'magnetometer=(), gyroscope=(self "https://www.youtube.com" "https://www.youtube-nocookie.com"), usb=(), payment=()'
     )
-    response.headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload'
+
+    # HSTS jen pro produkční HTTPS
+    if is_prod and is_https:
+        response.headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload'
+    else:
+        response.headers.pop('Strict-Transport-Security', None)
+
+    # COOP/CORP pouze na důvěryhodných origínech (produkční https nebo localhost); na privátní IP je vypneme
+    if is_prod and is_https or is_localhost:
+        response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
+        response.headers['Cross-Origin-Resource-Policy'] = 'same-origin'
+    else:
+        response.headers.pop('Cross-Origin-Opener-Policy', None)
+        response.headers.pop('Cross-Origin-Resource-Policy', None)
+
     response.headers['X-Frame-Options'] = 'DENY'
-    response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
-    response.headers['Cross-Origin-Resource-Policy'] = 'same-origin'
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
     return response
@@ -404,14 +434,15 @@ def service_worker_file():
     return resp
 
 
-# app.run(port=5000, debug=True)
+# === Alias: /send_notification -> použije test_send_push z push_notifications ===
+@app.route('/send_notification', methods=['POST'])
+def send_notification_alias_root():
+    return test_send_push()
 
-# from waitress import serve
 
-# serve(app, host="0.0.0.0", port=8080, threads=24, backlog=100)
+# app.run(port=5000, debug=True, host='0.0.0.0')
 
-
-# === Spuštění aplikace ===+%12
+# === Spuštění aplikace ===
 from waitress import serve
 
-serve(app, host="0.0.0.0", port=8080, threads=24, backlog=100)
+serve(app, host='0.0.0.0', port=8080, threads=24, backlog=100)
