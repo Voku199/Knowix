@@ -134,6 +134,12 @@ def _ensure_reminder_columns():
                 except Exception:
                     pass
 
+        # Implicitně zapnout e-maily pro všechny uživatele, kde je hodnota NULL
+        try:
+            cur.execute("UPDATE users SET receive_reminder_emails = 1 WHERE receive_reminder_emails IS NULL")
+        except Exception:
+            pass
+
         # Doplň tokeny uživatelům kde chybí
         cur.execute("SELECT id FROM users WHERE reminder_token IS NULL")
         for (uid,) in cur.fetchall():
@@ -185,34 +191,8 @@ def _ensure_user_stats_rows():
             conn.close()
 
 
-def _reset_daily_counters():
-    """Resetuje denní počítadla"""
-    conn = None
-    cur = None
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        today = time.strftime('%Y-%m-%d')
-
-        cur.execute("UPDATE users SET email_sends_today = 0 WHERE last_email_date != %s OR last_email_date IS NULL",
-                    (today,))
-        cur.execute("UPDATE users SET push_sends_today = 0 WHERE last_push_date != %s OR last_push_date IS NULL",
-                    (today,))
-        cur.execute("UPDATE users SET last_email_date = %s WHERE last_email_date IS NULL", (today,))
-        cur.execute("UPDATE users SET last_push_date = %s WHERE last_push_date IS NULL", (today,))
-
-        conn.commit()
-    except Exception as ex:
-        print(f"[reminders] Reset counters error: {ex}")
-    finally:
-        if cur:
-            cur.close()
-        if conn:
-            conn.close()
-
-
 def _get_email_candidates():
-    """Získá kandidáty na e-mailové připomínky"""
+    """Získá kandidáty na e-mailové připomínky (bez omezení hodin a aktivity)"""
     candidates = []
     conn = None
     cur = None
@@ -220,16 +200,23 @@ def _get_email_candidates():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        cur.execute("""
-            SELECT u.id, u.email, COALESCE(u.first_name, ''), u.reminder_token, 
-                   u.email_sends_today, TIMESTAMPDIFF(HOUR, us.last_active, NOW()) as hours_inactive
+        # Vytvoř dnesní efektivní čítač bez potřeby denního resetu a zajisti min. 6h rozestup mezi e-maily
+        cur.execute(
+            """
+            SELECT 
+                u.id, 
+                u.email, 
+                COALESCE(u.first_name, ''), 
+                u.reminder_token,
+                CASE WHEN u.last_email_date = CURDATE() THEN u.email_sends_today ELSE 0 END AS sends_today
             FROM users u
-            JOIN user_stats us ON u.id = us.user_id
             WHERE u.receive_reminder_emails = 1
-            AND u.email_sends_today < %s
-            AND TIMESTAMPDIFF(HOUR, us.last_active, NOW()) >= 6
-            AND us.last_active IS NOT NULL
-        """, (MAX_EMAILS_PER_DAY,))
+              AND u.email IS NOT NULL
+              AND (u.last_reminder_sent IS NULL OR TIMESTAMPDIFF(HOUR, u.last_reminder_sent, NOW()) >= 6)
+              AND (u.last_email_date IS NULL OR u.last_email_date != CURDATE() OR u.email_sends_today < %s)
+            """,
+            (MAX_EMAILS_PER_DAY,)
+        )
 
         candidates = cur.fetchall()
     except Exception as ex:
@@ -252,17 +239,20 @@ def _get_push_candidates():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        cur.execute("""
-            SELECT u.id, COALESCE(u.first_name, ''), u.push_sends_today, 
-                   TIMESTAMPDIFF(HOUR, us.last_active, NOW()) as hours_inactive
-            FROM users u
-            JOIN user_stats us ON u.id = us.user_id
-            JOIN push_subscriptions ps ON ps.user_id = u.id AND ps.installed = 1
-            WHERE u.push_sends_today < %s
-            AND TIMESTAMPDIFF(HOUR, us.last_active, NOW()) >= 3
-            AND us.last_active IS NOT NULL
-            GROUP BY u.id
-        """, (MAX_PUSHES_PER_DAY,))
+        cur.execute(
+            """
+                SELECT u.id,
+                       COALESCE(u.first_name, ''),
+                       CASE WHEN u.last_push_date = CURDATE() THEN u.push_sends_today ELSE 0 END AS sends_today,
+                       TIMESTAMPDIFF(HOUR, us.last_active, NOW()) as hours_inactive
+                FROM users u
+                JOIN user_stats us ON u.id = us.user_id
+                JOIN push_subscriptions ps ON ps.user_id = u.id
+                WHERE (u.last_push_date IS NULL OR u.last_push_date != CURDATE() OR u.push_sends_today < %s)
+                  AND TIMESTAMPDIFF(HOUR, us.last_active, NOW()) >= 3
+                  AND us.last_active IS NOT NULL
+                GROUP BY u.id
+            """, (MAX_PUSHES_PER_DAY,))
 
         candidates = cur.fetchall()
     except Exception as ex:
@@ -290,9 +280,16 @@ def _send_email_reminder(user_id: int, email: str, first_name: str, token: str) 
             conn = get_db_connection()
             cur = conn.cursor()
             today = time.strftime('%Y-%m-%d')
+            # Pokud je nový den, nastavíme čítač na 1; jinak inkrementujeme
             cur.execute(
-                "UPDATE users SET last_reminder_sent = NOW(), email_sends_today = email_sends_today + 1, last_email_date = %s WHERE id = %s",
-                (today, user_id)
+                """
+                UPDATE users 
+                SET last_reminder_sent = NOW(),
+                    email_sends_today = CASE WHEN last_email_date = %s THEN email_sends_today + 1 ELSE 1 END,
+                    last_email_date = %s
+                WHERE id = %s
+                """,
+                (today, today, user_id)
             )
             conn.commit()
         except Exception as ex:
@@ -329,7 +326,7 @@ def _send_push_reminder(user_id: int, first_name: str) -> bool:
         conn = get_db_connection()
         cur = conn.cursor(dictionary=True)
         cur.execute(
-            "SELECT endpoint, p256dh, auth FROM push_subscriptions WHERE user_id = %s AND installed = 1",
+            "SELECT endpoint, p256dh, auth FROM push_subscriptions WHERE user_id = %s",
             (user_id,)
         )
         subscriptions = cur.fetchall()
@@ -375,33 +372,29 @@ def send_daily_reminders():
     """Hlavní funkce pro rozesílání denních připomínek"""
     _ensure_reminder_columns()
     _ensure_user_stats_rows()
-    _reset_daily_counters()
-
-    # Zjistit aktuální hodinu pro inteligentní rozesílání
-    current_hour = time.localtime().tm_hour
+    # Zrušeno explicitní resetování čítačů – řídíme podle last_email_date/last_push_date
 
     emails_sent = 0
     pushes_sent = 0
 
-    # Rozesílání e-mailů (max 2x denně, v 10:00 a 18:00)
-    if current_hour in [10, 18] and os.getenv("EMAIL_PASSWORD"):
+    # E-maily: posílat průběžně až do limitu 1–2 denně na uživatele, bez náhodnosti a časových oken
+    if os.getenv("EMAIL_PASSWORD"):
         email_candidates = _get_email_candidates()
-        for user_id, email, first_name, token, sends_today, hours_inactive in email_candidates:
+        for user_id, email, first_name, token, sends_today in email_candidates:
             if _should_skip_email(email):
                 continue
+            if sends_today >= MAX_EMAILS_PER_DAY:
+                continue
+            if _send_email_reminder(user_id, email, first_name or 'student', token):
+                emails_sent += 1
 
-            # Náhodný výběr pro variabilitu
-            if random.random() < 0.7:  # 70% šance na odeslání
-                if _send_email_reminder(user_id, email, first_name, token):
-                    emails_sent += 1
-
-    # Rozesílání push notifikací (2-5x denně, v různých časech)
+    # Push notifikace: ponecháme původní logiku s časováním a pravděpodobností
+    current_hour = time.localtime().tm_hour
     push_hours = [9, 12, 15, 18, 21]
     if current_hour in push_hours and _webpush and VAPID_PRIVATE_KEY:
         push_candidates = _get_push_candidates()
 
         for user_id, first_name, sends_today, hours_inactive in push_candidates:
-            # Upravujeme pravděpodobnost podle toho, kolik notifikací uživatel již obdržel
             probability = 0.8 if sends_today < MIN_PUSHES_PER_DAY else 0.4
             if random.random() < probability:
                 if _send_push_reminder(user_id, first_name):
@@ -444,6 +437,70 @@ def admin_run_reminder_scan():
     })
 
 
+@reminders_bp.route('/admin/email_report')
+def admin_email_report():
+    """Admin přehled dnešních odeslání e‑mailů/push notifikací (GET, jen user_id==1).
+    Parametr all=1 zobrazí všechny uživatele, jinak jen ty s dnešním odesláním.
+    """
+    if session.get('user_id') != 1:
+        return jsonify({'success': False, 'error': 'Přístup zamítnut.'}), 403
+
+    show_all = request.args.get('all') == '1'
+
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        base_sql = (
+            """
+            SELECT u.id,
+                   COALESCE(u.first_name, ''),
+                   u.email,
+                   u.last_reminder_sent,
+                   CASE WHEN u.last_email_date = CURDATE() THEN u.email_sends_today ELSE 0 END AS emails_sent_today,
+                   u.last_email_date,
+                   CASE WHEN u.last_push_date = CURDATE() THEN u.push_sends_today ELSE 0 END AS pushes_sent_today,
+                   u.last_push_date,
+                   us.last_active
+            FROM users u
+            LEFT JOIN user_stats us ON us.user_id = u.id
+            WHERE u.receive_reminder_emails = 1
+            """
+        )
+        if not show_all:
+            base_sql += " AND ((u.last_email_date = CURDATE() AND u.email_sends_today > 0) OR (u.last_push_date = CURDATE() AND u.push_sends_today > 0))"
+        base_sql += " ORDER BY emails_sent_today DESC, u.last_reminder_sent DESC"
+        cur.execute(base_sql)
+        rows = cur.fetchall() or []
+
+        # HTML přehled
+        html = [
+            "<h2>Reminders – přehled dnešních odeslání</h2>",
+            f"<p>Filtr: {'všichni uživatelé' if show_all else 'pouze s dnešním odesláním'} | <a href='?all=1'>zobrazit všechny</a></p>",
+            "<table border='1' cellpadding='6' cellspacing='0'>",
+            "<tr><th>ID</th><th>Jméno</th><th>Email</th><th>Last email sent</th><th>Emails dnes</th><th>Last email date</th><th>Push dnes</th><th>Last push date</th><th>Last active</th></tr>"
+        ]
+        for r in rows:
+            uid, first_name, email, last_email_dt, emails_today, last_email_date, pushes_today, last_push_date, last_active = r
+            html.append(
+                f"<tr><td>{uid}</td><td>{first_name}</td><td>{email}</td>"
+                f"<td>{last_email_dt or ''}</td><td>{emails_today}</td><td>{last_email_date or ''}</td>"
+                f"<td>{pushes_today}</td><td>{last_push_date or ''}</td><td>{last_active or ''}</td></tr>"
+            )
+        html.append("</table>")
+        return "\n".join(html)
+
+    except Exception as ex:
+        print(f"[reminders] Admin email report error: {ex}")
+        return jsonify({'success': False, 'error': 'Chyba serveru.'}), 500
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
 @reminders_bp.route('/email/unsubscribe/<token>')
 def unsubscribe(token):
     """Odhlášení z e-mailových připomínek"""
@@ -469,31 +526,6 @@ def unsubscribe(token):
     except Exception as ex:
         print(f"[reminders] Unsubscribe error: {ex}")
         return render_template('unsubscribe.html', status='error')
-    finally:
-        if cur:
-            cur.close()
-        if conn:
-            conn.close()
-
-
-@reminders_bp.route('/email/enable', methods=['POST'])
-def enable_emails():
-    """Zapnutí e-mailových připomínek"""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'error': 'Nepřihlášen.'}), 401
-
-    uid = session['user_id']
-    conn = None
-    cur = None
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("UPDATE users SET receive_reminder_emails = 1 WHERE id = %s", (uid,))
-        conn.commit()
-        return jsonify({'success': True})
-    except Exception as ex:
-        print(f"[reminders] Enable emails error: {ex}")
-        return jsonify({'success': False, 'error': 'Chyba serveru.'}), 500
     finally:
         if cur:
             cur.close()

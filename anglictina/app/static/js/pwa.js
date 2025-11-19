@@ -188,6 +188,35 @@
         }
     }
 
+    async function getVapidPublicKey() {
+        const response = await fetch('/push/vapid-public-key');
+        const data = await response.json();
+        if (!data.publicKey) throw new Error('No VAPID public key');
+        return data.publicKey;
+    }
+
+    async function ensureWebPushSubscription(registration) {
+        try {
+            const existing = await registration.pushManager.getSubscription();
+            if (existing) {
+                console.log('[PWA] Found existing subscription, saving to server');
+                await saveSubscription(existing);
+                return existing;
+            }
+            console.log('[PWA] No existing subscription, creating new one');
+            const publicKey = await getVapidPublicKey();
+            const subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(publicKey)
+            });
+            await saveSubscription(subscription);
+            return subscription;
+        } catch (e) {
+            console.error('[PWA] ensureWebPushSubscription failed:', e);
+            throw e;
+        }
+    }
+
     // Web Push pro Android/Chrome
     async function initWebPush() {
         if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
@@ -202,6 +231,17 @@
             // Zkontroluj stav notifikací
             const permission = Notification.permission;
             console.log('[PWA] Notification permission:', permission);
+
+            if (permission === 'granted') {
+                // Pokud už jsou povoleny, ověř/ulož subscription bez další interakce
+                try {
+                    await ensureWebPushSubscription(registration);
+                    console.log('[PWA] Subscription ensured');
+                } catch (e) {
+                    console.warn('[PWA] Could not ensure subscription after granted:', e);
+                }
+                return;
+            }
 
             if (permission === 'default') {
                 // Počkej a pak zobraz výzvu
@@ -318,23 +358,9 @@
                 return false;
             }
 
-            // Získej VAPID public key
-            const response = await fetch('/push/vapid-public-key');
-            const data = await response.json();
-
-            if (!data.publicKey) {
-                throw new Error('No VAPID public key');
-            }
-
-            // Přihlas se k push notifikacím
+            // Přihlas se k push notifikacím (nebo ulož existující)
             const registration = await navigator.serviceWorker.ready;
-            const subscription = await registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(data.publicKey)
-            });
-
-            // Ulož subscription
-            await saveSubscription(subscription);
+            await ensureWebPushSubscription(registration);
 
             showSuccessMessage('Notifikace zapnuty! 🎉');
             return true;
@@ -434,3 +460,4 @@
         init();
     }
 })();
+
