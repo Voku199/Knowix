@@ -3,6 +3,14 @@
   <component name="CopilotDiffPersistence">
     <option name="pendingDiffs">
       <map>
+        <entry key="$PROJECT_DIR$/anglictina/app/templates/offline.html">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/anglictina/app/templates/offline.html" />
+              <option name="updatedContent" value="{% extends &quot;base.html&quot; %}&#10;{% block title %}Offline – Knowix{% endblock %}&#10;{% block content %}&#10;&lt;section style=&quot;max-width:720px;margin:40px auto;padding:24px;text-align:center;&quot;&gt;&#10;  &lt;h1&gt;Jste offline&lt;/h1&gt;&#10;  &lt;p&gt;Vypadá to, že nemáte připojení k internetu. Některý obsah může být k dispozici z cache.&#10;  Zkuste to prosím znovu později.&lt;/p&gt;&#10;  &lt;p&gt;&lt;a href=&quot;/&quot; class=&quot;auth-btn login-btn&quot;&gt;Zpět na úvod&lt;/a&gt;&lt;/p&gt;&#10;&lt;/section&gt;&#10;{% endblock %}&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/anglictina/app/templates/student_stats_chart.html">
           <value>
             <PendingDiffInfo>
