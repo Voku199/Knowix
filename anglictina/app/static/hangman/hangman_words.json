@@ -1,296 +1,100 @@
 [
   {
-    "word": "apple",
-    "translation": "jablko",
+    "word": "garden",
+    "translation": "zahrada",
     "level": "A1",
-    "hint": "A common fruit, often red or green.",
-    "hint_cz": "Běžné ovoce, často červené nebo zelené."
+    "hint": "Place next to a house with grass and plants.",
+    "hint_cz": "Místo vedle domu s trávou a rostlinami."
   },
   {
-    "word": "window",
-    "translation": "okno",
+    "word": "pillow",
+    "translation": "polštář",
     "level": "A1",
-    "hint": "Glass part of a wall for light and view.",
-    "hint_cz": "Skleněná část zdi pro světlo a výhled."
+    "hint": "Soft thing under your head when you sleep.",
+    "hint_cz": "Měkká věc pod hlavou, když spíš."
   },
   {
-    "word": "test",
-    "translation": "test / zkouška",
-    "level": "A2",
-    "hint": "Assessment of knowledge or ability.",
-    "hint_cz": "Hodnocení znalostí nebo schopností."
-  },
-  {
-    "word": "journey",
-    "translation": "cesta (dlouhá)",
-    "level": "B1",
-    "hint": "Traveling from one place to another over time.",
-    "hint_cz": "Cestování z jednoho místa na druhé po delší dobu."
-  },
-  {
-    "word": "conclusion",
-    "translation": "závěr",
-    "level": "B2",
-    "hint": "Final decision based on reasoning.",
-    "hint_cz": "Konečné rozhodnutí založené na logické úvaze."
-  },
-  {
-    "word": "sunset",
-    "translation": "západ slunce",
-    "level": "A2",
-    "hint": "Daily disappearance of the sun.",
-    "hint_cz": "Každodenní zmizení slunce na obzoru."
-  },
-  {
-    "word": "effort",
-    "translation": "úsilí",
-    "level": "B1",
-    "hint": "Physical or mental energy to achieve a goal.",
-    "hint_cz": "Fyzická nebo mentální energie k dosažení cíle."
-  },
-  {
-    "word": "breeze",
-    "translation": "větřík",
-    "level": "B1",
-    "hint": "Gentle wind.",
-    "hint_cz": "Jemný vánek."
-  },
-  {
-    "word": "obvious",
-    "translation": "zřejmý",
-    "level": "B2",
-    "hint": "Easily perceived or understood.",
-    "hint_cz": "Snadno vnímatelné nebo pochopitelné."
-  },
-  {
-    "word": "doubt",
-    "translation": "pochybnost",
-    "level": "B2",
-    "hint": "Uncertainty about truth or fact.",
-    "hint_cz": "Nejistota ohledně pravdy nebo skutečnosti."
-  },
-  {
-    "word": "glimpse",
-    "translation": "letmý pohled",
-    "level": "B1",
-    "hint": "Quick look at something.",
-    "hint_cz": "Rychlý pohled na něco."
-  },
-  {
-    "word": "thunder",
-    "translation": "hrom",
-    "level": "A2",
-    "hint": "Loud noise during a storm.",
-    "hint_cz": "Hlasitý zvuk během bouřky."
-  },
-  {
-    "word": "harmony",
-    "translation": "harmonie",
-    "level": "B2",
-    "hint": "Pleasant arrangement of parts.",
-    "hint_cz": "Příjemné uspořádání částí."
-  },
-  {
-    "word": "to rely on",
-    "translation": "spoléhat na",
-    "level": "B1",
-    "hint": "Depend on someone/something.",
-    "hint_cz": "Být závislý na někom/něčem."
-  },
-  {
-    "word": "awkward",
-    "translation": "trapný / neobratný",
-    "level": "B2",
-    "hint": "Causing embarrassment.",
-    "hint_cz": "Způsobující trapnou situaci."
-  },
-  {
-    "word": "to glance",
-    "translation": "letmo se podívat",
-    "level": "B1",
-    "hint": "Quickly look at something.",
-    "hint_cz": "Rychle se na něco podívat."
-  },
-  {
-    "word": "fierce",
-    "translation": "prudký / divoký",
-    "level": "B2",
-    "hint": "Intense aggression or strength.",
-    "hint_cz": "Silná agrese nebo síla."
-  },
-  {
-    "word": "to vanish",
-    "translation": "zmizet",
-    "level": "B2",
-    "hint": "Disappear suddenly.",
-    "hint_cz": "Náhlé zmizení."
-  },
-  {
-    "word": "to stumble",
-    "translation": "zakopnout / zadrhávat",
-    "level": "B2",
-    "hint": "Trip while walking or speaking.",
-    "hint_cz": "Zakopnout při chůzi nebo zadrhnout se v řeči."
-  },
-  {
-    "word": "blossom",
-    "translation": "kvést / květ",
-    "level": "B1",
-    "hint": "Flowers on a tree.",
-    "hint_cz": "Květy na stromě."
-  },
-  {
-    "word": "vague",
-    "translation": "nejasný",
-    "level": "B2",
-    "hint": "Not clear or definite.",
-    "hint_cz": "Nejasný nebo nejistý."
-  },
-  {
-    "word": "to wander",
-    "translation": "toulat se",
-    "level": "B1",
-    "hint": "Walk without a fixed direction.",
-    "hint_cz": "Chůze bez určitého směru."
-  },
-  {
-    "word": "to grasp",
-    "translation": "uchopit / pochopit",
-    "level": "B2",
-    "hint": "Physically hold or mentally understand.",
-    "hint_cz": "Fyzicky uchopit nebo mentálně pochopit."
-  },
-  {
-    "word": "humble",
-    "translation": "skromný",
-    "level": "B2",
-    "hint": "Modest, not arrogant.",
-    "hint_cz": "Skromný, bez arogance."
-  },
-  {
-    "word": "to bargain",
-    "translation": "smlouvat",
-    "level": "B1",
-    "hint": "Negotiate prices or conditions.",
-    "hint_cz": "Vyjednávat ceny nebo podmínky."
-  },
-  {
-    "word": "to whisper",
-    "translation": "šeptat",
-    "level": "A2",
-    "hint": "Speak very quietly.",
-    "hint_cz": "Velmi tiché mluvení."
-  },
-  {
-    "word": "river",
-    "translation": "řeka",
+    "word": "station",
+    "translation": "stanice",
     "level": "A1",
-    "hint": "A large natural stream of water.",
-    "hint_cz": "Velký přírodní proud vody."
+    "hint": "Place where trains or buses stop.",
+    "hint_cz": "Místo, kde zastavují vlaky nebo autobusy."
   },
   {
-    "word": "mountain",
-    "translation": "hora",
+    "word": "wallet",
+    "translation": "peněženka",
     "level": "A1",
-    "hint": "A very high hill.",
-    "hint_cz": "Velmi vysoký kopec."
+    "hint": "Small thing where you keep money and cards.",
+    "hint_cz": "Malá věc, kde nosíš peníze a karty."
   },
   {
-    "word": "brave",
-    "translation": "statečný",
+    "word": "raincoat",
+    "translation": "pláštěnka",
+    "level": "A1",
+    "hint": "Coat you wear when it rains.",
+    "hint_cz": "Kabát, který si bereš, když prší."
+  },
+  {
+    "word": "kitchen",
+    "translation": "kuchyně",
+    "level": "A1",
+    "hint": "Room where you cook food.",
+    "hint_cz": "Místnost, kde vaříš jídlo."
+  },
+  {
+    "word": "blanket",
+    "translation": "deka",
+    "level": "A1",
+    "hint": "Warm cover you use in bed.",
+    "hint_cz": "Teplá pokrývka, kterou používáš v posteli."
+  },
+  {
+    "word": "bicycle",
+    "translation": "kolo",
+    "level": "A1",
+    "hint": "Vehicle with two wheels that you ride.",
+    "hint_cz": "Vozidlo se dvěma koly, na kterém jezdíš."
+  },
+  {
+    "word": "airport",
+    "translation": "letiště",
+    "level": "A1",
+    "hint": "Place where planes arrive and leave.",
+    "hint_cz": "Místo, kde přilétají a odlétají letadla."
+  },
+  {
+    "word": "breakfast",
+    "translation": "snídaně",
+    "level": "A1",
+    "hint": "The first meal in the morning.",
+    "hint_cz": "První jídlo ráno."
+  },
+  {
+    "word": "dangerous",
+    "translation": "nebezpečný",
     "level": "A2",
-    "hint": "Not afraid to do dangerous things.",
-    "hint_cz": "Nebát se dělat nebezpečné věci."
+    "hint": "Something that can hurt you.",
+    "hint_cz": "Něco, co ti může ublížit."
   },
   {
-    "word": "to improve",
-    "translation": "zlepšit",
-    "level": "B1",
-    "hint": "To make something better.",
-    "hint_cz": "Udělat něco lepším."
-  },
-  {
-    "word": "to achieve",
-    "translation": "dosáhnout",
-    "level": "B1",
-    "hint": "To successfully reach a goal.",
-    "hint_cz": "Úspěšně dosáhnout cíle."
-  },
-  {
-    "word": "evidence",
-    "translation": "důkaz",
-    "level": "B2",
-    "hint": "Facts or information that show something is true.",
-    "hint_cz": "Fakta nebo informace, které ukazují, že něco je pravda."
-  },
-  {
-    "word": "to hesitate",
-    "translation": "váhat",
-    "level": "B2",
-    "hint": "Pause before doing something.",
-    "hint_cz": "Zastavit se před tím, než něco uděláš."
-  },
-  {
-    "word": "to encourage",
-    "translation": "povzbudit",
-    "level": "B1",
-    "hint": "Give someone support or confidence.",
-    "hint_cz": "Dát někomu podporu nebo sebedůvěru."
+    "word": "comfortable",
+    "translation": "pohodlný",
+    "level": "A2",
+    "hint": "Nice and easy to sit in or wear.",
+    "hint_cz": "Příjemné a snadné na sezení nebo nošení."
   },
   {
     "word": "to complain",
     "translation": "stěžovat si",
-    "level": "B1",
-    "hint": "Say that you are not satisfied.",
-    "hint_cz": "Říct, že nejsi spokojený."
-  },
-  {
-    "word": "to suggest",
-    "translation": "navrhnout",
-    "level": "B1",
-    "hint": "To offer an idea or plan.",
-    "hint_cz": "Nabídnout nápad nebo plán."
-  },
-  {
-    "word": "to refuse",
-    "translation": "odmítnout",
-    "level": "B2",
-    "hint": "Say no to something.",
-    "hint_cz": "Říct ne něčemu."
-  },
-  {
-    "word": "to persuade",
-    "translation": "přesvědčit",
-    "level": "B2",
-    "hint": "Make someone do something by giving reasons.",
-    "hint_cz": "Přimět někoho něco udělat tím, že mu dáš důvody."
-  },
-  {
-    "word": "to remind",
-    "translation": "připomenout",
-    "level": "B1",
-    "hint": "Help someone remember something.",
-    "hint_cz": "Pomoci někomu si něco zapamatovat."
-  },
-  {
-    "word": "to borrow",
-    "translation": "půjčit si",
     "level": "A2",
-    "hint": "Take and use something that belongs to someone else.",
-    "hint_cz": "Vzit si a použít něco, co patří někomu jinému."
-  },
-  {
-    "word": "to lend",
-    "translation": "půjčit (někomu)",
-    "level": "A2",
-    "hint": "Give something to someone for a short time.",
-    "hint_cz": "Dát něco někomu na krátkou dobu."
+    "hint": "Say that you are not happy about something.",
+    "hint_cz": "Říkat, že nejsi s něčím spokojený."
   },
   {
     "word": "to promise",
     "translation": "slíbit",
     "level": "A2",
-    "hint": "Say you will definitely do something.",
+    "hint": "Say that you will definitely do something.",
     "hint_cz": "Říct, že určitě něco uděláš."
   },
   {
@@ -298,20 +102,881 @@
     "translation": "pozvat",
     "level": "A2",
     "hint": "Ask someone to come to an event.",
-    "hint_cz": "Pozvat někoho na událost."
+    "hint_cz": "Poprosit někoho, aby přišel na akci."
+  },
+  {
+    "word": "to prepare",
+    "translation": "připravit se",
+    "level": "A2",
+    "hint": "Get ready before something happens.",
+    "hint_cz": "Připravit se předtím, než se něco stane."
+  },
+  {
+    "word": "to borrow",
+    "translation": "půjčit si",
+    "level": "A2",
+    "hint": "Take something that belongs to someone else for a time.",
+    "hint_cz": "Vzít si něco, co patří někomu jinému, na nějaký čas."
+  },
+  {
+    "word": "to lend",
+    "translation": "půjčit (někomu)",
+    "level": "A2",
+    "hint": "Give something to someone for a short time.",
+    "hint_cz": "Dát někomu něco na krátkou dobu."
+  },
+  {
+    "word": "on time",
+    "translation": "včas",
+    "level": "A2",
+    "hint": "Not late, at the right time.",
+    "hint_cz": "Nebýt pozdě, ve správný čas."
+  },
+  {
+    "word": "in a hurry",
+    "translation": "spěchat",
+    "level": "A2",
+    "hint": "Needing to do something quickly.",
+    "hint_cz": "Potřebovat udělat něco rychle."
+  },
+  {
+    "word": "confident",
+    "translation": "sebevědomý",
+    "level": "B1",
+    "hint": "Sure that you can do something well.",
+    "hint_cz": "Jistý si tím, že něco zvládneš."
+  },
+  {
+    "word": "creative",
+    "translation": "tvořivý / kreativní",
+    "level": "B1",
+    "hint": "Good at making new and interesting ideas.",
+    "hint_cz": "Umí vymýšlet nové a zajímavé nápady."
+  },
+  {
+    "word": "solve a problem",
+    "translation": "vyřešit problém",
+    "level": "B1",
+    "hint": "Find an answer to something difficult.",
+    "hint_cz": "Najít odpověď na něco těžkého."
+  },
+  {
+    "word": "make a decision",
+    "translation": "udělat rozhodnutí",
+    "level": "B1",
+    "hint": "Choose what you will do.",
+    "hint_cz": "Vybrat si, co uděláš."
+  },
+  {
+    "word": "pay attention",
+    "translation": "dávat pozor",
+    "level": "B1",
+    "hint": "Listen or look carefully.",
+    "hint_cz": "Pozorně poslouchat nebo se dívat."
+  },
+  {
+    "word": "waste time",
+    "translation": "plýtvat časem",
+    "level": "B1",
+    "hint": "Use time on something not important.",
+    "hint_cz": "Trávit čas něčím nedůležitým."
+  },
+  {
+    "word": "take a risk",
+    "translation": "riskovat",
+    "level": "B1",
+    "hint": "Do something that might be dangerous.",
+    "hint_cz": "Dělat něco, co může být nebezpečné."
+  },
+  {
+    "word": "lose weight",
+    "translation": "zhubnout",
+    "level": "B1",
+    "hint": "Become thinner.",
+    "hint_cz": "Zhubnout, stát se hubenějším."
+  },
+  {
+    "word": "keep in touch",
+    "translation": "zůstat v kontaktu",
+    "level": "B1",
+    "hint": "Continue to talk to someone.",
+    "hint_cz": "Pokračovat v kontaktu s někým."
+  },
+  {
+    "word": "interrupt",
+    "translation": "přerušit",
+    "level": "B1",
+    "hint": "Stop someone while they are talking.",
+    "hint_cz": "Zastavit někoho, když mluví."
+  },
+  {
+    "word": "accurate",
+    "translation": "přesný",
+    "level": "B2",
+    "hint": "Completely correct and without mistakes.",
+    "hint_cz": "Úplně správný a bez chyb."
+  },
+  {
+    "word": "efficient",
+    "translation": "efektivní / výkonný",
+    "level": "B2",
+    "hint": "Doing something well without wasting time.",
+    "hint_cz": "Dělat něco dobře bez ztráty času."
+  },
+  {
+    "word": "perspective",
+    "translation": "úhel pohledu",
+    "level": "B2",
+    "hint": "The way someone sees a situation.",
+    "hint_cz": "Způsob, jakým někdo vidí situaci."
+  },
+  {
+    "word": "requirement",
+    "translation": "požadavek",
+    "level": "B2",
+    "hint": "Something that is needed or asked for.",
+    "hint_cz": "Něco, co je potřeba nebo je požadováno."
+  },
+  {
+    "word": "nevertheless",
+    "translation": "přesto / nicméně",
+    "level": "B2",
+    "hint": "Used to say that something happens despite a fact.",
+    "hint_cz": "Používá se, když se něco stane navzdory nějakému faktu."
+  },
+  {
+    "word": "take something for granted",
+    "translation": "brát něco jako samozřejmost",
+    "level": "B2",
+    "hint": "Not notice how important something is because you always have it.",
+    "hint_cz": "Nevnímat, jak je něco důležité, protože to máš pořád."
+  },
+  {
+    "word": "from scratch",
+    "translation": "od začátku / od nuly",
+    "level": "B2",
+    "hint": "Start something without using anything that exists.",
+    "hint_cz": "Začít něco bez použití něčeho hotového."
+  },
+  {
+    "word": "on the other hand",
+    "translation": "na druhou stranu",
+    "level": "B2",
+    "hint": "Introduce a different opinion or fact.",
+    "hint_cz": "Uvede jiný názor nebo fakt."
+  },
+  {
+    "word": "as a result",
+    "translation": "v důsledku / proto",
+    "level": "B2",
+    "hint": "Shows what happens because of something.",
+    "hint_cz": "Ukazuje, co se stane kvůli něčemu."
+  },
+  {
+    "word": "in the meantime",
+    "translation": "zatímco / mezitím",
+    "level": "B2",
+    "hint": "During the time between two events.",
+    "hint_cz": "Během času mezi dvěma událostmi."
+  },
+  {
+    "word": "by accident",
+    "translation": "náhodou / omylem",
+    "level": "B2",
+    "hint": "Without planning to do it.",
+    "hint_cz": "Bez toho, aby to člověk plánoval."
+  },
+  {
+    "word": "take responsibility",
+    "translation": "převzít odpovědnost",
+    "level": "B2",
+    "hint": "Accept that something is your fault or your job.",
+    "hint_cz": "Přijmout, že je něco tvoje chyba nebo tvoje práce."
+  },
+  {
+    "word": "bedroom",
+    "translation": "ložnice",
+    "level": "A1",
+    "hint": "Room where you sleep.",
+    "hint_cz": "Místnost, kde spíš."
+  },
+  {
+    "word": "mirror",
+    "translation": "zrcadlo",
+    "level": "A1",
+    "hint": "You can see your face in it.",
+    "hint_cz": "Můžeš v něm vidět svůj obličej."
+  },
+  {
+    "word": "forest",
+    "translation": "les",
+    "level": "A1",
+    "hint": "Big area with many trees.",
+    "hint_cz": "Velká oblast s mnoha stromy."
+  },
+  {
+    "word": "island",
+    "translation": "ostrov",
+    "level": "A1",
+    "hint": "Land with water around it.",
+    "hint_cz": "Kus země obklopený vodou."
+  },
+  {
+    "word": "village",
+    "translation": "vesnice",
+    "level": "A1",
+    "hint": "Small place where people live, smaller than a town.",
+    "hint_cz": "Malé místo, kde lidé žijí, menší než město."
+  },
+  {
+    "word": "bridge",
+    "translation": "most",
+    "level": "A1",
+    "hint": "You walk or drive over it across water or a road.",
+    "hint_cz": "Chodíš nebo jezdíš po něm přes vodu nebo silnici."
+  },
+  {
+    "word": "roof",
+    "translation": "střecha",
+    "level": "A1",
+    "hint": "Top part of a house.",
+    "hint_cz": "Horní část domu."
+  },
+  {
+    "word": "factory",
+    "translation": "továrna",
+    "level": "A1",
+    "hint": "Place where things are made.",
+    "hint_cz": "Místo, kde se vyrábějí věci."
+  },
+  {
+    "word": "suitcase",
+    "translation": "kufr",
+    "level": "A1",
+    "hint": "Big bag for clothes when you travel.",
+    "hint_cz": "Velká taška na oblečení, když cestuješ."
+  },
+  {
+    "word": "candle",
+    "translation": "svíčka",
+    "level": "A1",
+    "hint": "It gives light when you burn it.",
+    "hint_cz": "Dává světlo, když ji zapálíš."
+  },
+  {
+    "word": "neighbour",
+    "translation": "soused",
+    "level": "A1",
+    "hint": "Person who lives next to you.",
+    "hint_cz": "Člověk, který bydlí vedle tebe."
+  },
+  {
+    "word": "password",
+    "translation": "heslo",
+    "level": "A1",
+    "hint": "Secret word you use to log in.",
+    "hint_cz": "Tajné slovo, které používáš k přihlášení."
+  },
+  {
+    "word": "email address",
+    "translation": "emailová adresa",
+    "level": "A1",
+    "hint": "You need it to send and get emails.",
+    "hint_cz": "Potřebuješ ji na posílání a přijímání emailů."
+  },
+  {
+    "word": "weekday",
+    "translation": "pracovní den",
+    "level": "A1",
+    "hint": "Any day from Monday to Friday.",
+    "hint_cz": "Jakýkoli den od pondělí do pátku."
+  },
+  {
+    "word": "weekend",
+    "translation": "víkend",
+    "level": "A1",
+    "hint": "Saturday and Sunday together.",
+    "hint_cz": "Sobota a neděle dohromady."
+  },
+  {
+    "word": "desert",
+    "translation": "poušť",
+    "level": "A2",
+    "hint": "Very dry place with a lot of sand.",
+    "hint_cz": "Velmi suché místo s velkým množstvím písku."
+  },
+  {
+    "word": "coast",
+    "translation": "pobřeží",
+    "level": "A2",
+    "hint": "Land next to the sea.",
+    "hint_cz": "Země vedle moře."
+  },
+  {
+    "word": "traffic jam",
+    "translation": "dopravní zácpa",
+    "level": "A2",
+    "hint": "Many cars on the road moving very slowly.",
+    "hint_cz": "Hodně aut na silnici, která jedou velmi pomalu."
+  },
+  {
+    "word": "crowded",
+    "translation": "přeplněný",
+    "level": "A2",
+    "hint": "Full of people.",
+    "hint_cz": "Plný lidí."
+  },
+  {
+    "word": "to depend on",
+    "translation": "záležet na / záviset na",
+    "level": "A2",
+    "hint": "To be decided or changed by something.",
+    "hint_cz": "Být ovlivněn nebo určen něčím jiným."
+  },
+  {
+    "word": "to solve",
+    "translation": "vyřešit",
+    "level": "A2",
+    "hint": "Find the answer to a problem.",
+    "hint_cz": "Najít řešení problému."
+  },
+  {
+    "word": "to realise",
+    "translation": "uvědomit si",
+    "level": "A2",
+    "hint": "Suddenly understand something.",
+    "hint_cz": "Najednou něco pochopit."
+  },
+  {
+    "word": "to share",
+    "translation": "sdílet",
+    "level": "A2",
+    "hint": "Let someone use something that is yours.",
+    "hint_cz": "Dovolit někomu používat něco, co je tvoje."
+  },
+  {
+    "word": "to guess",
+    "translation": "uhodnout / hádat",
+    "level": "A2",
+    "hint": "Say an answer when you are not sure.",
+    "hint_cz": "Říct odpověď, když si nejsi jistý."
+  },
+  {
+    "word": "to shout",
+    "translation": "křičet",
+    "level": "A2",
+    "hint": "Speak very loudly.",
+    "hint_cz": "Mluvit velmi nahlas."
+  },
+  {
+    "word": "to apologize",
+    "translation": "omluvit se",
+    "level": "A2",
+    "hint": "Say that you are sorry.",
+    "hint_cz": "Říct, že je ti to líto."
+  },
+  {
+    "word": "to recommend",
+    "translation": "doporučit",
+    "level": "A2",
+    "hint": "Say that something is good.",
+    "hint_cz": "Říct, že je něco dobré."
+  },
+  {
+    "word": "take a photo",
+    "translation": "vyfotit fotku",
+    "level": "A2",
+    "hint": "Use a camera or phone to make a picture.",
+    "hint_cz": "Použít foťák nebo mobil k vytvoření fotky."
+  },
+  {
+    "word": "do the dishes",
+    "translation": "umýt nádobí",
+    "level": "A2",
+    "hint": "Wash plates and cups after eating.",
+    "hint_cz": "Mýt talíře a hrnky po jídle."
+  },
+  {
+    "word": "do the shopping",
+    "translation": "nakoupit",
+    "level": "A2",
+    "hint": "Go to a shop to buy things.",
+    "hint_cz": "Jít do obchodu a koupit věci."
+  },
+  {
+    "word": "catch a cold",
+    "translation": "nachladit se",
+    "level": "A2",
+    "hint": "Become a little bit ill.",
+    "hint_cz": "Mírně onemocnět nachlazením."
+  },
+  {
+    "word": "get married",
+    "translation": "vdát se / oženit se",
+    "level": "A2",
+    "hint": "Become husband and wife.",
+    "hint_cz": "Stát se manželem a manželkou."
+  },
+  {
+    "word": "change your mind",
+    "translation": "změnit názor",
+    "level": "A2",
+    "hint": "Decide to do something different.",
+    "hint_cz": "Rozhodnout se udělat něco jiného."
+  },
+  {
+    "word": "look after",
+    "translation": "starat se o",
+    "level": "A2",
+    "hint": "Take care of someone.",
+    "hint_cz": "Starat se o někoho."
+  },
+  {
+    "word": "look forward to",
+    "translation": "těšit se na",
+    "level": "A2",
+    "hint": "Be happy because something will happen.",
+    "hint_cz": "Být rád, protože se něco stane."
+  },
+  {
+    "word": "look up",
+    "translation": "vyhledat (ve slovníku)",
+    "level": "A2",
+    "hint": "Search for information in a book or online.",
+    "hint_cz": "Hledat informace v knize nebo na internetu."
+  },
+  {
+    "word": "look for",
+    "translation": "hledat",
+    "level": "A2",
+    "hint": "Try to find something.",
+    "hint_cz": "Snažit se něco najít."
+  },
+  {
+    "word": "to blame",
+    "translation": "vinit",
+    "level": "B1",
+    "hint": "Say that someone is responsible for a problem.",
+    "hint_cz": "Říct, že někdo může za problém."
+  },
+  {
+    "word": "to avoid",
+    "translation": "vyhnout se",
+    "level": "B1",
+    "hint": "Stay away from something.",
+    "hint_cz": "Držet se dál od něčeho."
   },
   {
     "word": "to discover",
     "translation": "objevit",
     "level": "B1",
-    "hint": "Find something for the first time.",
-    "hint_cz": "Najít něco poprvé."
+    "hint": "Find something new.",
+    "hint_cz": "Najít něco nového."
   },
   {
-    "word": "to destroy",
-    "translation": "zničit",
+    "word": "to encourage",
+    "translation": "povzbudit",
     "level": "B1",
-    "hint": "To damage something so badly it cannot be used.",
-    "hint_cz": "Poškodit něco tak, že to už nejde použít."
+    "hint": "Give someone confidence to do something.",
+    "hint_cz": "Dodat někomu odvahu něco udělat."
+  },
+  {
+    "word": "to improve",
+    "translation": "zlepšit",
+    "level": "B1",
+    "hint": "Make something better.",
+    "hint_cz": "Udělat něco lepším."
+  },
+  {
+    "word": "to achieve",
+    "translation": "dosáhnout",
+    "level": "B1",
+    "hint": "Successfully reach a goal.",
+    "hint_cz": "Úspěšně dosáhnout cíle."
+  },
+  {
+    "word": "to behave",
+    "translation": "chovat se",
+    "level": "B1",
+    "hint": "Act in a particular way.",
+    "hint_cz": "Jednat určitým způsobem."
+  },
+  {
+    "word": "to explain",
+    "translation": "vysvětlit",
+    "level": "B1",
+    "hint": "Make something clear or easy to understand.",
+    "hint_cz": "Udělat něco jasným nebo snadným na pochopení."
+  },
+  {
+    "word": "to complain about",
+    "translation": "stěžovat si na",
+    "level": "B1",
+    "hint": "Say that you are unhappy with something.",
+    "hint_cz": "Říkat, že nejsi s něčím spokojený."
+  },
+  {
+    "word": "face a problem",
+    "translation": "čelit problému",
+    "level": "B1",
+    "hint": "Have a difficult situation you must deal with.",
+    "hint_cz": "Mít těžkou situaci, kterou musíš řešit."
+  },
+  {
+    "word": "make progress",
+    "translation": "dělat pokrok",
+    "level": "B1",
+    "hint": "Improve or move forward.",
+    "hint_cz": "Zlepšovat se nebo posouvat se dopředu."
+  },
+  {
+    "word": "set a goal",
+    "translation": "stanovit si cíl",
+    "level": "B1",
+    "hint": "Decide what you want to achieve.",
+    "hint_cz": "Rozhodnout se, čeho chceš dosáhnout."
+  },
+  {
+    "word": "change the subject",
+    "translation": "změnit téma",
+    "level": "B1",
+    "hint": "Start talking about something different.",
+    "hint_cz": "Začít mluvit o něčem jiném."
+  },
+  {
+    "word": "break the rules",
+    "translation": "porušit pravidla",
+    "level": "B1",
+    "hint": "Not follow the rules.",
+    "hint_cz": "Nedodržovat pravidla."
+  },
+  {
+    "word": "miss the bus",
+    "translation": "ujede ti autobus",
+    "level": "B1",
+    "hint": "Arrive too late to get on the bus.",
+    "hint_cz": "Přijít pozdě a nestihnout autobus."
+  },
+  {
+    "word": "take part in",
+    "translation": "zúčastnit se",
+    "level": "B1",
+    "hint": "Join an event or activity.",
+    "hint_cz": "Zúčastnit se akce nebo aktivity."
+  },
+  {
+    "word": "in my opinion",
+    "translation": "podle mého názoru",
+    "level": "B1",
+    "hint": "Used before giving your idea.",
+    "hint_cz": "Používá se před tím, než řekneš svůj názor."
+  },
+  {
+    "word": "as soon as possible",
+    "translation": "co nejdříve",
+    "level": "B1",
+    "hint": "As quickly as you can.",
+    "hint_cz": "Tak rychle, jak jen můžeš."
+  },
+  {
+    "word": "at the same time",
+    "translation": "ve stejnou dobu",
+    "level": "B1",
+    "hint": "Happening together, not one after another.",
+    "hint_cz": "Děje se to zároveň, ne po sobě."
+  },
+  {
+    "word": "on purpose",
+    "translation": "úmyslně",
+    "level": "B1",
+    "hint": "You mean to do it, it is not an accident.",
+    "hint_cz": "Uděláš to schválně, není to náhoda."
+  },
+  {
+    "word": "take a break",
+    "translation": "dát si pauzu",
+    "level": "B1",
+    "hint": "Stop working for a short time.",
+    "hint_cz": "Na chvíli přestat pracovat."
+  },
+  {
+    "word": "make an effort",
+    "translation": "vyvinout úsilí",
+    "level": "B1",
+    "hint": "Try hard to do something.",
+    "hint_cz": "Hodně se snažit něco udělat."
+  },
+  {
+    "word": "take care of",
+    "translation": "starat se o",
+    "level": "B1",
+    "hint": "Look after someone or something.",
+    "hint_cz": "Starat se o někoho nebo o něco."
+  },
+  {
+    "word": "in charge of",
+    "translation": "mít na starosti",
+    "level": "B1",
+    "hint": "Be responsible for something.",
+    "hint_cz": "Být za něco zodpovědný."
+  },
+  {
+    "word": "according to",
+    "translation": "podle (někoho / něčeho)",
+    "level": "B1",
+    "hint": "As said by someone or something.",
+    "hint_cz": "Jak říká někdo nebo něco."
+  },
+  {
+    "word": "take advantage of",
+    "translation": "využít (něco)",
+    "level": "B2",
+    "hint": "Use a situation to get something good for yourself.",
+    "hint_cz": "Využít situaci, aby z toho něco měl."
+  },
+  {
+    "word": "in the long term",
+    "translation": "z dlouhodobého hlediska",
+    "level": "B2",
+    "hint": "After a long time, not immediately.",
+    "hint_cz": "Po delší době, ne hned."
+  },
+  {
+    "word": "at first sight",
+    "translation": "na první pohled",
+    "level": "B2",
+    "hint": "When you see something for the first time.",
+    "hint_cz": "Když něco vidíš poprvé."
+  },
+  {
+    "word": "for instance",
+    "translation": "například",
+    "level": "B2",
+    "hint": "Another way to say 'for example'.",
+    "hint_cz": "Jiný způsob, jak říct 'například'."
+  },
+  {
+    "word": "due to",
+    "translation": "kvůli",
+    "level": "B2",
+    "hint": "Because of something.",
+    "hint_cz": "Kvůli něčemu."
+  },
+  {
+    "word": "in case",
+    "translation": "pro případ, že",
+    "level": "B2",
+    "hint": "If something happens.",
+    "hint_cz": "Kdyby se něco stalo."
+  },
+  {
+    "word": "on condition that",
+    "translation": "pod podmínkou, že",
+    "level": "B2",
+    "hint": "Only if something happens first.",
+    "hint_cz": "Jenom pokud se něco nejdřív stane."
+  },
+  {
+    "word": "as far as I know",
+    "translation": "pokud vím",
+    "level": "B2",
+    "hint": "Used when you are not 100% sure.",
+    "hint_cz": "Používá se, když si nejsi na 100 % jistý."
+  },
+  {
+    "word": "to estimate",
+    "translation": "odhadnout",
+    "level": "B2",
+    "hint": "Guess the number, amount or size.",
+    "hint_cz": "Odhadnout číslo, množství nebo velikost."
+  },
+  {
+    "word": "to convince",
+    "translation": "přesvědčit",
+    "level": "B2",
+    "hint": "Make someone believe that something is true.",
+    "hint_cz": "Přesvědčit někoho, že něco je pravda."
+  },
+  {
+    "word": "to consider",
+    "translation": "zvážit / považovat",
+    "level": "B2",
+    "hint": "Think carefully about something.",
+    "hint_cz": "Pečlivě o něčem přemýšlet."
+  },
+  {
+    "word": "to maintain",
+    "translation": "udržovat",
+    "level": "B2",
+    "hint": "Keep something in good condition.",
+    "hint_cz": "Držet něco v dobrém stavu."
+  },
+  {
+    "word": "to participate",
+    "translation": "účastnit se",
+    "level": "B2",
+    "hint": "Take part in an activity or event.",
+    "hint_cz": "Účastnit se nějaké aktivity nebo události."
+  },
+  {
+    "word": "to prevent",
+    "translation": "zabránit",
+    "level": "B2",
+    "hint": "Stop something from happening.",
+    "hint_cz": "Zabránit, aby se něco stalo."
+  },
+  {
+    "word": "to require",
+    "translation": "vyžadovat",
+    "level": "B2",
+    "hint": "Need something.",
+    "hint_cz": "Něco potřebovat nebo to mít jako podmínku."
+  },
+  {
+    "word": "to influence",
+    "translation": "ovlivnit",
+    "level": "B2",
+    "hint": "Change how someone thinks or behaves.",
+    "hint_cz": "Změnit, jak někdo přemýšlí nebo se chová."
+  },
+  {
+    "word": "to underestimate",
+    "translation": "podcenit",
+    "level": "B2",
+    "hint": "Think that someone or something is less good than it is.",
+    "hint_cz": "Myslet si, že někdo nebo něco je horší, než ve skutečnosti je."
+  },
+  {
+    "word": "to rely on",
+    "translation": "spoléhat na",
+    "level": "B2",
+    "hint": "Need someone or something to help you.",
+    "hint_cz": "Potřebovat někoho nebo něco, abys to zvládl."
+  },
+  {
+    "word": "to emphasize",
+    "translation": "zdůraznit",
+    "level": "B2",
+    "hint": "Say that something is very important.",
+    "hint_cz": "Říct, že je něco velmi důležité."
+  },
+  {
+    "word": "to reflect on",
+    "translation": "přemýšlet o",
+    "level": "B2",
+    "hint": "Think deeply and carefully about something.",
+    "hint_cz": "Hluboce a pečlivě o něčem přemýšlet."
+  },
+  {
+    "word": "majority",
+    "translation": "většina",
+    "level": "B2",
+    "hint": "More than half of a group.",
+    "hint_cz": "Více než polovina skupiny."
+  },
+  {
+    "word": "minority",
+    "translation": "menšina",
+    "level": "B2",
+    "hint": "Smaller part of a group.",
+    "hint_cz": "Menší část skupiny."
+  },
+  {
+    "word": "consequence",
+    "translation": "důsledek",
+    "level": "B2",
+    "hint": "Result of an action.",
+    "hint_cz": "Následek nějakého jednání."
+  },
+  {
+    "word": "circumstances",
+    "translation": "okolnosti",
+    "level": "B2",
+    "hint": "Facts and conditions that affect a situation.",
+    "hint_cz": "Fakta a podmínky, které ovlivňují situaci."
+  },
+  {
+    "word": "obstacle",
+    "translation": "překážka",
+    "level": "B2",
+    "hint": "Something that makes it difficult to do something.",
+    "hint_cz": "Něco, co ztěžuje, aby se něco udělalo."
+  },
+  {
+    "word": "opportunity",
+    "translation": "příležitost",
+    "level": "B2",
+    "hint": "Good chance to do something.",
+    "hint_cz": "Dobrá šance něco udělat."
+  },
+  {
+    "word": "responsibility",
+    "translation": "odpovědnost",
+    "level": "B2",
+    "hint": "Duty to deal with something.",
+    "hint_cz": "Povinnost se o něco starat nebo to řešit."
+  },
+  {
+    "word": "potential",
+    "translation": "potenciál",
+    "level": "B2",
+    "hint": "Ability to develop, succeed or improve.",
+    "hint_cz": "Schopnost se rozvíjet, uspět nebo zlepšit se."
+  },
+  {
+    "word": "significant",
+    "translation": "významný",
+    "level": "B2",
+    "hint": "Important or large enough to be noticed.",
+    "hint_cz": "Dost důležitý nebo velký, aby si ho člověk všiml."
+  },
+  {
+    "word": "slight",
+    "translation": "nepatrný / mírný",
+    "level": "B2",
+    "hint": "Very small in amount or degree.",
+    "hint_cz": "Velmi malý co do množství nebo míry."
+  },
+  {
+    "word": "gradually",
+    "translation": "postupně",
+    "level": "B2",
+    "hint": "Slowly over a period of time.",
+    "hint_cz": "Pomalu během určité doby."
+  },
+  {
+    "word": "roughly",
+    "translation": "zhruba / přibližně",
+    "level": "B2",
+    "hint": "Not exactly but almost.",
+    "hint_cz": "Ne úplně přesně, ale skoro."
+  },
+  {
+    "word": "rarely",
+    "translation": "zřídka",
+    "level": "B2",
+    "hint": "Not very often.",
+    "hint_cz": "Ne moc často."
+  },
+  {
+    "word": "frequently",
+    "translation": "často",
+    "level": "B2",
+    "hint": "Many times or very often.",
+    "hint_cz": "Mnohokrát nebo velmi často."
+  },
+  {
+    "word": "eventually",
+    "translation": "nakonec",
+    "level": "B2",
+    "hint": "In the end, after some time.",
+    "hint_cz": "Nakonec, po nějaké době."
+  },
+  {
+    "word": "meanwhile",
+    "translation": "zatím / mezitím",
+    "level": "B2",
+    "hint": "At the same time as something else.",
+    "hint_cz": "Ve stejnou dobu jako něco jiného."
   }
 ]

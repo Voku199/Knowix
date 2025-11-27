@@ -3,15 +3,69 @@ const STATIC_CACHE = 'knowix-static-v2';
 const DYNAMIC_CACHE = 'knowix-dynamic-v2';
 const OFFLINE_URL = '/offline';
 
+// Denní limit lokálně v SW jako poslední pojistka (server má hlavní limit)
+const MAX_PUSHES_PER_DAY_SW = 5;
+
 // Seznam statických souborů k precache
 const PRECACHE_ASSETS = [
     '/', '/offline', '/static/style.css', '/static/mobile_header.css',
     '/static/pic/logo.webp', '/static/favicon.ico', '/static/manifest.json'
 ];
 
-// Detekce iOS
+// --- Jednoduchý IndexedDB helper ---
+const DB_NAME = 'knowix-sw';
+const DB_STORE = 'kv';
+
+function idbOpen() {
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+            const db = req.result;
+            if (!db.objectStoreNames.contains(DB_STORE)) {
+                db.createObjectStore(DB_STORE);
+            }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+function idbGet(key) {
+    return idbOpen().then(db => new Promise((resolve, reject) => {
+        const tx = db.transaction(DB_STORE, 'readonly');
+        const st = tx.objectStore(DB_STORE);
+        const g = st.get(key);
+        g.onsuccess = () => resolve(g.result);
+        g.onerror = () => reject(g.error);
+    }));
+}
+
+function idbSet(key, val) {
+    return idbOpen().then(db => new Promise((resolve, reject) => {
+        const tx = db.transaction(DB_STORE, 'readwrite');
+        const st = tx.objectStore(DB_STORE);
+        const p = st.put(val, key);
+        p.onsuccess = () => resolve(true);
+        p.onerror = () => reject(p.error);
+    }));
+}
+
+function todayStr() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+
+// Detekce iOS v SW (bezpečně, userAgent může být nedostupný)
 function isIOS() {
-    return /iphone|ipad|ipod/i.test(navigator.userAgent);
+    try {
+        const ua = (self.navigator && self.navigator.userAgent) ? self.navigator.userAgent : '';
+        return /iphone|ipad|ipod/i.test(ua);
+    } catch (_) {
+        return false;
+    }
 }
 
 self.addEventListener('install', (event) => {
@@ -114,72 +168,115 @@ self.addEventListener('fetch', (event) => {
     );
 });
 
+async function canShowNotificationToday() {
+    try {
+        const key = 'push-count:' + todayStr();
+        const n = await idbGet(key);
+        const cur = typeof n === 'number' ? n : parseInt(n || '0', 10) || 0;
+        return cur < MAX_PUSHES_PER_DAY_SW;
+    } catch (_) {
+        return true; // pokud IDB selže, neblokuj
+    }
+}
+
+async function markNotificationShown() {
+    try {
+        const key = 'push-count:' + todayStr();
+        const n = await idbGet(key);
+        const cur = typeof n === 'number' ? n : parseInt(n || '0', 10) || 0;
+        await idbSet(key, cur + 1);
+    } catch (_) {
+        // ignore
+    }
+}
+
+async function notifyClientsShown() {
+    try {
+        const cl = await clients.matchAll({type: 'window', includeUncontrolled: true});
+        for (const c of cl) {
+            c.postMessage({type: 'PUSH_SHOWN'});
+        }
+    } catch (_) {
+    }
+}
+
 // Push notifikace - JEDNA definice
 self.addEventListener('push', (event) => {
     console.log('[SW] Push event received:', event);
 
-    let data = {};
-    try {
-        data = event.data ? event.data.json() : {};
-        console.log('[SW] Push data parsed:', data);
-    } catch (e) {
-        console.error('[SW] Push data parsing error:', e);
-        // Fallback pro starší prohlížeče
-        try {
-            data = {
-                title: 'Knowix',
-                body: event.data?.text() || 'Nová aktualizace!',
-                url: '/'
-            };
-        } catch (_) {
-            data = {
-                title: 'Knowix',
-                body: 'Nová lekce je dostupná!',
-                url: '/'
-            };
+    event.waitUntil((async () => {
+        // Denní limit – pojistka
+        const allowed = await canShowNotificationToday();
+        if (!allowed) {
+            console.log('[SW] Daily push limit reached in SW – skipping notification');
+            return;
         }
-    }
 
-    const title = data.title || 'Knowix aktualizace';
-    let body = data.body || 'Nová lekce je dostupná!';
-    const url = data.url || '/';
+        let data = {};
+        try {
+            data = event.data ? event.data.json() : {};
+            console.log('[SW] Push data parsed:', data);
+        } catch (e) {
+            console.error('[SW] Push data parsing error:', e);
+            // Fallback pro starší prohlížeče
+            try {
+                data = {
+                    title: 'Knowix',
+                    body: event.data?.text() || 'Nová aktualizace!',
+                    url: '/'
+                };
+            } catch (_) {
+                data = {
+                    title: 'Knowix',
+                    body: 'Nová lekce je dostupná!',
+                    url: '/'
+                };
+            }
+        }
 
-    // iOS specifické úpravy
-    const options = {
-        body: body,
-        icon: '/static/pic/logo.webp',
-        badge: '/static/pic/logo.webp',
-        data: {url: url},
-        tag: data.tag || 'knowix-general',
-        renotify: true,
-        requireInteraction: false
-    };
+        const title = data.title || 'Knowix aktualizace';
+        let body = data.body || 'Nová lekce je dostupná!';
+        const url = data.url || '/';
 
-    // Pro iOS: zkrátit text pokud je příliš dlouhý
-    if (isIOS() && body.length > 100) {
-        options.body = body.substring(0, 100) + '...';
-    }
+        // iOS specifické úpravy
+        const options = {
+            body: body,
+            icon: '/static/pic/logo.webp',
+            badge: '/static/pic/logo.webp',
+            data: {url: url},
+            tag: data.tag || 'knowix-general',
+            renotify: true,
+            requireInteraction: false,
+            vibrate: [100, 50, 100]
+        };
 
-    // Vibrace pokud jsou podporovány
-    if ('vibrate' in navigator) {
-        options.vibrate = [100, 50, 100];
-    }
+        // Pro iOS: zkrátit text pokud je příliš dlouhý
+        if (isIOS() && body.length > 100) {
+            options.body = body.substring(0, 100) + '...';
+        }
 
-    console.log('[SW] Showing notification with options:', options);
+        console.log('[SW] Showing notification with options:', options);
 
-    event.waitUntil(
-        self.registration.showNotification(title, options)
-            .then(() => console.log('[SW] Notification shown successfully'))
-            .catch(err => {
-                console.error('[SW] Notification error:', err);
-                // Fallback pro iOS - zkusíme bez tagu
-                if (isIOS()) {
-                    delete options.tag;
-                    return self.registration.showNotification(title, options);
+        try {
+            await self.registration.showNotification(title, options);
+            await markNotificationShown();
+            await notifyClientsShown();
+            console.log('[SW] Notification shown successfully');
+        } catch (err) {
+            console.error('[SW] Notification error:', err);
+            // Fallback pro iOS - zkusíme bez tagu
+            if (isIOS()) {
+                delete options.tag;
+                try {
+                    await self.registration.showNotification(title, options);
+                    await markNotificationShown();
+                    await notifyClientsShown();
+                } catch (e2) {
+                    console.error('[SW] Notification retry error:', e2);
                 }
-                throw err;
-            })
-    );
+            }
+        }
+    })());
 });
 
 // Obsluha kliknutí na notifikaci - JEDNA definice
@@ -276,3 +373,4 @@ self.addEventListener('pushsubscriptionchange', (event) => {
         }
     })());
 });
+

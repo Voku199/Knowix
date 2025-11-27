@@ -48,6 +48,7 @@ from daily_quest import daily_bp, get_daily_quests_for_user
 from AI_gramatika import ai_gramatika_bp
 from reminders import reminders_bp, start_reminder_scheduler  # Přidán import připomínkového systému
 from push_notifications import push_bp, test_send_push  # PWA push notifikace blueprint + test sender
+from wordle import wordle_bp
 
 # -------- Matematiky --------------------
 # from math_main import math_main_bp
@@ -154,6 +155,7 @@ app.register_blueprint(daily_bp)
 app.register_blueprint(ai_gramatika_bp)
 app.register_blueprint(reminders_bp)  # Registrace blueprintu pro unsubscribe a ruční scan
 app.register_blueprint(push_bp)
+app.register_blueprint(wordle_bp)
 
 # -------- Matematiky --------------------
 # app.register_blueprint(math_main_bp)
@@ -446,6 +448,4 @@ def send_notification_alias_root():
 # serve(app, host='0.0.0.0', port=8080, threads=24, backlog=100)
 
 # === Spuštění aplikace ===
-from waitress import serve
-
-serve(app, host='0.0.0.0', port=8080, threads=24, backlog=100)
+app.run(port=5000, debug=True, host='0.0.0.0')

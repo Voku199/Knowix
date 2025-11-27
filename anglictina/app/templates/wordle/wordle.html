@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Uč se anglicky zdarma a zábavně. Knowix nabízí písničky, chatové lekce, testy, příběhy a interaktivní cvičení pro děti i studenty. Moderní výuka angličtiny bez reklam. Angličitna Zdarma, Zábavná Angličtina">
+    <meta name="keywords" content="angličtina zdarma, výuka angličtiny, angličtina pro děti, procvičování angličtiny, angličtina online, angličtina zábavně, písničky angličtina, testy angličtina, chat angličtina, gramatika angličtina, knowix">
+    <meta name="robots" content="index, follow">
+<meta property="og:title" content="Knowix – Angličtina zdarma a zábavně">
+<meta property="og:description" content="Procvičuj angličtinu pomocí písniček, chatů, příběhů a testů. Kompletně zdarma, bez reklam.">
+<meta property="og:image" content="https://www.knowix.cz/static/og-banner.png">
+<meta property="og:url" content="https://www.knowix.cz">
+<meta property="og:type" content="website">
+    <!-- PWA manifest & theme -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0d1117">
+    <!-- iOS PWA podpora -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Knowix">
+    <link rel="apple-touch-icon" href="/static/pic/logo1.png">
+    <!-- CSRF token pro JS -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- Předej user_id do JS -->
+    <meta name="user-id" content="{{ session.get('user_id') or '' }}">
+
+    <link rel="canonical" href="https://www.knowix.cz">
+
+    <title>{% block title %}knowix{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/mobile_header.css">
+
+    <!-- Preconnect zrychlí DNS a spojení -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Font načti až po načtení stránky -->
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet"
+          media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap" rel="stylesheet">
+    </noscript>
+
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-W1EN990JKP');
+</script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Knowix",
+  "url": "https://www.knowix.cz",
+  "description": "Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam."
+}
+</script>
+
+    <style>
+        /* Základní layout sekce */
+        #wordle-game.centered-section {
+            max-width: 420px;
+            margin: 40px auto;
+            padding: 20px;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.9);
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.6);
+            color: #e5e7eb;
+            text-align: center;
+        }
+
+        #wordle-game h1 {
+            margin-bottom: 8px;
+            font-size: 1.9rem;
+        }
+
+        #wordle-game p {
+            margin-top: 0;
+            margin-bottom: 18px;
+            color: #9ca3af;
+            font-size: 0.95rem;
+        }
+
+        /* Herní deska */
+        .wordle-board {
+            display: grid;
+            grid-template-rows: repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .wordle-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .wordle-cell {
+            width: 58px;
+            height: 58px;
+            border-radius: 6px;
+            border: 2px solid #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: #111827;
+            color: #e5e7eb;
+            box-sizing: border-box;
+            transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+        }
+
+        /* Stavy buněk jako ve Wordle */
+        .wordle-cell.correct {
+            background-color: #22c55e; /* zelená */
+            border-color: #22c55e;
+            color: #022c22;
+            transform: scale(1.05);
+        }
+
+        .wordle-cell.present {
+            background-color: #eab308; /* žlutá */
+            border-color: #eab308;
+            color: #111827;
+        }
+
+        .wordle-cell.absent {
+            background-color: #111827;
+            border-color: #4b5563;
+            color: #6b7280;
+        }
+
+        /* Zprávy pod hrací deskou */
+        .wordle-message {
+            min-height: 24px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .wordle-message.error {
+            color: #f97373;
+        }
+
+        .wordle-message.success {
+            color: #4ade80;
+        }
+
+        .wordle-message.info {
+            color: #60a5fa;
+        }
+
+        /* Formulář */
+        .wordle-form {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .wordle-form input {
+            padding: 10px 12px;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: 1px solid #4b5563;
+            background: #020617;
+            color: #e5e7eb;
+            outline: none;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .wordle-form input::placeholder {
+            color: #6b7280;
+        }
+
+        .wordle-form input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 1px #3b82f6;
+        }
+
+        .wordle-form button {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #022c22;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.15s ease;
+        }
+
+        .wordle-form button:hover {
+            filter: brightness(1.05);
+            box-shadow: 0 6px 14px rgba(34, 197, 94, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .wordle-form button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        @media (max-width: 480px) {
+            #wordle-game.centered-section {
+                margin: 20px auto;
+                padding: 16px;
+            }
+
+            .wordle-cell {
+                width: 48px;
+                height: 48px;
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
+<header>
+    <div class="logo-streak-wrapper">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
+            </a>
+        </div>
+        <span class="streak-badge">
+            <img src="/static/fire.svg" alt="Streak">
+            {{ user_streak }}
+        </span>
+    </div>
+    <div class="nav-profile-wrapper">
+        <ul class="nav-right">
+            <li>
+                <a href="/anglictina" title="Angličtina">
+                    <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/feedback" title="Feedback">
+                    <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/news" title="Novinky">
+                    <img src="{{ url_for('static', filename='icons/bell.png') }}" alt="Novinky" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/obchod" title="Obchod">
+                    <img src="{{ url_for('static', filename='icons/shop.png') }}" alt="Obchod" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <a href="/zpravy" title="Zprávy">
+                    <img src="{{ url_for('static', filename='icons/mail.png') }}" alt="Zprávy" class="nav-icon">
+                </a>
+            </li>
+            <li>
+                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                    🌙
+                </button>
+            </li>
+            <li>
+                <button id="enable-notifications" data-type="notif" aria-label="Povolit notifikace" title="Povolit notifikace" class="pwa-action-btn" style="display:none;">
+                    <span class="icon">🔔</span><span class="label">Notifikace</span>
+                </button>
+            </li>
+            {% if session.get('user_id') == 1 %}
+            <li>
+    <button id="test-push" title="Test push notifikací" style="background:none;border:1px solid #444;border-radius:6px;cursor:pointer;padding:4px 8px;color:inherit;font-size:12px;">
+        Test Push
+    </button>
+</li>
+
+<li>
+    <a href="/push/admin/subscriptions" title="Push Admin" style="color: #ff4444; font-weight: bold;">
+        🔧 Push Admin
+    </a>
+</li>
+{% endif %}
+            <li>
+                <button id="install-app" data-type="pwa" aria-label="Instalovat aplikaci" title="Instalovat aplikaci" class="pwa-action-btn" style="display:none;">
+                    <span class="icon">⬇️</span><span class="label">Instalovat</span>
+                </button>
+            </li>
+        </ul>
+        {% if session.get('user_name') %}
+        <div class="user-profile">
+            <div class="profile-container">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                     alt="Profilová fotka" width="64" class="profile-pic"
+                     onerror="this.onerror=null; this.src='{{ url_for('static', filename='pic/default.webp') }}';">
+                {% else %}
+                <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
+                     class="profile-pic" id="profileMenuTrigger">
+                {% endif %}
+                <div class="profile-menu" id="profileMenu">
+                    <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
+                    <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
+                </div>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+            </div>
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            <div class="xp-header-bar">
+                <div class="xp-header-bar-labels">
+                    <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
+                    <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
+                </div>
+                <div class="xp-header-bar-progress-bg">
+                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+<div class="auth-links">
+    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+</div>
+        {% endif %}
+    </div>
+</header>
+<main>
+    <section id="wordle-game" class="centered-section">
+        <h1>Wordle (5 písmen)</h1>
+        <p>Uhádej dnešní anglické slovo na 6 pokusů.</p>
+
+        <div id="wordle-board" class="wordle-board" aria-label="Hrací pole Wordle">
+            <!-- 6 řádků × 5 polí doplní JS -->
+        </div>
+
+        <div id="wordle-message" class="wordle-message" aria-live="polite"></div>
+
+        <form id="wordle-form" class="wordle-form" autocomplete="off">
+            <input id="wordle-input" maxlength="5" minlength="5" pattern="[A-Za-z]{5}"
+                   placeholder="Napiš slovo (5 písmen)" required>
+            <button type="submit">Tipnout</button>
+        </form>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p class="footer-signature">
+        Made with ❤️ by
+        <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
+        and lot of ☕
+    </p>
+</footer>
+<script src="/static/js/pwa.js"></script>
+<!-- Definuj CSRF token z meta tagu pouze jednou -->
+<script>
+    const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+</script>
+<script>const CSRF_TOKEN = "{{ csrf_token() }}";</script>
+<script>
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        fetch('/set_theme', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
+            body: JSON.stringify({
+                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark',
+                csrf_token: CSRF_TOKEN
+            })
+        }).then(r => {
+            if (r.ok) {
+                document.body.classList.toggle('dark-mode');
+                sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            }
+        });
+    });
+
+(function () {
+    const ROWS = 6;
+    const COLS = 5;
+
+    const board = document.getElementById('wordle-board');
+    const form = document.getElementById('wordle-form');
+    const input = document.getElementById('wordle-input');
+    const messageEl = document.getElementById('wordle-message');
+
+    let currentRow = 0;
+    let locked = false;
+
+    // vytvoř mřížku
+    for (let r = 0; r < ROWS; r++) {
+        const row = document.createElement('div');
+        row.className = 'wordle-row';
+        for (let c = 0; c < COLS; c++) {
+            const cell = document.createElement('div');
+            cell.className = 'wordle-cell';
+            row.appendChild(cell);
+        }
+        board.appendChild(row);
+    }
+
+    function showMessage(text, type = '') {
+        messageEl.textContent = text;
+        messageEl.className = 'wordle-message ' + type;
+    }
+
+    async function fetchLength() {
+        try {
+            const res = await fetch('/wordle/word');
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data.length && data.length !== COLS) {
+                console.warn('Server poslal jinou délku slova než 5.');
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    fetchLength();
+
+    async function initStateFromServer() {
+        try {
+            const res = await fetch('/wordle/word');
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data.completed) {
+                locked = true;
+                showMessage('Dnešní Wordle už máš dohraný. Zkus to zase zítra!', 'info');
+            }
+            currentRow = data.guesses || 0;
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    initStateFromServer();
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (locked) return;
+
+        let guess = input.value.trim().toLowerCase();
+        if (guess.length !== COLS) {
+            showMessage('Slovo musí mít 5 písmen.', 'error');
+            return;
+        }
+
+        try {
+            const res = await fetch('/wordle/guess', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': CSRF_TOKEN
+                },
+                body: JSON.stringify({
+                    guess,
+                    csrf_token: CSRF_TOKEN
+                })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                if (data.error === 'length') {
+                    showMessage('Slovo musí mít přesně 5 písmen.', 'error');
+                } else if (data.error === 'already_completed') {
+                    locked = true;
+                    showMessage(data.message || 'Dnešní Wordle už máš dohraný. Zkus to zase zítra!', 'info');
+                } else if (data.error === 'not_logged_in') {
+                    showMessage('Pro Wordle se prosím přihlas.', 'error');
+                } else {
+                    showMessage('Něco se pokazilo. Zkus to znovu.', 'error');
+                }
+                return;
+            }
+
+            const row = board.children[currentRow];
+            if (!row) return;
+
+            data.result.forEach((item, i) => {
+                const cell = row.children[i];
+                cell.textContent = item.letter.toUpperCase();
+                cell.classList.remove('correct', 'present', 'absent');
+                cell.classList.add(item.status);
+            });
+
+            if (data.win) {
+                showMessage('Výborně! Uhádl jsi dnešní slovo.', 'success');
+                locked = true;
+            } else {
+                currentRow++;
+                if (currentRow >= ROWS || data.completed) {
+                    showMessage('Došly ti pokusy. Zkus to zase zítra!', 'error');
+                    locked = true;
+                } else {
+                    showMessage('Zkus další slovo.', 'info');
+                }
+            }
+                        // Pokud server udělil XP po dokončení, doplň informaci do zprávy
+            if (data.completed && data.xp_awarded && data.xp_awarded > 0) {
+                messageEl.textContent += ` Získal jsi +${data.xp_awarded} XP.`;
+            }
+
+            input.value = '';
+            input.focus();
+        } catch (err) {
+            console.error(err);
+            showMessage('Chyba spojení se serverem.', 'error');
+        }
+    });
+})();
+</script>
+</body>
+</html>

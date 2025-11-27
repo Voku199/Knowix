@@ -8,6 +8,8 @@ Poskytuje REST endpointy pro:
 - /push/unsubscribe (POST) – odhlásí subscription podle endpointu
 - /push/csrf-token (GET) – vrací CSRF token pro SW (pushsubscriptionchange)
 - /push/test-send (POST) – odeslání testovací notifikace uživateli (admin může všem)
+- /push/test-send-self (POST) – testovací odeslání pouze aktuálnímu uživateli
+- /push/admin/test-send/<uid> (POST) – administrátor odešle test konkrétnímu uživateli
 - /push/admin/subscriptions (GET) – jednoduchý přehled uložených subscriptions (jen admin)
 - /send_notification (POST) – alias pro testovací odeslání, aby vyhověl požadavku
 
@@ -248,6 +250,87 @@ def test_send_push():
         except WebPushException as wpe:
             status = getattr(wpe.response, 'status_code', None)
             # 404/410 znamená, že endpoint expiroval – odebereme
+            if status in (404, 410):
+                try:
+                    _delete_subscription(row['endpoint'], None)
+                    removed += 1
+                except Exception:
+                    pass
+            else:
+                failed += 1
+        except Exception:
+            failed += 1
+
+    return _json_ok(sent=sent, removed=removed, failed=failed, total=len(subs))
+
+
+@push_bp.post('/test-send-self')
+def test_send_self():
+    """Pošle testovací push jen aktuálnímu uživateli (vhodné pro admin test na localhostu)."""
+    uid = _current_user_id()
+    if not uid:
+        return _json_err('Not logged in', 401)
+
+    data = request.get_json(silent=True) or {}
+    title = data.get('title') or 'Knowix – test'
+    body = data.get('body') or 'Testovací push jen pro tebe'
+    url = data.get('url') or '/'
+
+    subs = _list_subscriptions(uid)
+    if not subs:
+        return _json_err('No subscriptions', 404)
+
+    sent, removed, failed = 0, 0, 0
+    for row in subs:
+        sub_obj = {
+            'endpoint': row['endpoint'],
+            'keys': {'p256dh': row['p256dh'], 'auth': row['auth']}
+        }
+        try:
+            _send_webpush(sub_obj, {'title': title, 'body': body, 'url': url, 'tag': 'knowix-self'})
+            sent += 1
+        except WebPushException as wpe:
+            status = getattr(wpe.response, 'status_code', None)
+            if status in (404, 410):
+                try:
+                    _delete_subscription(row['endpoint'], None)
+                    removed += 1
+                except Exception:
+                    pass
+            else:
+                failed += 1
+        except Exception:
+            failed += 1
+
+    return _json_ok(sent=sent, removed=removed, failed=failed, total=len(subs))
+
+
+@push_bp.post('/admin/test-send/<int:uid>')
+def admin_test_send_to_user(uid: int):
+    """Admin: pošli testovací push konkrétnímu uživateli (UID)."""
+    if _current_user_id() != 1:
+        abort(403)
+
+    data = request.get_json(silent=True) or {}
+    title = data.get('title') or 'Knowix – admin test'
+    body = data.get('body') or f'Test push pro uživatele {uid}'
+    url = data.get('url') or '/'
+
+    subs = _list_subscriptions(uid)
+    if not subs:
+        return _json_err('No subscriptions', 404)
+
+    sent, removed, failed = 0, 0, 0
+    for row in subs:
+        sub_obj = {
+            'endpoint': row['endpoint'],
+            'keys': {'p256dh': row['p256dh'], 'auth': row['auth']}
+        }
+        try:
+            _send_webpush(sub_obj, {'title': title, 'body': body, 'url': url, 'tag': 'knowix-admin'})
+            sent += 1
+        except WebPushException as wpe:
+            status = getattr(wpe.response, 'status_code', None)
             if status in (404, 410):
                 try:
                     _delete_subscription(row['endpoint'], None)

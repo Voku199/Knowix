@@ -27,6 +27,21 @@ MAX_EMAILS_PER_DAY = 2
 MAX_PUSHES_PER_DAY = 5
 MIN_PUSHES_PER_DAY = 2
 
+# Personalizované šablony push zpráv
+_PUSH_TEMPLATES = [
+    ("Ahoj {first}! Je čas na angličtinu 🎯", "Stačí pár minut a posuneš se dál.", "/"),
+    ("{first}, nezapomeň trénovat 💪", "Dnešní lekce tě čeká!", "/daily_quest"),
+    ("Angličtina volá 📞", "{first}, minutka procvičení a budeš lepší!", "/"),
+    ("Quick reminder 🔔", "{first}, 5 minut angličtiny = velký pokrok!", "/song-selection"),
+    ("Comeback time! 🏃", "Vrať se do formy rychlým cvičením, {first}!", "/")
+]
+
+
+def _format_push_message(first_name: str | None) -> tuple[str, str, str]:
+    f = (first_name or 'kamaráde').split()[0]
+    title, body, url = random.choice(_PUSH_TEMPLATES)
+    return title.format(first=f), body.format(first=f), url
+
 
 def _should_skip_email(email: str) -> bool:
     """Filtrace neplatných e-mailů"""
@@ -308,15 +323,7 @@ def _send_push_reminder(user_id: int, first_name: str) -> bool:
     if not (_webpush and VAPID_PRIVATE_KEY and VAPID_EMAIL):
         return False
 
-    push_messages = [
-        ("Je čas na angličtinu! 🎯", "Stačí pár minut a posuneš se dál.", "/"),
-        ("Nezapomeň trénovat 💪", "Dnešní lekce tě čeká!", "/daily_quest"),
-        ("Angličtina volá 📞", "Chvilka procvičení a budeš lepší!", "/"),
-        ("Quick reminder 🔔", "5 minut angličtiny = velký pokrok!", "/song-selection"),
-        ("Comeback time! 🏃", "Vrať se do formy rychlým cvičením!", "/")
-    ]
-
-    title, body, url = random.choice(push_messages)
+    title, body, url = _format_push_message(first_name)
 
     conn = None
     cur = None
@@ -351,9 +358,15 @@ def _send_push_reminder(user_id: int, first_name: str) -> bool:
 
         if sent:
             today = time.strftime('%Y-%m-%d')
+            # Reset/inkrement denního čítače podle data
             cur.execute(
-                "UPDATE users SET push_sends_today = push_sends_today + 1, last_push_date = %s WHERE id = %s",
-                (today, user_id)
+                """
+                UPDATE users 
+                SET push_sends_today = CASE WHEN last_push_date = %s THEN push_sends_today + 1 ELSE 1 END,
+                    last_push_date = %s
+                WHERE id = %s
+                """,
+                (today, today, user_id)
             )
             conn.commit()
 

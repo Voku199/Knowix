@@ -163,14 +163,14 @@
     <!-- Cvičení: dvě kolony (doplňování / překlady) -->
     <section class="exercises-section">
         <div class="exercises-grid">
-            <div style="grid-column: 1 / -1; margin-bottom: 10px; text-align:right;">
-                {% set _show = request.args.get('show_solutions') in ('1','true','yes') %}
-                {% if not _show %}
-                <a href="{{ request.path }}?show_solutions=1" style="font-size:.95rem; text-decoration:underline;">Zobrazit řešení na stránce</a>
-                {% else %}
-                <a href="{{ request.path }}" style="font-size:.95rem; text-decoration:underline;">Skrýt řešení</a>
-                {% endif %}
-            </div>
+<!--            <div style="grid-column: 1 / -1; margin-bottom: 10px; text-align:right;">-->
+<!--                {% set _show = request.args.get('show_solutions') in ('1','true','yes') %}-->
+<!--                {% if not _show %}-->
+<!--                <a href="{{ request.path }}?show_solutions=1" style="font-size:.95rem; text-decoration:underline;">Zobrazit řešení na stránce</a>-->
+<!--                {% else %}-->
+<!--                <a href="{{ request.path }}" style="font-size:.95rem; text-decoration:underline;">Skrýt řešení</a>-->
+<!--                {% endif %}-->
+<!--            </div>-->
             <div class="exercise-col">
                 <h2>Doplň chybějící slovo</h2>
                 {% for exercise in missing_exercises %}
