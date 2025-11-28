@@ -381,8 +381,96 @@ def _send_push_reminder(user_id: int, first_name: str) -> bool:
     return sent
 
 
+def _ensure_settings_table():
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS app_settings (
+                `key` VARCHAR(64) PRIMARY KEY,
+                `value` VARCHAR(256) NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        """)
+        # Default: reminders_enabled = 1 pokud záznam neexistuje
+        cur.execute("SELECT value FROM app_settings WHERE `key`='reminders_enabled'")
+        row = cur.fetchone()
+        if not row:
+            cur.execute("INSERT INTO app_settings (`key`, `value`) VALUES ('reminders_enabled','1')")
+        conn.commit()
+    except Exception as ex:
+        print(f"[reminders] Settings table ensure error: {ex}")
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
+# Globální cache příznaku povolení připomínek
+_REMINDERS_FLAG_CACHE: dict[str, tuple[bool, float]] = {}
+_FLAG_CACHE_TTL = 60  # sekundy
+
+
+def _get_global_reminders_enabled() -> bool:
+    # Env override (např. REMINDERS_FORCE_DISABLE=1)
+    if os.getenv('REMINDERS_FORCE_DISABLE') in ('1', 'true', 'True'):  # tvrdé vypnutí
+        return False
+    now = time.time()
+    cached = _REMINDERS_FLAG_CACHE.get('reminders_enabled')
+    if cached and (now - cached[1] < _FLAG_CACHE_TTL):
+        return cached[0]
+    conn = None
+    cur = None
+    enabled = True
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT value FROM app_settings WHERE `key`='reminders_enabled'")
+        row = cur.fetchone()
+        if row:
+            enabled = (row[0] == '1')
+        _REMINDERS_FLAG_CACHE['reminders_enabled'] = (enabled, now)
+    except Exception as ex:
+        print(f"[reminders] Get global flag error: {ex}")
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+    return enabled
+
+
+def _set_global_reminders_enabled(flag: bool) -> bool:
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("UPDATE app_settings SET value=%s WHERE `key`='reminders_enabled'", ('1' if flag else '0',))
+        if cur.rowcount == 0:
+            cur.execute("INSERT INTO app_settings (`key`,`value`) VALUES ('reminders_enabled', %s)",
+                        ('1' if flag else '0',))
+        conn.commit()
+        _REMINDERS_FLAG_CACHE['reminders_enabled'] = (flag, time.time())
+        return True
+    except Exception as ex:
+        print(f"[reminders] Set global flag error: {ex}")
+        return False
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
 def send_daily_reminders():
     """Hlavní funkce pro rozesílání denních připomínek"""
+    _ensure_settings_table()  # jistota že tabulka existuje
+    if not _get_global_reminders_enabled():
+        print("[reminders] Skipped (globálně vypnuto)", flush=True)
+        return 0, 0
     _ensure_reminder_columns()
     _ensure_user_stats_rows()
     # Zrušeno explicitní resetování čítačů – řídíme podle last_email_date/last_push_date
@@ -390,8 +478,9 @@ def send_daily_reminders():
     emails_sent = 0
     pushes_sent = 0
 
-    # E-maily: posílat průběžně až do limitu 1–2 denně na uživatele, bez náhodnosti a časových oken
-    if os.getenv("EMAIL_PASSWORD"):
+    # E-maily: posílat průběžně až do limitu 1–2 denně na uživatele
+    email_enabled = bool(os.getenv("RESEND_API_KEY") or os.getenv("EMAIL_PASSWORD") or os.getenv("SMTP_PASSWORD"))
+    if email_enabled:
         email_candidates = _get_email_candidates()
         for user_id, email, first_name, token, sends_today in email_candidates:
             if _should_skip_email(email):
@@ -413,7 +502,7 @@ def send_daily_reminders():
                 if _send_push_reminder(user_id, first_name):
                     pushes_sent += 1
 
-    print(f"[reminders] Daily reminders: {emails_sent} emails, {pushes_sent} pushes")
+    print(f"[reminders] Daily reminders: {emails_sent} emails, {pushes_sent} pushes", flush=True)
     return emails_sent, pushes_sent
 
 
@@ -512,6 +601,23 @@ def admin_email_report():
             cur.close()
         if conn:
             conn.close()
+
+
+@reminders_bp.route('/admin/reminders/status')
+def reminders_status():
+    if session.get('user_id') != 1:
+        return jsonify({'success': False, 'error': 'Přístup zamítnut.'}), 403
+    return jsonify({'success': True, 'enabled': _get_global_reminders_enabled()})
+
+
+@reminders_bp.route('/admin/reminders/enable', methods=['POST'])
+def reminders_set_enabled():
+    if session.get('user_id') != 1:
+        return jsonify({'success': False, 'error': 'Přístup zamítnut.'}), 403
+    data = request.get_json(silent=True) or {}
+    enabled = bool(data.get('enabled'))
+    ok = _set_global_reminders_enabled(enabled)
+    return jsonify({'success': ok, 'enabled': enabled})
 
 
 @reminders_bp.route('/email/unsubscribe/<token>')

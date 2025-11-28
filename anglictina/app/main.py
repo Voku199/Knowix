@@ -9,6 +9,7 @@ import redis
 from werkzeug.middleware.proxy_fix import ProxyFix
 import os
 import mimetypes
+from worker_main import start_worker_thread  # přidán import vlákna workeru
 
 # Zajisti správný MIME typ pro WebP
 mimetypes.add_type('image/webp', '.webp')
@@ -166,7 +167,11 @@ app.register_blueprint(wordle_bp)
 # app.register_blueprint(prevodky_bp)
 
 init_security(app)
-start_reminder_scheduler(app)  # Spuštění vlákenného scheduleru (idempotentní)
+# Spusť background worker (připomínky) při startu webu
+start_worker_thread()
+
+
+# (Volání start_reminder_scheduler odstraněno, aby nebylo dvojité odesílání)
 
 
 # === Sitemap & robots ===

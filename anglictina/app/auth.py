@@ -15,6 +15,10 @@ import secrets
 from xp import get_user_achievements, get_all_achievements, get_top_users, get_user_xp_and_level
 from db import get_db_connection
 
+# Pomocné importy pro e‑mailové odesílání
+import socket
+import requests
+
 auth_bp = Blueprint('auth', __name__)
 user_settings = {}
 
@@ -83,47 +87,119 @@ def generate_verification_code():
 
 
 def send_email(to_email, subject, body):
-    from_email = "skolnichat.zib@gmail.com"
-    from_password = os.getenv("EMAIL_PASSWORD")
-    msg = MIMEMultipart()
-    msg['From'] = from_email
-    msg['To'] = to_email
-    msg['Subject'] = subject
-    msg.attach(MIMEText(body, 'plain'))
-    try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(from_email, from_password)
-        text = msg.as_string()
-        server.sendmail(from_email, to_email, text)
-        server.quit()
-        return True
-    except Exception as e:
-        print(f"Error sending email: {e}")
-        return False
+    """Odešle prostý textový e‑mail přes SMTP/Resend podle dostupné konfigurace."""
+    # Preferovaná adresa odesílatele a přihlašovací údaje z env
+    from_email = os.getenv("EMAIL_FROM", "knowixcz@gmail.com")
+    # Reuse HTML odesílače s textem jako fallbackem
+    return send_email_html(to_email, subject, body or "",
+                           f"<pre>{(body or '').replace('&', '&amp;').replace('<', '&lt;')}</pre>")
 
 
 # Nové: odeslání e-mailu s HTML i textovou částí (multipart/alternative)
 def send_email_html(to_email, subject, text_body, html_body):
-    from_email = "knowixcz@gmail.com"
-    from_password = os.getenv("EMAIL_PASSWORD")
+    """Odešle e‑mail. Pořadí pokusů:
+    1) Resend API (pokud RESEND_API_KEY)
+    2) SMTP (konfigurovatelné env proměnnými; default Gmail 587 TLS)
+    Vrací True/False.
+    Env:
+      RESEND_API_KEY
+      EMAIL_FROM (např. "Knowix <hello@knowix.cz>")
+      SMTP_HOST, SMTP_PORT, SMTP_SSL (1/0), SMTP_TLS (1/0), SMTP_TIMEOUT
+      EMAIL_USER, EMAIL_PASSWORD (nebo pouze EMAIL_PASSWORD pro Gmail)
+      SMTP_FORCE_IPV4 (1/0)
+    """
+    from_email = os.getenv("EMAIL_FROM", "knowixcz@gmail.com")
+
+    # Sestavení zprávy (multipart/alternative)
     msg = MIMEMultipart('alternative')
     msg['From'] = from_email
     msg['To'] = to_email
     msg['Subject'] = subject
-    # text fallback
     msg.attach(MIMEText(text_body or '', 'plain', 'utf-8'))
-    # html část
     msg.attach(MIMEText(html_body or '', 'html', 'utf-8'))
+
+    # 1) Resend API (HTTP) – často funguje i tam, kde je SMTP blokované
+    api_key = os.getenv('RESEND_API_KEY')
+    if api_key:
+        try:
+            resp = requests.post(
+                'https://api.resend.com/emails',
+                headers={
+                    'Authorization': f'Bearer {api_key}',
+                    'Content-Type': 'application/json'
+                },
+                json={
+                    'from': from_email,
+                    'to': [to_email],
+                    'subject': subject,
+                    'html': html_body or '',
+                    'text': text_body or ''
+                },
+                timeout=float(os.getenv('SMTP_TIMEOUT', '20'))
+            )
+            if 200 <= resp.status_code < 300:
+                return True
+            else:
+                print(f"Error sending HTML email via Resend: HTTP {resp.status_code} {resp.text[:200]}")
+        except Exception as e:
+            print(f"Error sending HTML email via Resend: {e}")
+
+    # 2) SMTP cesta
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(from_email, from_password)
-        server.sendmail(from_email, to_email, msg.as_string())
-        server.quit()
-        return True
+        host = os.getenv('SMTP_HOST', 'smtp.gmail.com')
+        port = int(os.getenv('SMTP_PORT', '587'))
+        use_ssl = os.getenv('SMTP_SSL', '0') in ('1', 'true', 'True')
+        use_tls = os.getenv('SMTP_TLS', '1') in ('1', 'true', 'True') and not use_ssl
+        timeout = float(os.getenv('SMTP_TIMEOUT', '20'))
+        force_ipv4 = os.getenv('SMTP_FORCE_IPV4', '0') in ('1', 'true', 'True')
+
+        user = os.getenv('EMAIL_USER') or os.getenv('SMTP_USER') or os.getenv('EMAIL_FROM') or from_email
+        password = os.getenv('EMAIL_PASSWORD') or os.getenv('SMTP_PASSWORD')
+
+        if not password:
+            # Bez hesla nezkoušej SMTP – vrať False, ať volající ví, že není možné odeslat
+            print("Error sending HTML email: SMTP credentials missing (EMAIL_PASSWORD/SMTP_PASSWORD)")
+            return False
+
+        # Vytvoř připojení – volitelně vynutit IPv4, pokud IPv6 není dostupné
+        server = None
+        try:
+            if force_ipv4:
+                infos = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
+                if not infos:
+                    raise OSError("No IPv4 address resolved for SMTP host")
+                ipv4_addr = infos[0][4][0]
+                if use_ssl:
+                    server = smtplib.SMTP_SSL(ipv4_addr, port, timeout=timeout)
+                    server.ehlo()
+                else:
+                    server = smtplib.SMTP(ipv4_addr, port, timeout=timeout)
+            else:
+                if use_ssl:
+                    server = smtplib.SMTP_SSL(host, port, timeout=timeout)
+                    server.ehlo()
+                else:
+                    server = smtplib.SMTP(host, port, timeout=timeout)
+
+            if not use_ssl and use_tls:
+                server.starttls()
+                server.ehlo()
+
+            server.login(user, password)
+            server.sendmail(from_email, [to_email], msg.as_string())
+            server.quit()
+            return True
+        finally:
+            try:
+                # V případě výjimky zajisti uzavření
+                if server and getattr(server, 'sock', None):
+                    server.close()
+            except Exception:
+                pass
+
     except Exception as e:
-        print(f"Error sending HTML email: {e}")
+        print(
+            f"Error sending HTML email (SMTP host={os.getenv('SMTP_HOST', 'smtp.gmail.com')} port={os.getenv('SMTP_PORT', '587')}): {e}")
         return False
 
     # profile_pic=session['profile_pic'])
@@ -1058,3 +1134,19 @@ def edit_assignment(assignment_id):
 def register_finalize():
     session.pop('just_registered', None)
     return jsonify({'success': True})
+
+
+@auth_bp.route('/admin/test_email', methods=['POST'])
+def admin_test_email():
+    """Testovací endpoint: odešle e‑mail a vrátí JSON výsledek. Jen pro admina (user_id=1)."""
+    if session.get('user_id') != 1:
+        return jsonify({'success': False, 'error': 'Přístup zamítnut.'}), 403
+    data = request.get_json(silent=True) or {}
+    to_email = data.get('to') or session.get('reset_email') or os.getenv('TEST_EMAIL_TO' 'vojta.kurinec@gmail.com')
+    subject = data.get('subject') or 'Test Knowix email'
+    text = data.get('text') or 'Ahoj! Toto je testovací e‑mail z Knowixu.'
+    html = data.get('html') or '<strong>Ahoj!</strong> Toto je testovací e‑mail z Knowixu.'
+    if not to_email:
+        return jsonify({'success': False, 'error': 'Chybí cílový e‑mail (to).'}), 400
+    ok = send_email_html(to_email, subject, text, html)
+    return jsonify({'success': bool(ok), 'to': to_email, 'subject': subject})
