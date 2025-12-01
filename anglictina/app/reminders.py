@@ -27,6 +27,13 @@ MAX_EMAILS_PER_DAY = 2
 MAX_PUSHES_PER_DAY = 5
 MIN_PUSHES_PER_DAY = 2
 
+# Volitelné hodiny pro odeslání e‑mailů (CSV v ENV, např. "9,13,19")
+_EMAIL_HOURS_ENV = os.getenv('REMINDER_EMAIL_HOURS', '')
+try:
+    EMAIL_SEND_HOURS = sorted({int(h) for h in _EMAIL_HOURS_ENV.split(',') if h.strip() != ''}) or [9, 13, 19]
+except Exception:
+    EMAIL_SEND_HOURS = [9, 13, 19]
+
 # Personalizované šablony push zpráv
 _PUSH_TEMPLATES = [
     ("Ahoj {first}! Je čas na angličtinu 🎯", "Stačí pár minut a posuneš se dál.", "/"),
@@ -64,12 +71,38 @@ def _should_skip_email(email: str) -> bool:
 
 def _compose_reminder_email(first_name: str, unsubscribe_link: str) -> tuple:
     """Vrátí (text, html) obsah e-mailu"""
-    subject = "Nezapomeň na svou angličtinu! 🎯"
+    # Více zábavných předmětů, aby nebyl pořád stejný
+    subjects = [
+        "Je čas na angličtinu! 🎯",
+        "{first}, dáme dnes mini‑lekci? ✨",
+        "Pět minut denně = velký skok 🚀",
+        "Tvá angličtina se těší na comeback 🔄",
+        "Coffee break s angličtinou ☕📚"
+    ]
+    subject = random.choice(subjects).format(first=first_name.split()[0] if first_name else 'Kamaráde')
+
+    # Malé tipy/cta varianty
+    ctas = [
+        ("Pokračovat na Knowix", "https://www.knowix.cz/"),
+        ("Dnešní mini‑mise", "https://www.knowix.cz/anglictina"),
+        ("Zkus písničku", "https://www.knowix.cz/song-selection"),
+    ]
+    cta_text, cta_href = random.choice(ctas)
+
+    fun_lines = [
+        "Dneska stačí jen 5 minut – mozku to stačí, motivaci to stačí, a progres je jistý.",
+        "Máš 2 volné minuty? Dej si rychlý poslech nebo pár vět, angličtina ti poděkuje.",
+        "Bonus: každé cvičení zvedá tvůj streak a XP. Malé krůčky dělají velké věci.",
+        "Tip: když nevíš co, klikni na Daily Quest – připravili jsme to za tebe.",
+        "Lámání jazyků povoleno. Smích také. 😀"
+    ]
+    fun_line = random.choice(fun_lines)
 
     text_body = (
         f"Ahoj {first_name},\n\n"
-        "Už jsi dneska potrénoval angličtinu? Stačí pár minut a posuneš se dál!\n\n"
-        "Otevři Knowix: https://www.knowix.cz/\n\n"
+        "Dnes je ideální chvíle na krátké procvičení. "
+        f"{fun_line}\n\n"
+        f"Otevři Knowix: {cta_href}\n\n"
         "Pokud už nechceš dostávat tyto připomínkové emaily, klikni na odhlašovací odkaz:\n"
         f"{unsubscribe_link}\n\n"
         "Měj se,\nTeam Knowix"
@@ -90,6 +123,7 @@ def _compose_reminder_email(first_name: str, unsubscribe_link: str) -> tuple:
         .content {{ padding:28px 24px; text-align:center; }}
         h1 {{ font-size:22px; margin:0 0 10px; color:#0a2540; }}
         p {{ font-size:15px; line-height:1.6; margin:0 0 16px; color:#334155; }}
+        .tips {{ background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px; margin-top:8px; text-align:left; }}
         .cta {{ display:inline-block; margin-top:14px; background:#0a66c2; color:#fff !important; text-decoration:none; padding:12px 22px; border-radius:8px; font-weight:bold; }}
         .muted {{ color:#64748b; font-size:12px; margin-top:18px; }}
         .footer {{ text-align:center; color:#94a3b8; font-size:12px; padding:16px 0 0; }}
@@ -102,16 +136,23 @@ def _compose_reminder_email(first_name: str, unsubscribe_link: str) -> tuple:
           <img src='https://www.knowix.cz/static/pic/logo.webp' alt='Knowix banner' />
         </div>
         <div class='content'>
-          <h1>Je čas na angličtinu! 🎯</h1>
-          <p>Už jsi dneska potrénoval angličtinu? Stačí pár minut a posuneš se dál!</p>
+          <h1>{subject}</h1>
+          <p>{fun_line}</p>
+          <div class='tips'>
+            <ul style='padding-left:18px;margin:8px 0;'>
+              <li>Krátké cvičení dnes, dlouhodobý pokrok zítra 🚀</li>
+              <li>Nejrychlejší start: Daily Quest nebo poslech</li>
+              <li>Streaky a XP tě podrží – dej si minutu 😉</li>
+            </ul>
+          </div>
           <p>
-            <a class='cta' href='https://www.knowix.cz/'>Pokračovat na Knowix</a>
+            <a class='cta' href='{cta_href}'>{cta_text}</a>
           </p>
           <p class='muted'>Nechceš tyto připomínky? <a href='{unsubscribe_link}'>Odhlásit e‑maily</a> jedním kliknutím.</p>
         </div>
       </div>
       <div class='footer'>
-        © {time.localtime().tm_year} Knowix · Tento e‑mail je informační. Prosím neodpovídej.
+        © {time.localtime().tm_year} Knowix · Tento e‑mail je informační. Prosím neodpírej.
       </div>
     </body>
     </html>
@@ -256,17 +297,16 @@ def _get_push_candidates():
 
         cur.execute(
             """
-                SELECT u.id,
+                SELECT DISTINCT u.id,
                        COALESCE(u.first_name, ''),
                        CASE WHEN u.last_push_date = CURDATE() THEN u.push_sends_today ELSE 0 END AS sends_today,
                        TIMESTAMPDIFF(HOUR, us.last_active, NOW()) as hours_inactive
                 FROM users u
                 JOIN user_stats us ON u.id = us.user_id
-                JOIN push_subscriptions ps ON ps.user_id = u.id
-                WHERE (u.last_push_date IS NULL OR u.last_push_date != CURDATE() OR u.push_sends_today < %s)
+                WHERE EXISTS (SELECT 1 FROM push_subscriptions ps WHERE ps.user_id = u.id)
+                  AND (u.last_push_date IS NULL OR u.last_push_date != CURDATE() OR u.push_sends_today < %s)
                   AND TIMESTAMPDIFF(HOUR, us.last_active, NOW()) >= 3
                   AND us.last_active IS NOT NULL
-                GROUP BY u.id
             """, (MAX_PUSHES_PER_DAY,))
 
         candidates = cur.fetchall()
@@ -478,9 +518,11 @@ def send_daily_reminders():
     emails_sent = 0
     pushes_sent = 0
 
-    # E-maily: posílat průběžně až do limitu 1–2 denně na uživatele
+    current_hour = time.localtime().tm_hour
+
+    # E-maily: pouze ve vybraných hodinách, jinak úplně přeskočit
     email_enabled = bool(os.getenv("RESEND_API_KEY") or os.getenv("EMAIL_PASSWORD") or os.getenv("SMTP_PASSWORD"))
-    if email_enabled:
+    if email_enabled and current_hour in EMAIL_SEND_HOURS:
         email_candidates = _get_email_candidates()
         for user_id, email, first_name, token, sends_today in email_candidates:
             if _should_skip_email(email):
@@ -489,9 +531,11 @@ def send_daily_reminders():
                 continue
             if _send_email_reminder(user_id, email, first_name or 'student', token):
                 emails_sent += 1
+    else:
+        # Volitelný debug: mimo povolené hodiny
+        pass
 
     # Push notifikace: ponecháme původní logiku s časováním a pravděpodobností
-    current_hour = time.localtime().tm_hour
     push_hours = [9, 12, 15, 18, 21]
     if current_hour in push_hours and _webpush and VAPID_PRIVATE_KEY:
         push_candidates = _get_push_candidates()

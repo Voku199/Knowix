@@ -110,7 +110,6 @@ def send_email_html(to_email, subject, text_body, html_body):
     """
     from_email = os.getenv("EMAIL_FROM", "knowixcz@gmail.com")
 
-    # Sestavení zprávy (multipart/alternative)
     msg = MIMEMultipart('alternative')
     msg['From'] = from_email
     msg['To'] = to_email
@@ -118,33 +117,80 @@ def send_email_html(to_email, subject, text_body, html_body):
     msg.attach(MIMEText(text_body or '', 'plain', 'utf-8'))
     msg.attach(MIMEText(html_body or '', 'html', 'utf-8'))
 
-    # 1) Resend API (HTTP) – často funguje i tam, kde je SMTP blokované
     api_key = os.getenv('RESEND_API_KEY')
     if api_key:
+        print(f"[email] Resend attempt to={to_email} subject='{subject}' from='{from_email}'", flush=True)
         try:
-            resp = requests.post(
-                'https://api.resend.com/emails',
-                headers={
-                    'Authorization': f'Bearer {api_key}',
-                    'Content-Type': 'application/json'
-                },
-                json={
-                    'from': from_email,
-                    'to': [to_email],
-                    'subject': subject,
-                    'html': html_body or '',
-                    'text': text_body or ''
-                },
-                timeout=float(os.getenv('SMTP_TIMEOUT', '20'))
-            )
-            if 200 <= resp.status_code < 300:
-                return True
-            else:
-                print(f"Error sending HTML email via Resend: HTTP {resp.status_code} {resp.text[:200]}")
-        except Exception as e:
-            print(f"Error sending HTML email via Resend: {e}")
+            timeout = float(os.getenv('SMTP_TIMEOUT', '20'))
 
-    # 2) SMTP cesta
+            def _resend_post():
+                return requests.post(
+                    'https://api.resend.com/emails',
+                    headers={
+                        'Authorization': f'Bearer {api_key}',
+                        'Content-Type': 'application/json'
+                    },
+                    json={
+                        'from': from_email,
+                        'to': [to_email],
+                        'subject': subject,
+                        'html': html_body or '',
+                        'text': text_body or ''
+                    },
+                    timeout=timeout
+                )
+
+            resp = _resend_post()
+            if 200 <= resp.status_code < 300:
+                rid = ''
+                try:
+                    rid = resp.json().get('id', '')
+                except Exception:
+                    pass
+                print(f"[email] Resend success status={resp.status_code} id={rid}", flush=True)
+                return True
+            elif resp.status_code == 429:
+                # Respektuj Retry-After / RateLimit-Reset s exponenciálním backoffem + jitterem
+                headers = resp.headers
+                retry_after = headers.get('Retry-After')
+                rate_reset = headers.get('X-RateLimit-Reset') or headers.get('RateLimit-Reset')
+                base_delay = 0.75
+                try:
+                    if retry_after:
+                        base_delay = max(base_delay, float(retry_after))
+                    elif rate_reset:
+                        # Pokud je unix timestamp, spočti delta; jinak ignoruj
+                        import math
+                        now = time.time()
+                        ts = float(rate_reset)
+                        if ts > now:
+                            base_delay = max(base_delay, ts - now)
+                except Exception:
+                    pass
+                # Exponenciální backoff s jitterem, max 3 pokusy
+                max_retries = int(os.getenv('RESEND_MAX_RETRIES', '3'))
+                for attempt in range(1, max_retries + 1):
+                    jitter = random.uniform(0.2, 0.6)
+                    delay = min(6.0, base_delay * (2 ** (attempt - 1)) + jitter)
+                    print(f"[email] Resend rate limit -> sleep {delay:.2f}s, retry {attempt}/{max_retries}", flush=True)
+                    time.sleep(delay)
+                    resp2 = _resend_post()
+                    if 200 <= resp2.status_code < 300:
+                        print(f"[email] Resend retry success status={resp2.status_code}", flush=True)
+                        return True
+                    elif resp2.status_code != 429:
+                        print(f"[email] Resend retry failure status={resp2.status_code} body={resp2.text[:200]}",
+                              flush=True)
+                        break
+                print(f"[email] Resend final failure 429 after {max_retries} retries", flush=True)
+            else:
+                print(f"[email] Resend failure status={resp.status_code} body={resp.text[:200]}", flush=True)
+        except Exception as e:
+            print(f"[email] Resend exception: {e}", flush=True)
+    else:
+        print("[email] RESEND_API_KEY missing -> skipping Resend", flush=True)
+
+    # SMTP fallback
     try:
         host = os.getenv('SMTP_HOST', 'smtp.gmail.com')
         port = int(os.getenv('SMTP_PORT', '587'))
@@ -157,15 +203,16 @@ def send_email_html(to_email, subject, text_body, html_body):
         password = os.getenv('EMAIL_PASSWORD') or os.getenv('SMTP_PASSWORD')
 
         if not password:
-            # Bez hesla nezkoušej SMTP – vrať False, ať volající ví, že není možné odeslat
-            print("Error sending HTML email: SMTP credentials missing (EMAIL_PASSWORD/SMTP_PASSWORD)")
+            print("[email] SMTP credentials missing -> abort", flush=True)
             return False
 
-        # Vytvoř připojení – volitelně vynutit IPv4, pokud IPv6 není dostupné
         server = None
         try:
+            print(f"[email] SMTP attempt host={host} port={port} ssl={use_ssl} tls={use_tls} ipv4={force_ipv4}",
+                  flush=True)
             if force_ipv4:
-                infos = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
+                import socket as _socket
+                infos = _socket.getaddrinfo(host, port, _socket.AF_INET, _socket.SOCK_STREAM)
                 if not infos:
                     raise OSError("No IPv4 address resolved for SMTP host")
                 ipv4_addr = infos[0][4][0]
@@ -188,18 +235,18 @@ def send_email_html(to_email, subject, text_body, html_body):
             server.login(user, password)
             server.sendmail(from_email, [to_email], msg.as_string())
             server.quit()
+            print("[email] SMTP success", flush=True)
             return True
         finally:
             try:
-                # V případě výjimky zajisti uzavření
                 if server and getattr(server, 'sock', None):
                     server.close()
             except Exception:
                 pass
-
     except Exception as e:
         print(
-            f"Error sending HTML email (SMTP host={os.getenv('SMTP_HOST', 'smtp.gmail.com')} port={os.getenv('SMTP_PORT', '587')}): {e}")
+            f"Error sending HTML email (SMTP host={os.getenv('SMTP_HOST', 'smtp.gmail.com')} port={os.getenv('SMTP_PORT', '587')}): {e}",
+            flush=True)
         return False
 
     # profile_pic=session['profile_pic'])
@@ -1142,7 +1189,7 @@ def admin_test_email():
     if session.get('user_id') != 1:
         return jsonify({'success': False, 'error': 'Přístup zamítnut.'}), 403
     data = request.get_json(silent=True) or {}
-    to_email = data.get('to') or session.get('reset_email') or os.getenv('TEST_EMAIL_TO' 'vojta.kurinec@gmail.com')
+    to_email = data.get('to') or session.get('reset_email') or os.getenv('TEST_EMAIL_TO', 'vojta.kurinec@gmail.com')
     subject = data.get('subject') or 'Test Knowix email'
     text = data.get('text') or 'Ahoj! Toto je testovací e‑mail z Knowixu.'
     html = data.get('html') or '<strong>Ahoj!</strong> Toto je testovací e‑mail z Knowixu.'
