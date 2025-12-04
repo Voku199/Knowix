@@ -40,7 +40,15 @@ _PUSH_TEMPLATES = [
     ("{first}, nezapomeň trénovat 💪", "Dnešní lekce tě čeká!", "/daily_quest"),
     ("Angličtina volá 📞", "{first}, minutka procvičení a budeš lepší!", "/"),
     ("Quick reminder 🔔", "{first}, 5 minut angličtiny = velký pokrok!", "/song-selection"),
-    ("Comeback time! 🏃", "Vrať se do formy rychlým cvičením, {first}!", "/")
+    ("Comeback time! 🏃", "Vrať se do formy rychlým cvičením, {first}!", "/"),
+    # nové hravé varianty
+    ("Mini mise pro {first} 🚀", "Odehraj si krátký quest a získáš XP!", "/daily_quest"),
+    ("Poslech na 2 minuty 🎧", "{first}, dej si krátkou písničku nebo dialog.", "/song-selection"),
+    ("Streak čeká na boost 🔥", "Jedno cvičení dnes = delší série zítra, {first}.", "/"),
+    ("Vocabulary snack 🍪", "Ochutnej pár nových slovíček – rychlé a chutné!", "/anglictina"),
+    ("Grammar flash ✨", "Mrkni na mini gramatiku, {first}. Bleskovka!", "/anglictina"),
+    ("Zpátky do hry 🎮", "Klik a jedeš – 3 minuty a hotovo.", "/"),
+    ("Restart dne 🌀", "Krátký trénink = lepší nálada. Go {first}!", "/"),
 ]
 
 
@@ -77,7 +85,16 @@ def _compose_reminder_email(first_name: str, unsubscribe_link: str) -> tuple:
         "{first}, dáme dnes mini‑lekci? ✨",
         "Pět minut denně = velký skok 🚀",
         "Tvá angličtina se těší na comeback 🔄",
-        "Coffee break s angličtinou ☕📚"
+        "Coffee break s angličtinou ☕📚",
+        # nové varianty
+        "{first}, dnes stačí 3 minuty a máš splněno ✅",
+        "Rychlá mise: 1 mini úkol a XP do kapsy 🎖️",
+        "Chvilka slovíček? {first}, pojď na to 📚",
+        "Nastartuj streak 🔥 – krátké cvičení stačí",
+        "Poslech na dobrou náladu 🎧",
+        "{first}, malý krok dnes, velký skok zítra 🚀",
+        "Rozcvička pro mozek 🧠",
+        "Lehká gramatika na večer ✍️",
     ]
     subject = random.choice(subjects).format(first=first_name.split()[0] if first_name else 'Kamaráde')
 
@@ -86,6 +103,11 @@ def _compose_reminder_email(first_name: str, unsubscribe_link: str) -> tuple:
         ("Pokračovat na Knowix", "https://www.knowix.cz/"),
         ("Dnešní mini‑mise", "https://www.knowix.cz/anglictina"),
         ("Zkus písničku", "https://www.knowix.cz/song-selection"),
+        # nové varianty CTA
+        ("Nastartovat Daily Quest", "https://www.knowix.cz/daily_quest"),
+        ("Krátké procvičení", "https://www.knowix.cz/"),
+        ("Mini gramatika", "https://www.knowix.cz/anglictina"),
+        ("Posílit streak", "https://www.knowix.cz/"),
     ]
     cta_text, cta_href = random.choice(ctas)
 
@@ -94,7 +116,16 @@ def _compose_reminder_email(first_name: str, unsubscribe_link: str) -> tuple:
         "Máš 2 volné minuty? Dej si rychlý poslech nebo pár vět, angličtina ti poděkuje.",
         "Bonus: každé cvičení zvedá tvůj streak a XP. Malé krůčky dělají velké věci.",
         "Tip: když nevíš co, klikni na Daily Quest – připravili jsme to za tebe.",
-        "Lámání jazyků povoleno. Smích také. 😀"
+        "Lámání jazyků povoleno. Smích také. 😀",
+        # nové hravé řádky
+        "Malá porce angličtiny = velká spokojenost. 🍰",
+        "Rychlá dávka slovíček a máš hotovo. ⚡",
+        "Mozek si rád zacvičí – dej mu šanci. 🧠",
+        "Streak roste s každým mini‑krokem. 🔥",
+        "Zpátky na vlnu – klik a jedeš. 🌊",
+        "Krátký poslech, dlouhá radost. 🎧",
+        "Dnes nehoníme dokonalost, jen malý pokrok. ✅",
+        "XP do kapsy během pár minut. 🎖️",
     ]
     fun_line = random.choice(fun_lines)
 
@@ -304,7 +335,7 @@ def _get_push_candidates():
                 FROM users u
                 JOIN user_stats us ON u.id = us.user_id
                 WHERE EXISTS (SELECT 1 FROM push_subscriptions ps WHERE ps.user_id = u.id)
-                  AND (u.last_push_date IS NULL OR u.last_push_date != CURDATE() OR u.push_sends_today < %s)
+                  AND (u.last_push_date = CURDATE() OR u.push_sends_today < %s)
                   AND TIMESTAMPDIFF(HOUR, us.last_active, NOW()) >= 3
                   AND us.last_active IS NOT NULL
             """, (MAX_PUSHES_PER_DAY,))

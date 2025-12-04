@@ -157,13 +157,65 @@
         color: #555;
         margin: 6px 2px;
     }
+
+    .pwa-popout {
+        position: fixed;
+        z-index: 10000;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 560px;
+        width: calc(100% - 32px);
+        background: rgba(255, 255, 255, 0.98);
+        color: #111;
+        border-radius: 16px;
+        box-shadow: 0 12px 34px rgba(0, 0, 0, 0.35);
+        padding: 18px;
+        display: none;
+    }
+
+    .pwa-popout h3 {
+        margin: 0 0 6px;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .pwa-popout p {
+        margin: 8px 0;
+        line-height: 1.5;
+    }
+
+    .pwa-popout .steps {
+        background: #f3f4f6;
+        border-radius: 12px;
+        padding: 12px;
+    }
+
+    .pwa-popout .close-btn {
+        background: none;
+        border: none;
+        color: #555;
+        font-weight: 600;
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .pwa-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(6px);
+        z-index: 9999;
+        display: none;
+    }
 </style>
 
 <main>
     <section class="intro">
         <h1 class="logo-name">knowix</h1>
         <!--        <span class="alpha-badge">ALPHA VERZE</span>-->
-        <h2 class="motto">Každý pád je krok vpřed</h2>
+        <h2 class="motto">Dělano pro lidi.</h2>
     </section>
 
     <section class="info">
@@ -175,11 +227,19 @@
                 <p>Zábavné cvičení na téma Angličtina</p>
             </div>
         </div>
+        <!-- „PWA aplikace“ -->
+        <div class="bubble support-bubble" onclick="openPwaHelp()">
+            <img src="{{ url_for('static', filename='pic/logo1.webp') }}" alt="Knowix Logo">
+            <div class="bubble-text">
+                <h3>PWA aplikace</h3>
+                <p>Knowix jde nainstalovat jako aplikace. Klikni a uvidíš jak.</p>
+            </div>
+        </div>
         <div class="bubble support-bubble" onclick="location.href='/proc_jit_s_nama'">
             <img src="{{ url_for('static', filename='pic/why.png') }}" alt="Podpora">
             <div class="bubble-text">
-                <h3>Proč jít s náma?</h3>
-                <p>Klikni na to, a dozvíte se proč jít s náma.</p>
+                <h3>Proč cvičit na Knowixu?</h3>
+                <p>Klikni na to, a dozvíte se proč bys měl nás doporučit ostatním.</p>
             </div>
         </div>
         <!-- Kontakty bublina samostatně, text zvlášť pod ní -->
@@ -188,14 +248,6 @@
             <div class="bubble-text">
                 <h3>Kontakty</h3>
                 <p>Klikni jestliže chceš zjistit <strong>Discord, tiktok a atd...</strong></p>
-            </div>
-        </div>
-        <!-- „Kdo vytvořil Knowix?“ -->
-        <div class="bubble">
-            <img src="{{ url_for('static', filename='pic/logo1.png') }}" alt="Knowix Logo">
-            <div class="bubble-text">
-                <h3>Kdo vytvořil Knowix?</h3>
-                <p>Vytvořil žák Vojtěch Kurinec</p>
             </div>
         </div>
         <div class="bubble support-bubble" onclick="window.open('https://ko-fi.com/voku199', '_blank')">
@@ -212,6 +264,57 @@
         {% include 'daily_quest.html' %}
     </div>
 </main>
+
+<div id="pwaOverlay" class="pwa-overlay" onclick="closePwaHelp()"></div>
+<div id="pwaPopout" class="pwa-popout" role="dialog" aria-modal="true" aria-labelledby="pwaHelpTitle">
+    <div style="display:flex; align-items:center; margin-bottom: 10px;">
+        <div style="width:44px; height:44px; border-radius:50%; background: linear-gradient(90deg, #2d7ff9, #6aa9ff); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:18px; margin-right:10px;">
+            ⬇️
+        </div>
+        <div>
+            <h3 id="pwaHelpTitle">Instalace PWA aplikace</h3>
+            <p style="margin:2px 0 0; font-size:13px; color:#555;">Knowix si můžeš nainstalovat jako aplikaci.</p>
+        </div>
+    </div>
+    <div class="steps">
+        <p><strong>Chrome / Edge (Windows, Android):</strong></p>
+        <p>1) Klikni na ikonu „Instalovat“ vpravo nahoře nebo otevři menu ⋮ a zvol „Instalovat aplikaci“.</p>
+        <p>2) Potvrď instalaci. Aplikace se objeví v nabídce Start / na ploše.</p>
+        <hr style="border:none; border-top:1px solid #e5e7eb; margin:10px 0;">
+        <p><strong>Safari (iOS):</strong></p>
+        <p>1) Otevři menu „Sdílet“ (ikonka se šipkou nahoru).</p>
+        <p>2) Zvol „Přidat na plochu“.</p>
+        <p>3) Potvrď. Ikona se přidá na plochu jako aplikace.</p>
+    </div>
+    <div style="display:flex; justify-content:flex-end; margin-top:12px;">
+        <button class="close-btn" onclick="closePwaHelp()">Zavřít</button>
+        <button style="background: linear-gradient(90deg, #3b82f6, #8b5cf6); color:#fff; font-weight:600; padding:8px 14px; border:none; border-radius:10px; cursor:pointer; margin-left:8px;"
+                onclick="triggerPwaInstall()">Zkusit instalaci
+        </button>
+    </div>
+</div>
+
+<script>
+    function openPwaHelp() {
+        document.getElementById('pwaOverlay').style.display = 'block';
+        document.getElementById('pwaPopout').style.display = 'block';
+    }
+
+    function closePwaHelp() {
+        document.getElementById('pwaOverlay').style.display = 'none';
+        document.getElementById('pwaPopout').style.display = 'none';
+    }
+
+    function triggerPwaInstall() {
+        const btn = document.getElementById('install-app');
+        if (btn) {
+            btn.click();
+        } else {
+            alert('Instalace není dostupná v tomto prohlížeči. Postupuj dle návodu.');
+        }
+    }
+</script>
+<script>document.body.classList.add('onboarding-active');   </script>
 <script>const CSRF_TOKEN = "{{ csrf_token() }}";</script>
 <script>
     document.addEventListener('click', (e) => {
@@ -224,6 +327,7 @@
         }
     });
 </script>
+<script>document.body.classList.remove('onboarding-active');</script>
 <div class="plain-note">Děkujeme za <strong>th3cooki1 desing discordu! (ig : @th3cooki1 i discord)</strong></div>
 
 {% endblock %}

@@ -1,0 +1,238 @@
+{% if session.get('user_id') and not session.get('has_seen_onboarding') %}
+<div id="onboardingOverlay" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 9998;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+"></div>
+
+<div id="onboardingContainer" style="
+    position: fixed;
+    z-index: 9999;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const userOnboarding = {% if session.get('user_id') and not session.get('has_seen_onboarding') %}true{% else %}false{% endif %};
+    const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+    if (!userOnboarding) return;
+
+    // Načti onboarding data
+    fetch('/onboarding/data')
+        .then(response => response.json())
+        .then(data => {
+            if (data.step_data) {
+                startOnboarding(data);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading onboarding:', error);
+        });
+
+    function startOnboarding(data) {
+        const overlay = document.getElementById('onboardingOverlay');
+        const container = document.getElementById('onboardingContainer');
+
+        // Zobraz overlay s fade-in efektem
+        overlay.style.display = 'block';
+        container.style.display = 'block';
+        document.body.classList.add('onboarding-active');
+
+        setTimeout(() => {
+            overlay.style.opacity = '1';
+            container.style.opacity = '1';
+        }, 10);
+
+        // Vytvoř onboarding UI
+        renderOnboardingStep(data, container);
+    }
+
+    function renderOnboardingStep(data, container) {
+        const step = data.step_data;
+
+        // Výpočet umístění bez utilit tříd
+        let containerStyle = '';
+        let arrowPositionStyle = '';
+
+        switch(step.position) {
+            case 'top-right':
+                containerStyle = 'top: 32px; right: 32px;';
+                arrowPositionStyle = 'left: -12px; top: 20px; border-right-color: rgba(255,255,255,0.95);';
+                break;
+            case 'top-left':
+                containerStyle = 'top: 32px; left: 32px;';
+                arrowPositionStyle = 'right: -12px; top: 20px; border-left-color: rgba(255,255,255,0.95);';
+                break;
+            case 'bottom':
+                containerStyle = 'bottom: 32px; left: 32px;';
+                arrowPositionStyle = 'top: -12px; left: 20px; border-bottom-color: rgba(255,255,255,0.95);';
+                break;
+            default:
+                containerStyle = 'top: 50%; left: 50%; transform: translate(-50%, -50%);';
+                arrowPositionStyle = 'bottom: -12px; left: 50%; transform: translateX(-50%); border-top-color: rgba(255,255,255,0.95);';
+        }
+
+        container.innerHTML = `
+            <div style="position: fixed; ${containerStyle} background: rgba(255,255,255,0.95); color: #111; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); max-width: 520px; width: calc(100% - 64px); padding: 20px; opacity: 1; transition: all 0.3s ease;">
+                <div style="position: absolute; ${arrowPositionStyle} width: 0; height: 0; border: 12px solid transparent;"></div>
+
+                <div style="display:flex; align-items:center; margin-bottom: 12px;">
+                    <div style="width:48px; height:48px; border-radius:50%; background: linear-gradient(90deg, #8b5cf6, #ec4899); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:20px; margin-right:12px;">A</div>
+                    <div>
+                        <h3 style="margin:0; font-size:18px; font-weight:700; color:#111;">${step.title}</h3>
+                        <p style="margin:2px 0 0; font-size:13px; color:#555;">Alex, tvůj průvodce</p>
+                    </div>
+                </div>
+
+                <p style="color:#222; margin: 12px 0 18px; line-height:1.6; font-size:15px;">${step.message}</p>
+
+                <div style="display:flex; align-items:center; justify-content:space-between; padding-top:12px; border-top:1px solid #e5e7eb;">
+                    ${step.show_skip ?
+                        `<button onclick="skipOnboarding()" style="background:none; border:none; color:#555; font-weight:600; padding:8px 12px; border-radius:10px; cursor:pointer;">Přeskočit onboarding</button>` :
+                        `<div></div>`
+                    }
+
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div style="width:140px; height:8px; background:#e5e7eb; border-radius:999px; overflow:hidden;">
+                            <div style="height:100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); width: ${data.progress}%; transition: width .3s;"></div>
+                        </div>
+                        <span style="font-size:13px; color:#666;">Krok ${data.current_step} z ${data.total_steps}</span>
+
+                        <button onclick="nextOnboardingStep(${data.current_step})"
+                                style="background: linear-gradient(90deg, #3b82f6, #8b5cf6); color:#fff; font-weight:600; padding:10px 16px; border:none; border-radius:10px; cursor:pointer; box-shadow: 0 6px 20px rgba(59,130,246,0.35);">
+                            ${step.action_required === 'complete' ? 'Dokončit' : 'Další'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Pokud máme cílový element, zvýrazni ho
+        if (step.target_selector) {
+            const targetElement = document.querySelector(step.target_selector);
+            if (targetElement) {
+                targetElement.style.transition = 'all 0.3s ease';
+                targetElement.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3)';
+                targetElement.style.zIndex = '10000';
+                if (getComputedStyle(targetElement).position === 'static') {
+                    targetElement.style.position = 'relative';
+                }
+
+                // Přidej pulzující animaci
+                targetElement.classList.add('animate-pulse');
+
+                // Pokud je potřeba kliknutí, přidej event listener
+                if (step.action_required === 'click') {
+                    const anchor = targetElement.tagName === 'A' ? targetElement : targetElement.closest('a');
+                    const href = anchor ? anchor.getAttribute('href') : null;
+                    targetElement.addEventListener('click', function handleClick(e) {
+                        try {
+                            if (href) e.preventDefault();
+                            nextOnboardingStep(data.current_step).then(() => {
+                                if (href) {
+                                    // krátké zpoždění kvůli animacím
+                                    setTimeout(() => { window.location.href = href; }, 50);
+                                }
+                            });
+                        } finally {
+                            targetElement.removeEventListener('click', handleClick);
+                        }
+                    }, { once: true });
+                }
+            }
+        }
+    }
+
+    window.nextOnboardingStep = function(currentStep) {
+        return fetch('/onboarding/next', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': CSRF_TOKEN
+            },
+            body: JSON.stringify({ step_completed: currentStep, csrf_token: CSRF_TOKEN })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.completed) {
+                    document.getElementById('onboardingOverlay').style.opacity = '0';
+                    document.getElementById('onboardingContainer').style.opacity = '0';
+                    document.body.classList.remove('onboarding-active');
+                    setTimeout(() => {
+                        document.getElementById('onboardingOverlay').style.display = 'none';
+                        document.getElementById('onboardingContainer').style.display = 'none';
+                        window.location.reload();
+                    }, 300);
+                } else {
+                    return fetch('/onboarding/data')
+                        .then(response => response.json())
+                        .then(newData => {
+                            const allElements = document.querySelectorAll('*');
+                            allElements.forEach(el => {
+                                el.style.boxShadow = '';
+                                el.classList.remove('animate-pulse');
+                            });
+                            renderOnboardingStep(newData, document.getElementById('onboardingContainer'));
+                        });
+                }
+            }
+        });
+    };
+
+    window.skipOnboarding = function() {
+        if (confirm('Opravdu chceš přeskočit onboarding? Budeš si muset funkce objevit sám/sama.')) {
+            fetch('/onboarding/skip', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN },
+                body: JSON.stringify({ csrf_token: CSRF_TOKEN })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('onboardingOverlay').style.opacity = '0';
+                    document.getElementById('onboardingContainer').style.opacity = '0';
+                    document.body.classList.remove('onboarding-active');
+
+                    setTimeout(() => {
+                        document.getElementById('onboardingOverlay').style.display = 'none';
+                        document.getElementById('onboardingContainer').style.display = 'none';
+                        window.location.reload();
+                    }, 300);
+                }
+            });
+        }
+    };
+});
+</script>
+
+<style>
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.6), 0 0 30px rgba(59, 130, 246, 0.4);
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s infinite;
+}
+
+.z-9999 {
+    z-index: 9999;
+}
+</style>
+{% endif %}

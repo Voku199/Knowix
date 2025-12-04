@@ -10,6 +10,8 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 import os
 import mimetypes
 from worker_main import start_worker_thread  # přidán import vlákna workeru
+from db import get_db_connection
+from uuid import uuid4
 
 # Zajisti správný MIME typ pro WebP
 mimetypes.add_type('image/webp', '.webp')
@@ -47,9 +49,10 @@ from podcast import podcast_bp
 from slovni_fotbal import slovni_bp
 from daily_quest import daily_bp, get_daily_quests_for_user
 from AI_gramatika import ai_gramatika_bp
-from reminders import reminders_bp, start_reminder_scheduler  # Přidán import připomínkového systému
+from reminders import reminders_bp  # Přidán import připomínkového systému
 from push_notifications import push_bp, test_send_push  # PWA push notifikace blueprint + test sender
 from wordle import wordle_bp
+from onboarding import onboarding_bp  # nový onboarding blueprint
 
 # -------- Matematiky --------------------
 # from math_main import math_main_bp
@@ -157,6 +160,7 @@ app.register_blueprint(ai_gramatika_bp)
 app.register_blueprint(reminders_bp)  # Registrace blueprintu pro unsubscribe a ruční scan
 app.register_blueprint(push_bp)
 app.register_blueprint(wordle_bp)
+app.register_blueprint(onboarding_bp)
 
 # -------- Matematiky --------------------
 # app.register_blueprint(math_main_bp)
@@ -197,6 +201,7 @@ def offline_page():
 
 
 # === BEFORE_REQUEST: doména, secure, redirect, refresh ===
+# === BEFORE_REQUEST: doména, secure, redirect, refresh ===
 @app.before_request
 def handle_domain_and_session():
     host = request.host.split(':')[0]
@@ -231,13 +236,56 @@ def handle_domain_and_session():
         code = 308 if request.method not in ("GET", "HEAD", "OPTIONS") else 301
         return redirect(target, code=code)
 
+    # Zajištění guest účtu pro nepřihlášené
+    if 'user_id' not in session:
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            # Vytvoř guest záznam s unikátním placeholder emailem (sloupec email je NOT NULL)
+            guest_email = f"guest_{uuid4().hex[:12]}@example.com"
+            cur.execute(
+                """
+                INSERT INTO users (first_name, last_name, email, password, school, is_guest, has_seen_onboarding)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    'Guest',
+                    'User',
+                    guest_email,
+                    'scrypt:32768:8:1$SZwTcXBf633lMT5B$5314fff3be13114ecbf2bff33572a6e3771287491ad73f4dda4f2f13be7493853f0badd609b3bf0a09f0c821bf55c30c9282ee46e88bcb1f38eccab9b56f5eef',
+                    'Knowix',
+                    1,
+                    0
+                )
+            )
+            guest_id = cur.lastrowid
+            conn.commit()
+            session['user_id'] = guest_id
+            session['is_guest'] = True
+            session['has_seen_onboarding'] = 0
+            session['onboarding_step'] = 1
+        except Exception as ex:
+            print(f"[onboarding] WARNING: failed to create guest: {ex}")
+        finally:
+            try:
+                if 'cur' in locals() and cur:
+                    cur.close()
+                if 'conn' in locals() and conn:
+                    conn.close()
+            except Exception:
+                pass
+    # Aktualizace has_seen_onboarding ze session pokud chybí
+    session.setdefault('has_seen_onboarding', 0)
+    session.setdefault('onboarding_step', 1)
+
+    # NEpřesměrování na onboarding z / - místo toho budeme zobrazovat overlay
+    # if request.path == '/' and session.get('user_id') and not session.get('has_seen_onboarding'):
+    #     return redirect('/onboarding')
+
     # Permanentní session pro přihlášené
     if 'user_id' in session:
         session.permanent = True
-        # Lehké dotknutí se session jednou za X minut kvůli refresh cookie
-        # (Flask ji po změně nebo díky SESSION_REFRESH_EACH_REQUEST obnoví)
         session.setdefault('_last_refresh', 0)
-        # nepoužijeme čas – stačí existence klíče, případně by se dalo aktualizovat timestamp
 
     # Flag pro after_request zda byla session změněna explicitně (informativní)
     g.session_keys_before = set(session.keys())
@@ -446,6 +494,44 @@ def service_worker_file():
 def send_notification_alias_root():
     return test_send_push()
 
+
+def _ensure_user_columns():
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        # Každý sloupec přidáme zvlášť a ignorujeme chybu 1060 (Duplicate column)
+        alters = [
+            "ALTER TABLE users ADD COLUMN is_guest TINYINT(1) DEFAULT 0",
+            "ALTER TABLE users ADD COLUMN has_seen_onboarding TINYINT(1) DEFAULT 0",
+            "ALTER TABLE users ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        ]
+        for sql in alters:
+            try:
+                cur.execute(sql)
+                conn.commit()
+            except Exception as e:
+                # Pokud DB vrátí, že sloupec existuje, pokračuj; jinak znovu vyhoď
+                msg = str(getattr(e, 'msg', e))
+                if 'Duplicate column' in msg or '1060' in msg:
+                    continue
+                else:
+                    raise
+        print("[main] users table columns ensured")
+    except Exception as ex:
+        print(f"[main] WARNING: unable to ensure users columns: {ex}")
+    finally:
+        try:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+        except Exception:
+            pass
+
+
+_ensure_user_columns()
 
 # app.run(port=5000, debug=True, host='0.0.0.0')
 # from waitress import serve

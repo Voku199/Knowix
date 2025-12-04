@@ -44,14 +44,14 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+<!--<script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>-->
+<!--<script>-->
+<!--  window.dataLayer = window.dataLayer || [];-->
+<!--  function gtag(){dataLayer.push(arguments);}-->
+<!--  gtag('js', new Date());-->
 
-  gtag('config', 'G-W1EN990JKP');
-</script>
+<!--  gtag('config', 'G-W1EN990JKP');-->
+<!--</script>-->
     <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -91,6 +91,23 @@
         .pwa-action-btn.pulse {animation:pwaPulse 2s ease-out 1;}
         .pwa-action-btn[data-type="notif"].pulse {animation:notifPulse 2s ease-out 1;}
     </style>
+    <style>
+    /* Když je onboarding aktivní, rozostři obsah za ním */
+    body.onboarding-active #content-wrapper {
+        filter: blur(3px);
+        opacity: 0.7;
+        pointer-events: none;
+        user-select: none;
+        transition: filter 0.3s ease, opacity 0.3s ease;
+    }
+
+    /* Výjimka pro highlighted element */
+    .onboarding-highlight {
+        filter: none !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+</style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
@@ -169,11 +186,11 @@
 <!--                <button id="test-notif" title="Test notifikace" style="background:none;border:1px solid #444;border-radius:6px;cursor:pointer;padding:4px 8px;color:inherit;">Test notif</button>-->
 <!--            </li>-->
         </ul>
-        {% if session['user_name'] %}
+        {% if session.get('user_name') %}
         <div class="user-profile">
             <div class="profile-container">
                 {% if session.get('profile_pic') %}
-                <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}"
+                <img src="{{ url_for('static', filename='profile_pics/' + session.get('profile_pic')) }}"
                      alt="Profilová fotka" width="64" class="profile-pic"
                      onerror="this.onerror=null; this.src='{{ url_for('static', filename='pic/default.webp') }}';">
                 {% else %}
@@ -184,7 +201,7 @@
                     <a href="{{ url_for('auth.settings') }}">⚙️ Nastavení</a>
                     <a href="{{ url_for('auth.logout') }}">🚪 Odhlásit se</a>
                 </div>
-                <span class="greeting" style="margin-left: 10px;">Ahoj {{ session['user_name'].split()[0] }}!</span>
+                <span class="greeting" style="margin-left: 10px;">Ahoj {{ (session.get('user_name') or '').split()[0] }}!</span>
             </div>
             {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
             <div class="xp-header-bar">
@@ -241,6 +258,93 @@ document.getElementById('test-push')?.addEventListener('click', async function()
         alert('Chyba testu: ' + error.message);
     }
 });
+
+// Přepínač notifikací: povolit/vypnout (unsubscribe)
+(function(){
+  const btn = document.getElementById('enable-notifications');
+  if (!btn) return;
+
+  // Pomocná funkce pro nastavení vizuálu tlačítka
+  function setBtnState(enabled){
+    if (enabled){
+      btn.querySelector('.icon')?.replaceWith(Object.assign(document.createElement('span'), {className:'icon', textContent:'🔔'}));
+      btn.querySelector('.label')?.replaceWith(Object.assign(document.createElement('span'), {className:'label', textContent:'Vypnout notifikace'}));
+      btn.title = 'Vypnout notifikace';
+    } else {
+      btn.querySelector('.icon')?.replaceWith(Object.assign(document.createElement('span'), {className:'icon', textContent:'🔔'}));
+      btn.querySelector('.label')?.replaceWith(Object.assign(document.createElement('span'), {className:'label', textContent:'Povolit notifikace'}));
+      btn.title = 'Povolit notifikace';
+    }
+  }
+
+  // Inicializace stavu podle subscription
+  (async function init(){
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      setBtnState(!!sub && Notification.permission === 'granted');
+      btn.style.display = 'inline-block';
+    } catch(e){ /* ignore */ }
+  })();
+
+  btn.addEventListener('click', async function(){
+    try {
+      // Pokud prohlížeč nepodporuje notifikace
+      if (!('Notification' in window)){
+        alert('Notifikace nejsou podporované tímto prohlížečem.');
+        return;
+      }
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+
+      // Pokud je subscription a povolení uděleno -> vypnout (unsubscribe)
+      if (sub && Notification.permission === 'granted'){
+        const ok = await sub.unsubscribe();
+        setBtnState(false);
+        if (!ok){
+          console.warn('Unsubscribe nevrátil OK, ale subscription by měla být zrušena.');
+        }
+        alert('Notifikace byly vypnuty.');
+        return;
+      }
+
+      // Pokud nemáme subscription, požádáme o oprávnění a pokusíme se přihlásit
+      if (Notification.permission === 'default'){
+        const perm = await Notification.requestPermission();
+        if (perm !== 'granted'){
+          alert('Notifikace nejsou povolené. Povol je v nastavení prohlížeče.');
+          setBtnState(false);
+          return;
+        }
+      } else if (Notification.permission === 'denied'){
+        alert('Notifikace jsou zakázané v prohlížeči. Povol je v nastavení.');
+        setBtnState(false);
+        return;
+      }
+
+      // Vytvoření nové subscription (vyžaduje VAPID public key na serveru – pokud pwa.js již řeší, jen triggeruj)
+      try {
+        // Pokud vaše pwa.js obsahuje logiku pro subscribe, lze ji vyvolat událostí/custom handlerem.
+        // Zde fallback: pokus o vytvoření subscription bez odeslání na server (nutné doplnit VAPID klíč v reálné implementaci).
+        const newSub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: undefined });
+        if (newSub){
+          setBtnState(true);
+          alert('Notifikace byly povoleny.');
+        } else {
+          alert('Nepodařilo se povolit notifikace.');
+          setBtnState(false);
+        }
+      } catch(err){
+        console.error('Subscribe error', err);
+        alert('Chyba při povolování notifikací.');
+        setBtnState(false);
+      }
+    } catch(e){
+      console.error('Toggle notif error', e);
+      alert('Chyba při změně stavu notifikací.');
+    }
+  });
+})();
 
     document.getElementById('theme-toggle').addEventListener('click', () => {
         fetch('/set_theme', {
@@ -311,5 +415,9 @@ document.getElementById('test-push')?.addEventListener('click', async function()
   if (notifBtn) observer.observe(notifBtn, {attributes:true});
 })();
 </script>
+
+{# Onboarding overlay – vloženo globálně #}
+{% include 'onboarding.html' %}
+
 </body>
 </html>

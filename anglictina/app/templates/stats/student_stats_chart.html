@@ -12,7 +12,7 @@
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://knowix.cz/static/og-banner.png">
     <link rel="canonical" href="https://www.knowix.cz">
-        <link rel="stylesheet" href="/static/mobile_header.css">
+    <link rel="stylesheet" href="/static/mobile_header.css">
     <title>Knowix</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -76,7 +76,7 @@
         }
     </style>
 </head>
-<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}"></body>
+<body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
 <header>
     <div class="logo-streak-wrapper">
         <div class="logo">
@@ -162,6 +162,7 @@
 {% block content %}
 <body>
 <h2 style="text-align:center;">Statistiky studenta: {{ student.first_name }} {{ student.last_name }}</h2>
+<p style="text-align:center;color:#666;font-size:14px;margin-top:-4px;">Pokud se vaše statistiky nezobrazují, zkuste tvrdé obnovení stránky klávesovou zkratkou <strong>Ctrl+Shift+R</strong> (Mac: ⌘+Shift+R).</p>
 <div class="chart-grid">
     <div class="chart-container">
         <canvas id="answersChart"></canvas>
@@ -195,10 +196,8 @@
     </p>
 </footer>
 <script>const CSRF_TOKEN = "{{ csrf_token() }}";</script>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Data z backendu (předpoklad: stats obsahuje stejné klíče jako v původním stats.html)
     const correctRaw = {{ stats.correct_answers|default(0) }};
     const wrongRaw = {{ stats.wrong_answers|default(0) }};
     const lessons = {{ stats.total_lessons_done|default(0) }};
@@ -369,6 +368,6 @@
         });
     });
 </script>
-
 </body>
-{% endblock %}
+{% endblock %
+

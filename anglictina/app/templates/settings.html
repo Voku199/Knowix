@@ -21,6 +21,12 @@
         opacity: 0.95;
     }
 
+    /* Dark mode – globální pozadí a barvy */
+    body.dark-mode {
+        background: #0b1220 !important; /* velmi tmavé pozadí */
+        color: #e5e7eb !important;      /* světlý základní text */
+    }
+
     .students-list {
         display: flex;
         flex-direction: column;
@@ -39,9 +45,9 @@
         box-shadow: 0 4px 14px rgba(0,0,0,0.06);
     }
     body.dark-mode .student-card {
-        background: #1f2937; /* slate-800 */
+        background: #111827; /* slate-900 */
         border-color: #374151; /* slate-700 */
-        box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.5);
     }
 
     .student-avatar {
@@ -75,8 +81,8 @@
         line-height: 1.35;
         word-break: break-word;
     }
-    body.dark-mode .student-info strong { color: #e5e7eb; }
-    body.dark-mode .student-info span { color: #cbd5e1; }
+    body.dark-mode .student-info strong { color: #e5e7eb !important; }
+    body.dark-mode .student-info span { color: #cbd5e1 !important; }
 
     .student-actions {
         display: flex;
@@ -105,6 +111,124 @@
         box-shadow: 0 6px 16px rgba(239,68,68,0.25);
     }
 
+    /* Sekce Nastavení – pozadí a rámečky */
+    .settings-section {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+        margin: 16px 0;
+        color: #111827; /* Přidáno: zajištění čitelného textu v light módu */
+    }
+    body.dark-mode .settings-section {
+        background: #0f172a; /* slate-900/blue-900 mix */
+        border-color: #334155; /* slate-700 */
+        box-shadow: 0 8px 22px rgba(0,0,0,0.55);
+        color: #e5e7eb !important; /* Přidáno: světlý text v dark módu */
+    }
+
+    /* Sekce profilové fotky */
+    .profile-pic-section {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+        margin: 16px 0;
+        color: #111827;
+    }
+    body.dark-mode .profile-pic-section {
+        background: #0f172a;
+        border-color: #334155;
+        color: #e5e7eb !important;
+    }
+
+    /* Nadpisy */
+    .settings-section h2, .settings-container h1, .profile-pic-section h2 {
+        color: #111827;
+    }
+    body.dark-mode .settings-section h2,
+    body.dark-mode .settings-container h1,
+    body.dark-mode .profile-pic-section h2 {
+        color: #e5e7eb !important;
+    }
+
+    /* Tlačítka a formuláře */
+    .btn-save {
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 6px 18px rgba(59,130,246,0.25);
+        transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s;
+    }
+    .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(59,130,246,0.35); opacity: 0.95; }
+
+    /* Formuláře a inputy */
+    .form-select, .teacher-form input[type="email"], .teacher-form input[type="text"],
+    #assignment-text, #group-name-input, .upload-form input[type="file"] {
+        background: #ffffff;
+        color: #111827;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 8px 10px;
+    }
+    body.dark-mode .form-select,
+    body.dark-mode .teacher-form input[type="email"],
+    body.dark-mode .teacher-form input[type="text"],
+    body.dark-mode #assignment-text,
+    body.dark-mode #group-name-input,
+    body.dark-mode .upload-form input[type="file"] {
+        background: #0b1325; /* tmavé pole */
+        color: #e5e7eb !important;
+        border-color: #334155;
+    }
+
+    /* Formuláře pro nahrání fotky */
+    .upload-form label {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 700;
+        box-shadow: 0 6px 18px rgba(99, 102, 241, 0.28);
+        transition: transform 0.15s ease, box-shadow 0.2s ease;
+        display: inline-block;
+        margin-right: 10px;
+    }
+    .upload-form label:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(99, 102, 241, 0.35);
+    }
+    .upload-form input[type="file"] {
+        display: none;
+    }
+
+    /* Modály – přepnutí na tmavé */
+    #create-assignment-modal, #create-group-modal, #groups-list-modal {
+        background: rgba(0, 0, 0, 0.8);
+    }
+    #create-assignment-modal > div,
+    #create-group-modal > div,
+    #groups-list-modal > div {
+        background: #ffffff;
+        color: #111827;
+        border-radius: 12px;
+    }
+    body.dark-mode #create-assignment-modal > div,
+    body.dark-mode #create-group-modal > div,
+    body.dark-mode #groups-list-modal > div {
+        background: #0f172a;
+        color: #e5e7eb !important;
+        border: 1px solid #334155;
+        box-shadow: 0 8px 22px rgba(0,0,0,0.6);
+    }
+
     /* „Zobrazit statistiky“ jako pěkné tlačítko */
     .stats-section .stats-link {
         display: inline-block;
@@ -122,11 +246,106 @@
         box-shadow: 0 10px 24px rgba(99, 102, 241, 0.35);
     }
 
+    /* Achievementy */
+    .achievements-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .achievement-item {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 12px;
+        color: #111827;
+    }
+    body.dark-mode .achievement-item {
+        background: #111827;
+        border-color: #374151;
+        color: #e5e7eb !important;
+    }
+    .achievement-item.unlocked {
+        border-left: 4px solid #10b981;
+    }
+    .achievement-item.locked {
+        border-left: 4px solid #6b7280;
+        opacity: 0.7;
+    }
+
+    /* Top 10 uživatelů */
+    .top-users-list {
+        list-style: none;
+        padding: 0;
+    }
+    .top-users-list li {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 8px;
+        color: #111827;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    body.dark-mode .top-users-list li {
+        background: #111827;
+        border-color: #374151;
+        color: #e5e7eb !important;
+    }
+    .top-users-list li.top1 {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+    }
+    body.dark-mode .top-users-list li.top1 {
+        background: linear-gradient(135deg, #92400e, #b45309);
+    }
+    .top-users-list li.top2 {
+        background: linear-gradient(135deg, #e5e7eb, #d1d5db);
+    }
+    body.dark-mode .top-users-list li.top2 {
+        background: linear-gradient(135deg, #374151, #4b5563);
+    }
+    .top-users-list li.top3 {
+        background: linear-gradient(135deg, #fcd34d, #fbbf24);
+    }
+    body.dark-mode .top-users-list li.top3 {
+        background: linear-gradient(135deg, #78350f, #92400e);
+    }
+
     /* Responsivní úpravy pro menší obrazovky */
     @media (max-width: 600px) {
         .student-card { align-items: flex-start; }
         .student-avatar { width: 48px; height: 48px; flex-basis: 48px; }
         .student-actions { width: 100%; justify-content: flex-end; }
+    }
+
+    /* Oprava: zajistíme, aby veškerý text v dark módu byl viditelný */
+    body.dark-mode * {
+        color: inherit !important;
+    }
+
+    /* Hlavní kontejner */
+    .settings-container {
+        color: #111827;
+    }
+    body.dark-mode .settings-container {
+        color: #e5e7eb !important;
+    }
+
+    /* Informace o skupinách studenta */
+    .student-group-info {
+        color: #111827;
+    }
+    body.dark-mode .student-group-info {
+        color: #e5e7eb !important;
+    }
+
+    /* Úkoly studenta */
+    .student-tasks-info {
+        color: #111827;
+    }
+    body.dark-mode .student-tasks-info {
+        color: #e5e7eb !important;
     }
     </style>
 
@@ -147,7 +366,7 @@
                 📸 Vybrat soubor
                 <input type="file" name="file" id="file-upload" accept="image/*" required>
             </label>
-            <button type="submit">🚀 Nahrát novou fotku</button>
+            <button type="submit" class="btn-save">🚀 Nahrát novou fotku</button>
         </form>
     </div>
 
@@ -747,20 +966,52 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <script>const CSRF_TOKEN = "{{ csrf_token() }}";</script>
 <script>
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-        fetch('/set_theme', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
-            body: JSON.stringify({
-                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark',
-                csrf_token: CSRF_TOKEN
-            })
-        }).then(r => {
-            if (r.ok) {
+    // Opravený kód pro přepínání dark módu - zajistí okamžité přepnutí a ukládání
+    document.addEventListener('DOMContentLoaded', function() {
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                // Okamžitě přepneme téma
+                const isDark = document.body.classList.contains('dark-mode');
+                const newTheme = isDark ? 'light' : 'dark';
+
+                // Přepneme třídu
                 document.body.classList.toggle('dark-mode');
-                sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-            }
-        });
+
+                // Uložíme do sessionStorage
+                sessionStorage.setItem('theme', newTheme);
+
+                // Odešleme na server
+                fetch('/set_theme', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
+                    body: JSON.stringify({
+                        theme: newTheme,
+                        csrf_token: CSRF_TOKEN
+                    })
+                }).then(r => {
+                    if (!r.ok) {
+                        // Pokud selže, vrátíme zpět
+                        document.body.classList.toggle('dark-mode');
+                        sessionStorage.setItem('theme', isDark ? 'dark' : 'light');
+                        alert('Nepodařilo se změnit téma. Zkuste to znovu.');
+                    }
+                }).catch(() => {
+                    // Pokud selže fetch, také vrátíme zpět
+                    document.body.classList.toggle('dark-mode');
+                    sessionStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    alert('Nepodařilo se změnit téma. Zkuste to znovu.');
+                });
+            });
+        }
+
+        // Načtení uloženého tématu při startu
+        const savedTheme = sessionStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
     });
 </script>
 {% endblock %}

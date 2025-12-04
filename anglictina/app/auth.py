@@ -828,16 +828,22 @@ def logout():
 @auth_bp.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
-        input_data = request.form['email_or_username']
+        # Bezpečné získání hodnoty z formuláře, aby se předešlo BadRequestKeyError -> 400
+        input_data = (request.form.get('email_or_username') or '').strip().lower()
+
+        if not input_data:
+            flash("Zadejte e-mail nebo jméno.", "error")
+            return redirect(url_for('auth.forgot_password'))
 
         try:
             with get_db_connection() as conn:
                 cursor = conn.cursor()
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT id, first_name, email 
                     FROM users 
-                    WHERE email = %s OR first_name = %s
-                """, (input_data, input_data))
+                    WHERE email = %s OR LOWER(first_name) = %s
+                    """, (input_data, input_data))
                 user = cursor.fetchone()
 
             if user:
@@ -897,46 +903,14 @@ def verify_code():
     return render_template('verify_code.html')
 
 
-@auth_bp.route("/terms")
+@auth_bp.route('/terms')
 def terms():
-    return render_template("terms.html")
+    return render_template('terms.html')
 
 
-@auth_bp.route("/cookies")
+@auth_bp.route('/cookies')
 def cookies():
-    return render_template("cookie.html")
-
-
-@auth_bp.route('/resend_code', methods=['POST'])
-def resend_code():
-    if 'reset_email' not in session:
-        flash("Nejprve zadejte svůj email na stránce pro obnovení hesla.", "error")
-        return redirect(url_for('forgot_password'))
-
-    try:
-        verification_code = generate_verification_code()
-
-        # Aktualizace session
-        session['reset_code'] = verification_code
-        session['code_timestamp'] = time.time()
-
-        subject = "Nový ověřovací kód pro obnovení hesla"
-        body = f"""
-        Váš nový ověřovací kód je: {verification_code}
-
-        Kód je platný 15 minut. Pokud jste tento kód nevyžádali, ignorujte tento email.
-        """
-
-        if send_email(session['reset_email'], subject, body):
-            flash("Nový ověřovací kód byl odeslán na váš email.", "success")
-        else:
-            flash("Nepodařilo se odeslat nový ověřovací kód.", "error")
-
-    except Exception as e:
-        print(f"Chyba při opětovném odeslání kódu: {str(e)}")
-        flash("Došlo k chybě při generování nového kódu.", "error")
-
-    return redirect(url_for('auth.verify_code'))
+    return render_template('cookies.html')
 
 
 # 3. Route pro nastavení nového hesla
@@ -953,7 +927,7 @@ def reset_password():
 
         if not new_password or not confirm_password:
             flash("Vyplňte obě pole.", "error")
-            return redirect(url_for('reset_password'))
+            return redirect(url_for('auth.reset_password'))
 
         if new_password != confirm_password:
             flash("Hesla se neshodují.", "error")
@@ -980,6 +954,38 @@ def reset_password():
         return redirect(url_for('auth.login'))
 
     return render_template('reset_password.html')
+
+
+@auth_bp.route('/resend_code', methods=['POST'])
+def resend_code():
+    if 'reset_email' not in session:
+        flash("Nejprve zadejte svůj email na stránce pro obnovení hesla.", "error")
+        return redirect(url_for('auth.forgot_password'))
+
+    try:
+        verification_code = generate_verification_code()
+
+        # Aktualizace session
+        session['reset_code'] = verification_code
+        session['code_timestamp'] = time.time()
+
+        subject = "Nový ověřovací kód pro obnovení hesla"
+        body = f"""
+        Váš nový ověřovací kód je: {verification_code}
+
+        Kód je platný 15 minut. Pokud jste tento kód nevyžádali, ignorujte tento email.
+        """
+
+        if send_email(session['reset_email'], subject, body):
+            flash("Nový ověřovací kód byl odeslán na váš email.", "success")
+        else:
+            flash("Nepodařilo se odeslat nový ověřovací kód.", "error")
+
+    except Exception as e:
+        print(f"Chyba při opětovném odeslání kódu: {str(e)}")
+        flash("Došlo k chybě při generování nového kódu.", "error")
+
+    return redirect(url_for('auth.verify_code'))
 
 
 @auth_bp.route('/teacher/create_assignment', methods=['POST'])
