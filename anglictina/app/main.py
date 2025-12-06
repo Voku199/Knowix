@@ -1,6 +1,6 @@
 # --- Flask and SocketIO imports ---
 from dotenv import load_dotenv
-from flask import Flask, render_template, session, send_from_directory, request, redirect, jsonify, g
+from flask import Flask, render_template, session, send_from_directory, request, redirect, jsonify, g, url_for
 # from flask_session import Session
 import importlib
 from streak import get_user_streak
@@ -9,9 +9,11 @@ import redis
 from werkzeug.middleware.proxy_fix import ProxyFix
 import os
 import mimetypes
+import json
 from worker_main import start_worker_thread  # přidán import vlákna workeru
 from db import get_db_connection
 from uuid import uuid4
+from auth import auth_bp, ensure_users_table
 
 # Zajisti správný MIME typ pro WebP
 mimetypes.add_type('image/webp', '.webp')
@@ -20,7 +22,7 @@ mimetypes.add_type('image/webp', '.webp')
 from A1_music import exercises_bp
 from ai import ai_bp
 from at_on import at_on_bp
-from auth import auth_bp
+# from auth import auth_bp  # duplicitní import odstraněn
 from chat import zpravy_bp
 from feedback import feedback_bp
 from hangman import hangman_bp
@@ -66,6 +68,16 @@ from onboarding import onboarding_bp  # nový onboarding blueprint
 
 
 app = Flask(__name__)
+
+# # === Načtení překladů pro i18n ===
+# try:
+#     _translations_path = os.path.join(os.path.dirname(__file__), 'static', 'translations.json')
+#     with open(_translations_path, 'r', encoding='utf-8') as _f:
+#         translations = json.load(_f)
+#     print(f"[i18n] translations loaded: {_translations_path} ({len(translations)} keys)")
+# except Exception as _ex:
+#     print(f"[i18n] WARNING: failed to load translations.json: {_ex}")
+#     translations = {}
 
 # === ZÁKLADNÍ KONFIG A SESSION BACKEND ===
 load_dotenv(dotenv_path=".env")
@@ -443,7 +455,7 @@ def add_security_headers(response):
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.quilljs.com https://cdnjs.cloudflare.com; "
         "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
         "img-src 'self' data: https: blob: https://www.google-analytics.com https://ssl.google-analytics.com https://www.googletagmanager.com https://stats.g.doubleclick.net; "
-        "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com https://fonts.googleapis.com https://fonts.gstatic.com; "
+        "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
         "frame-src https://open.spotify.com https://*.spotify.com https://www.youtube-nocookie.com https://www.youtube.com https://*.youtube.com; "
         "media-src 'self' blob:; "
         "object-src 'none'; frame-ancestors 'none';"
@@ -489,10 +501,35 @@ def service_worker_file():
     return resp
 
 
+# @app.route("/set_lang/<lang>")
+# def set_lang(lang):
+#     session["lang"] = lang
+#     return redirect(request.referrer or url_for("main.index"))
+#
+#
+# def t(key):
+#     lang = session.get("lang", "cs")
+#     # Odolnější fallback při chybějícím klíči/jazyku
+#     entry = translations.get(key)
+#     if isinstance(entry, dict):
+#         return entry.get(lang) or entry.get("cs") or next(iter(entry.values()), key)
+#     return key
+#
+#
+# # Zpřístupnit překladovou funkci do Jinja šablon
+# @app.context_processor
+# def inject_t():
+#     return dict(t=t)
+
+
 # === Alias: /send_notification -> použije test_send_push z push_notifications ===
 @app.route('/send_notification', methods=['POST'])
 def send_notification_alias_root():
     return test_send_push()
+
+
+# Po registraci blueprintů a inicializaci session zajistíme DB schéma users
+ensure_users_table()
 
 
 def _ensure_user_columns():

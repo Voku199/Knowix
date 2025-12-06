@@ -14,6 +14,8 @@ import random
 import secrets
 from xp import get_user_achievements, get_all_achievements, get_top_users, get_user_xp_and_level
 from db import get_db_connection
+from authlib.integrations.flask_client import OAuth
+from datetime import datetime
 
 # Pomocné importy pro e‑mailové odesílání
 import socket
@@ -910,7 +912,7 @@ def terms():
 
 @auth_bp.route('/cookies')
 def cookies():
-    return render_template('cookies.html')
+    return render_template('cookie.html')
 
 
 # 3. Route pro nastavení nového hesla
@@ -1203,3 +1205,348 @@ def admin_test_email():
         return jsonify({'success': False, 'error': 'Chybí cílový e‑mail (to).'}), 400
     ok = send_email_html(to_email, subject, text, html)
     return jsonify({'success': bool(ok), 'to': to_email, 'subject': subject})
+
+
+oauth = OAuth()
+
+
+@auth_bp.route('/test/oauth')
+def test_oauth():
+    """Testovací endpoint pro ladění OAuth."""
+    _init_oauth()
+
+    # Zkontrolujte metadata
+    try:
+        metadata = oauth.google.load_server_metadata()
+        return jsonify({
+            'metadata': {
+                'authorization_endpoint': metadata.get('authorization_endpoint'),
+                'token_endpoint': metadata.get('token_endpoint'),
+                'userinfo_endpoint': metadata.get('userinfo_endpoint'),
+                'jwks_uri': metadata.get('jwks_uri'),
+            },
+            'client_id': os.environ.get('GOOGLE_CLIENT_ID')[:10] + '...' if os.environ.get(
+                'GOOGLE_CLIENT_ID') else None,
+            'redirect_uri': os.environ.get('OAUTH_REDIRECT_URI') or url_for('auth.callback_google', _external=True)
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+def _init_oauth(app=None):
+    """Inicializuje OAuth klienta pro Google podle env proměnných."""
+    app = app or current_app
+    oauth.init_app(app)
+
+    client_id = os.environ.get('GOOGLE_CLIENT_ID')
+    client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
+    if not client_id or not client_secret:
+        raise RuntimeError('GOOGLE_CLIENT_ID nebo GOOGLE_CLIENT_SECRET není nastaveno')
+
+    client = oauth._clients.get('google')  # type: ignore[attr-defined]
+    if client is None:
+        client = oauth.register(
+            name='google',
+            client_id=client_id,
+            client_secret=client_secret,
+            server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+            client_kwargs={'scope': 'openid email profile', 'prompt': 'consent'},
+        )
+    else:
+        client.client_id = client_id
+        client.client_secret = client_secret
+
+    if hasattr(client, '_server_metadata'):
+        del client._server_metadata
+
+    try:
+        metadata = client.load_server_metadata()
+        current_app.logger.debug(f"Metadata načtena: {metadata.get('authorization_endpoint')}")
+    except Exception as e:
+        current_app.logger.error(f"Chyba při načítání metadat: {str(e)}")
+        client = oauth.register(
+            name='google',
+            client_id=client_id,
+            client_secret=client_secret,
+            authorize_url='https://accounts.google.com/o/oauth2/v2/auth',
+            access_token_url='https://oauth2.googleapis.com/token',
+            jwks_uri='https://www.googleapis.com/oauth2/v3/certs',
+            userinfo_endpoint='https://openidconnect.googleapis.com/v1/userinfo',
+            client_kwargs={'scope': 'openid email profile', 'prompt': 'consent'},
+        )
+        if hasattr(client, '_server_metadata'):
+            del client._server_metadata
+
+
+def _generate_temporary_password():
+    # Přesný formát KnowixGoogle + 5 číslic
+    return 'KnowixGoogle' + ''.join(random.choices(string.digits, k=5))
+
+
+def _hash_password(plain):
+    # Použij werkzeug generate_password_hash (PBKDF2) – lze přepnout na bcrypt/argon2
+    return generate_password_hash(plain)
+
+
+def _send_temporary_password_email(email, temp_password):
+    print(temp_password)
+    subject = 'Knowix – Dočasné heslo pro první přihlášení'
+    text_body = (
+        'Dobrý den,\n\n'
+        'Váš dočasný přístup k Knowix byl vytvořen přes Google.\n'
+        f'Dočasné heslo: {temp_password}\n\n'
+        'Toto heslo je dočasné. Doporučujeme okamžitou změnu hesla – v aplikaci použijte "Zapomenuté heslo"\n'
+        'nebo odkaz v profilu k nastavení vlastního hesla.\n\n'
+        'Bezpečnější alternativa je jednorázový odkaz pro nastavení hesla (doporučeno).\n\n'
+        'Tým Knowix'
+    )
+    html_body = (
+        '<p>Dobrý den,</p>'
+        '<p>Váš dočasný přístup k Knowix byl vytvořen přes Google.</p>'
+        f'<p><strong>Dočasné heslo:</strong> <code>{temp_password}</code></p>'
+        '<p><em>Toto heslo je dočasné.</em> Doporučujeme okamžitou změnu hesla – v aplikaci použijte '
+        '„Zapomenuté heslo“ nebo odkaz v profilu k nastavení vlastního hesla.</p>'
+        '<p><strong>Bezpečnější alternativa</strong> je jednorázový odkaz pro nastavení hesla (doporučeno).</p>'
+        '<p>Tým Knowix</p>'
+    )
+    return send_email_html(email, subject, text_body, html_body)
+
+
+@auth_bp.route('/debug/db')
+def debug_db():
+    """Debug endpoint pro kontrolu struktury DB."""
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(dictionary=True)
+
+        # Zkontrolujte strukturu tabulky users
+        cur.execute("DESCRIBE users")
+        columns = cur.fetchall()
+
+        # Zkontrolujte, zda existují nějací uživatelé
+        cur.execute("SELECT COUNT(*) as count FROM users")
+        count = cur.fetchone()['count']
+
+        cur.close()
+        conn.close()
+
+        return jsonify({
+            'table_structure': columns,
+            'user_count': count,
+            'env_check': {
+                'GOOGLE_CLIENT_ID_exists': bool(os.environ.get('GOOGLE_CLIENT_ID')),
+                'GOOGLE_CLIENT_SECRET_exists': bool(os.environ.get('GOOGLE_CLIENT_SECRET')),
+            }
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+def create_user_from_google(profile):
+    """Vytvoří uživatele z Google profilu, vygeneruje dočasné heslo a pošle e‑mail."""
+    google_id = profile.get('sub')
+    email = profile.get('email')
+    first_name = profile.get('given_name') or ''
+    last_name = profile.get('family_name') or ''
+    avatar_url = profile.get('picture') or None
+
+    current_app.logger.debug(f"Vytvářím uživatele: email={email}, google_id={google_id}")
+
+    temp_password = _generate_temporary_password()
+    password_hash = _hash_password(temp_password)
+
+    now = datetime.utcnow()
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        current_app.logger.debug(f"Vkládám uživatele do DB...")
+        cur.execute(
+            """
+            INSERT INTO users (provider, provider_id, email, first_name, last_name, avatar_url, password, created_at, last_login)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            ('google', google_id, email, first_name, last_name, avatar_url, password_hash, now, now)
+        )
+        conn.commit()
+        user_id = cur.lastrowid
+        current_app.logger.debug(f"Uživatel vytvořen s ID: {user_id}")
+    except Exception as e:
+        current_app.logger.error(f"Chyba při vkládání uživatele do DB: {str(e)}", exc_info=True)
+        conn.rollback()
+        raise
+    finally:
+        cur.close()
+        conn.close()
+
+    # Pošleme e‑mail s dočasným heslem
+    try:
+        _send_temporary_password_email(email, temp_password)
+        current_app.logger.debug(f"Email s dočasným heslem odeslán na {email}")
+    except Exception as e:
+        current_app.logger.warning(f"Email send failed: {type(e).__name__}: {str(e)[:120]}")
+
+    return user_id
+
+
+@auth_bp.route('/login/google')
+def login_google():
+    """Zahájí OAuth2 flow s Googlem. Používá state pro CSRF."""
+    try:
+        _init_oauth()
+        redirect_uri = os.environ.get('OAUTH_REDIRECT_URI') or url_for('auth.callback_google', _external=True)
+
+        # Whitelist kontrola redirect URI (základní ochrana)
+        allowed_base = os.environ.get('OAUTH_REDIRECT_BASE')
+        if allowed_base and not redirect_uri.startswith(allowed_base):
+            flash('Neplatné redirect URI (není na whitelistu).', 'error')
+            return redirect(url_for('auth.login'))
+
+        # Před zahájením OAuth pročisti session (prevence kolize state/nonce)
+        session.clear()
+
+        # Získejte metadata pro debug
+        try:
+            metadata = oauth.google.load_server_metadata()
+            current_app.logger.debug(f"Metadata načtena: {metadata.get('authorization_endpoint')}")
+        except Exception as e:
+            current_app.logger.warning(f"Nepodařilo se načíst metadata: {str(e)}")
+
+        return oauth.google.authorize_redirect(redirect_uri)
+
+    except Exception as e:
+        current_app.logger.error(f"Chyba v login_google: {str(e)}", exc_info=True)
+        flash('Nastala chyba při pokusu o přihlášení přes Google.', 'error')
+        return redirect(url_for('auth.login'))
+
+
+@auth_bp.route('/callback/google')
+def callback_google():
+    """Zpracuje návrat z Google OAuth, vytvoří/načte uživatele a přihlásí ho."""
+    _init_oauth()
+
+    try:
+        token = oauth.google.authorize_access_token()
+        current_app.logger.debug(f"Token získán: {list(token.keys())}")
+    except Exception as e:
+        current_app.logger.error(f"Chyba při získávání tokenu: {str(e)}", exc_info=True)
+        flash('Přihlášení přes Google selhalo.', 'error')
+        return redirect(url_for('auth.login'))
+
+    try:
+        profile = oauth.google.parse_id_token(token, nonce=None)
+        current_app.logger.debug(f"Profil získán z ID tokenu: {list(profile.keys())}")
+    except Exception as e:
+        current_app.logger.error(f"Chyba při parsování ID tokenu: {str(e)}", exc_info=True)
+        flash('Chyba při zpracování dat z Googlu.', 'error')
+        return redirect(url_for('auth.login'))
+
+    if not profile or not profile.get('email') or not profile.get('sub'):
+        current_app.logger.error(f"Profil neobsahuje potřebná data: {profile}")
+        flash('Google profil neobsahuje potřebná data.', 'error')
+        return redirect(url_for('auth.login'))
+
+    google_id = profile.get('sub')
+    email = profile.get('email')
+
+    current_app.logger.debug(f"Zpracovávám uživatele: email={email}, google_id={google_id}")
+
+    # Najdi existujícího uživatele
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+    try:
+        current_app.logger.debug(f"Hledám uživatele s provider=google, provider_id={google_id}")
+        cur.execute("SELECT id, first_name, last_name FROM users WHERE provider=%s AND provider_id=%s",
+                    ('google', google_id))
+        user = cur.fetchone()
+        current_app.logger.debug(f"Nalezený uživatel: {user}")
+
+        if not user:
+            current_app.logger.debug(f"Uživatel neexistuje, vytvářím nového...")
+            # Pokud neexistuje, vytvoř nového
+            user_id = create_user_from_google(profile)
+            user = {'id': user_id, 'first_name': profile.get('given_name'), 'last_name': profile.get('family_name')}
+            current_app.logger.debug(f"Nový uživatel vytvořen: {user}")
+
+        # Aktualizuj last_login
+        current_app.logger.debug(f"Aktualizuji last_login pro user_id={user['id']}")
+        cur.execute("UPDATE users SET last_login=%s WHERE id=%s", (datetime.utcnow(), user['id']))
+        conn.commit()
+        current_app.logger.debug(f"Databázové operace dokončeny")
+
+    except Exception as e:
+        current_app.logger.error(f"Databázová chyba: {str(e)}", exc_info=True)
+        flash('Došlo k chybě při práci s databází.', 'error')
+        return redirect(url_for('auth.login'))
+    finally:
+        cur.close()
+        conn.close()
+
+    # Přihlas do session
+    session['user_id'] = user['id']
+    session['user_name'] = f"{user.get('first_name') or ''} {user.get('last_name') or ''}".strip()
+    session.modified = True
+
+    current_app.logger.debug(f"Uživatel přihlášen: user_id={user['id']}, user_name={session['user_name']}")
+
+    # Po přihlášení přesměruj rovnou na hlavní stránku
+    return redirect(url_for('main.index'))
+
+
+def ensure_users_table():
+    """Zajistí, že tabulka users existuje a má potřebné sloupce pro Google OAuth.
+    Vytvoří tabulku, pokud chybí. Dále přidá chybějící sloupce.
+    """
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS users (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              provider VARCHAR(32) NULL,
+              provider_id VARCHAR(128) NULL,
+              email VARCHAR(255) NOT NULL,
+              first_name VARCHAR(100) NULL,
+              last_name VARCHAR(100) NULL,
+              avatar_url VARCHAR(512) NULL,
+              password VARCHAR(255) NOT NULL,
+              english_level ENUM('A1','A2','B1','B2','C1','C2') NULL,
+              school INT NULL,
+              created_at TIMESTAMP NULL,
+              last_login TIMESTAMP NULL,
+              UNIQUE KEY uniq_email (email)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            """
+        )
+        # Přidej unikátní kombinaci provider+provider_id
+        cur.execute(
+            """
+            ALTER TABLE users
+            ADD UNIQUE KEY IF NOT EXISTS uniq_provider (provider, provider_id);
+            """
+        )
+    except Exception:
+        # Některé MySQL verze nepodporují IF NOT EXISTS u ALTER; fallback kontrola přes INFORMATION_SCHEMA
+        conn.rollback()
+        try:
+            cur.execute(
+                "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'users' AND column_name = 'provider'")
+            if cur.fetchone()[0] == 0:
+                cur.execute("ALTER TABLE users ADD COLUMN provider VARCHAR(32) NULL")
+            cur.execute(
+                "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'users' AND column_name = 'provider_id'")
+            if cur.fetchone()[0] == 0:
+                cur.execute("ALTER TABLE users ADD COLUMN provider_id VARCHAR(128) NULL")
+            cur.execute(
+                "SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'users' AND index_name = 'uniq_provider'")
+            if cur.fetchone()[0] == 0:
+                cur.execute("ALTER TABLE users ADD UNIQUE KEY uniq_provider (provider, provider_id)")
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            # Log jen stručně
+            print("[db] Nepodařilo se automaticky upravit schéma users.")
+    finally:
+        cur.close()
+        conn.close()
