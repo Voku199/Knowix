@@ -110,6 +110,17 @@ def send_email_html(to_email, subject, text_body, html_body):
       EMAIL_USER, EMAIL_PASSWORD (nebo pouze EMAIL_PASSWORD pro Gmail)
       SMTP_FORCE_IPV4 (1/0)
     """
+    # Ignoruj testovací adresy a anonymní identifikátory
+    try:
+        _to = (to_email or '').strip().lower()
+        local, _, domain = _to.partition('@')
+        if domain == 'example.com' or local.startswith('anonymous_'):
+            print(f"[email] Ignored to='{to_email}' subject='{subject}' (example/anonym)", flush=True)
+            return True
+    except Exception:
+        # V případě neočekávaného formátu pokračuj standardní cestou
+        pass
+
     from_email = os.getenv("EMAIL_FROM", "knowixcz@gmail.com")
 
     msg = MIMEMultipart('alternative')
