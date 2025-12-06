@@ -26,7 +26,7 @@ gevent==25.5.1
 gevent-websocket==0.10.1
 redis==6.2.0
 flask-limiter==3.12
-Authlib==0.5.1
+Authlib==1.6.5
 
 gTTS==2.5.3
 pywebpush==1.14.0
