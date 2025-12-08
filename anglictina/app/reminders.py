@@ -102,9 +102,9 @@ def _compose_reminder_email(first_name: str, unsubscribe_link: str) -> tuple:
     ctas = [
         ("Pokračovat na Knowix", "https://www.knowix.cz/"),
         ("Dnešní mini‑mise", "https://www.knowix.cz/anglictina"),
-        ("Zkus písničku", "https://www.knowix.cz/song-selection"),
+        ("Zkus písničku", "https://www.knowix.cz/anglictinan"),
         # nové varianty CTA
-        ("Nastartovat Daily Quest", "https://www.knowix.cz/daily_quest"),
+        ("Nastartovat Daily Quest", "https://www.knowix.cz/anglictina"),
         ("Krátké procvičení", "https://www.knowix.cz/"),
         ("Mini gramatika", "https://www.knowix.cz/anglictina"),
         ("Posílit streak", "https://www.knowix.cz/"),
@@ -335,12 +335,16 @@ def _get_push_candidates():
                 FROM users u
                 JOIN user_stats us ON u.id = us.user_id
                 WHERE EXISTS (SELECT 1 FROM push_subscriptions ps WHERE ps.user_id = u.id)
-                  AND (u.last_push_date = CURDATE() OR u.push_sends_today < %s)
+                  AND (u.last_push_date IS NULL OR u.last_push_date != CURDATE() OR u.push_sends_today < %s)
                   AND TIMESTAMPDIFF(HOUR, us.last_active, NOW()) >= 3
                   AND us.last_active IS NOT NULL
             """, (MAX_PUSHES_PER_DAY,))
 
         candidates = cur.fetchall()
+        # Debug: kolik kandidátů a ukázka prvních 5
+        print(f"[reminders] _get_push_candidates: count={len(candidates)}", flush=True)
+        if candidates:
+            print("[reminders] _get_push_candidates sample:", candidates[:5], flush=True)
     except Exception as ex:
         print(f"[reminders] Get push candidates error: {ex}")
     finally:

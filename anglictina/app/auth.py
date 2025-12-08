@@ -203,67 +203,6 @@ def send_email_html(to_email, subject, text_body, html_body):
     else:
         print("[email] RESEND_API_KEY missing -> skipping Resend", flush=True)
 
-    # SMTP fallback
-    try:
-        host = os.getenv('SMTP_HOST', 'smtp.gmail.com')
-        port = int(os.getenv('SMTP_PORT', '587'))
-        use_ssl = os.getenv('SMTP_SSL', '0') in ('1', 'true', 'True')
-        use_tls = os.getenv('SMTP_TLS', '1') in ('1', 'true', 'True') and not use_ssl
-        timeout = float(os.getenv('SMTP_TIMEOUT', '20'))
-        force_ipv4 = os.getenv('SMTP_FORCE_IPV4', '0') in ('1', 'true', 'True')
-
-        user = os.getenv('EMAIL_USER') or os.getenv('SMTP_USER') or os.getenv('EMAIL_FROM') or from_email
-        password = os.getenv('EMAIL_PASSWORD') or os.getenv('SMTP_PASSWORD')
-
-        if not password:
-            print("[email] SMTP credentials missing -> abort", flush=True)
-            return False
-
-        server = None
-        try:
-            print(f"[email] SMTP attempt host={host} port={port} ssl={use_ssl} tls={use_tls} ipv4={force_ipv4}",
-                  flush=True)
-            if force_ipv4:
-                import socket as _socket
-                infos = _socket.getaddrinfo(host, port, _socket.AF_INET, _socket.SOCK_STREAM)
-                if not infos:
-                    raise OSError("No IPv4 address resolved for SMTP host")
-                ipv4_addr = infos[0][4][0]
-                if use_ssl:
-                    server = smtplib.SMTP_SSL(ipv4_addr, port, timeout=timeout)
-                    server.ehlo()
-                else:
-                    server = smtplib.SMTP(ipv4_addr, port, timeout=timeout)
-            else:
-                if use_ssl:
-                    server = smtplib.SMTP_SSL(host, port, timeout=timeout)
-                    server.ehlo()
-                else:
-                    server = smtplib.SMTP(host, port, timeout=timeout)
-
-            if not use_ssl and use_tls:
-                server.starttls()
-                server.ehlo()
-
-            server.login(user, password)
-            server.sendmail(from_email, [to_email], msg.as_string())
-            server.quit()
-            print("[email] SMTP success", flush=True)
-            return True
-        finally:
-            try:
-                if server and getattr(server, 'sock', None):
-                    server.close()
-            except Exception:
-                pass
-    except Exception as e:
-        print(
-            f"Error sending HTML email (SMTP host={os.getenv('SMTP_HOST', 'smtp.gmail.com')} port={os.getenv('SMTP_PORT', '587')}): {e}",
-            flush=True)
-        return False
-
-    # profile_pic=session['profile_pic'])
-
 
 @auth_bp.route('/remove_student', methods=['POST'])
 def remove_student():
