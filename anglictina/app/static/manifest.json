@@ -20,13 +20,13 @@
   ],
   "icons": [
     {
-      "src": "/static/pic/logo1.png",
+      "src": "/static/pic/logo1.webp",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/static/pic/logo1.png",
+      "src": "/static/pic/logo1.webp",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
@@ -59,7 +59,7 @@
       "url": "/anglictina",
       "icons": [
         {
-          "src": "/static/pic/logo1.png",
+          "src": "/static/pic/logo1.webp",
           "sizes": "192x192",
           "type": "image/png",
           "purpose": "any"
@@ -72,7 +72,7 @@
       "url": "/test",
       "icons": [
         {
-          "src": "/static/pic/logo1.png",
+          "src": "/static/pic/logo1.webp",
           "sizes": "192x192",
           "type": "image/png",
           "purpose": "any"
