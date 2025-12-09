@@ -11,7 +11,7 @@ import os
 import mimetypes
 import json
 from worker_main import start_worker_thread  # přidán import vlákna workeru
-from db import get_db_connection
+from db import get_db_connection, ensure_users_table_guest
 from uuid import uuid4
 from auth import auth_bp, ensure_users_table
 
@@ -80,6 +80,7 @@ app = Flask(__name__)
 #     translations = {}
 
 # === ZÁKLADNÍ KONFIG A SESSION BACKEND ===
+ensure_users_table_guest()
 load_dotenv(dotenv_path=".env")
 app.secret_key = os.getenv("SECRET_KEY")
 if not app.secret_key:
@@ -257,7 +258,7 @@ def handle_domain_and_session():
             guest_email = f"guest_{uuid4().hex[:12]}@example.com"
             cur.execute(
                 """
-                INSERT INTO users (first_name, last_name, email, password, school, is_guest, has_seen_onboarding)
+                INSERT INTO guest (first_name, last_name, email, password, school, is_guest, has_seen_onboarding)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
                 """,
                 (

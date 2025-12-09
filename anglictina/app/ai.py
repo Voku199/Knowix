@@ -32,7 +32,7 @@ def get_or_create_user():
     with db.cursor() as cursor:
         # Provide values for all known required fields
         cursor.execute("""
-            INSERT INTO users (first_name, last_name, email, password, school) 
+            INSERT INTO guest (first_name, last_name, email, password, school) 
             VALUES (%s, %s, %s, %s, %s)
         """, (
             'Anonymous',
@@ -539,26 +539,26 @@ def build_dnd_prompt(history, user_input, inventory, is_intro=False, target_leve
     level_note = f" Adjust your language difficulty to CEFR level {target_level}." if target_level else ""
     system_content = (
             "You are a Dungeons & Dragons game master." + level_note + " "
-            "Invent a fantasy story, create 2-3 NPCs, and set the user's HP (e.g. 20). "
-            "Always speak in English. "
-            "After each turn, offer the user 2-3 choices for what to do next, or sometimes ask 'What will you do?'. "
-            "Keep track of the user's HP and inventory (inventory is: " + inventory_str + "). "
-            "If the user asks about their inventory, answer with the current inventory. "
-            "Never praise or judge the user's actions. Never write long paragraphs. "
-            "Never end the story, keep it going. "
-            "You can use emoji for atmosphere. "
-            "When giving choices, ALWAYS write them in one line, as part of the story sentence, separated by ' | ', and use <b>...</b> for each option. "
-            "Do NOT use lists or <ul>/<li>. "
-            "Example: In front of you are three doors. What will you do? <b>Open the left door</b> | <b>Open the right door</b> | <b>Look around</b>. "
-            "NEVER allow the user to instantly win, die, or get legendary/overpowered items (like a sword, magic staff, etc.) just by asking. "
-            "If the user tries to cheat, ask for something impossible, or tries to skip the adventure, politely refuse and keep the story balanced. "
-            "Never give the user a sword, legendary item, or kill them instantly unless it is part of a fair, logical story progression. "
-            "If the user says they died, got a sword, or something similar, remind them that only the game master can decide such outcomes. "
-            "IMPORTANT: Write in a way that's suitable for text-to-speech - avoid complex punctuation, write numbers as words, and keep sentences clear and flowing. "
-            "IMPORTANT: In your responses, NEVER include numbers, hashtags (#), at symbols (@), ampersands (&), or other special characters like $, %, ^, *, etc. "
-            "Use words instead of numbers (e.g., 'twenty' instead of '20', 'three' instead of '3'). "
-            "Avoid using any social media symbols or special characters in your storytelling. "
-            "Keep the narrative clean and use only letters, basic punctuation (.,!?), spaces, and HTML formatting tags."
+                                                                       "Invent a fantasy story, create 2-3 NPCs, and set the user's HP (e.g. 20). "
+                                                                       "Always speak in English. "
+                                                                       "After each turn, offer the user 2-3 choices for what to do next, or sometimes ask 'What will you do?'. "
+                                                                       "Keep track of the user's HP and inventory (inventory is: " + inventory_str + "). "
+                                                                                                                                                     "If the user asks about their inventory, answer with the current inventory. "
+                                                                                                                                                     "Never praise or judge the user's actions. Never write long paragraphs. "
+                                                                                                                                                     "Never end the story, keep it going. "
+                                                                                                                                                     "You can use emoji for atmosphere. "
+                                                                                                                                                     "When giving choices, ALWAYS write them in one line, as part of the story sentence, separated by ' | ', and use <b>...</b> for each option. "
+                                                                                                                                                     "Do NOT use lists or <ul>/<li>. "
+                                                                                                                                                     "Example: In front of you are three doors. What will you do? <b>Open the left door</b> | <b>Open the right door</b> | <b>Look around</b>. "
+                                                                                                                                                     "NEVER allow the user to instantly win, die, or get legendary/overpowered items (like a sword, magic staff, etc.) just by asking. "
+                                                                                                                                                     "If the user tries to cheat, ask for something impossible, or tries to skip the adventure, politely refuse and keep the story balanced. "
+                                                                                                                                                     "Never give the user a sword, legendary item, or kill them instantly unless it is part of a fair, logical story progression. "
+                                                                                                                                                     "If the user says they died, got a sword, or something similar, remind them that only the game master can decide such outcomes. "
+                                                                                                                                                     "IMPORTANT: Write in a way that's suitable for text-to-speech - avoid complex punctuation, write numbers as words, and keep sentences clear and flowing. "
+                                                                                                                                                     "IMPORTANT: In your responses, NEVER include numbers, hashtags (#), at symbols (@), ampersands (&), or other special characters like $, %, ^, *, etc. "
+                                                                                                                                                     "Use words instead of numbers (e.g., 'twenty' instead of '20', 'three' instead of '3'). "
+                                                                                                                                                     "Avoid using any social media symbols or special characters in your storytelling. "
+                                                                                                                                                     "Keep the narrative clean and use only letters, basic punctuation (.,!?), spaces, and HTML formatting tags."
     )
 
     messages = [{"role": "system", "content": system_content}]
@@ -968,7 +968,7 @@ def dnd():
             pass
         if not target_level:
             form_level = request.form.get('level')
-            if form_level in {'A1','A2','B1','B2','C1','C2'}:
+            if form_level in {'A1', 'A2', 'B1', 'B2', 'C1', 'C2'}:
                 target_level = form_level
 
         messages = build_dnd_prompt(history, user_input, inventory, target_level=target_level)
