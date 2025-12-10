@@ -24,8 +24,7 @@ CHECK_INTERVAL_SECONDS = 3600  # 1 hodina
 
 # Denní limity
 MAX_EMAILS_PER_DAY = 2
-MAX_PUSHES_PER_DAY = 5
-MIN_PUSHES_PER_DAY = 2
+MAX_PUSHES_PER_DAY = 3
 
 # Volitelné hodiny pro odeslání e‑mailů (CSV v ENV, např. "9,13,19")
 _EMAIL_HOURS_ENV = os.getenv('REMINDER_EMAIL_HOURS', '')
@@ -33,6 +32,9 @@ try:
     EMAIL_SEND_HOURS = sorted({int(h) for h in _EMAIL_HOURS_ENV.split(',') if h.strip() != ''}) or [9, 13, 19]
 except Exception:
     EMAIL_SEND_HOURS = [9, 13, 19]
+
+# Hodiny pro odeslání push notifikací – pevné časy
+PUSH_SEND_HOURS = [9, 15, 20]
 
 # Personalizované šablony push zpráv
 _PUSH_TEMPLATES = [
@@ -570,16 +572,16 @@ def send_daily_reminders():
         # Volitelný debug: mimo povolené hodiny
         pass
 
-    # Push notifikace: ponecháme původní logiku s časováním a pravděpodobností
-    push_hours = [9, 12, 15, 18, 21]
-    if current_hour in push_hours and _webpush and VAPID_PRIVATE_KEY:
+    # Push notifikace: max 3x denně v pevné časy (9, 15, 20)
+    if current_hour in PUSH_SEND_HOURS and _webpush and VAPID_PRIVATE_KEY:
         push_candidates = _get_push_candidates()
-
+        print(f"[reminders] Push window hit at hour={current_hour}, candidates={len(push_candidates)}", flush=True)
         for user_id, first_name, sends_today, hours_inactive in push_candidates:
-            probability = 0.8 if sends_today < MIN_PUSHES_PER_DAY else 0.4
-            if random.random() < probability:
-                if _send_push_reminder(user_id, first_name):
-                    pushes_sent += 1
+            # Denní limit je již v SQL, ale pro jistotu ještě zkontrolujeme
+            if sends_today >= MAX_PUSHES_PER_DAY:
+                continue
+            if _send_push_reminder(user_id, first_name):
+                pushes_sent += 1
 
     print(f"[reminders] Daily reminders: {emails_sent} emails, {pushes_sent} pushes", flush=True)
     return emails_sent, pushes_sent
