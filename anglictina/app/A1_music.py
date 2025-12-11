@@ -145,11 +145,48 @@ def similarity(a, b):
 
 @exercises_bp.record_once
 def on_load(state):
-    state.app.translator = deepl.Translator(state.app.config['DEEPL_API_KEY'])
-    with open(os.path.join(state.app.static_folder, 'music/songs.json'), encoding='utf-8') as f:
-        state.app.songs = json.load(f)
-    with open(os.path.join(state.app.static_folder, 'music/word_pairs.json'), encoding='utf-8') as f:
-        state.app.word_pairs = json.load(f)
+    """Inicializace překladače a dat písniček/word_pairs při registraci blueprintu.
+
+    Na produkci může chybět DEEPL_API_KEY nebo soubory songs.json/word_pairs.json,
+    proto zde přidáváme defenzivní logiku, aby aplikace nespadla 500 při startu.
+    """
+    # --- DeepL překladač (volitelný) ---
+    deepl_key = state.app.config.get('DEEPL_API_KEY')
+    translator = None
+    if deepl_key:
+        try:
+            translator = deepl.Translator(deepl_key)
+        except Exception as exc:
+            # Nechceme, aby kvůli špatnému klíči spadla celá appka
+            print(f"[A1_music] Nepodařilo se inicializovat DeepL překladač: {exc}")
+            translator = None
+    else:
+        print("[A1_music] DEEPL_API_KEY není nastaven, překlady textů písní budou vypnuté.")
+    state.app.translator = translator
+
+    # --- Načtení songs.json ---
+    songs_path = os.path.join(state.app.static_folder, 'music/songs.json')
+    try:
+        with open(songs_path, encoding='utf-8') as f:
+            state.app.songs = json.load(f)
+    except FileNotFoundError:
+        print(f"[A1_music] Soubor {songs_path} nenalezen, seznam písní bude prázdný.")
+        state.app.songs = []
+    except Exception as exc:
+        print(f"[A1_music] Chyba při načítání {songs_path}: {exc}")
+        state.app.songs = []
+
+    # --- Načtení word_pairs.json ---
+    word_pairs_path = os.path.join(state.app.static_folder, 'music/word_pairs.json')
+    try:
+        with open(word_pairs_path, encoding='utf-8') as f:
+            state.app.word_pairs = json.load(f)
+    except FileNotFoundError:
+        print(f"[A1_music] Soubor {word_pairs_path} nenalezen, párovací cvičení budou vypnutá.")
+        state.app.word_pairs = {}
+    except Exception as exc:
+        print(f"[A1_music] Chyba při načítání {word_pairs_path}: {exc}")
+        state.app.word_pairs = {}
 
 
 @exercises_bp.route('/song-selection', methods=['GET'])
@@ -255,11 +292,25 @@ def exercise(song_id):
                                             min(3, len(remaining_indices))) if remaining_indices else []
 
         # Pokud používáme LRC fallback, přelož pouze nezbytné řádky pro aktuální cvičení
-        if lrc_fallback:
+        if lrc_fallback and getattr(current_app, 'translator', None) is not None:
             indices_to_translate = set(missing_indices + translation_indices)
             for idx in indices_to_translate:
                 if 0 <= idx < len(lyrics_lines) and not translations_lines[idx]:
-                    translations_lines[idx] = translate_line_with_retry(current_app.translator, lyrics_lines[idx], target_lang='CS')
+                    try:
+                        translations_lines[idx] = translate_line_with_retry(
+                            current_app.translator,
+                            lyrics_lines[idx],
+                            target_lang='CS'
+                        )
+                    except Exception as exc:
+                        print(f"[A1_music] Chyba při překladu LRC řádku index {idx}: {exc}")
+                        translations_lines[idx] = f"[Nepřeloženo] {lyrics_lines[idx]}"
+        elif lrc_fallback:
+            # Není k dispozici překladač – necháme překlady None nebo zkopírujeme originál
+            indices_to_fill = set(missing_indices + translation_indices)
+            for idx in indices_to_fill:
+                if 0 <= idx < len(lyrics_lines) and not translations_lines[idx]:
+                    translations_lines[idx] = lyrics_lines[idx]
 
         missing_exercises = []
         for idx in missing_indices:
