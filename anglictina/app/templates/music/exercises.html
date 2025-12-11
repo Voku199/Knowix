@@ -414,6 +414,36 @@ document.getElementById('checkButton').addEventListener('click', async () => {
                 csrf_token: csrfToken
             })
         });
+
+        // --- NOVĚ: detailní logování chyb z /check-answer ---
+        if (!res.ok) {
+            console.error('[A1_music] /check-answer HTTP error:', res.status, res.statusText);
+            let errorPayload = null;
+            try {
+                // Zkusíme přečíst JSON tělo, pokud backend vrací strukturovanou chybu
+                errorPayload = await res.json();
+                console.error('[A1_music] /check-answer error JSON:', errorPayload);
+                if (errorPayload.traceback) {
+                    console.error('[A1_music] server traceback:', errorPayload.traceback);
+                }
+            } catch (e) {
+                console.error('[A1_music] Nelze parsovat JSON odpovědi z /check-answer:', e);
+                try {
+                    const text = await res.text();
+                    console.error('[A1_music] Raw response text z /check-answer:', text);
+                } catch (e2) {
+                    console.error('[A1_music] Nelze přečíst ani text odpovědi z /check-answer:', e2);
+                }
+            }
+
+            // Zobrazme stručnou hlášku i v UI, aby uživatel věděl, že něco selhalo
+            const resultBox = document.getElementById('result');
+            if (resultBox) {
+                resultBox.innerHTML = '<p class="error-msg">Došlo k chybě na serveru při vyhodnocení odpovědí. Zkus to prosím za chvíli znovu.</p>';
+            }
+            return; // Nepokračujeme dál, protože nemáme validní data.results
+        }
+
         const data = await res.json();
         console.log("ODPOVĚĎ ZE SERVERU:", data);
         lastCheckData = data; // Uložíme pro review
@@ -469,6 +499,10 @@ document.getElementById('checkButton').addEventListener('click', async () => {
 
     } catch (error) {
         console.error('Chyba při kontrole odpovědí:', error);
+        const resultBox = document.getElementById('result');
+        if (resultBox) {
+            resultBox.innerHTML = '<p class="error-msg">Nastala neočekávaná chyba při komunikaci se serverem. Zkontroluj připojení a zkus to znovu.</p>';
+        }
     }
 });
 
@@ -699,3 +733,4 @@ if (window.exerciseConfig && window.exerciseConfig.word_pairs) {
 </script>
 </body>
 </html>
+
