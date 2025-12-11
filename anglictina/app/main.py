@@ -391,6 +391,29 @@ def inject_daily_quests_cp():
 def server_error(e):
     code = getattr(e, 'code', 500)
     tb = traceback.format_exc()
+
+    # --- DETAILNÍ LOGOVÁNÍ CHYB ---
+    try:
+        user_id = session.get('user_id')
+    except Exception:
+        user_id = None
+    try:
+        path = request.path
+        method = request.method
+    except Exception:
+        path = '<no request>'
+        method = '<no method>'
+
+    print("[ERROR] server_error caught exception:")
+    print(f"  type   = {type(e).__name__}")
+    print(f"  code   = {code}")
+    print(f"  msg    = {e}")
+    print(f"  method = {method}")
+    print(f"  path   = {path}")
+    print(f"  user_id= {user_id}")
+    print("  traceback:")
+    print(tb)
+
     wants_json = ('application/json' in request.headers.get('Accept', '')) or \
                  ('application/json' in request.headers.get('Content-Type', '')) or \
                  request.path.endswith('/check-answer')
