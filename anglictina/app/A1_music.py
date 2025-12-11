@@ -191,7 +191,42 @@ def on_load(state):
 
 @exercises_bp.route('/song-selection', methods=['GET'])
 def song_selection():
-    return render_template('music/index.html', songs=current_app.songs)
+    """Výběr písničky pro cvičení.
+
+    Přidáno podrobné logování, aby bylo vidět, že se route volá i na serveru
+    a v jakém stavu je seznam písniček.
+    """
+    try:
+        # Základní log o volání endpointu
+        user_id = session.get('user_id')
+        print(f"[A1_music] /song-selection called, user_id={user_id}")
+
+        # Ověření, že songs jsou načtené
+        songs = getattr(current_app, 'songs', None)
+        if songs is None:
+            print("[A1_music] current_app.songs is None – songs.json se pravděpodobně nenačetl v on_load.")
+            songs = []
+        else:
+            try:
+                print(f"[A1_music] songs loaded, count={len(songs)}")
+            except Exception as exc:
+                print(f"[A1_music] Nelze zjistit počet písniček: {exc}")
+
+        # Logujeme první položku pro debug (bez přetěžování logů)
+        if songs:
+            first = songs[0]
+            print(f"[A1_music] first song in list: {first}")
+        else:
+            print("[A1_music] songs list is empty.")
+
+        return render_template('music/index.html', songs=songs)
+    except Exception as exc:
+        # Zachytíme neočekávané chyby a zalogujeme je, aby byly viditelné v Railway logu
+        print(f"[A1_music] ERROR in /song-selection: {exc}")
+        import traceback as _tb
+        print(_tb.format_exc())
+        # Necháme globální error handler vrátit 500/HTML, ale log máme
+        raise
 
 
 # --- FRONTOVÁNÍ uživatelů pro endpoint /exercise/<int:song_id> ---
