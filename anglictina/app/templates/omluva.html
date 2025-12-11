@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pracujeme na opravě chyby</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 40px;
+            text-align: center;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .icon-container {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .icon-container i {
+            font-size: 60px;
+            color: white;
+        }
+
+        .pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            opacity: 0.7;
+            z-index: -1;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+
+        .message {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #555;
+        }
+
+        .highlight {
+            background-color: #f0f4ff;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #2575fc;
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .highlight p {
+            margin: 0;
+        }
+
+        .details {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 25px 0;
+            text-align: left;
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .action-box {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            min-width: 180px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(37, 117, 252, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(37, 117, 252, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: #f0f4ff;
+            color: #2575fc;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e1e9ff;
+            transform: translateY(-3px);
+        }
+
+        .btn i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin: 30px 0;
+            overflow: hidden;
+            height: 12px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 65%;
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            border-radius: 10px;
+            animation: progress 2s ease-in-out;
+        }
+
+        @keyframes progress {
+            0% {
+                width: 0%;
+            }
+            100% {
+                width: 65%;
+            }
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .time-suggestion {
+            background-color: #fff9e6;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 25px 0;
+            border-left: 5px solid #ffcc00;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .time-suggestion i {
+            margin-right: 10px;
+            color: #ffcc00;
+            font-size: 1.5rem;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .message {
+                font-size: 1.1rem;
+            }
+
+            .btn {
+                min-width: 100%;
+            }
+        }
+
+        /* Další animace pro zajímavost */
+        .tool-icon {
+            font-size: 2rem;
+            margin: 0 10px;
+            color: #6a11cb;
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .tools {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="icon-container">
+        <div class="pulse"></div>
+        <i class="fas fa-tools"></i>
+    </div>
+
+    <h1>Ajaj, něco se pokazilo!</h1>
+
+    <div class="message">
+        <p>Omlouváme se, ale právě jsme narazili na technickou chybu. Majitel už na problému pracuje a dělá vše pro to,
+            aby byla co nejdříve vyřešena.</p>
+    </div>
+
+    <div class="highlight">
+        <p><i class="fas fa-info-circle"></i> <strong>Co se stalo?</strong> Během provádění operace došlo k neočekávané
+            chybě. Naši technici byli okamžitě upozorněni a začali s opravou.</p>
+    </div>
+
+    <div class="time-suggestion">
+        <i class="far fa-clock"></i>
+        <span>Doporučujeme se vrátit zítra, chyba by měla být již opravena.</span>
+    </div>
+
+    <!--    <div class="progress-container">-->
+    <!--        <div class="progress-text">-->
+    <!--            <span>Stav opravy:</span>-->
+    <!--            <span>55%</span>-->
+    <!--        </div>-->
+    <!--        <div class="progress-bar"></div>-->
+    <!--    </div>-->
+
+    <div class="details">
+        <p><i class="fas fa-user-cog"></i> <strong>Co právě děláme?</strong></p>
+        <ul style="margin-top: 10px; padding-left: 20px;">
+            <li>Identifikovali jsme zdroj problému</li>
+            <li>Testujeme možné řešení</li>
+            <li>Provádíme potřebné úpravy v kódu</li>
+            <li>Připravujeme aktualizaci systému</li>
+        </ul>
+    </div>
+
+    <div class="tools">
+        <i class="fas fa-wrench tool-icon"></i>
+        <i class="fas fa-code tool-icon"></i>
+        <i class="fas fa-bug tool-icon"></i>
+    </div>
+
+    <div class="action-box">
+        <button class="btn btn-primary" onclick="window.location.reload()">
+            <i class="fas fa-redo"></i> Zkusit znovu nyní
+        </button>
+        <a href="/" class="btn btn-secondary">
+            <i class="fas fa-home"></i> Zpět na hlavní stránku
+        </a>
+    </div>
+
+    <footer>
+        <p>Děkujeme za pochopení a trpělivost! &copy; <span id="current-year"></span></p>
+    </footer>
+</div>
+
+<script>
+    // Aktualizace roku v patičce
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+
+    // Simulace aktualizace progresu
+    let progress = 65;
+    const progressBar = document.querySelector('.progress-bar');
+    const progressText = document.querySelector('.progress-text span:last-child');
+
+    // Simulace postupného zvyšování progresu
+    const progressInterval = setInterval(() => {
+        if (progress < 95) {
+            progress += Math.floor(Math.random() * 5) + 1;
+            if (progress > 95) progress = 95;
+
+            progressBar.style.width = progress + '%';
+            progressText.textContent = progress + '%';
+        } else {
+            clearInterval(progressInterval);
+        }
+    }, 3000);
+
+    // Přidání efektu při kliknutí na tlačítko "Zkusit znovu nyní"
+    document.querySelector('.btn-primary').addEventListener('click', function () {
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kontroluji stav...';
+        setTimeout(() => {
+            this.innerHTML = '<i class="fas fa-redo"></i> Zkusit znovu nyní';
+            alert('Omlouváme se, oprava stále probíhá. Zkuste to prosím později.');
+        }, 1500);
+    });
+</script>
+</body>
+</html>
