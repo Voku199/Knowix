@@ -393,8 +393,9 @@ def ai_judge_translation(original_en: str, user_cs: str) -> dict | None:
 
 def genius_search_song(query: str) -> dict | None:
     token = _get_genius_token()
+    logger = logging.getLogger("vlastni_music")
     if not token:
-        print('Missing GENIUS_ACCESS_TOKEN')
+        logger.error('[vlastni_music] Missing GENIUS_ACCESS_TOKEN při hledání "%s"', query)
         return None
     try:
         resp = requests.get(
@@ -404,31 +405,42 @@ def genius_search_song(query: str) -> dict | None:
             timeout=10
         )
         if resp.status_code != 200:
-            print('Genius search error', resp.status_code, resp.text)
+            logger.error('[vlastni_music] Genius search error %s pro "%s": %s',
+                         resp.status_code, query, resp.text[:300])
             return None
-        hits = resp.json().get('response', {}).get('hits', [])
+        data = resp.json()
+        hits = data.get('response', {}).get('hits', [])
+        logger.info('[vlastni_music] Genius search "%s" -> %d hits', query, len(hits))
         if not hits:
             return None
         # return the best hit
         return hits[0].get('result')
     except Exception as e:
-        print('Genius exception', e)
+        logger.error('[vlastni_music] Genius exception pro "%s": %s', query, e)
+        logger.error(traceback.format_exc())
         return None
 
 
 def genius_fetch_lyrics(song_url: str) -> str | None:
+    logger = logging.getLogger("vlastni_music")
     try:
+        logger.info('[vlastni_music] Fetching lyrics from Genius URL=%r', song_url)
         r = requests.get(song_url, timeout=10)
         if r.status_code != 200:
-            print('Genius page error', r.status_code)
+            logger.error('[vlastni_music] Genius page error %s pro URL=%r: %s',
+                         r.status_code, song_url, r.text[:300])
             return None
         html = r.text
+        logger.info('[vlastni_music] Genius HTML length=%d chars', len(html))
         # Extract lyrics from data-lyrics-container sections
         parts = re.findall(r'<div[^>]*data-lyrics-container="true"[^>]*>(.*?)</div>', html, re.DOTALL)
+        logger.info('[vlastni_music] data-lyrics-container blocks found: %d', len(parts))
         if not parts:
             # fallback to older selector
             parts = re.findall(r'<div class="lyrics">(.*?)</div>', html, re.DOTALL)
+            logger.info('[vlastni_music] fallback <div class="lyrics"> blocks found: %d', len(parts))
         if not parts:
+            logger.error('[vlastni_music] Žádné lyrics bloky nenalezeny v HTML pro URL=%r', song_url)
             return None
 
         def strip_tags(s: str) -> str:
@@ -437,9 +449,11 @@ def genius_fetch_lyrics(song_url: str) -> str | None:
             return s
 
         text = '\n'.join(strip_tags(p) for p in parts)
+        logger.info('[vlastni_music] Parsed lyrics length=%d chars', len(text))
         return text
     except Exception as e:
-        print('Genius scrape exception', e)
+        logger.error('[vlastni_music] Genius scrape exception pro URL=%r: %s', song_url, e)
+        logger.error(traceback.format_exc())
         return None
 
 
@@ -943,8 +957,10 @@ def check_answer():
 @vlastni_music_bp.route('/vlastni_music', methods=['GET', 'POST'])
 def index():
     video_id = None
+    logger = logging.getLogger("vlastni_music")
     if request.method == 'POST':
         song_name = request.form['song']
+        logger.info("[vlastni_music] index POST song_name='%s' user_id=%s", song_name, session.get('user_id'))
         # --- STAT START (shodne s A1) ---
         if 'user_id' in session:
             session['training_start'] = time.time()
@@ -963,20 +979,26 @@ def index():
         song_url = hit.get('url')
         lyrics_raw = genius_fetch_lyrics(song_url)
         if not lyrics_raw:
+            logger.error("[vlastni_music] genius_fetch_lyrics vrátil prázdný text pro URL=%r", song_url)
             return render_template('vlastni_music/vlastni_music.html', video_id=None,
                                    error='Text písně se nepodařilo načíst.')
+        logger.info("[vlastni_music] lyrics_raw length=%d chars", len(lyrics_raw))
         # Jazyková kontrola – povoleny jen anglické písně (pokud selže detekce, pokračujeme)
         try:
             sample_for_lang = '\n'.join(lyrics_raw.splitlines()[:40])[:4000]
             lang = deepl_detect_language(sample_for_lang) or 'EN'
+            logger.info('[vlastni_music] detected language for "%s" -> %s', song_name, lang)
             if lang.upper() != 'EN':
-                # Zabraň přehrání videa (video_id=None) – není anglické
+                logger.warning('[vlastni_music] Píseň "%s" detekována jako %s, zamítá se.', song_name, lang)
                 return render_template('vlastni_music/vlastni_music.html', video_id=None,
                                        error=f'Píseň není v angličtině (detekováno {lang}). Zkus jinou skladbu.')
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error('[vlastni_music] Chyba při detekci jazyka pro "%s": %s', song_name, e)
+            logger.error(traceback.format_exc())
         lines = clean_lyrics_lines(lyrics_raw)
+        logger.info('[vlastni_music] clean_lyrics_lines: %d řádků po filtrování', len(lines))
         if not lines:
+            logger.error('[vlastni_music] Po clean_lyrics_lines žádné použitelné řádky pro "%s"', song_name)
             return render_template('vlastni_music/vlastni_music.html', video_id=video_id,
                                    error='Text písně je prázdný nebo nečitelný.')
 

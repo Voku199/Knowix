@@ -243,8 +243,8 @@ def song_selection():
             print(f"[A1_music] first song in list: {first}")
         else:
             print("[A1_music] songs list is empty.")
-        return render_template('omluva.html', songs=songs)
-        # return render_template('music/index.html', songs=songs)
+        # return render_template('omluva.html', songs=songs)
+        return render_template('music/index.html', songs=songs)
     except Exception as exc:
         # Zachytíme neočekávané chyby a zalogujeme je, aby byly viditelné v Railway logu
         print(f"[A1_music] ERROR in /song-selection: {exc}")
