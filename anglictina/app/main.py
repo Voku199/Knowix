@@ -623,7 +623,6 @@ def _ensure_user_columns():
 
 
 _ensure_user_columns()
-
 # app.run(port=5000, debug=True, host='0.0.0.0')
 
 # from waitress import serve
