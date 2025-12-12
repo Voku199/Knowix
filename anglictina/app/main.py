@@ -256,9 +256,12 @@ def handle_domain_and_session():
             cur = conn.cursor()
             # Vytvoř guest záznam s unikátním placeholder emailem (sloupec email je NOT NULL)
             guest_email = f"guest_{uuid4().hex[:12]}@example.com"
+
+            # 1) Nejprve vytvořit záznam v users jako "shadow" uživatele pro guest
+            #    aby všechny FK (např. v user_stats) ukazovaly na users.id
             cur.execute(
                 """
-                INSERT INTO guest (first_name, last_name, email, password, school, is_guest, has_seen_onboarding)
+                INSERT INTO users (first_name, last_name, email, password, school, is_guest, has_seen_onboarding)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
@@ -271,9 +274,32 @@ def handle_domain_and_session():
                     0
                 )
             )
-            guest_id = cur.lastrowid
+            user_id = cur.lastrowid
+
+            # 2) Záznam v tabulce guest, který odkazuje na tohoto users.id
+            #    Předpokládá se, že tabulka guest má sloupce kompatibilní s níže uvedenými
+            cur.execute(
+                """
+                INSERT INTO guest (user_id, first_name, last_name, email, password, school, is_guest, has_seen_onboarding)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    user_id,
+                    'Guest',
+                    'User',
+                    guest_email,
+                    'scrypt:32768:8:1$SZwTcXBf633lMT5B$5314fff3be13114ecbf2bff33572a6e3771287491ad73f4dda4f2f13be7493853f0badd609b3bf0a09f0c821bf55c30c9282ee46e88bcb1f38eccab9b56f5eef',
+                    'Knowix',
+                    1,
+                    0
+                )
+            )
+
             conn.commit()
-            session['user_id'] = guest_id
+
+            # 3) Do session ukládáme users.id (ne guest.id), aby všechny další části appky
+            #    pracovaly konzistentně s jedním ID pro user_stats, XP, streak atd.
+            session['user_id'] = user_id
             session['is_guest'] = True
             session['has_seen_onboarding'] = 0
             session['onboarding_step'] = 1
@@ -602,4 +628,4 @@ _ensure_user_columns()
 # === Spuštění aplikace ===
 from waitress import serve
 
-serve(app, host='0.0.0.0', port=8080, threads=24, backlog=100)
+serve(app, host='0.0.0.0', port=8080, threads=32, backlog=100)
