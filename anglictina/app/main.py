@@ -632,4 +632,4 @@ _ensure_user_columns()
 # === Spuštění aplikace ===
 from waitress import serve
 
-serve(app, host='0.0.0.0', port=8080, threads=32, backlog=100, debug=True)
+serve(app, host='0.0.0.0', port=8080, threads=32, backlog=1000)
