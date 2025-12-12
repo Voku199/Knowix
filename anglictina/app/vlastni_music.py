@@ -9,6 +9,8 @@ import time
 import traceback
 import unicodedata
 from difflib import SequenceMatcher
+from db import get_db_connection
+import logging
 
 vlastni_music_bp = Blueprint("vlastni_music_bp", __name__)
 
@@ -578,6 +580,75 @@ def inject_meta():
     return out
 
 
+def _ensure_user_exists_for_session_vlastni():
+    """Zajistí, že session['user_id'] existuje v tabulce users.
+
+    Pokud neexistuje users.id, ale existuje záznam v guest s tímto id,
+    vytvoří odpovídající řádek v users (shadow user) a tím opraví stará data.
+    Používá se před voláním update_user_stats/add_learning_time/add_xp_to_user.
+    """
+    sid = session.get('user_id')
+    if not sid:
+        return
+    try:
+        db = get_db_connection()
+        cur = db.cursor(dictionary=True)
+        # 1) Zkus users
+        cur.execute("SELECT id FROM users WHERE id = %s", (sid,))
+        if cur.fetchone():
+            return
+        # 2) Zkus guest
+        cur.execute("SELECT * FROM guest WHERE id = %s", (sid,))
+        guest_row = cur.fetchone()
+        if not guest_row:
+            logging.getLogger("vlastni_music").error(
+                "[vlastni_music] user_id=%s neexistuje ani v users, ani v guest",
+                sid,
+            )
+            return
+        logging.getLogger("vlastni_music").warning(
+            "[vlastni_music] user_id=%s nenalezen v users, ale existuje v guest -> vytvářím users řádek",
+            sid,
+        )
+        insert_sql = (
+            "INSERT INTO users (id, first_name, last_name, email, password, school, is_guest, has_seen_onboarding) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+        params = (
+            guest_row.get('id'),
+            guest_row.get('first_name') or 'Guest',
+            guest_row.get('last_name') or 'User',
+            guest_row.get('email'),
+            guest_row.get('password') or '',
+            guest_row.get('school') or 'Knowix',
+            1,
+            guest_row.get('has_seen_onboarding') or 0,
+        )
+        try:
+            cur.execute(insert_sql, params)
+            db.commit()
+        except Exception as exc:
+            logging.getLogger("vlastni_music").error(
+                "[vlastni_music] nepodařilo se vytvořit users řádek pro guest.id=%s: %s",
+                sid,
+                exc,
+            )
+    except Exception as exc:
+        logging.getLogger("vlastni_music").error(
+            "[vlastni_music] _ensure_user_exists_for_session_vlastni: chyba při kontrole/repair users.id pro user_id=%s: %s",
+            session.get('user_id'),
+            exc,
+        )
+    finally:
+        try:
+            if 'cur' in locals() and cur:
+                cur.close()
+            if 'db' in locals() and db:
+                db.close()
+        except Exception:
+            pass
+
+
 @vlastni_music_bp.route("/vlastni_music/check-answer", methods=["POST"])  # změněno namespace
 def check_answer():
     """
@@ -618,6 +689,7 @@ def check_answer():
                 if start:
                     duration = max(1, int(time.time() - start))
                     if add_learning_time:
+                        _ensure_user_exists_for_session_vlastni()
                         add_learning_time(session["user_id"], duration)
             except Exception as e:
                 print("Chyba při ukládání času tréninku:", e)
@@ -793,6 +865,7 @@ def check_answer():
                 wrong_count = len([x for x in results['missing'] if x is False]) + \
                               len([x for x in results['translations'] if x is False]) + \
                               len([x for x in pair_results if x is False])
+                _ensure_user_exists_for_session_vlastni()
                 update_user_stats(session['user_id'], correct=correct_count, wrong=wrong_count, lesson_done=success)
             except Exception as e:
                 print('Chyba při update_user_stats:', e)
@@ -807,6 +880,7 @@ def check_answer():
         streak_message = None
         if success and 'user_id' in session and add_xp_to_user and update_user_streak:
             try:
+                _ensure_user_exists_for_session_vlastni()
                 xp_result = add_xp_to_user(session['user_id'], 10)
                 streak_info = update_user_streak(session['user_id'])
                 xp_awarded = 10
@@ -876,6 +950,7 @@ def index():
             session['training_start'] = time.time()
             try:
                 from user_stats import update_user_stats  # noqa
+                _ensure_user_exists_for_session_vlastni()
                 update_user_stats(session['user_id'], set_first_activity=True)
             except Exception as e:  # pragma: no cover
                 print('Nelze inicializovat user_stats (vlastni_music start):', e)
