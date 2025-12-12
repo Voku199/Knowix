@@ -6,6 +6,7 @@ import time
 from xp import get_user_xp_and_level, add_xp_to_user
 from streak import update_user_streak, get_user_streak
 from user_stats import update_user_stats
+import logging
 
 verbs_bp = Blueprint('verbs', __name__)
 
@@ -143,7 +144,7 @@ def get_possible_answers(verb, correct_tense):
         if val in all_answers:
             all_answers.remove(val)
 
-    # Zbytek doplň náhodnými špatnými odpověďmi
+    # Zbytek doplň náhodnými špatnými odpovědmi
     needed_wrong = 3 - (1 if same_verb_extra else 0)
     wrong_answers = random.sample(all_answers, min(needed_wrong, len(all_answers)))
 
@@ -156,6 +157,72 @@ def get_possible_answers(verb, correct_tense):
     return answers
 
 
+def _ensure_user_exists_for_session_verbs():
+    """Zajistí, že session['user_id'] existuje v users.
+
+    Pokud ne, ale existuje v guest, vytvoří odpovídající users řádek.
+    Používá se před voláním update_user_stats / XP pro nepravidelná slovesa.
+    """
+    sid = session.get('user_id')
+    if not sid:
+        return
+    try:
+        db = get_db_connection()
+        cur = db.cursor(dictionary=True)
+        cur.execute("SELECT id FROM users WHERE id = %s", (sid,))
+        if cur.fetchone():
+            return
+        cur.execute("SELECT * FROM guest WHERE id = %s", (sid,))
+        guest_row = cur.fetchone()
+        if not guest_row:
+            logging.getLogger("nepravidelna_slovesa").error(
+                "[verbs] user_id=%s neexistuje ani v users, ani v guest",
+                sid,
+            )
+            return
+        logging.getLogger("nepravidelna_slovesa").warning(
+            "[verbs] user_id=%s nenalezen v users, ale existuje v guest -> vytvářím users řádek",
+            sid,
+        )
+        insert_sql = (
+            "INSERT INTO users (id, first_name, last_name, email, password, school, is_guest, has_seen_onboarding) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+        params = (
+            guest_row.get('id'),
+            guest_row.get('first_name') or 'Guest',
+            guest_row.get('last_name') or 'User',
+            guest_row.get('email'),
+            guest_row.get('password') or '',
+            guest_row.get('school') or 'Knowix',
+            1,
+            guest_row.get('has_seen_onboarding') or 0,
+        )
+        try:
+            cur.execute(insert_sql, params)
+            db.commit()
+        except Exception as exc:
+            logging.getLogger("nepravidelna_slovesa").error(
+                "[verbs] nepodařilo se vytvořit users řádek pro guest.id=%s: %s",
+                sid,
+                exc,
+            )
+    except Exception as exc:
+        logging.getLogger("nepravidelna_slovesa").error(
+            "[verbs] _ensure_user_exists_for_session_verbs: chyba při kontrole/repair users.id pro user_id=%s: %s",
+            session.get('user_id'),
+            exc,
+        )
+    finally:
+        try:
+            if 'cur' in locals() and cur:
+                cur.close()
+            if 'db' in locals() and db:
+                db.close()
+        except Exception:
+            pass
+
+
 # Routy pro výuku
 @verbs_bp.route('/anglictina/test', methods=['GET', 'POST'])
 def test():
@@ -166,7 +233,8 @@ def test():
 
     # --- Nastavení first_activity a začátek měření času při vstupu do lekce (GET nebo první POST) ---
     if not is_guest and (request.method == 'GET' or (request.method == 'POST' and 'verb' in request.form)):
-        # Nastavíme first_activity pokud ještě není
+        _ensure_user_exists_for_session_verbs()
+        # Nastaví first_activity pokud ještě není
         update_user_stats(session['user_id'], set_first_activity=True)
         # Ulož čas začátku lekce
         session['irregular_training_start'] = time.time()
@@ -251,6 +319,7 @@ def test():
 
         # --- ZAZNAMENÁNÍ ODPOVĚDI DO STATISTIK ---
         if not is_guest:
+            _ensure_user_exists_for_session_verbs()
             if is_correct:
                 update_user_stats(session['user_id'], correct=1, irregular_verbs_guessed=1)
             else:
@@ -258,6 +327,7 @@ def test():
 
         # --- XP ZA KAŽDOU SPRÁVNOU ODPOVĚĎ ---
         if is_correct and not is_guest:
+            _ensure_user_exists_for_session_verbs()
             result = add_xp_to_user(session['user_id'], 2)
             if "error" in result:
                 flash(f"XP se nepodařilo přidat: {result['error']}", "error")
@@ -280,6 +350,7 @@ def test():
                 except Exception as e:
                     print("Chyba při ukládání času tréninku:", e)
             # Zaznamenej lesson_done a learning_time
+            _ensure_user_exists_for_session_verbs()
             update_user_stats(
                 session['user_id'],
                 lesson_done=True,

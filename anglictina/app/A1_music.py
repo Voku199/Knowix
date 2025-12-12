@@ -298,7 +298,70 @@ def exercise(song_id):
     if 'user_id' in session:
         session['training_start'] = time.time()
         # Nastavíme first_activity pokud ještě není
-        update_user_stats(session['user_id'], set_first_activity=True)
+        # Ošetření starých session: pokud session['user_id'] neexistuje v users,
+        # ale existuje v guest, vytvoříme pro něj záznam v users a tím opravíme FK.
+        try:
+            db = get_db_connection()
+            cur = db.cursor(dictionary=True)
+            sid = session.get('user_id')
+            # 1) existuje users.id?
+            cur.execute("SELECT id FROM users WHERE id = %s", (sid,))
+            row = cur.fetchone()
+            if not row:
+                # 2) zkusíme najít v guest
+                cur.execute("SELECT * FROM guest WHERE id = %s", (sid,))
+                guest_row = cur.fetchone()
+                if guest_row:
+                    logging.getLogger("A1_music").warning(
+                        "[A1_music] exercise: user_id=%s nenalezen v users, ale existuje v guest -> vytvářím users řádek",
+                        sid,
+                    )
+                    # Vytvoříme users záznam se stejným id jako guest.id, aby seděl FK v user_stats
+                    insert_sql = (
+                        "INSERT INTO users (id, first_name, last_name, email, password, school, is_guest, has_seen_onboarding) "
+                        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+                    )
+                    # guest_row je dict díky cursoru dictionary=True
+                    params = (
+                        guest_row.get('id'),
+                        guest_row.get('first_name') or 'Guest',
+                        guest_row.get('last_name') or 'User',
+                        guest_row.get('email'),
+                        guest_row.get('password') or '',
+                        guest_row.get('school') or 'Knowix',
+                        1,
+                        guest_row.get('has_seen_onboarding') or 0,
+                    )
+                    try:
+                        cur.execute(insert_sql, params)
+                        db.commit()
+                    except Exception as exc:
+                        logging.getLogger("A1_music").error(
+                            "[A1_music] exercise: nepodařilo se vytvořit users řádek pro guest.id=%s: %s",
+                            sid,
+                            exc,
+                        )
+                else:
+                    logging.getLogger("A1_music").error(
+                        "[A1_music] exercise: session user_id=%s neexistuje ani v users, ani v guest",
+                        sid,
+                    )
+            # Po případné opravě zkusíme normálně nastavit first_activity
+            update_user_stats(session['user_id'], set_first_activity=True)
+        except Exception as exc:
+            logging.getLogger("A1_music").error(
+                "[A1_music] exercise: chyba při kontrole/repair users.id pro user_id=%s: %s",
+                session.get('user_id'),
+                exc,
+            )
+        finally:
+            try:
+                if cur:
+                    cur.close()
+                if db:
+                    db.close()
+            except Exception:
+                pass
 
     try:
         while True:

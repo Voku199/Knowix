@@ -8,6 +8,8 @@ import time
 from xp import add_xp_to_user, get_user_xp_and_level
 from streak import update_user_streak, get_user_streak  # <-- Přidáno pro streak
 from user_stats import update_user_stats  # <-- Přidáno pro statistiky
+from db import get_db_connection
+import logging
 
 at_on_bp = Blueprint("at_on", __name__, template_folder="templates")
 app.secret_key = os.getenv("SECRET_KEY")
@@ -147,6 +149,7 @@ def fill_word():
         # Při vstupu na stránku uložíme čas začátku lekce
         session['at_on_training_start'] = time.time()
         if user_id:
+            _ensure_user_exists_for_session_at_on()
             update_user_stats(user_id, set_first_activity=True)
 
     # Při prvním načtení nastavíme náhodných 10 otázek a připravíme strukturu pro odpovědi
@@ -175,6 +178,7 @@ def fill_word():
 
         # --- STATISTIKY: Uložení správné/špatné odpovědi ---
         if user_id and question_id not in answered:
+            _ensure_user_exists_for_session_at_on()
             if is_correct:
                 update_user_stats(user_id, at_cor=1)
                 # --- OKAMŽITÉ PŘIPSÁNÍ XP a aktualizace streaku při správné odpovědi ---
@@ -224,6 +228,7 @@ def fill_word():
                     print("Chyba při ukládání času tréninku:", e)
 
             if user_id and (correct_count > 0 or wrong_count > 0):
+                _ensure_user_exists_for_session_at_on()
                 # Zaznamenej celkový počet správných a špatných odpovědí za lekci + learning_time + lesson_done
                 update_user_stats(
                     user_id,
@@ -268,6 +273,7 @@ def fill_word():
         if user_id:
             try:
                 if correct_count > 0 or wrong_count > 0:
+                    _ensure_user_exists_for_session_at_on()
                     # Zaznamenej celkový počet správných a špatných odpovědí za lekci (pro jistotu i zde)
                     update_user_stats(
                         user_id,
@@ -319,3 +325,69 @@ def reset_progress():
     session.pop('at_on_training_start', None)
     flash("♻️ Pokrok byl resetován, můžeš začít znovu!", "info")
     return redirect(url_for('at_on.fill_word'))
+
+
+def _ensure_user_exists_for_session_at_on():
+    """Zajistí, že session['user_id'] existuje v users.
+
+    Pokud ne, ale existuje v guest, vytvoří odpovídající users řádek.
+    Specifické pro at_on lekci, aby user_stats/XP nepadaly na FK.
+    """
+    sid = session.get('user_id')
+    if not sid:
+        return
+    try:
+        db = get_db_connection()
+        cur = db.cursor(dictionary=True)
+        cur.execute("SELECT id FROM users WHERE id = %s", (sid,))
+        if cur.fetchone():
+            return
+        cur.execute("SELECT * FROM guest WHERE id = %s", (sid,))
+        guest_row = cur.fetchone()
+        if not guest_row:
+            logging.getLogger("at_on").error(
+                "[at_on] user_id=%s neexistuje ani v users, ani v guest",
+                sid,
+            )
+            return
+        logging.getLogger("at_on").warning(
+            "[at_on] user_id=%s nenalezen v users, ale existuje v guest -> vytvářím users řádek",
+            sid,
+        )
+        insert_sql = (
+            "INSERT INTO users (id, first_name, last_name, email, password, school, is_guest, has_seen_onboarding) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+        params = (
+            guest_row.get('id'),
+            guest_row.get('first_name') or 'Guest',
+            guest_row.get('last_name') or 'User',
+            guest_row.get('email'),
+            guest_row.get('password') or '',
+            guest_row.get('school') or 'Knowix',
+            1,
+            guest_row.get('has_seen_onboarding') or 0,
+        )
+        try:
+            cur.execute(insert_sql, params)
+            db.commit()
+        except Exception as exc:
+            logging.getLogger("at_on").error(
+                "[at_on] nepodařilo se vytvořit users řádek pro guest.id=%s: %s",
+                sid,
+                exc,
+            )
+    except Exception as exc:
+        logging.getLogger("at_on").error(
+            "[at_on] _ensure_user_exists_for_session_at_on: chyba při kontrole/repair users.id pro user_id=%s: %s",
+            session.get('user_id'),
+            exc,
+        )
+    finally:
+        try:
+            if 'cur' in locals() and cur:
+                cur.close()
+            if 'db' in locals() and db:
+                db.close()
+        except Exception:
+            pass

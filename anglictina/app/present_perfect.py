@@ -9,8 +9,79 @@ from xp import add_xp_to_user
 from streak import update_user_streak, get_user_streak
 from user_stats import update_user_stats
 import time
+from db import get_db_connection  # kvůli opravě user_id přes tabulku guest
+import logging
 
 chat_bp = Blueprint("chat_bp", __name__)
+
+
+def _ensure_user_exists_for_session():
+    """Zajistí, že session['user_id'] existuje v tabulce users.
+
+    Pokud neexistuje users.id, ale existuje záznam v guest s tímto id,
+    vytvoří odpovídající řádek v users (shadow user) a tím opraví stará data.
+    Používá se před voláním update_user_stats/add_xp_to_user atd.
+    """
+    sid = session.get('user_id')
+    if not sid:
+        return
+    try:
+        db = get_db_connection()
+        cur = db.cursor(dictionary=True)
+        # existuje users.id?
+        cur.execute("SELECT id FROM users WHERE id = %s", (sid,))
+        if cur.fetchone():
+            return
+        # zkus guest
+        cur.execute("SELECT * FROM guest WHERE id = %s", (sid,))
+        guest_row = cur.fetchone()
+        if not guest_row:
+            logging.getLogger("present_perfect").error(
+                "[present_perfect] user_id=%s neexistuje ani v users, ani v guest",
+                sid,
+            )
+            return
+        logging.getLogger("present_perfect").warning(
+            "[present_perfect] user_id=%s nenalezen v users, ale existuje v guest -> vytvářím users řádek",
+            sid,
+        )
+        insert_sql = (
+            "INSERT INTO users (id, first_name, last_name, email, password, school, is_guest, has_seen_onboarding) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+        params = (
+            guest_row.get('id'),
+            guest_row.get('first_name') or 'Guest',
+            guest_row.get('last_name') or 'User',
+            guest_row.get('email'),
+            guest_row.get('password') or '',
+            guest_row.get('school') or 'Knowix',
+            1,
+            guest_row.get('has_seen_onboarding') or 0,
+        )
+        try:
+            cur.execute(insert_sql, params)
+            db.commit()
+        except Exception as exc:
+            logging.getLogger("present_perfect").error(
+                "[present_perfect] nepodařilo se vytvořit users řádek pro guest.id=%s: %s",
+                sid,
+                exc,
+            )
+    except Exception as exc:
+        logging.getLogger("present_perfect").error(
+            "[present_perfect] _ensure_user_exists_for_session: chyba při kontrole/repair users.id pro user_id=%s: %s",
+            session.get('user_id'),
+            exc,
+        )
+    finally:
+        try:
+            if 'cur' in locals() and cur:
+                cur.close()
+            if 'db' in locals() and db:
+                db.close()
+        except Exception:
+            pass
 
 
 @chat_bp.errorhandler(502)
@@ -74,6 +145,7 @@ def chat():
     # --- Nastavení first_activity a začátek měření času při vstupu do lekce ---
     user_id = session.get('user_id')
     if user_id:
+        _ensure_user_exists_for_session()
         update_user_stats(user_id, set_first_activity=True)
     session['pp_training_start'] = time.time()
 
@@ -310,6 +382,7 @@ def next_step():
             try:
                 # 100% správná odpověď
                 if user_id:
+                    _ensure_user_exists_for_session()
                     update_user_stats(user_id, pp_correct=1)
                 current_index += 1
                 session['chat_index'] = current_index
@@ -334,6 +407,7 @@ def next_step():
                                 learning_time = duration
                             except Exception as e:
                                 print("Chyba při ukládání času tréninku:", e)
+                        _ensure_user_exists_for_session()
                         update_user_stats(user_id, lesson_done=True, learning_time=learning_time,
                                           set_first_activity=True)
                         xp_result = add_xp_to_user(user_id, xp_awarded)
@@ -353,6 +427,7 @@ def next_step():
             try:
                 # Skoro správně – uznáme, ale upozorníme na chybu
                 if user_id:
+                    _ensure_user_exists_for_session()
                     update_user_stats(user_id, pp_maybe=1)
                 current_index += 1
                 session['chat_index'] = current_index
@@ -378,6 +453,7 @@ def next_step():
                                 learning_time = duration
                             except Exception as e:
                                 print("Chyba při ukládání času tréninku:", e)
+                        _ensure_user_exists_for_session()
                         update_user_stats(user_id, lesson_done=True, learning_time=learning_time,
                                           set_first_activity=True)
                         xp_result = add_xp_to_user(user_id, xp_awarded)
@@ -399,6 +475,7 @@ def next_step():
             try:
                 # Špatně
                 if user_id:
+                    _ensure_user_exists_for_session()
                     update_user_stats(user_id, pp_wrong=1)
                 return jsonify({"correct": False})
             except Exception as e:
