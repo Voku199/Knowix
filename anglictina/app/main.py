@@ -10,6 +10,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 import os
 import mimetypes
 import json
+import logging  # přidán logging
 from worker_main import start_worker_thread  # přidán import vlákna workeru
 from db import get_db_connection, ensure_users_table_guest
 from uuid import uuid4
@@ -418,6 +419,8 @@ def server_error(e):
     code = getattr(e, 'code', 500)
     tb = traceback.format_exc()
 
+    logger = logging.getLogger("main")
+
     # --- DETAILNÍ LOGOVÁNÍ CHYB ---
     try:
         user_id = session.get('user_id')
@@ -430,15 +433,16 @@ def server_error(e):
         path = '<no request>'
         method = '<no method>'
 
-    print("[ERROR] server_error caught exception:")
-    print(f"  type   = {type(e).__name__}")
-    print(f"  code   = {code}")
-    print(f"  msg    = {e}")
-    print(f"  method = {method}")
-    print(f"  path   = {path}")
-    print(f"  user_id= {user_id}")
-    print("  traceback:")
-    print(tb)
+    logger.error(
+        "[main] server_error: type=%s code=%s msg=%s method=%s path=%s user_id=%s\n%s",
+        type(e).__name__,
+        code,
+        str(e),
+        method,
+        path,
+        user_id,
+        tb
+    )
 
     wants_json = ('application/json' in request.headers.get('Accept', '')) or \
                  ('application/json' in request.headers.get('Content-Type', '')) or \
@@ -628,4 +632,4 @@ _ensure_user_columns()
 # === Spuštění aplikace ===
 from waitress import serve
 
-serve(app, host='0.0.0.0', port=8080, threads=32, backlog=100)
+serve(app, host='0.0.0.0', port=8080, threads=32, backlog=100, debug=True)

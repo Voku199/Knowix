@@ -12,6 +12,7 @@ import re
 from concurrent.futures import ThreadPoolExecutor
 from collections import deque
 import traceback
+import logging  # přidán logging
 from xp import add_xp_to_user, get_user_xp_and_level  # DŮLEŽITÉ: XP systém
 from streak import update_user_streak, get_user_streak
 from user_stats import add_learning_time, update_user_stats
@@ -126,8 +127,32 @@ def inject_xp_info():
 @exercises_bp.errorhandler(404)
 @exercises_bp.errorhandler(Exception)
 def server_error(e):
-    # Oprava: bezpečně získat error_code, pokud existuje, jinak 500
+    """Lokální error handler pro blueprint A1_music.
+
+    Loguje chybu pomocí logging modulů, aby bylo vidět v serverových logách,
+    co přesně se pokazilo v rámci tohoto blueprintu.
+    """
+    logger = logging.getLogger("A1_music")
     error_code = getattr(e, "code", 500)
+    tb = traceback.format_exc()
+    try:
+        path = request.path
+    except Exception:
+        path = "<no-path>"
+    try:
+        uid = session.get("user_id")
+    except Exception:
+        uid = None
+
+    logger.error(
+        "[A1_music] server_error: code=%s type=%s msg=%s path=%s user_id=%s\n%s",
+        error_code,
+        type(e).__name__,
+        str(e),
+        path,
+        uid,
+        tb
+    )
     return render_template('error.html', error_code=error_code), error_code
 
 
