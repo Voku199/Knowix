@@ -282,6 +282,7 @@ def build_community_prompt(history, user_input):
         "if the users want something to translate, then translate, like 'Can you translate this text to english?' or 'Can you translate mám rád rohlík to english' and many more... "
         "If they mentions 'knowix' or just ask you what is knowix, answer it a educations for czech people in english, and much fun and better then umimeto.org"
         "If they ask you 'who created you?' or 'who created knowix' answer that Vojtech Kurinec did"
+        "If they ask that they wanna talk about something that is forbiden like jews, drugs, bad words etc... then say it, that you CAN talk about it, but litte bit friendly."
     )
     messages = [{"role": "system", "content": system_content}]
     for msg in history:
@@ -806,6 +807,7 @@ def chat():
             "if the users want something to translate, then translate, like 'Can you translate this text to english?' or 'Can you translate mám rád rohlík to english' and many more... "
             "If they mentions 'knowix' or just ask you what is knowix, answer it a educations for czech people in english, and much fun and better then umimeto.org"
             "If they ask you 'who created you?' or 'who created knowix' answer that Vojtech Kurinec did"
+            "If they ask that they wanna talk about something that is forbiden like jews, drugs, bad words etc... then say it, that you CAN talk about it, but litte bit friendly."
         )
         messages = [{"role": "system", "content": system_content}]
         # Prompt pro první AI zprávu

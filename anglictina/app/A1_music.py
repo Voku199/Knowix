@@ -177,6 +177,7 @@ def on_load(state):
     """
     # --- DeepL překladač (volitelný) ---
     deepl_key = state.app.config.get('DEEPL_API_KEY')
+    
     translator = None
     if deepl_key:
         try:

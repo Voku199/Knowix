@@ -109,14 +109,82 @@
         pointer-events: auto !important;
     }
 </style>
+    <style>
+    /* Vánoční doplňky: barvy, sníh a dekorace */
+    .christmas-accent { color: #b71c1c; } /* tmavá vánoční červená */
+    .christmas-accent-2 { color: #1b5e20; } /* tmavá vánoční zelená */
+
+    /* Lehké přebarvení odkazů a tlačítek během Vánoc */
+    header .nav-right a, header .nav-right button { transition: transform .12s ease, color .12s ease; }
+    header .nav-right a:hover, header .nav-right button:hover { transform: translateY(-2px); color: #b71c1c; }
+
+    /* Logo s čepičkou a girlandou */
+    .logo { position: relative; display:inline-block; }
+    .logo .santa-hat { position: absolute; left: -8px; top: -12px; width: 48px; pointer-events:none; transform-origin:center; }
+    .logo .garland { position: absolute; right: -6px; top: 38px; width: 120px; pointer-events:none; opacity:0.9; }
+
+    /* Sněhové vločky (CSS fallback - animovaný gradient a základní animace) */
+    /* Sníh musí být nad většinou UI, zvýšíme z-index pro spolehlivou viditelnost */
+    #snow-container { pointer-events:none; position:fixed; left:0; top:0; width:100%; height:100%; z-index:1000000; overflow:hidden; }
+    .snowflake { position:absolute; top:-10px; font-size:14px; opacity:0.9; will-change: transform; user-select:none; text-shadow:0 1px 2px rgba(0,0,0,.25); }
+    /* Plné kruhové vločky (lepší kontrast na světlém pozadí) */
+    .snowflake.dot { width:12px; height:12px; border-radius:50%; display:block; text-indent:-9999px; position:absolute; z-index:1000001; mix-blend-mode:normal; box-shadow: 0 6px 18px rgba(0,0,0,0.32); border:1px solid rgba(0,0,0,0.12); }
+    .snowflake.dot.large { width:18px; height:18px; }
+    /* Odstraněna CSS animace transform, protože JS používá transform pro pád a animace by s ní kolidovala. */
+
+    /* Zvýrazněný drop-shadow pro výrazný kontrast na světlém pozadí */
+    /* SVG vločky: základní styly pro inline SVG elementy používané jako vločky */
+    .flake-svg { position:absolute; pointer-events:none; z-index:1000002; display:block; will-change: transform; }
+    .flake-svg line { stroke-linecap: round; }
+    .flake-svg.small line { stroke-width:1.2; }
+    .flake-svg.medium line { stroke-width:1.6; }
+    .flake-svg.large line { stroke-width:2.2; }
+
+    /* jemné blikání světélek v hlavičce */
+    .header-lights { position:absolute; left:0; right:0; top:0; height:8px; pointer-events:none; }
+    .header-lights span { display:inline-block; width:10px; height:10px; border-radius:50%; margin:0 6px; opacity:0.95; animation:lightTwinkle 3s infinite; }
+    @keyframes lightTwinkle { 0%,100%{ opacity:0.6; transform: scale(1);} 50%{ opacity:1; transform: scale(1.25);} }
+
+    /* lehký sníh efekt přes obsah (pro tmavé i světlé téma) */
+    .snow-overlay { position:fixed; inset:0; background-image: radial-gradient(rgba(134, 131, 131, 0.03) 1px, transparent 1px); background-size: 40px 40px; z-index:15; pointer-events:none; mix-blend-mode:screen; }
+
+    /* Vánoční toast (popout bublina) */
+    .xmas-toast { position:fixed; right:20px; bottom:24px; background: linear-gradient(135deg,#fff8e1,#ffe0b2); color:#222; border-radius:12px; padding:12px 16px; box-shadow:0 8px 30px rgba(0,0,0,.2); z-index:10001; display:flex; gap:10px; align-items:center; max-width:320px; font-weight:600; }
+    .dark-mode .xmas-toast { background: linear-gradient(135deg,#2b2b2b,#1e1e1e); color:#fff; box-shadow:0 8px 30px rgba(0,0,0,.6); }
+    .xmas-toast .xmas-close { background:transparent; border:none; font-size:18px; cursor:pointer; color:inherit; margin-left:auto; }
+    .xmas-toast img { width:36px; height:36px; border-radius:6px; }
+    @keyframes xmasPop { 0%{ transform: translateY(20px) scale(.98); opacity:0} 60%{ transform: translateY(-6px) scale(1.02); opacity:1 } 100%{ transform: translateY(0) scale(1); } }
+    .xmas-toast.show { animation: xmasPop .6s cubic-bezier(.2,.9,.3,1) both; }
+
+    /* Footer styl + malé vánoční přání */
+    footer { position:relative; }
+    footer .xmas-greeting { font-weight:600; color:#b71c1c; margin-top:6px; }
+    </style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
-<header>
+
+<!-- Vánoční sníh + dekorace -->
+<div id="snow-container" aria-hidden="true"></div>
+<div class="snow-overlay" aria-hidden="true"></div>
+
+<header style="position:relative;">
+    <div class="header-lights" aria-hidden="true" style="display:flex;justify-content:center;align-items:center;">
+        <span style="background:#ff3d00; animation-delay:0s;"></span>
+        <span style="background:#ffd600; animation-delay:.4s;"></span>
+        <span style="background:#00c853; animation-delay:.8s;"></span>
+        <span style="background:#2979ff; animation-delay:1.2s;"></span>
+        <span style="background:#ff4081; animation-delay:1.6s;"></span>
+    </div>
+
     <div class="logo-streak-wrapper">
         <div class="logo">
-            <a href="{{ url_for('main.index') }}">
+            <a href="{{ url_for('main.index') }}" aria-label="Knowix domů">
                 <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
             </a>
+            <!-- Santa čepička (přelepená přes logo) - používáme PNG umístěné ve static/pic -->
+            <img class="santa-hat" src="{{ url_for('static', filename='pic/santa_hat.png') }}" alt="Santa hat" onerror="this.style.display='none'">
+            <!-- Girlanda dekorace -->
+            <img class="garland" src="{{ url_for('static', filename='pic/garland.png') }}" alt="Garland" onerror="this.style.display='none'">
         </div>
         <span class="streak-badge">
             <img src="/static/fire.svg" alt="Streak">
@@ -247,6 +315,236 @@
     </p>
 </footer>
 <script src="/static/js/pwa.js"></script>
+<script>
+(function(){
+  // Generátor jednoduchých sněhových vloček - vytváří elementy s náhodnou pozicí, rychlostí a velikostí
+  const container = document.getElementById('snow-container');
+  if (!container) return;
+
+  // Vrací barvu vloček podle pozadí/témy (světlé pozadí -> tmavé vločky)
+  function computeSnowColor(){
+    // Pokud máme explictní třídu dark-mode, použij bílou
+    if (document.body.classList.contains('dark-mode')){ window.__snow_is_light = false; return '#ffffff'; }
+
+    // Zkontroluj několik elementů (body, main, #content-wrapper) a spočti průměrnou luminanci
+    try{
+      const candidates = [document.body, document.querySelector('#content-wrapper'), document.querySelector('main')].filter(Boolean);
+      let sumLum = 0, count = 0;
+      for (const el of candidates){
+        const bg = window.getComputedStyle(el).backgroundColor;
+        if (!bg) continue;
+        const m = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+        if (!m) continue;
+        const r = parseInt(m[1],10), g = parseInt(m[2],10), b = parseInt(m[3],10);
+        const lum = 0.2126*r + 0.7152*g + 0.0722*b;
+        sumLum += lum; count++;
+      }
+      const avgLum = count ? (sumLum / count) : 255;
+      // pokud je průměrná luminance > 150 -> světlé pozadí => tmavé vločky
+      window.__snow_is_light = (avgLum > 150);
+      return window.__snow_is_light ? '#111111' : '#ffffff';
+    }catch(e){
+      window.__snow_is_light = true;
+      return '#111111';
+    }
+  }
+
+  // Použij barvu jednou; případně obnov při resize/tématu
+  let currentSnowColor = computeSnowColor();
+  // globální příznak pro jednoduché kontroly
+  window.__snow_is_light = !!window.__snow_is_light;
+
+  const maxFlakes = Math.min(Math.max(Math.round(window.innerWidth / 30), 15), 120); // přizpůsobí se šířce
+  function createFlake(){
+    let f;
+    const size = Math.random() * 10 + 6; // 6-16px
+    // Pokud je stránka světlá, preferuj SVG šedé vločky; jinak použij bílé unicode vločky
+    const useSvgFlake = (window.__snow_is_light === true) ? (Math.random() < 0.95) : (Math.random() < 0.18);
+    if (useSvgFlake) {
+      // vytvoříme inline SVG místo kulaté tečky
+      const dim = Math.round(10 + Math.random() * 8); // 10-18
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(svgNS, 'svg');
+      svg.setAttribute('width', dim);
+      svg.setAttribute('height', dim);
+      svg.setAttribute('viewBox', `0 0 ${dim} ${dim}`);
+      svg.className.baseVal = 'flake-svg';
+      // určeme variantu stroke width podle velikosti
+      if (dim < 12) svg.classList.add('small'); else if (dim < 16) svg.classList.add('medium'); else svg.classList.add('large');
+      // pozice a styl
+      svg.style.left = Math.random() * 100 + '%';
+      svg.style.top = '-10px';
+      svg.style.opacity = (0.65 + Math.random() * 0.35).toFixed(2);
+      svg.style.transformOrigin = 'center';
+
+      // styl: šedá barva pro lepší kontrast na bílém pozadí
+      const strokeColor = '#8a8a8a';
+
+      // jednoduchá vločka: 6 paprsků
+      const cx = dim/2, cy = dim/2, len = dim*0.38;
+      for (let i=0;i<6;i++){
+        const ang = (i * Math.PI / 3);
+        const x1 = cx - Math.cos(ang)*len;
+        const y1 = cy - Math.sin(ang)*len;
+        const x2 = cx + Math.cos(ang)*len;
+        const y2 = cy + Math.sin(ang)*len;
+        const line = document.createElementNS(svgNS, 'line');
+        line.setAttribute('x1', x1); line.setAttribute('y1', y1); line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+        line.setAttribute('stroke', strokeColor);
+        line.setAttribute('stroke-opacity', 0.95);
+        line.setAttribute('stroke-width', Math.max(1, Math.round(dim*0.12)));
+        svg.appendChild(line);
+        // drobné větvičky u některých paprsků (dekor)
+        const bx = cx + Math.cos(ang)* (len*0.55);
+        const by = cy + Math.sin(ang)* (len*0.55);
+        const angL = ang + Math.PI/6; const angR = ang - Math.PI/6;
+        const l1 = document.createElementNS(svgNS, 'line');
+        l1.setAttribute('x1', bx); l1.setAttribute('y1', by);
+        l1.setAttribute('x2', bx + Math.cos(angL)* (len*0.18));
+        l1.setAttribute('y2', by + Math.sin(angL)* (len*0.18));
+        l1.setAttribute('stroke', strokeColor); l1.setAttribute('stroke-opacity',0.9); l1.setAttribute('stroke-width', Math.max(1, Math.round(dim*0.08)));
+        svg.appendChild(l1);
+        const l2 = document.createElementNS(svgNS, 'line');
+        l2.setAttribute('x1', bx); l2.setAttribute('y1', by);
+        l2.setAttribute('x2', bx + Math.cos(angR)* (len*0.18));
+        l2.setAttribute('y2', by + Math.sin(angR)* (len*0.18));
+        l2.setAttribute('stroke', strokeColor); l2.setAttribute('stroke-opacity',0.9); l2.setAttribute('stroke-width', Math.max(1, Math.round(dim*0.08)));
+        svg.appendChild(l2);
+      }
+
+      // lehké otáčení pro variaci
+      svg.style.transition = `transform ${8000 + Math.random()*8000}ms linear`;
+      f = svg;
+    } else {
+      const div = document.createElement('div');
+      div.className = 'snowflake';
+      div.style.fontSize = size + 'px';
+      div.style.left = Math.random() * 100 + '%';
+      div.style.opacity = (0.5 + Math.random() * 0.5).toFixed(2);
+      div.style.color = currentSnowColor;
+      if (currentSnowColor === '#111111' || currentSnowColor === '#000') {
+        div.style.textShadow = '0 1px 0 rgba(255,255,255,0.85)';
+      } else {
+        div.style.textShadow = '0 1px 2px rgba(0,0,0,0.35)';
+      }
+      div.textContent = '❄';
+      f = div;
+    }
+
+    // Animace přes transform pomocí transition + JS (kompatibilní fallback)
+    const duration = 8000 + Math.random() * 12000; // 8-20s
+    f.style.transition = `transform ${duration}ms linear, top ${duration}ms linear, left ${duration}ms linear`;
+
+    container.appendChild(f);
+
+    // Vypočti koncovou pozici a přidej jemné otáčení
+    requestAnimationFrame(()=>{
+      const endX = (Math.random() * 20 - 10); // horizontální drift
+      const rot = (Math.random()*60 - 30); // otáčení během pádu
+      f.style.transform = `translate(${endX}vw, ${window.innerHeight + 40}px) rotate(${rot}deg)`;
+    });
+
+    // Odstranění po době trvání
+    setTimeout(()=>{ try{ f.remove(); }catch(e){} }, duration + 500);
+  }
+
+  // Plynulé doplňování vloček
+  let running = true;
+  function loop(){
+    if (!running) return;
+    if (container.children.length < maxFlakes) createFlake();
+    setTimeout(loop, 200 + Math.random() * 300);
+  }
+  loop();
+
+  // Pokud se změní rozměr nebo téma, znovu vypočti barvu
+  window.addEventListener('resize', ()=>{ currentSnowColor = computeSnowColor(); });
+  // Poslouchej změnu třídy dark-mode (pokud někdo přepíná téma JSem)
+  const mo = new MutationObserver(()=>{ currentSnowColor = computeSnowColor(); });
+  mo.observe(document.body, { attributes: true, attributeFilter:['class'] });
+
+})();
+</script>
+
+<!-- Přidáme jednorázovou vánoční bublinu (toast) -->
+<script>
+(function(){
+  const KEY = 'knowix_xmas_toast_shown_v1';
+  const PHRASE = 'Veselé Vánoce a šťastný nový rok od Knowix! 🎄';
+  // zobraz jen jednou za session/klienta
+  if (sessionStorage.getItem(KEY)) return;
+
+  function pageHasPhrase(){
+    try{
+      if (document.body && document.body.innerText && document.body.innerText.indexOf(PHRASE) !== -1) return true;
+      const footer = document.querySelector('footer');
+      if (footer && footer.innerText && footer.innerText.indexOf(PHRASE) !== -1) return true;
+      if (document.querySelector('.xmas-greeting') && document.querySelector('.xmas-greeting').innerText.indexOf(PHRASE) !== -1) return true;
+    }catch(e){ /* ignore */ }
+    return false;
+  }
+
+  function showToastOnce(){
+    if (sessionStorage.getItem(KEY)) return;
+    try{
+      const toast = document.createElement('div');
+      toast.className = 'xmas-toast show';
+
+      const img = document.createElement('img');
+      img.src = '/static/pic/christmas_icon.png';
+      img.alt = '🎄';
+      img.onerror = function(){ this.style.display='none'; };
+
+      const txt = document.createElement('div');
+      txt.textContent = PHRASE;
+
+      const close = document.createElement('button');
+      close.className = 'xmas-close';
+      close.innerHTML = '✕';
+      close.addEventListener('click', ()=>{ toast.remove(); sessionStorage.setItem(KEY,'1'); });
+
+      toast.appendChild(img);
+      toast.appendChild(txt);
+      toast.appendChild(close);
+
+      document.body.appendChild(toast);
+
+      // automaticky skryj po some sekundách
+      setTimeout(()=>{ try{ if(document.body.contains(toast)){ toast.remove(); sessionStorage.setItem(KEY,'1'); } }catch(e){} }, 9000);
+    }catch(e){ console.error('xmas toast error', e); }
+  }
+
+  // Pokud už stránka obsahuje frázi, ukaž toast, jinak sleduj DOM krátce
+  if (pageHasPhrase()){
+    setTimeout(showToastOnce, 600); // malá prodleva, ať není v konfliktu s layoutem
+  } else {
+    const mo = new MutationObserver((muts, obs)=>{
+      if (pageHasPhrase()){
+        obs.disconnect();
+        showToastOnce();
+      }
+    });
+    mo.observe(document.body, { childList:true, subtree:true });
+    // timeout - pokud se fráze neobjeví do 5s, přestaň sledovat
+    setTimeout(()=>{ try{ mo.disconnect(); }catch(e){} }, 5000);
+  }
+
+})();
+</script>
+
+<!-- zachovej další skripty a include onboarding -->
+<!--<script>-->
+<!--// Přidej malý vánoční text do patičky (pokud není) - necháváme možnost lokalizace přes Jinja-->
+<!--(function(){-->
+<!--  const footer = document.querySelector('footer');-->
+<!--  if (footer && !footer.querySelector('.xmas-greeting')){-->
+<!--    const p = document.createElement('p');-->
+<!--    p.className = 'xmas-greeting';-->
+<!--    p.textContent = 'Veselé Vánoce a šťastný nový rok od Knowix! 🎄';-->
+<!--    footer.insertBefore(p, footer.firstChild);-->
+<!--  }-->
+<!--})();-->
+<!--</script>-->
 <script>
 // Diagnostika push notifikací
 document.getElementById('test-push')?.addEventListener('click', async function() {
