@@ -1,5 +1,6 @@
 import os
 import mysql.connector
+import logging
 
 
 def get_db_connection():
@@ -24,6 +25,7 @@ def ensure_users_table_guest():
             """
 CREATE TABLE IF NOT EXISTS guest (
   id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NULL,
   first_name VARCHAR(50) NULL,
   last_name VARCHAR(50) NULL,
   email VARCHAR(100) NOT NULL,
@@ -60,13 +62,41 @@ CREATE TABLE IF NOT EXISTS guest (
   provider_id VARCHAR(128) NULL,
   avatar_url VARCHAR(5512) NULL,
   last_login TIMESTAMP NULL,
-  UNIQUE KEY uniq_email (email)
+  UNIQUE KEY uniq_email (email),
+  KEY idx_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
             """
         )
+
+        # Pokud tabulka již existovala bez sloupce user_id, pokusíme se ho bezpečně přidat
+        try:
+            cur.execute("ALTER TABLE guest ADD COLUMN user_id INT NULL")
+        except Exception as e:
+            # Pokud sloupec existuje, MySQL vrátí chybu 1060 (Duplicate column name) -> ignoruj
+            msg = str(getattr(e, 'msg', e))
+            if 'Duplicate column' in msg or '1060' in msg:
+                pass
+            else:
+                raise
+
+        # Stejně tak přidej index pokud chybí
+        try:
+            cur.execute("CREATE INDEX idx_user_id ON guest (user_id)")
+        except Exception as e:
+            msg = str(getattr(e, 'msg', e))
+            if 'Duplicate key name' in msg or '1061' in msg:
+                pass
+            else:
+                # některé MySQL varianty vrací jiný text; bezpečně ignoruj pokud index existuje
+                if 'already exists' in msg:
+                    pass
+                else:
+                    raise
+
+        conn.commit()
     except Exception:
 
-        print("[DB] Chyba při zajišťování tabulky guest:", exc_info=True)
+        logging.exception("[DB] Chyba při zajišťování tabulky guest")
     finally:
         cur.close()
         conn.close()

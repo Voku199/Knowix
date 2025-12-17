@@ -26,6 +26,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const userOnboarding = {% if session.get('user_id') and not session.get('has_seen_onboarding') %}true{% else %}false{% endif %};
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
+    // Alex avatary podle stavu (URL řeší Jinja přes url_for)
+    const ALEX_IMAGES = {
+        idle: "{{ url_for('static', filename='Alex_Idle.png') }}",
+        happy: "{{ url_for('static', filename='Alex_Happy.png') }}",
+        thinking: "{{ url_for('static', filename='Alex_Idle.png') }}" // můžeš nahradit jiným obrázkem
+    };
+    let currentAlexState = 'idle';
+
+    function setAlexState(newState) {
+        if (!ALEX_IMAGES[newState]) return;
+        currentAlexState = newState;
+        // Avatar se přerenderuje při dalším renderOnboardingStep; pro jednoduchost teď neupdatujeme inline
+    }
+
+    function getAlexAvatarHTML() {
+        const src = ALEX_IMAGES[currentAlexState] || ALEX_IMAGES.idle;
+        return `
+            <div style="width:48px; height:48px; border-radius:50%; background: radial-gradient(circle at 30% 30%, #fef3c7, #f97316); display:flex; align-items:center; justify-content:center; margin-right:12px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); border: 2px solid rgba(255,255,255,0.9); overflow:hidden;">
+                <img src="${src}" alt="Alex, tvůj průvodce" class="alex-avatar" style="width:100%; height:100%; object-fit:cover; display:block;">
+            </div>
+        `;
+    }
+
     if (!userOnboarding) return;
 
     // Načti onboarding data
@@ -54,6 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
             container.style.opacity = '1';
         }, 10);
 
+        setAlexState('idle');
         // Vytvoř onboarding UI
         renderOnboardingStep(data, container);
     }
@@ -87,8 +111,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <div style="position: fixed; ${containerStyle} background: rgba(255,255,255,0.95); color: #111; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); max-width: 520px; width: calc(100% - 64px); padding: 20px; opacity: 1; transition: all 0.3s ease;">
                 <div style="position: absolute; ${arrowPositionStyle} width: 0; height: 0; border: 12px solid transparent;"></div>
 
-                <div style="display:flex; align-items:center; margin-bottom: 12px;">
-                    <div style="width:48px; height:48px; border-radius:50%; background: linear-gradient(90deg, #8b5cf6, #ec4899); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:20px; margin-right:12px;">A</div>
+                <div style="display:flex; align-items:center; margin-bottom: 16px;">
+                    ${getAlexAvatarHTML()}
                     <div>
                         <h3 style="margin:0; font-size:18px; font-weight:700; color:#111;">${step.title}</h3>
                         <p style="margin:2px 0 0; font-size:13px; color:#555;">Alex, tvůj průvodce</p>
@@ -117,6 +141,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
         `;
+
+        // Interakce s avatarem Alexe (hover/click -> happy)
+        const avatarEl = container.querySelector('.alex-avatar');
+        if (avatarEl) {
+            avatarEl.addEventListener('mouseenter', () => {
+                setAlexState('happy');
+            });
+            avatarEl.addEventListener('mouseleave', () => {
+                setAlexState('idle');
+            });
+            avatarEl.addEventListener('click', () => {
+                setAlexState('happy');
+                setTimeout(() => {
+                    // pokud mezitím nepřepsal stav nextOnboardingStep, vrať se do idle
+                    if (currentAlexState === 'happy') {
+                        setAlexState('idle');
+                    }
+                }, 800);
+            });
+        }
 
         // Pokud máme cílový element, zvýrazni ho
         if (step.target_selector) {
@@ -155,6 +199,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     window.nextOnboardingStep = function(currentStep) {
+        // Alex reaguje na kliknutí na další/dokončit
+        setAlexState('happy');
+        setTimeout(() => {
+            if (currentAlexState === 'happy') {
+                setAlexState('thinking');
+            }
+        }, 300);
+
         return fetch('/onboarding/next', {
             method: 'POST',
             headers: {
@@ -184,6 +236,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 el.style.boxShadow = '';
                                 el.classList.remove('animate-pulse');
                             });
+                            setAlexState('idle');
                             renderOnboardingStep(newData, document.getElementById('onboardingContainer'));
                         });
                 }

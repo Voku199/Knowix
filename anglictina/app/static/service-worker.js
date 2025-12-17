@@ -179,6 +179,23 @@ async function canShowNotificationToday() {
     }
 }
 
+self.addEventListener('fetch', event => {
+    try {
+        const url = new URL(event.request.url);
+        if (url.pathname.startsWith('/static/') || url.pathname.startsWith('/.well-known/')) {
+            // neni voláno event.respondWith -> necháme prohlížeč standardně načíst zdroj
+            return;
+        }
+    } catch (e) {
+        // pokud URL parsing selže, pokračujeme do běžného handleru níže
+    }
+
+    // Původní fetch/cache logika SW (příklad fallbacku)
+    event.respondWith(
+        caches.match(event.request).then(cached => cached || fetch(event.request))
+    );
+});
+
 async function markNotificationShown() {
     try {
         const key = 'push-count:' + todayStr();

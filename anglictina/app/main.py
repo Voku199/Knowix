@@ -1,6 +1,6 @@
 # --- Flask and SocketIO imports ---
 from dotenv import load_dotenv
-from flask import Flask, render_template, session, send_from_directory, request, redirect, jsonify, g, url_for
+from flask import Flask, render_template, session, send_from_directory, request, redirect, jsonify, g, make_response
 # from flask_session import Session
 import importlib
 from streak import get_user_streak
@@ -342,6 +342,12 @@ def serve_profile_pic(filename):
             return send_from_directory('static/profile_pics', 'default.webp')
         except Exception:
             return send_from_directory('static', 'favicon.ico')  # poslední fallback
+
+
+@app.route('/.well-known/appspecific/com.chrome.devtools.json')
+def chrome_devtools_assoc():
+    # vrátí prázdný 204 No Content místo 404
+    return make_response('', 204)
 
 
 # === Context procesory ===
