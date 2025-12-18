@@ -198,6 +198,33 @@ def sitemap():
     return send_from_directory('templates', 'sitemap.xml')
 
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'),
+        'favicon.ico',
+        mimetype='image/vnd.microsoft.icon'
+    )
+
+
+@app.route('/apple-touch-icon.png')
+def apple_touch_icon():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'),
+        'apple-touch-icon.png',
+        mimetype='image/png'
+    )
+
+
+@app.route('/apple-touch-icon-precomposed.png')
+def apple_touch_icon_precomposed():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'),
+        'apple-touch-icon.png',
+        mimetype='image/png'
+    )
+
+
 @app.route('/kontakty')
 def kontakty():
     return render_template('kontakty.html')

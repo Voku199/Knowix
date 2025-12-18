@@ -3,6 +3,8 @@ from db import get_db_connection
 
 def _ensure_extended_columns():
     """Zajistí nové sloupce pro shadow a podcast statistiky (idempotentně)."""
+    conn = None
+    cur = None
     try:
         conn = get_db_connection()
         cur = conn.cursor()
@@ -28,10 +30,20 @@ def _ensure_extended_columns():
                 except Exception:
                     pass
         conn.commit()
-        cur.close()
-        conn.close()
     except Exception:
+        # nechceme zlomit request kvůli chybě v ALTER TABLE
         pass
+    finally:
+        try:
+            if cur is not None:
+                cur.close()
+        except Exception:
+            pass
+        try:
+            if conn is not None:
+                conn.close()
+        except Exception:
+            pass
 
 
 def ensure_user_stats_exists(user_id):

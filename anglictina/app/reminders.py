@@ -26,6 +26,11 @@ CHECK_INTERVAL_SECONDS = 3600  # 1 hodina
 MAX_EMAILS_PER_DAY = 2
 MAX_PUSHES_PER_DAY = 3
 
+# Throttling / backoff pro e‑maily
+EMAIL_SEND_SLEEP_SECONDS = float(os.getenv('REMINDER_EMAIL_DELAY_SECONDS', '0.5'))  # pauza mezi e‑maily
+EMAIL_MAX_RETRIES = int(os.getenv('REMINDER_EMAIL_MAX_RETRIES', '1'))  # kolik dalších pokusů po 429
+EMAIL_BACKOFF_SECONDS = float(os.getenv('REMINDER_EMAIL_BACKOFF_SECONDS', '2.0'))  # pauza po 429
+
 # Volitelné hodiny pro odeslání e‑mailů (CSV v ENV, např. "9,13,19")
 _EMAIL_HOURS_ENV = os.getenv('REMINDER_EMAIL_HOURS', '')
 try:
@@ -576,12 +581,17 @@ def send_daily_reminders():
     if current_hour in PUSH_SEND_HOURS and _webpush and VAPID_PRIVATE_KEY:
         push_candidates = _get_push_candidates()
         print(f"[reminders] Push window hit at hour={current_hour}, candidates={len(push_candidates)}", flush=True)
+        sent_push_users: set[int] = set()
         for user_id, first_name, sends_today, hours_inactive in push_candidates:
             # Denní limit je již v SQL, ale pro jistotu ještě zkontrolujeme
             if sends_today >= MAX_PUSHES_PER_DAY:
                 continue
+            # V rámci jednoho běhu pošleme každému uživateli maximálně jednu push notifikaci
+            if user_id in sent_push_users:
+                continue
             if _send_push_reminder(user_id, first_name):
                 pushes_sent += 1
+                sent_push_users.add(user_id)
 
     print(f"[reminders] Daily reminders: {emails_sent} emails, {pushes_sent} pushes", flush=True)
     return emails_sent, pushes_sent

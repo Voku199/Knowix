@@ -9,7 +9,13 @@ from db import get_db_connection
 
 try:
     from xp import add_xp_to_user
-except Exception:
+except Exception as ex:
+    # Zalogujs chybu importu, aby bylo vidět, proč se případně nepřidávají XP
+    try:
+        current_app.logger.error(f"[slovni_fotbal] Failed to import add_xp_to_user from xp: {ex}")
+    except Exception:
+        # current_app nemusí být k dispozici při importu modulu
+        print(f"[slovni_fotbal] Failed to import add_xp_to_user from xp: {ex}")
     add_xp_to_user = None
 try:
     from streak import update_user_streak
@@ -785,12 +791,18 @@ def slovni_reset():
         xp_awarded = 0
         new_quick_points = None
         if user_id and chain_len > 0:
+            # XP = délka řetězu
             xp_awarded = int(chain_len)
             try:
-                if add_xp_to_user:
-                    add_xp_to_user(user_id, xp_awarded)
-            except Exception:
-                pass
+                # pokud je XP backend dostupný, přidej XP; pokud ne, jen statistiky, ale bez pádu
+                if add_xp_to_user is not None:
+                    add_xp_to_user(user_id, xp_awarded, reason="slovni_reset")
+            except Exception as ex:
+                try:
+                    current_app.logger.error(
+                        f"[slovni_fotbal] add_xp_to_user failed user={user_id} xp={xp_awarded}: {ex}")
+                except Exception:
+                    pass
             try:
                 if update_user_streak:
                     update_user_streak(user_id)
