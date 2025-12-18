@@ -190,13 +190,14 @@ def send_email_html(to_email, subject, text_body, html_body):
                 print(f"[email] Resend success status={resp.status_code} id={rid}", flush=True)
                 return True
             elif resp.status_code == 429:
-                # Respektuj Retry-After / RateLimit-Reset s exponenciálním backoffem + jitterem
+                # Respektuj Retry-After / RateLimit-Reset s pevnou pauzou mezi pokusy
                 headers = resp.headers
                 retry_after = headers.get('Retry-After')
                 rate_reset = headers.get('X-RateLimit-Reset') or headers.get('RateLimit-Reset')
-                base_delay = 0.75
+                base_delay = 2.0  # výchozí čekání 2 s mezi pokusy
                 try:
                     if retry_after:
+                        # Pokud server doporučí delší pauzu, použij ji
                         base_delay = max(base_delay, float(retry_after))
                     elif rate_reset:
                         # Pokud je unix timestamp, spočti delta; jinak ignoruj
@@ -207,11 +208,10 @@ def send_email_html(to_email, subject, text_body, html_body):
                             base_delay = max(base_delay, ts - now)
                 except Exception:
                     pass
-                # Exponenciální backoff s jitterem, max 3 pokusy
+                # Fixní čekání base_delay mezi pokusy, max 3 retry
                 max_retries = int(os.getenv('RESEND_MAX_RETRIES', '3'))
                 for attempt in range(1, max_retries + 1):
-                    jitter = random.uniform(0.2, 0.6)
-                    delay = min(6.0, base_delay * (2 ** (attempt - 1)) + jitter)
+                    delay = base_delay
                     print(f"[email] Resend rate limit -> sleep {delay:.2f}s, retry {attempt}/{max_retries}", flush=True)
                     time.sleep(delay)
                     resp2 = _rate_limited(_resend_post, max_per_sec=2)
