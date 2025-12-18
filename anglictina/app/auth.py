@@ -20,6 +20,32 @@ from datetime import datetime
 # Pomocné importy pro e‑mailové odesílání
 import socket
 import requests
+import threading
+
+# --- Jednoduchý globální rate‑limiter pro externí API (např. Resend) ---
+# Umožní omezit počet requestů na max 2/s na proces a při překročení limitu čeká.
+_rate_lock = threading.Lock()
+_rate_timestamps = []  # časy posledních volání
+
+
+def _rate_limited(func, max_per_sec=2):
+    """Spustí func() tak, aby nebylo překročeno max_per_sec volání za sekundu."""
+    global _rate_timestamps
+    while True:
+        with _rate_lock:
+            now = time.time()
+            # ponecháme jen poslední 1 s
+            _rate_timestamps = [t for t in _rate_timestamps if now - t < 1.0]
+            if len(_rate_timestamps) < max_per_sec:
+                _rate_timestamps.append(now)
+                break
+            # musíme počkat, než se okno uvolní
+            wait_for = 1.0 - (now - _rate_timestamps[0])
+        if wait_for > 0:
+            time.sleep(wait_for)
+
+    return func()
+
 
 auth_bp = Blueprint('auth', __name__)
 user_settings = {}
@@ -97,7 +123,7 @@ def send_email(to_email, subject, body):
                            f"<pre>{(body or '').replace('&', '&amp;').replace('<', '&lt;')}</pre>")
 
 
-# Nové: odeslání e-mailu s HTML i textovou částí (multipart/alternative)
+# Nové: odeslání e‑mailu s HTML i textovou částí (multipart/alternative)
 def send_email_html(to_email, subject, text_body, html_body):
     """Odešle e‑mail. Pořadí pokusů:
     1) Resend API (pokud RESEND_API_KEY)
@@ -153,7 +179,8 @@ def send_email_html(to_email, subject, text_body, html_body):
                     timeout=timeout
                 )
 
-            resp = _resend_post()
+            # První volání přes rate‑limiter (max 2/s)
+            resp = _rate_limited(_resend_post, max_per_sec=2)
             if 200 <= resp.status_code < 300:
                 rid = ''
                 try:
@@ -187,7 +214,7 @@ def send_email_html(to_email, subject, text_body, html_body):
                     delay = min(6.0, base_delay * (2 ** (attempt - 1)) + jitter)
                     print(f"[email] Resend rate limit -> sleep {delay:.2f}s, retry {attempt}/{max_retries}", flush=True)
                     time.sleep(delay)
-                    resp2 = _resend_post()
+                    resp2 = _rate_limited(_resend_post, max_per_sec=2)
                     if 200 <= resp2.status_code < 300:
                         print(f"[email] Resend retry success status={resp2.status_code}", flush=True)
                         return True
