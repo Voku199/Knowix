@@ -26,10 +26,10 @@ CHECK_INTERVAL_SECONDS = 3600  # 1 hodina
 MAX_EMAILS_PER_DAY = 2
 MAX_PUSHES_PER_DAY = 3
 
-# Throttling / backoff pro e‑maily
-EMAIL_SEND_SLEEP_SECONDS = float(os.getenv('REMINDER_EMAIL_DELAY_SECONDS', '0.5'))  # pauza mezi e‑maily
-EMAIL_MAX_RETRIES = int(os.getenv('REMINDER_EMAIL_MAX_RETRIES', '1'))  # kolik dalších pokusů po 429
-EMAIL_BACKOFF_SECONDS = float(os.getenv('REMINDER_EMAIL_BACKOFF_SECONDS', '2.0'))  # pauza po 429
+# Throttling / backoff pro e‑maily – RADŠI POMALÉ NEŽ 429
+EMAIL_SEND_SLEEP_SECONDS = float(os.getenv('REMINDER_EMAIL_DELAY_SECONDS', '60.0'))  # pauza mezi e‑maily (sekundy)
+EMAIL_MAX_RETRIES = int(os.getenv('REMINDER_EMAIL_MAX_RETRIES', '0'))  # další pokusy jen pro běžné chyby, ne pro 429
+EMAIL_BACKOFF_SECONDS = float(os.getenv('REMINDER_EMAIL_BACKOFF_SECONDS', '60.0'))  # pauza po 429 (sekundy)
 
 # Volitelné hodiny pro odeslání e‑mailů (CSV v ENV, např. "9,13,19")
 _EMAIL_HOURS_ENV = os.getenv('REMINDER_EMAIL_HOURS', '')
@@ -363,41 +363,86 @@ def _get_push_candidates():
     return candidates
 
 
-def _send_email_reminder(user_id: int, email: str, first_name: str, token: str) -> bool:
-    """Pošle jeden e-mail"""
+# pomocná návratová hodnota pro _send_email_reminder
+class EmailSendResult:
+    __slots__ = ("success", "rate_limited", "error")
+
+    def __init__(self, success: bool, rate_limited: bool = False, error: str | None = None):
+        self.success = success
+        self.rate_limited = rate_limited
+        self.error = error
+
+
+def _send_email_reminder(user_id: int, email: str, first_name: str, token: str) -> EmailSendResult:
+    """Pošle jeden e‑mail, vrací informaci o úspěchu a případném rate‑limitu (429).
+
+    success=True  -> odesláno a zapsáno do DB
+    success=False, rate_limited=True  -> API vrátilo 429, neaktualizujeme počitadla, další pokusy až v dalším běhu
+    success=False, rate_limited=False -> jiná chyba, v tomto běhu uživatele neřešíme dál
+    """
     unsubscribe_link = f"https://www.knowix.cz/email/unsubscribe/{token}"
     text_body, html_body, subject = _compose_reminder_email(first_name, unsubscribe_link)
 
-    success = send_email_html(email, subject, text_body, html_body)
+    print(f"[reminders] Sending email reminder to user_id={user_id} email={email}", flush=True)
 
-    if success:
-        conn = None
-        cur = None
+    # Základní pokus + případné malé množství retry pro běžné chyby (ne 429)
+    attempts = max(1, EMAIL_MAX_RETRIES + 1)
+    last_error = None
+    for attempt in range(1, attempts + 1):
         try:
-            conn = get_db_connection()
-            cur = conn.cursor()
-            today = time.strftime('%Y-%m-%d')
-            # Pokud je nový den, nastavíme čítač na 1; jinak inkrementujeme
-            cur.execute(
-                """
-                UPDATE users 
-                SET last_reminder_sent = NOW(),
-                    email_sends_today = CASE WHEN last_email_date = %s THEN email_sends_today + 1 ELSE 1 END,
-                    last_email_date = %s
-                WHERE id = %s
-                """,
-                (today, today, user_id)
-            )
-            conn.commit()
+            success = send_email_html(email, subject, text_body, html_body)
         except Exception as ex:
-            print(f"[reminders] Update email counter error: {ex}")
-        finally:
-            if cur:
-                cur.close()
-            if conn:
-                conn.close()
+            # Pokud send_email_html někdy začne házet speciální výjimku pro 429,
+            # tady ji můžeme rozlišit; zatím ji bereme jako běžnou chybu.
+            last_error = str(ex)
+            print(f"[reminders] Email send exception user_id={user_id} attempt={attempt}: {ex}", flush=True)
+            success = False
 
-    return success
+        # send_email_html aktuálně vrací jen True/False, ale 429 už řeší interně přes retry.
+        if success:
+            conn = None
+            cur = None
+            try:
+                conn = get_db_connection()
+                cur = conn.cursor()
+                today = time.strftime('%Y-%m-%d')
+                cur.execute(
+                    """
+                    UPDATE users 
+                    SET last_reminder_sent = NOW(),
+                        email_sends_today = CASE WHEN last_email_date = %s THEN email_sends_today + 1 ELSE 1 END,
+                        last_email_date = %s
+                    WHERE id = %s
+                    """,
+                    (today, today, user_id)
+                )
+                conn.commit()
+                print(f"[reminders] Email sent OK to user_id={user_id}", flush=True)
+            except Exception as ex:
+                print(f"[reminders] Update email counter error: {ex}", flush=True)
+            finally:
+                if cur:
+                    cur.close()
+                if conn:
+                    conn.close()
+            return EmailSendResult(True, False, None)
+
+        # Pokud neúspěch a nejsme v posledním pokusu, zkusíme jemný backoff
+        if attempt < attempts:
+            print(
+                f"[reminders] Email send failed for user_id={user_id}, attempt={attempt}/{attempts}, "
+                f"sleeping {EMAIL_BACKOFF_SECONDS}s before next attempt",
+                flush=True,
+            )
+            time.sleep(EMAIL_BACKOFF_SECONDS)
+
+    # Všechny pokusy selhaly – považujeme to za běžnou chybu (rate limit 429 už řeší send_email_html)
+    print(
+        f"[reminders] Email send FAILED for user_id={user_id} after {attempts} attempts, "
+        f"last_error={last_error}",
+        flush=True,
+    )
+    return EmailSendResult(False, False, last_error)
 
 
 def _send_push_reminder(user_id: int, first_name: str) -> bool:
@@ -566,13 +611,34 @@ def send_daily_reminders():
     email_enabled = bool(os.getenv("RESEND_API_KEY") or os.getenv("EMAIL_PASSWORD") or os.getenv("SMTP_PASSWORD"))
     if email_enabled and current_hour in EMAIL_SEND_HOURS:
         email_candidates = _get_email_candidates()
+        print(
+            f"[reminders] Email window hit at hour={current_hour}, candidates={len(email_candidates)}, "
+            f"sleep={EMAIL_SEND_SLEEP_SECONDS}s, backoff={EMAIL_BACKOFF_SECONDS}s",
+            flush=True,
+        )
         for user_id, email, first_name, token, sends_today in email_candidates:
             if _should_skip_email(email):
                 continue
             if sends_today >= MAX_EMAILS_PER_DAY:
                 continue
-            if _send_email_reminder(user_id, email, first_name or 'student', token):
+
+            result = _send_email_reminder(user_id, email, first_name or 'student', token)
+            if result.success:
                 emails_sent += 1
+            else:
+                # Zatím nerozlišujeme speciálně 429, protože Resend už má vlastní retry + delay uvnitř
+                print(
+                    f"[reminders] Email not sent to user_id={user_id}, "
+                    f"rate_limited={result.rate_limited}, error={result.error}",
+                    flush=True,
+                )
+
+            # Klíčové: mezi každým uživatelem udělat pauzu, ať už e‑mail vyšel nebo ne
+            print(
+                f"[reminders] Sleeping {EMAIL_SEND_SLEEP_SECONDS}s before next email (user_id={user_id})",
+                flush=True,
+            )
+            time.sleep(EMAIL_SEND_SLEEP_SECONDS)
     else:
         # Volitelný debug: mimo povolené hodiny
         pass

@@ -6,8 +6,7 @@ Používá MySQL a je určen pro integraci do Flask aplikace.
 from flask import Blueprint, session
 from db import get_db_connection
 import math
-
-# streak_info = {"streak": 5, "status": "continued"}
+from flask import jsonify, request
 
 xp_bp = Blueprint('xp', __name__)
 
@@ -442,3 +441,87 @@ def get_top_users(limit=10):
                 conn.close()
         except Exception:
             pass
+
+
+def get_user_keys(user_id: int) -> int:
+    """Vrátí aktuální počet klíčů uživatele z tabulky user_keys (sloupec key_count)."""
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT key_count FROM user_keys WHERE user_id = %s", (user_id,))
+        row = cur.fetchone()
+        if not row or row[0] is None:
+            return 0
+        return int(row[0])
+    except Exception:
+        return 0
+    finally:
+        try:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+        except Exception:
+            pass
+
+
+def add_user_keys(user_id: int, amount: int) -> int:
+    """Navýší key_count v user_keys o amount a vrátí nový počet (při chybě vrací odhad)."""
+    amount = int(amount or 0)
+    if amount == 0:
+        return get_user_keys(user_id)
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        # Zkus update; pokud nic neaktualizuje, vlož nový řádek
+        cur.execute("UPDATE user_keys SET key_count = COALESCE(key_count,0) + %s WHERE user_id = %s",
+                    (amount, user_id))
+        if cur.rowcount == 0:
+            cur.execute("INSERT INTO user_keys (user_id, key_count) VALUES (%s, %s)", (user_id, amount))
+        conn.commit()
+        return get_user_keys(user_id)
+    except Exception:
+        # fallback – vrať aktuální známý stav, i když se update nepovedl
+        return get_user_keys(user_id)
+    finally:
+        try:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+        except Exception:
+            pass
+
+
+@xp_bp.route('/grant_keys', methods=['POST'])
+def grant_keys():
+    """Backend endpoint pro přidání klíčů ke kolu štěstí.
+
+    Očekává JSON body {"amount": <int>} (volitelné, default 5).
+    Vrací JSON {status, key_count} pro aktuálně přihlášeného uživatele.
+    """
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"status": "error", "message": "Nejprve se přihlaste."}), 401
+
+    data = request.get_json(silent=True) or {}
+    try:
+        amount = int(data.get('amount', 5))
+    except Exception:
+        amount = 5
+    # bezpečnostní limit, aby někdo neposlal extrémní číslo
+    if amount > 50:
+        amount = 50
+    if amount < 1:
+        amount = 1
+
+    new_count = add_user_keys(user_id, amount)
+    return jsonify({
+        "status": "success",
+        "message": f"Přidáno {amount} klíčů.",
+        "key_count": new_count
+    })

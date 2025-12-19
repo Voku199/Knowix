@@ -291,6 +291,24 @@ def handle_feedback():
         ''', (session['user_id'], message, rating))
         feedback_id = cursor.lastrowid
 
+        # NOVĚ: navýšíme feedback_count v user_stats, aby mohl naskočit achievement za recenzi
+        try:
+            from stats import ensure_user_stats_exists
+            ensure_user_stats_exists(session['user_id'])
+        except Exception:
+            # pokud helper selže, nebráníme uložení feedbacku
+            pass
+        try:
+            # COALESCE kvůli případným NULL hodnotám
+            cursor.execute('''
+                UPDATE user_stats
+                SET feedback_count = COALESCE(feedback_count, 0) + 1
+                WHERE user_id = %s
+            ''', (session['user_id'],))
+        except Exception as e:
+            # jen zalogujeme, ale neblokujeme uživatele
+            print(f"[feedback] Chyba při navyšování feedback_count: {e}")
+
         # Získání kompletních dat
         cursor.execute('''
             SELECT 
@@ -309,7 +327,7 @@ def handle_feedback():
 
         conn.commit()
 
-        # Kontrola a přidělení achievementů
+        # Kontrola a přidělení achievementů (už po navýšení feedback_count)
         unlocked_achievements = check_and_award_achievements(session['user_id'])
 
         return jsonify({

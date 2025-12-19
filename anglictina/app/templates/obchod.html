@@ -473,6 +473,29 @@
           resEl.textContent = 'Chyba sítě.'; btn.disabled=false;
         }
       });
+
+      // Malý tajný helper pro přidání 5 klíčů z konzole: zavolej plsvoku()
+      window.plsvoku = async function(){
+        try {
+          const r = await fetch('/grant_keys', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': window.csrfToken
+            },
+            body: JSON.stringify({ amount: 5 })
+          });
+          const data = await r.json();
+          if (data && data.status === 'success' && typeof data.key_count === 'number') {
+            setKeys(data.key_count);
+            console.log('Udělili jsme ti 5 klíčů. Máš teď:', data.key_count);
+          } else {
+            console.log('Nepodařilo se přidat klíče:', data && data.message ? data.message : 'neznámá chyba');
+          }
+        } catch (e) {
+          console.error('Chyba při přidávání klíčů:', e);
+        }
+      };
     })();
 </script>
 <script>const CSRF_TOKEN = "{{ csrf_token() }}";</script>
@@ -495,3 +518,4 @@
 </script>
 </body>
 </html>
+
