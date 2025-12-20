@@ -52,12 +52,12 @@
 <div class="wrap">
     <h1>Ups, něco se pokazilo ({{ error_code or 500 }})</h1>
     <div class="muted">{{ error_message or 'Internal Server Error' }}</div>
-    {% if error_traceback %}
-    <details style="margin-top:12px;">
-        <summary>Detaily chyby</summary>
-        <pre>{{ error_traceback }}</pre>
-    </details>
-    {% endif %}
+    <!--    {% if error_traceback %}-->
+    <!--    <details style="margin-top:12px;">-->
+    <!--        <summary>Detaily chyby</summary>-->
+    <!--        <pre>{{ error_traceback }}</pre>-->
+    <!--    </details>-->
+    <!--    {% endif %}-->
     <a class="btn" href="/">Zpět na domov</a>
 </div>
 </body>
