@@ -185,17 +185,21 @@ app.register_blueprint(onboarding_bp)
 # app.register_blueprint(prevodky_bp)
 
 init_security(app)
-# Spusť background worker (připomínky) při startu webu
-start_worker_thread()
+
+if os.getenv('START_WORKER_IN_WEB', '0') == '1':
+    start_worker_thread()
+else:
+    print('[main] Background worker ve web procesu je vypnutý (nastav START_WORKER_IN_WEB=1 pro zapnutí).', flush=True)
 
 
-# (Volání start_reminder_scheduler odstraněno, aby nebylo dvojité odesílání)
-
-
-# === Sitemap & robots ===
 @app.route('/sitemap.xml')
 def sitemap():
     return send_from_directory('templates', 'sitemap.xml')
+
+
+@app.route('/privacy')
+def sitemap():
+    return send_from_directory('templates', 'privacy.hzml')
 
 
 @app.route('/favicon.ico')

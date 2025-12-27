@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .terms-container {
+        background: #f7faff;
+        border-radius: 1.2rem;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+        padding: 2.2rem 1.5rem 2rem 1.5rem;
+        max-width: 650px;
+        margin: 2.5rem auto 2rem auto;
+    }
+
+    .terms-container h1 {
+        font-size: 2rem;
+        margin-bottom: 1.2rem;
+        color: #2563eb;
+        text-align: center;
+    }
+
+    .terms-container h2 {
+        font-size: 1.25rem;
+        margin: 1.4rem 0 0.6rem 0;
+        color: #1f2937;
+    }
+
+    .terms-container ul {
+        margin: 0.8rem 0 1.0rem 1.2rem;
+        padding-left: 1.2rem;
+    }
+
+    .terms-container li {
+        margin-bottom: 0.5em;
+        font-size: 1.05em;
+        line-height: 1.5;
+    }
+
+    .terms-container .highlight {
+        background: #e0e7ff;
+        padding: 0.2em 0.5em;
+        border-radius: 0.4em;
+        font-weight: 600;
+    }
+
+    .terms-container p {
+        margin-bottom: 1em;
+        font-size: 1.06em;
+        line-height: 1.6;
+    }
+
+    .terms-container hr {
+        border: 0;
+        border-top: 1px solid rgba(37, 99, 235, 0.18);
+        margin: 1.2rem 0;
+    }
+
+    .terms-container a {
+        color: #2563eb;
+        text-decoration: underline;
+    }
+
+    @media (max-width: 700px) {
+        .terms-container {
+            padding: 1.2rem 0.5rem;
+            border-radius: 0.7rem;
+        }
+
+        .terms-container h1 {
+            font-size: 1.3rem;
+        }
+
+        .terms-container h2 {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+
+
+<main>
+    <div class="terms-container">
+        <h1>Privacy Policy – Knowix</h1>
+
+        <h2>1. Úvod</h2>
+        <p>
+            Knowix je neziskový projekt a webová aplikace zaměřená na vzdělávání a procvičování jazyků.
+            Tyto zásady ochrany osobních údajů popisují, jaké údaje shromažďujeme, jak je používáme a jak jsou chráněny.
+        </p>
+        <p>Používáním aplikace Knowix souhlasíš s těmito zásadami.</p>
+        <hr>
+
+        <h2>2. Jaké údaje shromažďujeme</h2>
+        <p>Knowix může shromažďovat následující osobní údaje:</p>
+        <ul>
+            <li>e-mailová adresa</li>
+            <li>uživatelské jméno nebo jméno a příjmení</li>
+            <li>údaje z lekcí (odpovědi, postup, XP, streaky, statistiky)</li>
+            <li>škola zadaná při registraci (nepovinné, možnost přidat vlastní školu)</li>
+            <li>informace o účtu při přihlášení přes Google (Google OAuth)</li>
+        </ul>
+        <p>
+            Dále mohou být automaticky zpracovávány technické údaje (např. IP adresa) za účelem bezpečnosti a správného
+            fungování aplikace.
+        </p>
+        <hr>
+
+        <h2>3. Jak údaje používáme</h2>
+        <p>Shromážděná data používáme výhradně k těmto účelům:</p>
+        <ul>
+            <li>správa uživatelského účtu</li>
+            <li>ukládání postupu v lekcích</li>
+            <li>zobrazování statistik uživateli (XP, streaky, user stats)</li>
+            <li>trénování a zlepšování AI funkcí v rámci aplikace</li>
+            <li>zajištění bezpečnosti a stability systému</li>
+        </ul>
+        <p>
+            Knowix nevyužívá osobní údaje pro marketing, neprodává je a nepředává je třetím stranám pro reklamní účely.
+        </p>
+        <hr>
+
+        <h2>4. Přihlášení přes Google</h2>
+        <p>
+            Knowix umožňuje přihlášení pomocí účtu Google. Při tomto přihlášení získáváme pouze základní údaje nutné
+            k vytvoření a správě účtu (např. e-mail a jméno), v souladu se zásadami Google.
+        </p>
+        <hr>
+
+        <h2>5. Třetí strany a API</h2>
+        <p>Knowix využívá služby třetích stran:</p>
+        <ul>
+            <li>Genius API – pro práci s texty písní</li>
+            <li>DeepL API – pro překlady</li>
+            <li>AIML API – pro AI funkce</li>
+        </ul>
+        <p>
+            Tyto služby mají vlastní zásady ochrany osobních údajů. Knowix jim nepředává žádná data nad rámec nezbytného
+            technického fungování.
+        </p>
+        <hr>
+
+        <h2>6. Cookies</h2>
+        <p>Knowix používá cookies pouze pro technické a funkční účely (např. přihlášení uživatele).</p>
+        <p>
+            Podrobné informace o cookies jsou dostupné zde:
+            <a href="https://www.knowix.cz/cookies">https://www.knowix.cz/cookies</a>
+        </p>
+        <hr>
+
+        <h2>7. Ukládání a ochrana dat</h2>
+        <p>
+            Veškerá data jsou ukládána v databázi a chráněna proti neoprávněnému přístupu. Přístup k datům má pouze
+            majitel projektu Knowix.
+        </p>
+        <p>Jsou přijata technická opatření k ochraně dat před zneužitím, ztrátou nebo útoky.</p>
+        <hr>
+
+        <h2>8. Práva uživatele</h2>
+        <p>Uživatel má právo:</p>
+        <ul>
+            <li>zobrazit své statistiky a údaje</li>
+            <li>upravit profil (např. profilovou fotku)</li>
+            <li>vypnout e-mailové nebo push notifikace</li>
+            <li>vytvořit další účet</li>
+            <li>požádat o smazání účtu a osobních údajů</li>
+        </ul>
+        <hr>
+
+        <h2>9. Podmínky používání</h2>
+        <p>
+            Používání aplikace Knowix se řídí také podmínkami služby:
+            <a href="https://www.knowix.cz/terms">https://www.knowix.cz/terms</a>
+        </p>
+        <hr>
+
+        <h2>10. Změny zásad</h2>
+        <p>
+            Tyto zásady mohou být v budoucnu aktualizovány. Aktuální verze bude vždy dostupná na webu Knowix.
+        </p>
+
+        <p style="text-align:center; margin-top:1.5em; color:#2563eb; font-weight:600;">
+            Děkujeme, že používáš Knowix!
+        </p>
+    </div>
+</main>
+<script>const CSRF_TOKEN = "{{ csrf_token() }}";</script>
+<script>
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        fetch('/set_theme', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
+            body: JSON.stringify({
+                theme: document.body.classList.contains('dark-mode') ? 'light' : 'dark',
+                csrf_token: CSRF_TOKEN
+            })
+        }).then(r => {
+            if (r.ok) {
+                document.body.classList.toggle('dark-mode');
+                sessionStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            }
+        });
+    });
+</script>
+{% endblock %}
