@@ -198,8 +198,8 @@ def sitemap():
 
 
 @app.route('/privacy')
-def sitemap():
-    return send_from_directory('templates', 'privacy.hzml')
+def kontakty():
+    return render_template('privacy.html')
 
 
 @app.route('/favicon.ico')
