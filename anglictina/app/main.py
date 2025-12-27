@@ -198,7 +198,7 @@ def sitemap():
 
 
 @app.route('/privacy')
-def kontakty():
+def privacy():
     return render_template('privacy.html')
 
 
