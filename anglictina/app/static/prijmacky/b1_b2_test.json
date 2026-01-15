@@ -1,0 +1,564 @@
+{
+  "id": "prijmacky-b1b2-001",
+  "level": "B1-B2",
+  "time_limit": 45,
+  "sections": [
+    {
+      "type": "grammar",
+      "title": "Grammar & Use of English",
+      "questions": [
+        {
+          "id": "b1-g-1",
+          "format": "mcq",
+          "prompt": "I ___ never been to London.",
+          "options": [
+            "have",
+            "has",
+            "had",
+            "having"
+          ],
+          "correct": [
+            "have"
+          ],
+          "explanation": "Present perfect."
+        },
+        {
+          "id": "b1-g-2",
+          "format": "mcq",
+          "prompt": "If I ___ more time, I would travel more.",
+          "options": [
+            "have",
+            "had",
+            "has",
+            "having"
+          ],
+          "correct": [
+            "had"
+          ],
+          "explanation": "Second conditional."
+        },
+        {
+          "id": "b1-g-3",
+          "format": "mcq",
+          "prompt": "She suggested ___ by train.",
+          "options": [
+            "go",
+            "going",
+            "to go",
+            "gone"
+          ],
+          "correct": [
+            "going"
+          ],
+          "explanation": "Suggest + -ing."
+        },
+        {
+          "id": "b1-g-4",
+          "format": "mcq",
+          "prompt": "By the time we arrived, the film ___.",
+          "options": [
+            "started",
+            "had started",
+            "starts",
+            "has started"
+          ],
+          "correct": [
+            "had started"
+          ],
+          "explanation": "Past perfect."
+        },
+        {
+          "id": "b1-g-5",
+          "format": "mcq",
+          "prompt": "You ___ smoke here. It's forbidden.",
+          "options": [
+            "must",
+            "mustn't",
+            "don't have to",
+            "should"
+          ],
+          "correct": [
+            "mustn't"
+          ],
+          "explanation": "Prohibition."
+        },
+        {
+          "id": "b1-g-6",
+          "format": "mcq",
+          "prompt": "I wish I ___ taller.",
+          "options": [
+            "am",
+            "was",
+            "were",
+            "will be"
+          ],
+          "correct": [
+            "were"
+          ],
+          "explanation": "Wish + past (were)."
+        },
+        {
+          "id": "b1-g-7",
+          "format": "mcq",
+          "prompt": "He said he ___ help me later.",
+          "options": [
+            "will",
+            "would",
+            "can",
+            "must"
+          ],
+          "correct": [
+            "would"
+          ],
+          "explanation": "Reported speech."
+        },
+        {
+          "id": "b1-g-8",
+          "format": "mcq",
+          "prompt": "Neither Tom nor Jane ___ coming.",
+          "options": [
+            "is",
+            "are",
+            "were",
+            "be"
+          ],
+          "correct": [
+            "is"
+          ],
+          "explanation": "Neither...nor agreement."
+        },
+        {
+          "id": "b1-g-9",
+          "format": "mcq",
+          "prompt": "I look forward to ___ from you.",
+          "options": [
+            "hear",
+            "hearing",
+            "to hear",
+            "heard"
+          ],
+          "correct": [
+            "hearing"
+          ],
+          "explanation": "look forward to + -ing."
+        },
+        {
+          "id": "b1-g-10",
+          "format": "mcq",
+          "prompt": "This is the person ___ car was stolen.",
+          "options": [
+            "who",
+            "which",
+            "whose",
+            "whom"
+          ],
+          "correct": [
+            "whose"
+          ],
+          "explanation": "Possessive relative."
+        }
+      ]
+    },
+    {
+      "type": "vocabulary",
+      "title": "Vocabulary",
+      "questions": [
+        {
+          "id": "b1-v-1",
+          "format": "mcq",
+          "prompt": "He finally ___ a decision.",
+          "options": [
+            "did",
+            "made",
+            "took",
+            "put"
+          ],
+          "correct": [
+            "made"
+          ],
+          "explanation": "make a decision."
+        },
+        {
+          "id": "b1-v-2",
+          "format": "mcq",
+          "prompt": "This film is really ___.",
+          "options": [
+            "excite",
+            "exciting",
+            "excited",
+            "excitement"
+          ],
+          "correct": [
+            "exciting"
+          ],
+          "explanation": "-ing describes the thing."
+        },
+        {
+          "id": "b1-v-3",
+          "format": "mcq",
+          "prompt": "False friend: 'eventually' means:",
+          "options": [
+            "nakonec",
+            "eventuálně",
+            "případně",
+            "okamžitě"
+          ],
+          "correct": [
+            "nakonec"
+          ],
+          "explanation": "Eventually = in the end."
+        },
+        {
+          "id": "b1-v-4",
+          "format": "mcq",
+          "prompt": "She applied ___ the job.",
+          "options": [
+            "for",
+            "to",
+            "at",
+            "in"
+          ],
+          "correct": [
+            "for"
+          ],
+          "explanation": "apply for a job."
+        },
+        {
+          "id": "b1-v-5",
+          "format": "mcq",
+          "prompt": "I can't ___ to buy it.",
+          "options": [
+            "affect",
+            "afford",
+            "effort",
+            "avoid"
+          ],
+          "correct": [
+            "afford"
+          ],
+          "explanation": "afford = mít dost peněz."
+        },
+        {
+          "id": "b1-v-6",
+          "format": "mcq",
+          "prompt": "The lecture was so ___ that I nearly fell asleep.",
+          "options": [
+            "boring",
+            "bored",
+            "interest",
+            "interested"
+          ],
+          "correct": [
+            "boring"
+          ],
+          "explanation": "-ing describes the lecture."
+        },
+        {
+          "id": "b1-v-7",
+          "format": "mcq",
+          "prompt": "He is responsible ___ the project.",
+          "options": [
+            "of",
+            "for",
+            "to",
+            "with"
+          ],
+          "correct": [
+            "for"
+          ],
+          "explanation": "responsible for."
+        },
+        {
+          "id": "b1-v-8",
+          "format": "mcq",
+          "prompt": "Let's ___ up this issue tomorrow.",
+          "options": [
+            "bring",
+            "take",
+            "make",
+            "do"
+          ],
+          "correct": [
+            "bring"
+          ],
+          "explanation": "bring up = otevřít téma."
+        },
+        {
+          "id": "b1-v-9",
+          "format": "mcq",
+          "prompt": "We ran ___ sugar, so I went to the shop.",
+          "options": [
+            "out of",
+            "into",
+            "over",
+            "up"
+          ],
+          "correct": [
+            "out of"
+          ],
+          "explanation": "run out of."
+        },
+        {
+          "id": "b1-v-10",
+          "format": "mcq",
+          "prompt": "I prefer tea ___ coffee.",
+          "options": [
+            "than",
+            "to",
+            "from",
+            "with"
+          ],
+          "correct": [
+            "to"
+          ],
+          "explanation": "prefer X to Y."
+        }
+      ]
+    },
+    {
+      "type": "reading",
+      "title": "Reading comprehension",
+      "passage": "When I started university, I expected to have lots of free time. However, I quickly realised that studying required much more organisation than I had imagined. Between lectures, part-time work, and preparing for exams, my days became surprisingly busy. The biggest change was learning how to plan ahead: I now write weekly to-do lists and set realistic goals. Although it can be stressful, I feel more independent and confident than before.",
+      "questions": [
+        {
+          "id": "b1-r-1",
+          "format": "mcq",
+          "prompt": "What did the writer NOT expect about university?",
+          "options": [
+            "Having lots of free time",
+            "Needing organisation",
+            "Being busy",
+            "Planning ahead"
+          ],
+          "correct": [
+            "Needing organisation"
+          ],
+          "explanation": "They expected free time, not organisation."
+        },
+        {
+          "id": "b1-r-2",
+          "format": "true_false",
+          "prompt": "The writer feels less confident now.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correct": [
+            "False"
+          ],
+          "explanation": "They feel more confident."
+        },
+        {
+          "id": "b1-r-3",
+          "format": "mcq",
+          "prompt": "What helps the writer plan better?",
+          "options": [
+            "Weekly to-do lists",
+            "More lectures",
+            "Less work",
+            "No exams"
+          ],
+          "correct": [
+            "Weekly to-do lists"
+          ],
+          "explanation": "They write weekly to-do lists."
+        },
+        {
+          "id": "b1-r-4",
+          "format": "mcq",
+          "prompt": "Which statement is true?",
+          "options": [
+            "University was easier than expected",
+            "Days became busy",
+            "They stopped working",
+            "They hate planning"
+          ],
+          "correct": [
+            "Days became busy"
+          ],
+          "explanation": "It became surprisingly busy."
+        }
+      ]
+    },
+    {
+      "type": "transformation",
+      "title": "Sentence transformation",
+      "questions": [
+        {
+          "id": "b1-t-1",
+          "format": "transform",
+          "prompt": "Rewrite using the word 'used' (do not change it): I often went swimming when I was a child.",
+          "correct": [
+            "I used to go swimming when I was a child."
+          ],
+          "alternatives": [
+            "When I was a child, I used to go swimming."
+          ],
+          "explanation": "used to = zvyky v minulosti."
+        },
+        {
+          "id": "b1-t-2",
+          "format": "transform",
+          "prompt": "Finish the sentence so it means the same: It's the first time I've tried sushi. I have never ___ before.",
+          "correct": [
+            "tried sushi"
+          ],
+          "alternatives": [
+            "tried sushi before"
+          ],
+          "explanation": "never tried sushi (before)."
+        },
+        {
+          "id": "b1-t-3",
+          "format": "transform",
+          "prompt": "Rewrite: I'm too tired to study. (use 'so')",
+          "correct": [
+            "I am so tired that I can't study."
+          ],
+          "alternatives": [
+            "I'm so tired that I cannot study."
+          ],
+          "explanation": "so...that."
+        }
+      ]
+    },
+    {
+      "type": "listening",
+      "title": "Listening (placeholder)",
+      "audio": null,
+      "passage": "(Listening text) Good morning everyone. This is a quick message about today's lesson. Unfortunately, the teacher has a high fever and won't be able to come to school. Because of that, the lesson is cancelled today. You don't need to do any extra homework, but please check the course page this afternoon in case there are updates. The lesson will take place next Monday at the usual time, in room 204. Please be on time, because we will start with a short revision quiz.",
+      "questions": [
+        {
+          "id": "b1-l-1",
+          "format": "mcq",
+          "prompt": "Why is the lesson cancelled?",
+          "options": [
+            "The teacher is ill",
+            "The classroom is closed",
+            "There is an exam",
+            "The teacher is late"
+          ],
+          "correct": [
+            "The teacher is ill"
+          ],
+          "explanation": "Because she has a high fever."
+        },
+        {
+          "id": "b1-l-2",
+          "format": "mcq",
+          "prompt": "Where will the replacement lesson take place?",
+          "options": [
+            "Room 104",
+            "Room 204",
+            "The gym",
+            "Online"
+          ],
+          "correct": [
+            "Room 204"
+          ],
+          "explanation": "It says: in room 204."
+        },
+        {
+          "id": "b1-l-3",
+          "format": "mcq",
+          "prompt": "What should students do this afternoon?",
+          "options": [
+            "Do extra homework",
+            "Check the course page for updates",
+            "Prepare a presentation",
+            "Meet the teacher"
+          ],
+          "correct": [
+            "Check the course page for updates"
+          ],
+          "explanation": "They should check the course page this afternoon."
+        },
+        {
+          "id": "b1-l-4",
+          "format": "true_false",
+          "prompt": "There will be a short revision quiz next Monday.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correct": [
+            "True"
+          ],
+          "explanation": "It says they will start with a short revision quiz."
+        }
+      ]
+    },
+    {
+      "type": "speaking",
+      "title": "Speaking (repeat / short answers)",
+      "instructions": "Klikni na Přehrát a zkus větu zopakovat nahlas. Tahle část se nepočítá do skóre – je to trénink výslovnosti a plynulosti.",
+      "questions": [
+        {
+          "id": "b1-s-1",
+          "format": "repeat",
+          "prompt": "Repeat: 'I'm calling to let you know that I can't make it today.'",
+          "tts": "I'm calling to let you know that I can't make it today.",
+          "correct": [],
+          "alternatives": [],
+          "explanation": "Trénuj spojování slov a přirozený rytmus."
+        },
+        {
+          "id": "b1-s-2",
+          "format": "repeat",
+          "prompt": "Repeat: 'Could you possibly send me the details by email?'",
+          "tts": "Could you possibly send me the details by email?",
+          "correct": [],
+          "alternatives": [],
+          "explanation": "Zdvořilá žádost (possibly)."
+        },
+        {
+          "id": "b1-s-3",
+          "format": "repeat",
+          "prompt": "Repeat: 'I was surprised to hear that the lesson was cancelled.'",
+          "tts": "I was surprised to hear that the lesson was cancelled.",
+          "correct": [],
+          "alternatives": [],
+          "explanation": "Pozor na výslovnost 'surprised' a 'cancelled'."
+        },
+        {
+          "id": "b1-s-4",
+          "format": "speak_answer",
+          "prompt": "Say 1–2 sentences: Explain why you couldn't attend a class and apologise.",
+          "tts": "Say one or two sentences. Explain why you couldn't attend a class and apologise.",
+          "correct": [],
+          "alternatives": [],
+          "explanation": "Otevřená odpověď – zkus použít because, sorry, couldn't."
+        }
+      ]
+    },
+    {
+      "type": "writing",
+      "title": "Writing (short)",
+      "questions": [
+        {
+          "id": "b1-w-1",
+          "format": "mcq",
+          "prompt": "Choose the best sentence for the start of a semi-formal email:",
+          "options": [
+            "Yo! What's up?",
+            "I am writing to ask for information about your course.",
+            "Gimme details.",
+            "Hey teacher!"
+          ],
+          "correct": [
+            "I am writing to ask for information about your course."
+          ],
+          "explanation": "Semi-formální styl."
+        },
+        {
+          "id": "b1-w-2",
+          "format": "short_answer",
+          "prompt": "Write 1–2 sentences: Reply to a friend who invited you to a party. Accept or refuse and give a reason.",
+          "correct": [],
+          "alternatives": [],
+          "explanation": "Otevřená odpověď (nepočítá se do skóre)."
+        }
+      ]
+    }
+  ]
+}

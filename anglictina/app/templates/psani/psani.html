@@ -340,6 +340,7 @@ li {
 
 <form method="POST" id="psani-form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="submit_token" id="submit_token" value="">
     <div id="toolbar">
       <span class="ql-formats">
         <select class="ql-size">
@@ -421,7 +422,7 @@ li {
 </ul>
 
 <footer>
-    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p>&copy; 2026 Knowix. Všechna práva vyhrazena.</p>
     <p class="footer-signature">
         Made with ❤️ by
         <a href="https://ko-fi.com/voku199" target="_blank"
@@ -517,6 +518,18 @@ li {
     });
   });
 });
+    // Jednoduchý anti-double-submit token (na backendu se použije pro idempotenci uložení)
+    (function () {
+        try {
+            var el = document.getElementById('submit_token');
+            if (el && !el.value) {
+                el.value = (Date.now().toString(36) + Math.random().toString(36).slice(2));
+            }
+        } catch (e) {
+            // ignore
+        }
+    })();
 </script>
 </body>
 </html>
+

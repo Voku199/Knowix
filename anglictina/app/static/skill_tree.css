@@ -1,0 +1,333 @@
+/* Home / Skill tree styles (extracted from index.html to avoid inline <style> parser issues) */
+
+.home-wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 22px 16px 42px;
+}
+
+.home-hero {
+    text-align: center;
+    margin: 10px 0 14px;
+}
+
+.home-hero .logo-name {
+    font-size: 3.2rem;
+    color: #2c3e50;
+    text-transform: lowercase;
+    margin: 0 0 6px;
+    letter-spacing: -2px;
+}
+
+body.dark-mode .home-hero .logo-name {
+    color: #e9eef6;
+}
+
+.home-hero .motto {
+    margin: 0;
+    color: #666;
+    font-weight: 600;
+}
+
+body.dark-mode .home-hero .motto {
+    color: #b7c0cc;
+}
+
+.phase-meta {
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #6b7280;
+}
+
+body.dark-mode .phase-meta {
+    color: #9ca3af;
+}
+
+.phase-menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin: 10px 0 14px;
+}
+
+.phase-btn {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: rgba(255, 255, 255, 0.85);
+    color: #111;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+body.dark-mode .phase-btn {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(17, 24, 39, 0.65);
+    color: #f3f4f6;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
+}
+
+.phase-btn:hover {
+    transform: translateY(-1px);
+}
+
+.phase-btn.active {
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    color: #fff;
+    border: none;
+}
+
+.phase-btn.locked {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.phase-btn.locked:hover {
+    transform: none;
+}
+
+.skill-tree {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 10 / 9;
+    min-height: 520px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+body.dark-mode .skill-tree {
+    background: rgba(24, 26, 31, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
+}
+
+.skill-tree svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.skill-path {
+    stroke: rgba(79, 70, 229, 0.55);
+    stroke-width: 8;
+    stroke-linecap: round;
+    fill: none;
+}
+
+body.dark-mode .skill-path {
+    stroke: rgba(99, 102, 241, 0.55);
+}
+
+.skill-nodes {
+    position: absolute;
+    inset: 0;
+}
+
+.skill-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    user-select: none;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
+    border: 3px solid rgba(255, 255, 255, 0.85);
+    transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.skill-node:hover {
+    /* Jemné "nadlehčení" jako u .motto:hover (jen malý pohyb) */
+    transform: translate(-50%, -50%) translateY(-2px) scale(1.04);
+    box-shadow: 0 14px 26px rgba(0, 0, 0, 0.25);
+}
+
+.skill-node:active {
+    transform: translate(-50%, -50%) scale(0.98);
+}
+
+.skill-node .node-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.skill-node.locked {
+    background: linear-gradient(135deg, #9ca3af, #6b7280);
+    cursor: not-allowed;
+    filter: grayscale(20%);
+}
+
+body.dark-mode .skill-node.locked {
+    background: linear-gradient(135deg, #4b5563, #374151);
+}
+
+.skill-node.locked:hover {
+    transform: translate(-50%, -50%);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
+}
+
+.node-label {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 8px);
+    transform: translateX(-50%);
+    width: 160px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #111827;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 6px 8px;
+    backdrop-filter: blur(6px);
+}
+
+body.dark-mode .node-label {
+    color: #e5e7eb;
+    background: rgba(17, 24, 39, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.skill-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+    display: none;
+    z-index: 10000;
+}
+
+.skill-modal {
+    position: fixed;
+    z-index: 10001;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(560px, calc(100% - 32px));
+    background: rgba(255, 255, 255, 0.98);
+    color: #111;
+    border-radius: 16px;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+    padding: 16px;
+    display: none;
+}
+
+body.dark-mode .skill-modal {
+    background: rgba(17, 24, 39, 0.98);
+    color: #f3f4f6;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.skill-modal h3 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.skill-modal p {
+    margin: 10px 0;
+    line-height: 1.5;
+    color: inherit;
+    opacity: 0.92;
+}
+
+.skill-modal .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    color: inherit;
+    font-weight: 700;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+body.dark-mode .btn-secondary {
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    color: #fff;
+    font-weight: 800;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.btn-primary[disabled] {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.below-tree {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+.go-english {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    color: #111;
+    font-weight: 800;
+    text-decoration: none;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .go-english {
+    background: rgba(17, 24, 39, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #f3f4f6;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 640px) {
+    .skill-tree {
+        min-height: 480px;
+    }
+
+    .skill-node {
+        width: 62px;
+        height: 62px;
+    }
+
+    .node-label {
+        width: 150px;
+    }
+}

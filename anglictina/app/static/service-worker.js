@@ -108,6 +108,10 @@ self.addEventListener('fetch', (event) => {
     // Ignoruj vše mimo http/https (např. chrome-extension://)
     if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
 
+    if (url.origin !== self.location.origin) {
+        return;
+    }
+
     // Navigace (HTML stránky) – network first s fallbackem
     if (request.mode === 'navigate') {
         event.respondWith(

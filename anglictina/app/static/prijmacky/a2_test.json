@@ -1,0 +1,536 @@
+{
+  "id": "prijmacky-a2-001",
+  "level": "A2",
+  "time_limit": 35,
+  "sections": [
+    {
+      "type": "grammar",
+      "title": "Grammar & Use of English",
+      "questions": [
+        {
+          "id": "a2-g-1",
+          "format": "mcq",
+          "prompt": "I ___ to school every day.",
+          "options": [
+            "go",
+            "goes",
+            "going",
+            "gone"
+          ],
+          "correct": [
+            "go"
+          ],
+          "explanation": "Present simple: I go."
+        },
+        {
+          "id": "a2-g-2",
+          "format": "mcq",
+          "prompt": "She ___ in Brno.",
+          "options": [
+            "live",
+            "lives",
+            "living",
+            "lived"
+          ],
+          "correct": [
+            "lives"
+          ],
+          "explanation": "3rd person singular: lives."
+        },
+        {
+          "id": "a2-g-3",
+          "format": "mcq",
+          "prompt": "They ___ TV now.",
+          "options": [
+            "watch",
+            "watches",
+            "are watching",
+            "watched"
+          ],
+          "correct": [
+            "are watching"
+          ],
+          "explanation": "Present continuous: are watching."
+        },
+        {
+          "id": "a2-g-4",
+          "format": "mcq",
+          "prompt": "We ___ a dog.",
+          "options": [
+            "has",
+            "have",
+            "having",
+            "had"
+          ],
+          "correct": [
+            "have"
+          ],
+          "explanation": "I/you/we/they: have."
+        },
+        {
+          "id": "a2-g-5",
+          "format": "mcq",
+          "prompt": "He ___ like coffee.",
+          "options": [
+            "don't",
+            "doesn't",
+            "isn't",
+            "can't"
+          ],
+          "correct": [
+            "doesn't"
+          ],
+          "explanation": "He/She/It: doesn't."
+        },
+        {
+          "id": "a2-g-6",
+          "format": "mcq",
+          "prompt": "___ you play tennis?",
+          "options": [
+            "Do",
+            "Does",
+            "Did",
+            "Are"
+          ],
+          "correct": [
+            "Do"
+          ],
+          "explanation": "Questions with do for you/we/they."
+        },
+        {
+          "id": "a2-g-7",
+          "format": "mcq",
+          "prompt": "I was born ___ 2008.",
+          "options": [
+            "in",
+            "on",
+            "at",
+            "for"
+          ],
+          "correct": [
+            "in"
+          ],
+          "explanation": "Years: in 2008."
+        },
+        {
+          "id": "a2-g-8",
+          "format": "mcq",
+          "prompt": "There ___ some milk in the fridge.",
+          "options": [
+            "is",
+            "are",
+            "be",
+            "were"
+          ],
+          "correct": [
+            "is"
+          ],
+          "explanation": "Uncountable: is."
+        },
+        {
+          "id": "a2-g-9",
+          "format": "mcq",
+          "prompt": "We ___ to the cinema yesterday.",
+          "options": [
+            "go",
+            "went",
+            "gone",
+            "going"
+          ],
+          "correct": [
+            "went"
+          ],
+          "explanation": "Past simple of go: went."
+        },
+        {
+          "id": "a2-g-10",
+          "format": "mcq",
+          "prompt": "Can you ___ me?",
+          "options": [
+            "help",
+            "helps",
+            "helping",
+            "helped"
+          ],
+          "correct": [
+            "help"
+          ],
+          "explanation": "Modal verb + base form."
+        }
+      ]
+    },
+    {
+      "type": "vocabulary",
+      "title": "Vocabulary",
+      "questions": [
+        {
+          "id": "a2-v-1",
+          "format": "mcq",
+          "prompt": "I'm ___ because I worked all day.",
+          "options": [
+            "tired",
+            "hungry",
+            "angry",
+            "cold"
+          ],
+          "correct": [
+            "tired"
+          ],
+          "explanation": "Tired = unavený."
+        },
+        {
+          "id": "a2-v-2",
+          "format": "mcq",
+          "prompt": "Can I have a glass of ___, please?",
+          "options": [
+            "water",
+            "rice",
+            "bread",
+            "tea"
+          ],
+          "correct": [
+            "water"
+          ],
+          "explanation": "A glass of water."
+        },
+        {
+          "id": "a2-v-3",
+          "format": "mcq",
+          "prompt": "My uncle is a ___. He works in a hospital.",
+          "options": [
+            "teacher",
+            "doctor",
+            "driver",
+            "singer"
+          ],
+          "correct": [
+            "doctor"
+          ],
+          "explanation": "Hospital → doctor."
+        },
+        {
+          "id": "a2-v-4",
+          "format": "mcq",
+          "prompt": "I usually ___ a shower in the morning.",
+          "options": [
+            "do",
+            "make",
+            "take",
+            "have"
+          ],
+          "correct": [
+            "have"
+          ],
+          "explanation": "Collocation: have a shower."
+        },
+        {
+          "id": "a2-v-5",
+          "format": "mcq",
+          "prompt": "Opposite of 'cheap' is ___.",
+          "options": [
+            "expensive",
+            "small",
+            "late",
+            "old"
+          ],
+          "correct": [
+            "expensive"
+          ],
+          "explanation": "cheap ↔ expensive."
+        },
+        {
+          "id": "a2-v-6",
+          "format": "mcq",
+          "prompt": "I need to buy some ___.",
+          "options": [
+            "food",
+            "chairs",
+            "cars",
+            "keys"
+          ],
+          "correct": [
+            "food"
+          ],
+          "explanation": "General word: food."
+        },
+        {
+          "id": "a2-v-7",
+          "format": "mcq",
+          "prompt": "False friend: 'actual' means:",
+          "options": [
+            "skutečný",
+            "aktuální",
+            "herec",
+            "aktivní"
+          ],
+          "correct": [
+            "skutečný"
+          ],
+          "explanation": "Actual = real."
+        },
+        {
+          "id": "a2-v-8",
+          "format": "mcq",
+          "prompt": "We ___ a bus at the bus stop.",
+          "options": [
+            "wait",
+            "wait for",
+            "waits",
+            "waiting"
+          ],
+          "correct": [
+            "wait for"
+          ],
+          "explanation": "wait for something."
+        },
+        {
+          "id": "a2-v-9",
+          "format": "mcq",
+          "prompt": "It's ___ today. Let's wear a jacket.",
+          "options": [
+            "sunny",
+            "warm",
+            "cold",
+            "easy"
+          ],
+          "correct": [
+            "cold"
+          ],
+          "explanation": "Cold → jacket."
+        },
+        {
+          "id": "a2-v-10",
+          "format": "mcq",
+          "prompt": "Choose: I ___ my homework every day.",
+          "options": [
+            "do",
+            "make",
+            "take",
+            "get"
+          ],
+          "correct": [
+            "do"
+          ],
+          "explanation": "do homework."
+        }
+      ]
+    },
+    {
+      "type": "reading",
+      "title": "Reading comprehension",
+      "passage": "Hi! My name is Tom. I'm 16 years old and I live in a small town. On weekdays, I get up at 6:30, have breakfast, and go to school by bus. After school, I usually do my homework and then I play football with my friends. At the weekend, I like watching movies and visiting my grandparents.",
+      "questions": [
+        {
+          "id": "a2-r-1",
+          "format": "mcq",
+          "prompt": "How does Tom go to school?",
+          "options": [
+            "By bus",
+            "By car",
+            "On foot",
+            "By train"
+          ],
+          "correct": [
+            "By bus"
+          ],
+          "explanation": "In the text: 'go to school by bus'."
+        },
+        {
+          "id": "a2-r-2",
+          "format": "true_false",
+          "prompt": "Tom plays football after school.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correct": [
+            "True"
+          ],
+          "explanation": "He plays football after school."
+        },
+        {
+          "id": "a2-r-3",
+          "format": "mcq",
+          "prompt": "What does Tom do at the weekend?",
+          "options": [
+            "He visits grandparents",
+            "He works",
+            "He goes to school",
+            "He sleeps all day"
+          ],
+          "correct": [
+            "He visits grandparents"
+          ],
+          "explanation": "Weekend: visiting grandparents."
+        },
+        {
+          "id": "a2-r-4",
+          "format": "mcq",
+          "prompt": "How old is Tom?",
+          "options": [
+            "15",
+            "16",
+            "17",
+            "18"
+          ],
+          "correct": [
+            "16"
+          ],
+          "explanation": "He says: I'm 16 years old."
+        }
+      ]
+    },
+    {
+      "type": "transformation",
+      "title": "Sentence transformation",
+      "questions": [
+        {
+          "id": "a2-t-1",
+          "format": "transform",
+          "prompt": "Rewrite using 'because': I stayed at home. I was sick.",
+          "correct": [
+            "I stayed at home because I was sick."
+          ],
+          "alternatives": [
+            "Because I was sick, I stayed at home."
+          ],
+          "explanation": "because spojuje věty."
+        },
+        {
+          "id": "a2-t-2",
+          "format": "transform",
+          "prompt": "Rewrite using 'and': I like tea. I like coffee.",
+          "correct": [
+            "I like tea and coffee."
+          ],
+          "alternatives": [
+            "I like tea and I like coffee."
+          ],
+          "explanation": "Spojíme pomocí and."
+        },
+        {
+          "id": "a2-t-3",
+          "format": "transform",
+          "prompt": "Rewrite using 'can': It is possible for me to swim.",
+          "correct": [
+            "I can swim."
+          ],
+          "alternatives": [
+            "I can swim"
+          ],
+          "explanation": "Can vyjadřuje schopnost."
+        }
+      ]
+    },
+    {
+      "type": "listening",
+      "title": "Listening (placeholder)",
+      "audio": null,
+      "passage": "(Listening text) The train to Prague will leave from platform 3 at 10:15.",
+      "questions": [
+        {
+          "id": "a2-l-1",
+          "format": "mcq",
+          "prompt": "What platform will the train leave from?",
+          "options": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "correct": [
+            "3"
+          ],
+          "explanation": "It says platform 3."
+        },
+        {
+          "id": "a2-l-2",
+          "format": "mcq",
+          "prompt": "What time will it leave?",
+          "options": [
+            "9:15",
+            "10:15",
+            "11:15",
+            "12:15"
+          ],
+          "correct": [
+            "10:15"
+          ],
+          "explanation": "It says 10:15."
+        }
+      ]
+    },
+    {
+      "type": "speaking",
+      "title": "Speaking (repeat / short answers)",
+      "instructions": "Klikni na Přehrát a zkus větu zopakovat nahlas. U některých úloh můžeš také myšlenku napsat (volitelné). Sekce se nepočítá do skóre.",
+      "questions": [
+        {
+          "id": "a2-s-1",
+          "format": "repeat",
+          "prompt": "Repeat: 'Could you help me, please?'",
+          "tts": "Could you help me, please?",
+          "correct": [],
+          "alternatives": [],
+          "explanation": "Trénuj výslovnost a zdvořilostní frázi."
+        },
+        {
+          "id": "a2-s-2",
+          "format": "repeat",
+          "prompt": "Repeat: 'I would like a glass of water.'",
+          "tts": "I would like a glass of water.",
+          "correct": [],
+          "alternatives": [],
+          "explanation": "Zaměř se na rytmus věty."
+        },
+        {
+          "id": "a2-s-3",
+          "format": "repeat",
+          "prompt": "Repeat: 'I get up at half past six.'",
+          "tts": "I get up at half past six.",
+          "correct": [],
+          "alternatives": [],
+          "explanation": "Procvič časové výrazy."
+        },
+        {
+          "id": "a2-s-4",
+          "format": "speak_answer",
+          "prompt": "Say 1 short sentence about today’s weather.",
+          "tts": "Say one short sentence about today's weather.",
+          "correct": [],
+          "alternatives": [],
+          "explanation": "Otevřená odpověď – napiš si ji klidně i do políčka."
+        }
+      ]
+    },
+    {
+      "type": "writing",
+      "title": "Writing (short)",
+      "questions": [
+        {
+          "id": "a2-w-1",
+          "format": "short_answer",
+          "prompt": "Write 1–2 sentences: Describe your favourite hobby.",
+          "correct": [],
+          "alternatives": [],
+          "explanation": "Otevřená odpověď (nepočítá se do skóre)."
+        },
+        {
+          "id": "a2-w-2",
+          "format": "mcq",
+          "prompt": "Choose the best closing for an email to a friend:",
+          "options": [
+            "Yours faithfully,",
+            "Best wishes,",
+            "Dear Sir or Madam,",
+            "To whom it may concern,"
+          ],
+          "correct": [
+            "Best wishes,"
+          ],
+          "explanation": "Neformální email."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Knowix – zábavná angličtina zdarma</title>
+
+    <style>
+        :root {
+            /* Brand barvy */
+            --bg: #fefefe; /* pozadí */
+            --muted: #c4c2c1; /* vedlejší */
+            --surface: #f5f5f5; /* vedlejší */
+            --text: #292929; /* hlavní text */
+
+            /* UI */
+            --border: rgba(41, 41, 41, .14);
+            --shadow: 0 18px 50px rgba(41, 41, 41, .12);
+            --radius: 18px;
+            --max: 1120px;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html, body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            color: var(--text);
+            background: radial-gradient(900px 600px at 60% -10%, rgba(196, 194, 193, .35), transparent 60%),
+            radial-gradient(900px 600px at 10% 10%, rgba(245, 245, 245, .95), transparent 55%),
+            linear-gradient(180deg, var(--bg) 0%, #ffffff 100%);
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none
+        }
+
+        .container {
+            max-width: var(--max);
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Top nav */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(14px);
+            background: rgba(254, 254, 254, .82);
+            border-bottom: 1px solid rgba(41, 41, 41, .10);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .brand-logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: var(--surface);
+            border: 1px solid rgba(41, 41, 41, .10);
+            box-shadow: 0 10px 24px rgba(41, 41, 41, .10);
+            overflow: hidden;
+            display: grid;
+            place-items: center;
+        }
+
+        .brand-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .brand-name {
+            font-weight: 750;
+            letter-spacing: .2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nav-cta {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(41, 41, 41, .16);
+            background: rgba(245, 245, 245, .92);
+            color: var(--text);
+            font-weight: 650;
+            letter-spacing: .2px;
+            transition: transform .18s ease, background .18s ease, border-color .18s ease;
+            user-select: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            background: rgba(245, 245, 245, 1);
+            border-color: rgba(41, 41, 41, .26)
+        }
+
+        .btn:active {
+            transform: translateY(0px) scale(.99)
+        }
+
+        .btn-primary {
+            border-color: rgba(41, 41, 41, .38);
+            background: var(--text);
+            color: #fefefe;
+        }
+
+        .btn-primary:hover {
+            border-color: rgba(41, 41, 41, .55);
+            background: #1f1f1f;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border-color: rgba(41, 41, 41, .14);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 64px 0 36px;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.15fr .85fr;
+            gap: 28px;
+            align-items: center;
+        }
+
+        .eyebrow {
+            color: rgba(41, 41, 41, .72);
+            font-weight: 650;
+            letter-spacing: .3px;
+            font-size: 13px;
+        }
+
+        h1 {
+            margin: 10px 0 10px;
+            font-size: clamp(36px, 4.6vw, 60px);
+            line-height: 1.02;
+            letter-spacing: -.8px;
+            font-weight: 820;
+        }
+
+        .sub {
+            color: rgba(41, 41, 41, .72);
+            font-size: 19px;
+            line-height: 1.65;
+            max-width: 62ch;
+            font-weight: 600;
+        }
+
+        .cta-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 22px;
+        }
+
+        .small-link {
+            color: rgba(41, 41, 41, .70);
+            font-weight: 650;
+            font-size: 14px;
+            padding: 8px 2px;
+        }
+
+        .small-link:hover {
+            color: rgba(41, 41, 41, .95)
+        }
+
+        /* Mock preview */
+        .preview {
+            border-radius: var(--radius);
+            border: 1px solid rgba(41, 41, 41, .14);
+            background: linear-gradient(180deg, rgba(245, 245, 245, .90), rgba(254, 254, 254, .98));
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            min-height: 360px;
+            position: relative;
+        }
+
+        .preview-top {
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            border-bottom: 1px solid rgba(41, 41, 41, .10);
+            background: rgba(245, 245, 245, .85);
+        }
+
+        .dots {
+            display: flex;
+            gap: 6px
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(41, 41, 41, .16)
+        }
+
+        .preview-body {
+            padding: 18px
+        }
+
+        .chip-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 14px
+        }
+
+        .chip {
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(41, 41, 41, .12);
+            background: rgba(254, 254, 254, .9);
+            color: rgba(41, 41, 41, .72);
+            font-weight: 650;
+            font-size: 13px
+        }
+
+        .card-stack {
+            display: grid;
+            gap: 12px
+        }
+
+        .mini {
+            padding: 14px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(41, 41, 41, .12);
+            background: rgba(254, 254, 254, .92);
+        }
+
+        .mini h3 {
+            margin: 0 0 8px;
+            font-size: 15px;
+            letter-spacing: -.1px;
+            font-weight: 850;
+        }
+
+        .mini p {
+            margin: 0;
+            color: rgba(41, 41, 41, .68);
+            font-size: 14px;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        .float {
+            position: absolute;
+            inset: auto auto 22px 22px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            border: 1px solid rgba(41, 41, 41, .12);
+            background: rgba(254, 254, 254, .86);
+            backdrop-filter: blur(10px);
+            color: rgba(41, 41, 41, .72);
+            font-weight: 650;
+            font-size: 13px;
+        }
+
+        /* Sections */
+        .section {
+            padding: 54px 0;
+        }
+
+        .section-title {
+            font-size: 26px;
+            letter-spacing: -.35px;
+            margin: 0 0 12px;
+            font-weight: 820;
+        }
+
+        .section-lead {
+            margin: 0 0 22px;
+            color: rgba(41, 41, 41, .72);
+            line-height: 1.75;
+            max-width: 78ch;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .panel {
+            border-radius: var(--radius);
+            border: 1px solid rgba(41, 41, 41, .12);
+            background: rgba(245, 245, 245, .92);
+            box-shadow: 0 16px 45px rgba(41, 41, 41, .08);
+            padding: 18px;
+        }
+
+        .bullets {
+            display: grid;
+            gap: 12px;
+            margin: 0;
+            padding: 0;
+            list-style: none
+        }
+
+        .bullets li {
+            display: grid;
+            gap: 6px;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(41, 41, 41, .10);
+            background: rgba(254, 254, 254, .92);
+        }
+
+        .bullets strong {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: -.1px;
+        }
+
+        .bullets span {
+            color: rgba(41, 41, 41, .68);
+            font-size: 14px;
+            line-height: 1.65
+        }
+
+        .callout {
+            padding: 18px;
+            border-radius: var(--radius);
+            border: 1px solid rgba(41, 41, 41, .14);
+            background: rgba(254, 254, 254, .92);
+        }
+
+        .callout h3 {
+            margin: 0 0 8px;
+            font-size: 16px;
+            font-weight: 850;
+            letter-spacing: -.15px;
+        }
+
+        .callout p {
+            margin: 0;
+            color: rgba(41, 41, 41, .72);
+            line-height: 1.7;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        footer {
+            padding: 30px 0 50px;
+            border-top: 1px solid rgba(41, 41, 41, .10);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.2fr .8fr;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .footer-note {
+            color: rgba(41, 41, 41, .68);
+            line-height: 1.7;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: flex-end
+        }
+
+        .footer-links a {
+            color: rgba(41, 41, 41, .72);
+            font-weight: 650;
+            font-size: 14px
+        }
+
+        .footer-links a:hover {
+            color: rgba(41, 41, 41, .95)
+        }
+
+        /* Scroll reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(14px) scale(.99);
+            filter: blur(6px);
+            transition: opacity .7s ease, transform .7s ease, filter .7s ease;
+        }
+
+        .reveal.is-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+        }
+
+        /* Hero entrance */
+        .enter {
+            opacity: 0;
+            transform: translateY(14px);
+            animation: enter .8s ease forwards;
+        }
+
+        .enter.d2 {
+            animation-delay: .08s
+        }
+
+        .enter.d3 {
+            animation-delay: .14s
+        }
+
+        @keyframes enter {
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 920px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .preview {
+                min-height: 320px;
+            }
+
+            .split {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-links {
+                justify-content: flex-start
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                scroll-behavior: auto !important
+            }
+
+            .reveal, .enter {
+                opacity: 1 !important;
+                transform: none !important;
+                filter: none !important;
+                animation: none !important;
+            }
+
+            .btn {
+                transition: none !important
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header class="nav">
+    <div class="container nav-inner">
+        <a class="brand" href="/" aria-label="Knowix">
+            <div class="brand-logo" aria-hidden="true">
+                <img src="/favicon.ico" alt="Knowix" width="34" height="34" loading="eager" decoding="async">
+            </div>
+            <div class="brand-name">knowix</div>
+        </a>
+        <div class="nav-cta">
+            <a class="btn btn-ghost" href="/login">Přihlásit se</a>
+            <a class="btn btn-primary" href="/onboarding">Začít</a>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="hero">
+        <div class="container hero-grid">
+            <div>
+                <div class="eyebrow enter">Zábavná angličtina • zdarma • prakticky</div>
+                <h1 class="enter d2">Knowix.
+                    <span style="color:rgba(41,41,41,.78); font-weight:750">Angličtina, kterou fakt použiješ.</span>
+                </h1>
+                <p class="sub enter d3">
+                    Krátká cvičení, jasný postup a okamžitá zpětná vazba. Něco mezi UmímeTo a Duolingem,
+                    ale po česku a bez paywallu.
+                </p>
+
+                <div class="cta-row reveal" data-reveal>
+                    <a class="btn btn-primary" href="/onboarding">Začít s knowixem</a>
+                    <a class="btn" href="/anglictina">Přicházím ze školy</a>
+                    <a class="small-link" href="/login">Již mám účet</a>
+                </div>
+            </div>
+
+            <div class="preview reveal" data-reveal aria-label="Ukázka cvičení">
+                <div class="preview-top">
+                    <div class="dots" aria-hidden="true">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                    <div style="color:rgba(41,41,41,.72); font-weight:750; font-size:12px; letter-spacing:.2px">
+                        Preview
+                    </div>
+                </div>
+                <div class="preview-body">
+                    <div class="chip-row">
+                        <div class="chip">🎧 Poslech</div>
+                        <div class="chip">⚡ XP</div>
+                        <div class="chip">🔥 Streak</div>
+                        <div class="chip">🧠 Porozumění</div>
+                    </div>
+                    <div class="card-stack">
+                        <div class="mini">
+                            <h3>1 minuta</h3>
+                            <p>Krátké úkoly, které se dají zvládnout i mezi hodinami. Bez zbytečného klikání.</p>
+                        </div>
+                        <div class="mini">
+                            <h3>Okamžitá zpětná vazba</h3>
+                            <p>Hned víš, co je špatně a proč. Učení je rychlejší i zábavnější.</p>
+                        </div>
+                        <div class="mini">
+                            <h3>Motivace hrou</h3>
+                            <p>XP, odznaky a streaky. Každý den kousek dopředu.</p>
+                        </div>
+                    </div>
+                </div>
+                <!--                <div class="float">Tip: Scrollni dolů 👇</div>-->
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="reveal" data-reveal>
+                <div class="section-title">Co je to Knowix</div>
+                <p class="section-lead">
+                    Knowix je web zaměřený na praktickou angličtinu – to, co děti využijí v běžných situacích.
+                    Najdete tu i několik náročnějších gramatických cvičení, ale těžiště je v poslechu,
+                    porozumění a použití v praxi. Krátká cvičení, jasný postup a okamžitá zpětná vazba.
+                </p>
+            </div>
+
+            <div class="split">
+                <div class="panel reveal" data-reveal>
+                    <ul class="bullets">
+                        <li>
+                            <strong>🎯 Prakticky a rychle</strong>
+                            <span>Učíme to, co dává smysl v reálném životě. Minimum klikání, maximum pochopení.</span>
+                        </li>
+                        <li>
+                            <strong>🔥 Motivace hrou</strong>
+                            <span>Streaky, XP a odznaky drží motivaci – něco mezi UmímeTo a Duolingem, ale po česku a zdarma.</span>
+                        </li>
+                        <li>
+                            <strong>💸 Vždy zdarma</strong>
+                            <span>Učit se má možnost každý. Bez paywallu, bez licencí.</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="callout reveal" data-reveal>
+                    <h3>Hlavní cíl</h3>
+                    <p>
+                        Chceme, aby se žák naučil angličtinu tak, aby ji dokázal používat, rozuměl jí
+                        a věděl, o čem se lidé baví. Nejen testy, ale reálné situace.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="reveal" data-reveal>
+                <div class="section-title">V čem jsme jiný</div>
+                <p class="section-lead">Jednoduchost, porozumění a motivace. Bez zbytečného balastu.</p>
+            </div>
+
+            <div class="split">
+                <div class="panel reveal" data-reveal>
+                    <ul class="bullets">
+                        <li>
+                            <strong>🧠 Důraz na porozumění</strong>
+                            <span>Ne biflování, ale pochopení a použití. Psané i mluvené situace z praxe.</span>
+                        </li>
+                        <li>
+                            <strong>🏆 Herní prvky</strong>
+                            <span>XP, streaky a odměny pomáhají u učení vydržet – každý den kousek dopředu.</span>
+                        </li>
+                        <li>
+                            <strong>🛠️ Jednoduché pro školy</strong>
+                            <span>Skvělé jako doplněk do výuky: rychlé, přehledné a bez papírování navíc.</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="callout reveal" data-reveal>
+                    <h3>Pro koho to je?</h3>
+                    <p>
+                        Pro děti, rodiče i školy. Krátká cvičení fungují doma i ve třídě — stačí otevřít a jet.
+                    </p>
+                    <div style="height:12px"></div>
+                    <a class="btn btn-primary" href="/onboarding">Zkusím to</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="reveal" data-reveal>
+                <div class="section-title">Jak vznikl Knowix</div>
+                <p class="section-lead">
+                    Inspiroval mě táta, který během covidu vytvořil Počítejsám – jednoduchý web na procvičování
+                    matematiky pro 1.–3. třídu.
+                    Ve škole jsme řešili licence na UmímeTo.org a napadlo mě: Co kdyby existoval web podobný, ale
+                    nejdřív jen na angličtinu – a zdarma?
+                </p>
+            </div>
+
+            <div class="panel reveal" data-reveal>
+                <p style="margin:0; color:rgba(41,41,41,.72); line-height:1.7">
+                    A tak jsem začal. Design, backend, frontend, databáze, hosting i doména – to všechno řeším sám,
+                    s pomocí AI a občasnou radou od táty. Knowix není firma – je to projekt jednoho člověka,
+                    který chce dát vzdělávání všem.
+                    <br><br>
+                    „Začali jsme angličtinou a hudbou (písničky). Cíl je porozumění – rozumět, používat, zvládat reálné
+                    situace.“
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" style="padding-top:10px">
+        <div class="container">
+            <div class="split">
+                <div class="panel reveal" data-reveal>
+                    <div class="section-title" style="margin-bottom:8px">Kontakty</div>
+                    <p class="section-lead" style="margin-bottom:0">
+                        Nápad, chyba, feedback nebo spolupráce? Napiš mi.
+                    </p>
+                    <div style="height:14px"></div>
+                    <a class="btn" href="/kontakty">Otevřít kontakty</a>
+                </div>
+                <div class="panel reveal" data-reveal>
+                    <div class="section-title" style="margin-bottom:8px">PWA aplikace & podpora</div>
+                    <p class="section-lead" style="margin-bottom:0">
+                        Knowix funguje jako PWA – můžeš si ho připnout na plochu jako aplikaci.
+                        Podpora je vždycky zdarma.
+                    </p>
+                    <div style="height:14px"></div>
+                    <a class="btn" href="/privacy">Soukromí</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="container footer-grid">
+        <div>
+            <div class="brand" style="gap:10px">
+                <div class="brand-logo" aria-hidden="true">
+                    <img src="/favicon.ico" alt="Knowix" width="34" height="34" loading="lazy" decoding="async">
+                </div>
+                <div class="brand-name">knowix</div>
+            </div>
+            <p class="footer-note">
+                Knowix je moderní web pro praktickou angličtinu. Krátké úkoly, motivace hrou a bez paywallu.
+            </p>
+        </div>
+        <div class="footer-links">
+            <a href="/kontakty">Kontakt</a>
+            <a href="/privacy">Soukromí</a>
+            <a href="/">Do aplikace</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    (function () {
+        const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduced) return;
+
+        const els = Array.prototype.slice.call(document.querySelectorAll('[data-reveal]'));
+        if (!('IntersectionObserver' in window) || els.length === 0) {
+            els.forEach(el => el.classList.add('is-visible'));
+            return;
+        }
+
+        const obs = new IntersectionObserver((entries) => {
+            for (const e of entries) {
+                if (e.isIntersecting) {
+                    e.target.classList.add('is-visible');
+                    obs.unobserve(e.target);
+                }
+            }
+        }, {threshold: 0.16, rootMargin: '0px 0px -8% 0px'});
+
+        els.forEach(el => {
+            el.classList.add('reveal');
+            obs.observe(el);
+        });
+    })();
+</script>
+
+</body>
+</html>

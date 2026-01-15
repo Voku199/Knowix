@@ -324,6 +324,32 @@ def my_stats():
     return render_template('stats/stats.html', student=user, stats=stats)
 
 
+def _get_birthdate_column(cur):
+    """Vrátí název sloupce v tabulce users pro datum narození.
+
+    Repo používá někde `birthdate` (registrace), ale některé části mohou mít `date_of_birth`.
+    Chceme to mít kompatibilní, aby /settings nepadal na 'Unknown column'.
+    """
+    try:
+        cur.execute(
+            """
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema = DATABASE()
+              AND table_name = 'users'
+              AND column_name IN ('date_of_birth', 'birthdate')
+            """
+        )
+        cols = [r['column_name'] if isinstance(r, dict) else r[0] for r in cur.fetchall()]
+        if 'date_of_birth' in cols:
+            return 'date_of_birth'
+        if 'birthdate' in cols:
+            return 'birthdate'
+    except Exception:
+        pass
+    return None
+
+
 @auth_bp.route('/settings', methods=['GET'])
 def settings():
     user = session.get('user_id')
@@ -336,8 +362,14 @@ def settings():
     db = get_db_connection()
     cur = db.cursor(dictionary=True)
 
-    # Získání role uživatele
-    cur.execute("SELECT role, english_level, theme_mode FROM users WHERE id = %s", (user,))
+    birthdate_col = _get_birthdate_column(cur)
+    birthdate_select = f", {birthdate_col} AS date_of_birth" if birthdate_col else ", NULL AS date_of_birth"
+
+    # Získání role uživatele + profilových dat
+    cur.execute(
+        "SELECT role, english_level, theme_mode, first_name, last_name, email" + birthdate_select + " FROM users WHERE id = %s",
+        (user,)
+    )
     user_data = cur.fetchone()
     is_teacher = user_data and user_data['role'] == 'teacher'
 
@@ -390,6 +422,15 @@ def settings():
 
     theme = user_data['theme_mode'] if user_data and user_data['theme_mode'] in ['light', 'dark'] else 'light'
     english_level = user_data['english_level'] if user_data else 'A1'
+
+    # Profilová data pro editaci
+    profile = {
+        'first_name': (user_data.get('first_name') if user_data else '') or '',
+        'last_name': (user_data.get('last_name') if user_data else '') or '',
+        'email': (user_data.get('email') if user_data else '') or '',
+        'date_of_birth': user_data.get('date_of_birth') if user_data else None,
+    }
+
     cur.close()
     db.close()
 
@@ -408,7 +449,97 @@ def settings():
                            is_teacher=is_teacher,
                            active_group_name=active_group_name,
                            student_group_name=student_group_name,
-                           student_groups=student_groups)
+                           student_groups=student_groups,
+                           profile=profile)
+
+
+@auth_bp.route('/update_profile', methods=['POST'])
+def update_profile():
+    """Uložení základních údajů uživatele z nastavení (jméno, příjmení, email, datum narození)."""
+    if 'user_id' not in session:
+        flash('Nejdříve se musíte přihlásit.', 'warning')
+        return redirect(url_for('auth.login'))
+
+    user_id = session['user_id']
+
+    first_name = (request.form.get('first_name') or '').strip()
+    last_name = (request.form.get('last_name') or '').strip()
+    email = (request.form.get('email') or '').strip().lower()
+    dob = (request.form.get('date_of_birth') or '').strip()  # očekáváme YYYY-MM-DD
+
+    # Základní validace
+    if not first_name or not last_name:
+        flash('Vyplňte prosím jméno i příjmení.', 'error')
+        return redirect(url_for('auth.settings'))
+
+    if not email or '@' not in email or '.' not in email.split('@')[-1]:
+        flash('Zadejte prosím platný e-mail.', 'error')
+        return redirect(url_for('auth.settings'))
+
+    # Datum narození – volitelné, ale pokud je vyplněné, musí být validní
+    dob_value = None
+    if dob:
+        try:
+            dob_value = datetime.strptime(dob, '%Y-%m-%d').date()
+        except Exception:
+            flash('Datum narození musí být ve formátu RRRR-MM-DD.', 'error')
+            return redirect(url_for('auth.settings'))
+
+    db = get_db_connection()
+    try:
+        cur_dict = db.cursor(dictionary=True)
+        birthdate_col = _get_birthdate_column(cur_dict)
+
+        # Kontrola uniqueness e-mailu (kromě vlastního účtu)
+        cur_dict.execute("SELECT id FROM users WHERE email = %s AND id <> %s LIMIT 1", (email, user_id))
+        existing = cur_dict.fetchone()
+        cur_dict.close()
+
+        if existing:
+            flash('Tento e-mail už používá jiný účet.', 'error')
+            return redirect(url_for('auth.settings'))
+
+        cur = db.cursor()
+        if birthdate_col:
+            sql = f"UPDATE users SET first_name=%s, last_name=%s, email=%s, {birthdate_col}=%s WHERE id=%s"
+            params = (first_name, last_name, email, dob_value, user_id)
+        else:
+            sql = "UPDATE users SET first_name=%s, last_name=%s, email=%s WHERE id=%s"
+            params = (first_name, last_name, email, user_id)
+
+        cur.execute(sql, params)
+        db.commit()
+
+        affected = getattr(cur, 'rowcount', None)
+        print(f"[auth.update_profile] user_id={user_id} affected_rows={affected} birthdate_col={birthdate_col}")
+
+        cur.close()
+
+        # Aktualizace session (aby se hned propsalo do headeru apod.)
+        session['user_name'] = f"{first_name} {last_name}".strip()
+
+        # Pokud rowcount==0, typicky jde o stejná data jako předtím
+        if affected == 0:
+            flash('Uloženo. (Hodnoty už byly stejné, takže se nic neměnilo.)', 'info')
+        else:
+            flash('Profil byl úspěšně aktualizován.', 'success')
+
+        return redirect(url_for('auth.settings'))
+
+    except Exception as e:
+        try:
+            db.rollback()
+        except Exception:
+            pass
+        print(f"[auth.update_profile] ERROR user_id={user_id}: {type(e).__name__}: {e}")
+        flash('Nepodařilo se uložit profil (chyba serveru).', 'error')
+        return redirect(url_for('auth.settings'))
+
+    finally:
+        try:
+            db.close()
+        except Exception:
+            pass
 
 
 @auth_bp.route('/set_english_level', methods=['POST'])
@@ -778,15 +909,25 @@ def login():
 
         with get_db_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT id, first_name, last_name, password, profile_pic FROM users WHERE email = %s",
-                           (email,))
+            cursor.execute(
+                "SELECT id, first_name, last_name, password, profile_pic, has_seen_onboarding, is_guest FROM users WHERE email = %s",
+                (email,)
+            )
             user = cursor.fetchone()
             print(f"[auth.login] DB user found={bool(user)}")
 
             if user and check_password_hash(user[3], password):
                 session["user_id"] = user[0]
                 session["user_name"] = f"{user[1]} {user[2]}"
-                session["profile_pic"] = user[4] if user[4] else 'default.jpg'  # Přidej roli uživatele do session
+                session["profile_pic"] = user[4] if user[4] else 'default.jpg'
+
+                # Důležité pro routing /welcome vs / a onboarding guard
+                try:
+                    session["has_seen_onboarding"] = int(user[5] or 0)
+                except Exception:
+                    session["has_seen_onboarding"] = 0
+                session["is_guest"] = bool(user[6] or 0)
+
                 print(f"[auth.login] session set user_id={session.get('user_id')} session_keys={list(session.keys())}")
                 return redirect(url_for('main.index'))
             else:
@@ -1462,6 +1603,32 @@ def callback_google():
     # Přihlas do session
     session['user_id'] = user['id']
     session['user_name'] = f"{user.get('first_name') or ''} {user.get('last_name') or ''}".strip()
+
+    # Doplň flags pro onboarding/welcome redirect (vezmeme z DB, když to jde)
+    try:
+        conn2 = get_db_connection()
+        cur2 = conn2.cursor()
+        cur2.execute('SELECT has_seen_onboarding, is_guest FROM users WHERE id = %s', (user['id'],))
+        row2 = cur2.fetchone()
+        if row2:
+            try:
+                session['has_seen_onboarding'] = int(row2[0] or 0)
+            except Exception:
+                session['has_seen_onboarding'] = 0
+            session['is_guest'] = bool(row2[1] or 0)
+    except Exception:
+        # fallback
+        session.setdefault('has_seen_onboarding', 0)
+        session.setdefault('is_guest', False)
+    finally:
+        try:
+            if 'cur2' in locals() and cur2:
+                cur2.close()
+            if 'conn2' in locals() and conn2:
+                conn2.close()
+        except Exception:
+            pass
+
     session.modified = True
 
     current_app.logger.debug(f"Uživatel přihlášen: user_id={user['id']}, user_name={session['user_name']}")

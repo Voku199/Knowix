@@ -2,7 +2,11 @@
 (function () {
     'use strict';
 
-    const PROMPT_IMMEDIATELY = true; // vyžádej povolení ihned po načtení
+    // Pokud je onboarding aktivní, nechceme usera bombardovat promptem hned po loadu.
+    // Onboarding si permission vyžádá explicitně tlačítkem.
+    const IS_ONBOARDING = document.body?.dataset?.onboarding === '1';
+
+    const PROMPT_IMMEDIATELY = !IS_ONBOARDING; // dřív: true
 
     const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent || '');
     const isStandalone = () => window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
@@ -72,7 +76,11 @@
 
     async function getVapidPublicKey() {
         const resp = await fetch('/push/vapid-public-key');
-        const data = await resp.json();
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) {
+            const detail = data && data.error ? data.error : ('HTTP ' + resp.status);
+            throw new Error('VAPID key error: ' + detail);
+        }
         if (!data.publicKey) throw new Error('No VAPID public key');
         return data.publicKey;
     }
@@ -131,11 +139,20 @@
     const showError = (t) => showMessage(t, '#f44336');
 
     async function requestWebPushPermissionImmediate() {
+        // Push vyžaduje secure context (HTTPS nebo localhost)
+        if (window.isSecureContext === false) {
+            showError('Push notifikace vyžadují HTTPS (nebo localhost).');
+            return false;
+        }
         if (!('Notification' in window)) {
             showError('Prohlížeč nepodporuje notifikace.');
             return false;
         }
+
+        // DŮLEŽITÉ: prompt musí být vyvolán přímo z user gesture.
+        // Tohle volání je synchronní vzhledem k click handleru (už žádné await před ním).
         const permission = await Notification.requestPermission();
+
         if (permission !== 'granted') {
             updateNotifButtonUI();
             if (permission === 'denied')
@@ -150,7 +167,12 @@
             return true;
         } catch (e) {
             console.error('[PWA] subscribe after grant failed', e);
-            showError('Nepodařilo se dokončit přihlášení k notifikacím.');
+            const msg = (e && e.message) ? e.message : '';
+            if (msg.includes('VAPID') || msg.includes('public key')) {
+                showError('Server nemá nastavené push klíče (VAPID). Bez toho nejde push zapnout.');
+            } else {
+                showError('Nepodařilo se dokončit přihlášení k notifikacím.');
+            }
             return false;
         } finally {
             updateNotifButtonUI();
@@ -258,6 +280,82 @@
         }
         updateNotifButtonUI();
     }
+
+    // Veřejné API pro onboarding (a případně další části appky)
+    // Vrací { ok: boolean, status: 'granted'|'denied'|'default'|'unsupported'|'error' }
+    async function requestPushPermission() {
+        try {
+            if (!('Notification' in window)) {
+                updateNotifButtonUI();
+                return {ok: false, status: 'unsupported'};
+            }
+
+            // Už povoleno
+            if (Notification.permission === 'granted') {
+                updateNotifButtonUI();
+                return {ok: true, status: 'granted'};
+            }
+
+            // Už zablokováno
+            if (Notification.permission === 'denied') {
+                updateNotifButtonUI();
+                return {ok: false, status: 'denied'};
+            }
+
+            // Default -> vyžádej
+            let ok;
+            if ('PushManager' in window) ok = await requestWebPushPermissionImmediate();
+            else ok = await requestIOSPermissionImmediate();
+
+            const status = ('Notification' in window) ? Notification.permission : 'unsupported';
+            return {ok: !!ok, status: status || (ok ? 'granted' : 'default')};
+        } catch (e) {
+            console.error('[PWA] requestPushPermission error', e);
+            updateNotifButtonUI();
+            return {ok: false, status: 'error'};
+        }
+    }
+
+    // Nové API pro onboarding: nativní prompt MUSÍ být zavolaný hned v rámci clicku,
+    // a teprve potom můžeme dělat async věci (SW, fetch, subscribe).
+    async function requestPushPermissionFromUserGesture() {
+        try {
+            if (!('Notification' in window)) {
+                updateNotifButtonUI();
+                return {ok: false, status: 'unsupported'};
+            }
+
+            // Pokud už je granted/denied, prohlížeč žádné okno neukáže (to je očekávané chování).
+            if (Notification.permission === 'granted') {
+                updateNotifButtonUI();
+                return {ok: true, status: 'granted'};
+            }
+            if (Notification.permission === 'denied') {
+                updateNotifButtonUI();
+                return {ok: false, status: 'denied'};
+            }
+
+            // PROMPT: vyvolat hned
+            let ok;
+            if ('PushManager' in window) ok = await requestWebPushPermissionImmediate();
+            else ok = await requestIOSPermissionImmediate();
+
+            const status = ('Notification' in window) ? Notification.permission : 'unsupported';
+            return {ok: !!ok, status: status || (ok ? 'granted' : 'default')};
+        } catch (e) {
+            console.error('[PWA] requestPushPermissionFromUserGesture error', e);
+            updateNotifButtonUI();
+            return {ok: false, status: 'error'};
+        }
+    }
+
+    // Expose on window
+    window.KnowixPWA = window.KnowixPWA || {};
+    window.KnowixPWA.requestPushPermission = requestPushPermission;
+    window.KnowixPWA.requestPushPermissionFromUserGesture = requestPushPermissionFromUserGesture;
+    window.KnowixPWA.isPushSupported = function () {
+        return ('Notification' in window);
+    };
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

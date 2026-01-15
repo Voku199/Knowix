@@ -954,6 +954,135 @@ def check_answer():
     # end check_answer
 
 
+@vlastni_music_bp.route('/vlastni_music/embed-preview', methods=['GET', 'POST'])
+def embed_preview():
+    """Minimal embedded varianta vlastni_music pro onboarding (bez full layoutu).
+
+    GET: ukáže search formulář.
+    POST: vezme `song` a vygeneruje mini cvičení (na základě stejné logiky jako index()).
+    """
+    video_id = None
+    youtube_url = None
+    logger = logging.getLogger("vlastni_music")
+
+    if request.method == 'POST':
+        song_name = (request.form.get('song') or '').strip()
+        if not song_name:
+            return render_template('vlastni_music/embed_preview.html', video_id=None, youtube_url=None,
+                                   error='Zadej název písničky.')
+
+        logger.info("[vlastni_music] embed_preview POST song_name='%s' user_id=%s", song_name, session.get('user_id'))
+
+        # Stejně jako v index(): start tréninku pro learning time
+        if 'user_id' in session:
+            session['training_start'] = time.time()
+            try:
+                from user_stats import update_user_stats  # noqa
+                _ensure_user_exists_for_session_vlastni()
+                update_user_stats(session['user_id'], set_first_activity=True)
+            except Exception:
+                pass
+
+        video_id = search_youtube_first_video_id(song_name)
+        hit = genius_search_song(song_name)
+        if not hit:
+            return render_template('vlastni_music/embed_preview.html', video_id=None, youtube_url=None,
+                                   error='Píseň nebyla nalezena na Genius.')
+        song_url = hit.get('url')
+        lyrics_raw = genius_fetch_lyrics(song_url)
+        if not lyrics_raw:
+            return render_template('vlastni_music/embed_preview.html', video_id=None, youtube_url=None,
+                                   error='Text písně se nepodařilo načíst.')
+
+        # Jazyková kontrola (stejné jako index, ale tichý fallback)
+        try:
+            sample_for_lang = '\n'.join(lyrics_raw.splitlines()[:40])[:4000]
+            lang = deepl_detect_language(sample_for_lang) or 'EN'
+            if lang.upper() != 'EN':
+                return render_template('vlastni_music/embed_preview.html', video_id=None, youtube_url=None,
+                                       error=f'Píseň není v angličtině (detekováno {lang}). Zkus jinou.')
+        except Exception:
+            pass
+
+        lines = clean_lyrics_lines(lyrics_raw)
+        if not lines:
+            return render_template('vlastni_music/embed_preview.html', video_id=None, youtube_url=None,
+                                   error='Text písně je prázdný nebo nečitelný.')
+
+        def good_line(ln: str) -> bool:
+            return (bool(ln) and
+                    3 <= len(ln.split()) <= 16 and
+                    not ln.endswith(':') and
+                    not filter_unwanted_content(ln))
+
+        candidates = [ln for ln in lines if good_line(ln)]
+        random.shuffle(candidates)
+
+        # Cloze: 1 řádek
+        missing_exercises = []
+        used_lines_for_cloze = set()
+        for ln in candidates:
+            if len(missing_exercises) >= 1:
+                break
+            if ln in used_lines_for_cloze:
+                continue
+            words = re.findall(r"[A-Za-z']+", ln)
+            words = [w for w in words if len(w) > 3]
+            if not words:
+                continue
+            target = random.choice(words)
+            blanked = re.sub(rf"\b{re.escape(target)}\b", '_____', ln, count=1)
+            if blanked == ln:
+                continue
+            missing_exercises.append({'original': ln, 'with_blank': blanked, 'missing_word': target, 'answer': target})
+            used_lines_for_cloze.add(ln)
+
+        # Translation: 1 věta
+        trans_pool = [ln for ln in candidates if ln not in used_lines_for_cloze]
+        random.shuffle(trans_pool)
+        translation_exercises = []
+        translation_alternatives = []
+        for ln in trans_pool:
+            if len(translation_exercises) >= 1:
+                break
+            try:
+                translated = deepl_translate([ln], target_lang='CS')[0]
+            except Exception:
+                translated = ''
+            translation_exercises.append({'original': ln, 'translated': translated})
+            translation_alternatives.append([])
+
+        # Pairs v embed nepoužijeme (držíme krátké)
+        matching_pairs = []
+        matching_cs_shuffled = []
+
+        # Session pro check-answer endpoint
+        try:
+            session['missing_exercises'] = missing_exercises
+            session['translation_exercises'] = translation_exercises
+            session['translation_alternatives'] = translation_alternatives
+            session['current_exercise_pairs'] = {}
+        except Exception:
+            pass
+
+        if video_id:
+            youtube_url = f"https://www.youtube-nocookie.com/embed/{video_id}?cc_load_policy=0&iv_load_policy=3&modestbranding=1&rel=0&controls=1&fs=1&playsinline=1&disablekb=0"
+
+        return render_template(
+            'vlastni_music/embed_preview.html',
+            video_id=video_id,
+            youtube_url=youtube_url,
+            missing_exercises=missing_exercises,
+            translation_exercises=translation_exercises,
+            matching_pairs=matching_pairs,
+            matching_cs_shuffled=matching_cs_shuffled,
+            error=None,
+        )
+
+    # GET
+    return render_template('vlastni_music/embed_preview.html', video_id=None, youtube_url=None)
+
+
 @vlastni_music_bp.route('/vlastni_music', methods=['GET', 'POST'])
 def index():
     video_id = None

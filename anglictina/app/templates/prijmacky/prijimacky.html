@@ -1,0 +1,1297 @@
+{% extends "base.html" %}
+
+{% block title %}Přijímačky z angličtiny | Knowix{% endblock %}
+
+{% block content %}
+<style>
+    /* Moderní design pro přijímačky */
+    .pm-wrap {
+        min-height: calc(100vh - 220px);
+        display: flex;
+        justify-content: center;
+        padding: 18px 12px 34px;
+    }
+
+    .pm-container {
+        width: 100%;
+        max-width: 980px;
+        display: grid;
+        gap: 20px;
+    }
+
+    /* Hero sekce - světlý design podle obrázku */
+    .pm-hero {
+        padding: 32px;
+        border-radius: 20px;
+        background: linear-gradient(145deg, #ffffff, #f5f9ff);
+        border: 1px solid #e3e9f2;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        text-align: center;
+    }
+
+    .pm-hero h1 {
+        margin: 0;
+        font-size: 36px;
+        font-weight: 900;
+        color: #1a365d;
+        letter-spacing: -0.5px;
+        margin-bottom: 12px;
+    }
+
+    .pm-hero p {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.6;
+        color: #4a5568;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    /* Výběr úrovně - čistý moderní design */
+    .pm-level-card {
+        padding: 32px;
+        border-radius: 20px;
+        background: white;
+        border: 1px solid #e3e9f2;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    }
+
+    .pm-level-header {
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .pm-level-header h2 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 8px;
+    }
+
+    .pm-level-header .pm-muted {
+        color: #718096;
+        font-size: 16px;
+    }
+
+    .pm-row {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        align-items: center;
+    }
+
+    .pm-select-wrapper {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .pm-label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 12px;
+        font-size: 16px;
+        color: #2d3748;
+        text-align: center;
+    }
+
+    .pm-select {
+        width: 100%;
+        padding: 16px 20px;
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        background: white;
+        color: #2d3748;
+        font-size: 16px;
+        outline: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .pm-select:hover {
+        border-color: #cbd5e0;
+    }
+
+    .pm-select:focus {
+        border-color: #2d7ff9;
+        box-shadow: 0 0 0 3px rgba(45, 127, 249, 0.15);
+    }
+
+    .pm-btn {
+        padding: 16px 40px;
+        border-radius: 12px;
+        font-weight: 700;
+        border: none;
+        background: linear-gradient(135deg, #2d7ff9, #6aa9ff);
+        color: white;
+        cursor: pointer;
+        font-size: 18px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(45, 127, 249, 0.25);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .pm-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(45, 127, 249, 0.35);
+        background: linear-gradient(135deg, #2568e6, #5a9bff);
+    }
+
+    .pm-btn.secondary {
+        background: white;
+        color: #2d3748;
+        border: 2px solid #e2e8f0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .pm-btn.secondary:hover {
+        background: #f7fafc;
+        border-color: #cbd5e0;
+        transform: translateY(-2px);
+    }
+
+    /* Top bar pro test */
+    .pm-topbar {
+        position: sticky;
+        top: 20px;
+        z-index: 100;
+        border-radius: 16px;
+        background: white;
+        border: 1px solid #e3e9f2;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .pm-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        border-radius: 12px;
+        background: #f7fafc;
+        border: 1px solid #e2e8f0;
+        font-weight: 600;
+        font-size: 15px;
+        color: #2d3748;
+    }
+
+    .pm-timer {
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 1px;
+        font-weight: 700;
+        color: #2d7ff9;
+        font-size: 18px;
+    }
+
+    .pm-timer.warning {
+        color: #ed8936;
+    }
+
+    .pm-timer.danger {
+        color: #f56565;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+
+    .pm-progress {
+        flex: 1;
+        min-width: 220px;
+        height: 14px;
+        border-radius: 999px;
+        background: #edf2f7;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+    }
+
+    .pm-progress > div {
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, #2d7ff9, #6aa9ff);
+        border-radius: 999px;
+        transition: width 0.3s ease;
+    }
+
+    /* Sekce testu - světlý design */
+    .pm-section {
+        border-radius: 20px;
+        background: white;
+        border: 1px solid #e3e9f2;
+        overflow: hidden;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .pm-section-head {
+        padding: 20px 28px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .pm-section-title {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        color: #2d3748;
+    }
+
+    .pm-section-body {
+        padding: 28px;
+    }
+
+    /* Text pro reading/listening */
+    .pm-passage {
+        padding: 20px;
+        border-radius: 12px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        line-height: 1.7;
+        font-size: 16px;
+        margin-bottom: 20px;
+        color: #2d3748;
+    }
+
+    /* Otázka */
+    .pm-q {
+        padding: 20px;
+        border-radius: 12px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .pm-q:hover {
+        background: white;
+        border-color: #cbd5e0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .pm-q-title {
+        font-weight: 600;
+        margin-bottom: 16px;
+        line-height: 1.4;
+        font-size: 17px;
+        color: #2d3748;
+    }
+
+    /* Možnosti odpovědí - omezeno na 5 */
+    .pm-options {
+        display: grid;
+        gap: 12px;
+    }
+
+    .pm-options.limited {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .pm-option {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 16px;
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .pm-option:hover {
+        background: #edf2f7;
+        border-color: #cbd5e0;
+        transform: translateX(4px);
+    }
+
+    .pm-option input[type="radio"] {
+        width: 20px;
+        height: 20px;
+        accent-color: #2d7ff9;
+    }
+
+    .pm-input {
+        width: 100%;
+        padding: 16px;
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        background: white;
+        color: #2d3748;
+        font-size: 16px;
+        outline: none;
+        transition: all 0.3s ease;
+    }
+
+    .pm-input:focus {
+        border-color: #2d7ff9;
+        box-shadow: 0 0 0 3px rgba(45, 127, 249, 0.15);
+    }
+
+    /* TTS ovládání */
+    .pm-tts-controls {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+        padding: 16px;
+        border-radius: 12px;
+        background: #edf2f7;
+        border: 1px solid #e2e8f0;
+    }
+
+    .pm-tts-btn {
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        border: 2px solid #2d7ff9;
+        background: white;
+        color: #2d7ff9;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .pm-tts-btn:hover:not(:disabled) {
+        background: #2d7ff9;
+        color: white;
+    }
+
+    .pm-tts-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        border-color: #cbd5e0;
+        color: #a0aec0;
+    }
+
+    .pm-tts-counter {
+        font-size: 14px;
+        color: #718096;
+        font-weight: 600;
+        margin-left: auto;
+    }
+
+    /* Speech-to-text sekce */
+    .pm-stt-section {
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: 12px;
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+    }
+
+    .pm-stt-controls {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+    }
+
+    .pm-stt-btn {
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .pm-stt-btn.record {
+        background: #f56565;
+        color: white;
+    }
+
+    .pm-stt-btn.record:hover:not(:disabled) {
+        background: #e53e3e;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
+    }
+
+    .pm-stt-btn.stop {
+        background: #48bb78;
+        color: white;
+    }
+
+    .pm-stt-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .pm-stt-status {
+        padding: 12px 16px;
+        border-radius: 10px;
+        background: #fff5f5;
+        border: 1px solid #fed7d7;
+        color: #c53030;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .pm-stt-result {
+        margin-top: 16px;
+        padding: 16px;
+        border-radius: 10px;
+        background: white;
+        border: 2px solid #e2e8f0;
+        min-height: 60px;
+        font-size: 16px;
+        color: #2d3748;
+        user-select: text;
+    }
+
+    .pm-stt-result[contenteditable="false"] {
+        cursor: default;
+    }
+
+    .pm-stt-result:empty::before {
+        content: "Zde se zobrazí přepsaný text...";
+        color: #a0aec0;
+    }
+
+    /* Výsledek */
+    .pm-result-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+    }
+
+    .pm-result-box {
+        padding: 24px;
+        border-radius: 16px;
+        background: white;
+        border: 1px solid #e3e9f2;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .pm-big {
+        font-size: 36px;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin: 10px 0;
+        color: #2d7ff9;
+    }
+
+    .pm-muted {
+        color: #718096;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    /* Akce */
+    .pm-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: center;
+        justify-content: space-between;
+        margin: 40px 0 20px;
+        padding-top: 30px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    /* CSRF token styling */
+    input[name="csrf_token"] {
+        display: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .pm-hero {
+            padding: 24px;
+        }
+
+        .pm-hero h1 {
+            font-size: 28px;
+        }
+
+        .pm-hero p {
+            font-size: 16px;
+        }
+
+        .pm-level-card {
+            padding: 24px;
+        }
+
+        .pm-row {
+            gap: 20px;
+        }
+
+        .pm-select-wrapper {
+            max-width: 100%;
+        }
+
+        .pm-topbar {
+            flex-wrap: wrap;
+            gap: 12px;
+            top: 10px;
+            margin: 10px;
+        }
+
+        .pm-progress {
+            width: 100%;
+            min-width: 100%;
+        }
+
+        .pm-section-body {
+            padding: 20px;
+        }
+
+        .pm-options.limited {
+            grid-template-columns: 1fr;
+        }
+
+        .pm-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .pm-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .pm-wrap {
+            padding: 12px 8px 24px;
+        }
+
+        .pm-hero {
+            padding: 20px;
+        }
+
+        .pm-hero h1 {
+            font-size: 24px;
+        }
+
+        .pm-section-body {
+            padding: 16px;
+        }
+
+        .pm-q {
+            padding: 16px;
+        }
+
+        .pm-result-box {
+            padding: 20px;
+        }
+
+        .pm-big {
+            font-size: 28px;
+        }
+    }
+</style>
+
+<div class="pm-wrap">
+    <div class="pm-container">
+        <!-- Hero sekce podle obrázku -->
+        <div class="pm-hero">
+            <h1>Přijímačky z angličtiny</h1>
+            <p>
+                Chcete si otestovat angličtinu? Vyberte si úroveň, spusťte test a získejte zpětnou vazbu
+                s doporučeními pro další studium.
+            </p>
+        </div>
+
+        <!-- Výběr úrovně podle obrázku -->
+        <div class="pm-level-card">
+            <div class="pm-level-header">
+                <h2>Vyber úroveň testu</h2>
+                <div class="pm-muted">
+                    {% for key, meta in levels.items() %}
+                        {% if selected_level == key %}
+                            {{ meta.label }}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <form method="get" action="/prijmacky" class="pm-row">
+                <div class="pm-select-wrapper">
+                    <label for="level" class="pm-label">Úroveň testu</label>
+                    <select id="level" name="level" class="pm-select">
+                        {% for key, meta in levels.items() %}
+                            <option value="{{ key }}" {% if selected_level == key %}selected{% endif %}>{{ meta.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" name="run" value="1" class="pm-btn">
+                    <span>▶️</span>
+                    <span>Spustit test</span>
+                </button>
+            </form>
+        </div>
+
+        {% if show_test and test %}
+            <!-- Top bar s časem -->
+            <div class="pm-topbar" id="pmTopBar">
+                <div class="pm-badge">
+                    <span>⏳ Čas:</span>
+                    <span class="pm-timer" id="pmTimer">--:--</span>
+                </div>
+
+                <div class="pm-progress">
+                    <div id="pmProgressBar"></div>
+                </div>
+
+                <div class="pm-badge">
+                    <span>✅ Hotovo:</span>
+                    <span id="pmAnswered">0</span>/<span id="pmTotal">0</span>
+                </div>
+
+                <button type="button" class="pm-btn secondary" id="pmScrollTop">↑ Nahoru</button>
+            </div>
+
+            <!-- Test -->
+            <div class="pm-level-card">
+                <form method="post" action="/prijmacky" id="pmForm">
+                    <!-- CSRF token pro POST formulář -->
+                    {% if csrf_token %}
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    {% endif %}
+
+                    <input type="hidden" name="level" value="{{ selected_level }}">
+                    <input type="hidden" name="time_spent" id="pmTimeSpent" value="">
+                    <input type="hidden" id="pmTimeLimitSec" value="{{ (test.time_limit or 0) * 60 }}">
+
+                    {#
+                       Speaking skórování: zatím jen připravíme informaci pro backend.
+                       Backend může zohlednit, že speaking má váhu 70%.
+                    #}
+                    <input type="hidden" name="speaking_weight" value="0.7">
+                    <input type="hidden" name="speaking_answered_count" id="pmSpeakingAnsweredCount" value="0">
+                    <input type="hidden" name="speaking_total_count" id="pmSpeakingTotalCount" value="0">
+
+                    {% for section in test.sections %}
+                        {% set question_limit = 5 if section.type not in ['speaking', 'listening'] else section.questions|length %}
+
+                        <div class="pm-section">
+                            <div class="pm-section-head">
+                                <h2 class="pm-section-title">{{ section.title }}</h2>
+                                <div class="pm-muted" style="font-size: 14px;">
+                                    {{ section.questions[:question_limit]|length }} úloh
+                                </div>
+                            </div>
+
+                            <div class="pm-section-body">
+                                {% if section.type == 'reading' and section.passage %}
+                                    <div class="pm-passage">{{ section.passage }}</div>
+                                {% endif %}
+
+                                {% if section.type == 'listening' and section.passage %}
+                                    <div class="pm-passage" data-tts-text="{{ section.passage|e }}">
+                                        <div class="pm-tts-controls">
+                                            <button type="button" class="pm-tts-btn" data-tts-play data-tts-text="{{ section.passage|e }}">
+                                                🔊 Přehrát poslech
+                                            </button>
+                                            <button type="button" class="pm-tts-btn secondary" data-tts-stop>
+                                                ⏹️ Zastavit
+                                            </button>
+                                            <div class="pm-tts-counter">
+                                                <span data-tts-count>0</span>/3 přehrání
+                                            </div>
+                                        </div>
+<!--                                        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e2e8f0; color: #4a5568;">-->
+<!--                                            <strong>Text poslechu:</strong><br>-->
+<!--                                            {{ section.passage }}-->
+<!--                                        </div>-->
+                                    </div>
+                                {% endif %}
+
+                                {% if section.type == 'speaking' and section.instructions %}
+                                    <div class="pm-passage">
+                                        <div style="font-weight: 600; margin-bottom: 8px; color: #2d3748;">📋 Instrukce</div>
+                                        {{ section.instructions }}
+                                    </div>
+                                {% endif %}
+
+                                {% for q in section.questions[:question_limit] %}
+                                    <div class="pm-q">
+                                        <div class="pm-q-title">{{ loop.index }}. {{ q.prompt }}</div>
+
+                                        {% if section.type == 'speaking' %}
+                                            <!-- Speaking s TTS a STT -->
+                                            <div class="pm-tts-controls">
+                                                <button type="button" class="pm-tts-btn"
+                                                        data-tts-play
+                                                        data-tts-text="{{ (q.tts or q.prompt)|e }}">
+                                                    🔊 Přehrát větu
+                                                </button>
+                                                <button type="button" class="pm-tts-btn secondary" data-tts-stop>
+                                                    ⏹️ Zastavit
+                                                </button>
+                                                <div class="pm-tts-counter">
+                                                    <span data-tts-count>0</span>/3 přehrání
+                                                </div>
+                                            </div>
+
+                                            <div class="pm-stt-section">
+                                                <div class="pm-stt-controls">
+                                                    <button type="button" class="pm-stt-btn record" data-stt-record>
+                                                        🎤 Nahrát odpověď
+                                                    </button>
+                                                    <button type="button" class="pm-stt-btn stop" data-stt-stop disabled>
+                                                        ⏹️ Zastavit
+                                                    </button>
+                                                    <button type="button" class="pm-btn secondary" data-stt-clear style="padding: 10px 16px; font-size: 14px;">
+                                                        🗑️ Smazat
+                                                    </button>
+                                                </div>
+
+                                                <div id="sttStatus_{{ q.id }}" class="pm-stt-status" style="display: none;">
+                                                    <span style="display: inline-block; width: 12px; height: 12px; background: #f56565; border-radius: 50%; animation: pulse 1.5s infinite;"></span>
+                                                    Nahrávám... mluvte nyní
+                                                </div>
+
+                                                <div class="pm-stt-result"
+                                                     id="sttResult_{{ q.id }}"
+                                                     contenteditable="false"
+                                                     data-question-id="{{ q.id }}">
+                                                    {% if request.method == 'POST' and request.form.get('q_' ~ q.id ~ '_text') %}
+                                                        {{ request.form.get('q_' ~ q.id ~ '_text') }}
+                                                    {% endif %}
+                                                </div>
+                                                <input type="hidden" name="q_{{ q.id }}_text" id="sttText_{{ q.id }}" data-track-speaking="1"
+                                                       value="{% if request.method == 'POST' %}{{ request.form.get('q_' ~ q.id ~ '_text', '') }}{% endif %}">
+                                                <div class="pm-muted" style="margin-top:10px; font-size: 13px;">
+                                                    Tip: Když chcete odpověď opravit, klikněte znovu na „Nahrát odpověď“ a řekněte to znovu.
+                                                </div>
+                                            </div>
+
+                                        {% elif q.format in ['mcq', 'true_false'] and q.options and q.options|length <= 6 %}
+                                            <!-- Výběr z možností -->
+                                            <div class="pm-options {% if q.options|length > 3 %}limited{% endif %}">
+                                                {% for opt in q.options %}
+                                                    <label class="pm-option">
+                                                        <input type="radio" data-track="1" name="q_{{ q.id }}" value="{{ opt }}"
+                                                               {% if request.method == 'POST' and request.form.get('q_' ~ q.id) == opt %}checked{% endif %}>
+                                                        <span>{{ opt }}</span>
+                                                    </label>
+                                                {% endfor %}
+                                            </div>
+
+                                        {% else %}
+                                            <!-- Textový vstup -->
+                                            <input type="text" class="pm-input" data-track="1" name="q_{{ q.id }}"
+                                                   value="{% if request.method == 'POST' %}{{ request.form.get('q_' ~ q.id, '') }}{% endif %}"
+                                                   placeholder="Zadejte odpověď...">
+                                            {% if q.format in ['mcq', 'true_false'] and q.options and q.options|length > 6 %}
+                                                <div class="pm-muted" style="margin-top: 8px; font-size: 14px;">
+                                                    Tip: můžete napsat odpověď ručně
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+
+                                        {% if result %}
+                                            {% set found = namespace(item=None) %}
+                                            {% for rs in result.sections %}
+                                                {% for rq in rs.questions %}
+                                                    {% if rq.id == q.id %}
+                                                        {% set found.item = rq %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endfor %}
+
+                                            {% if found.item %}
+                                                <div style="margin-top: 16px; padding: 16px; border-radius: 10px;
+                                                           border: 2px solid {% if found.item.is_correct %}#48bb78{% else %}#f56565{% endif %};
+                                                           background: {% if found.item.is_correct %}#f0fff4{% else %}#fff5f5{% endif %};">
+                                                    <div style="font-weight: 600; display: flex; align-items: center; gap: 8px; color: {% if found.item.is_correct %}#22543d{% else %}#742a2a{% endif %};">
+                                                        {% if found.item.is_correct %}
+                                                            ✅ Správně
+                                                        {% else %}
+                                                            ❌ Špatně
+                                                        {% endif %}
+                                                    </div>
+                                                    {% if not found.item.is_correct and found.item.correct %}
+                                                        <div style="margin-top: 8px; color: #4a5568;">
+                                                            <strong>Správná odpověď:</strong>
+                                                            {{ (found.item.correct + (found.item.alternatives or [])) | join(' / ') }}
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if found.item.explanation %}
+                                                        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.1); color: #718096;">
+                                                            {{ found.item.explanation }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    <div class="pm-actions">
+                        <button type="submit" class="pm-btn">
+                            <span>📤</span>
+                            <span>Odeslat a vyhodnotit</span>
+                        </button>
+
+                        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                            {% if result %}
+                                <a class="pm-btn secondary" href="/prijmacky?level={{ selected_level }}&run=1">
+                                    🔄 Zkusit znovu
+                                </a>
+                            {% endif %}
+                            <a class="pm-btn secondary" href="/prijmacky">
+                                ↶ Změnit úroveň
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            {% if result %}
+                <!-- Výsledky -->
+                <div class="pm-level-card">
+                    <h2 style="margin:0 0 20px; color: #2d3748; font-size: 24px;">📊 Výsledek testu</h2>
+                    <div class="pm-result-grid">
+                        <div class="pm-result-box">
+                            <div class="pm-muted">Celkové skóre</div>
+                            <div class="pm-big">{{ result.total.percent }}%</div>
+                            <div style="margin-top: 8px; font-weight: 700; font-size: 18px; color: #2d3748;">{{ result.total.rating }}</div>
+                            <div class="pm-muted" style="margin-top: 8px;">
+                                {{ result.total.correct }} / {{ result.total.count }} bodů
+                            </div>
+                        </div>
+
+                        <div class="pm-result-box">
+                            <div class="pm-muted">Výkon v sekcích</div>
+                            <ul style="margin: 16px 0 0; padding-left: 0; list-style: none;">
+                                {% for s in result.sections %}
+                                    <li style="margin-bottom: 12px; display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+                                        <span style="color: #2d3748;">{{ s.title }}:</span>
+                                        <span style="font-weight: 700; color: #2d7ff9;">
+                                            {% if s.count %}
+                                                {{ s.correct }}/{{ s.count }}
+                                                ({{ s.percent|round(1) }}%)
+                                            {% else %}
+                                                —
+                                            {% endif %}
+                                        </span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <div class="pm-result-box">
+                            <div class="pm-muted">Doporučení k dalšímu studiu</div>
+                            {% if result.improvements %}
+                                <ul style="margin: 16px 0 0; padding-left: 20px;">
+                                    {% for item in result.improvements %}
+                                        <li style="margin-bottom: 10px; padding-left: 8px; color: #4a5568;">• {{ item }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <div style="margin-top: 16px; padding: 16px; border-radius: 10px; background: #f0fff4; border: 2px solid #c6f6d5;">
+                                    <div style="font-weight: 700; display: flex; align-items: center; gap: 8px; color: #22543d;">
+                                        🎉 Výborně!
+                                    </div>
+                                    <div style="margin-top: 8px; color: #48bb78;">
+                                        Nemáme žádná konkrétní doporučení – pokračujte v dobré práci!
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <script>
+                (function () {
+                    const form = document.getElementById('pmForm');
+                    const timerEl = document.getElementById('pmTimer');
+                    const timeSpentEl = document.getElementById('pmTimeSpent');
+                    const limitSecEl = document.getElementById('pmTimeLimitSec');
+                    const answeredEl = document.getElementById('pmAnswered');
+                    const totalEl = document.getElementById('pmTotal');
+                    const barEl = document.getElementById('pmProgressBar');
+                    const scrollTopBtn = document.getElementById('pmScrollTop');
+
+                    const speakingAnsweredCountEl = document.getElementById('pmSpeakingAnsweredCount');
+                    const speakingTotalCountEl = document.getElementById('pmSpeakingTotalCount');
+
+                    if (!form || !timerEl || !limitSecEl) return;
+
+                    scrollTopBtn && scrollTopBtn.addEventListener('click', function () {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    });
+
+                    const limitSec = parseInt(limitSecEl.value || '0', 10);
+                    const startedAt = Date.now();
+
+                    function fmt(sec) {
+                        sec = Math.max(0, sec);
+                        const mm = Math.floor(sec / 60);
+                        const ss = sec % 60;
+                        return String(mm).padStart(2, '0') + ':' + String(ss).padStart(2, '0');
+                    }
+
+                    // Speaking se vyplňuje do hidden inputů (q_<id>_text), které má data-track-speaking.
+                    function computeSpeakingCounts() {
+                        const els = form.querySelectorAll('[data-track-speaking="1"]');
+                        let total = 0;
+                        let answered = 0;
+                        els.forEach(el => {
+                            total += 1;
+                            const v = String(el.value || '').trim();
+                            if (v.length > 0) answered += 1;
+                        });
+                        if (speakingAnsweredCountEl) speakingAnsweredCountEl.value = String(answered);
+                        if (speakingTotalCountEl) speakingTotalCountEl.value = String(total);
+                        return { answered, total };
+                    }
+
+                    function computeTotalTracked() {
+                        const els = form.querySelectorAll('[data-track="1"]');
+                        const names = new Set();
+                        els.forEach(el => {
+                            if (el && el.name) names.add(el.name);
+                        });
+                        return names.size;
+                    }
+
+                    const total = computeTotalTracked();
+                    totalEl.textContent = String(total);
+
+                    function computeAnswered() {
+                        const names = new Map();
+                        const els = form.querySelectorAll('[data-track="1"]');
+
+                        els.forEach(el => {
+                            if (!el.name) return;
+
+                            if (el.type === 'radio') {
+                                if (!names.has(el.name)) names.set(el.name, false);
+                                if (el.checked) names.set(el.name, true);
+                            } else {
+                                const v = (el.value || '').trim();
+                                names.set(el.name, v.length > 0);
+                            }
+                        });
+
+                        let answered = 0;
+                        names.forEach(v => { if (v) answered += 1; });
+                        return answered;
+                    }
+
+                    function setProgress(answered) {
+                        answeredEl.textContent = String(answered);
+                        const p = total ? Math.round((answered / total) * 100) : 0;
+                        barEl.style.width = Math.max(0, Math.min(100, p)) + '%';
+                    }
+
+                    function tick() {
+                        const elapsedSec = Math.floor((Date.now() - startedAt) / 1000);
+                        if (timeSpentEl) timeSpentEl.value = String(elapsedSec);
+
+                        // průběžně ukládejme info o speaking (backend si může dopočítat 70% váhu)
+                        computeSpeakingCounts();
+
+                        if (limitSec > 0) {
+                            const remaining = limitSec - elapsedSec;
+                            timerEl.textContent = fmt(remaining);
+
+                            // Barva podle času
+                            if (remaining <= 300) {
+                                timerEl.className = 'pm-timer warning';
+                            }
+                            if (remaining <= 60) {
+                                timerEl.className = 'pm-timer danger';
+                            }
+
+                            if (remaining <= 0) {
+                                try {
+                                    form.submit();
+                                } catch (e) {}
+                                return;
+                            }
+                        } else {
+                            timerEl.textContent = '∞';
+                        }
+
+                        setProgress(computeAnswered());
+                        setTimeout(tick, 500);
+                    }
+
+                    // -----------------------
+                    // TTS s omezením na 3x
+                    // -----------------------
+                    let currentUtterance = null;
+                    const ttsCounters = new Map();
+
+                    // Cache dostupných hlasů (browser je někdy načítá opožděně)
+                    let cachedVoices = [];
+                    function refreshVoices() {
+                        try {
+                            cachedVoices = (window.speechSynthesis && window.speechSynthesis.getVoices()) ? window.speechSynthesis.getVoices() : [];
+                        } catch (e) {
+                            cachedVoices = [];
+                        }
+                    }
+
+                    function pickEnglishVoice() {
+                        if (!cachedVoices || cachedVoices.length === 0) return null;
+
+                        const isEn = (v) => String(v.lang || '').toLowerCase().startsWith('en');
+                        const isEnUS = (v) => String(v.lang || '').toLowerCase() === 'en-us';
+                        const isEnGB = (v) => String(v.lang || '').toLowerCase() === 'en-gb';
+                        const isGoogle = (v) => String(v.name || '').toLowerCase().includes('google');
+
+                        // 1) Google en-US
+                        let v = cachedVoices.find(x => isGoogle(x) && isEnUS(x));
+                        if (v) return v;
+                        // 2) Google en-GB
+                        v = cachedVoices.find(x => isGoogle(x) && isEnGB(x));
+                        if (v) return v;
+                        // 3) Jakýkoliv Google en-*
+                        v = cachedVoices.find(x => isGoogle(x) && isEn(x));
+                        if (v) return v;
+                        // 4) Jakýkoliv en-US
+                        v = cachedVoices.find(x => isEnUS(x));
+                        if (v) return v;
+                        // 5) Jakýkoliv en-*
+                        v = cachedVoices.find(x => isEn(x));
+                        if (v) return v;
+
+                        return null;
+                    }
+
+                    // Inicializace a hook na pozdní načtení voice listu
+                    if ('speechSynthesis' in window) {
+                        refreshVoices();
+                        try {
+                            window.speechSynthesis.onvoiceschanged = () => refreshVoices();
+                        } catch (e) {}
+                    }
+
+                    function stopTTS() {
+                        if (window.speechSynthesis) {
+                            window.speechSynthesis.cancel();
+                        }
+                        currentUtterance = null;
+                    }
+
+                    function speakText(text, btn) {
+                        const counterId = btn.getAttribute('data-tts-text') || btn.closest('[data-tts-text]')?.getAttribute('data-tts-text');
+                        if (!counterId) return;
+
+                        let count = ttsCounters.get(counterId) || 0;
+                        if (count >= 3) {
+                            alert('Můžete přehrát maximálně 3x.');
+                            return;
+                        }
+
+                        stopTTS();
+
+                        if (!('speechSynthesis' in window)) {
+                            alert('TTS není podporováno v tomto prohlížeči.');
+                            return;
+                        }
+
+                        // pro jistotu vždy refresh (někdy se voices načtou až po prvním speak)
+                        refreshVoices();
+
+                        const u = new SpeechSynthesisUtterance(String(text || ''));
+                        // Jazyk nastavíme vždy natvrdo na EN, aby to neujelo do DE.
+                        u.lang = 'en-US';
+                        u.rate = 0.9;
+                        u.pitch = 1.0;
+
+                        const englishVoice = pickEnglishVoice();
+                        if (englishVoice) {
+                            u.voice = englishVoice;
+                        }
+
+                        currentUtterance = u;
+                        window.speechSynthesis.speak(u);
+
+                        count++;
+                        ttsCounters.set(counterId, count);
+
+                        const counterEl = btn.closest('.pm-tts-controls')?.querySelector('[data-tts-count]');
+                        if (counterEl) {
+                            counterEl.textContent = count;
+                        }
+
+                        // po dohrání nic speciálního
+                        u.onend = () => { /* noop */ };
+                    }
+
+                    // Bind TTS tlačítka
+                    document.querySelectorAll('[data-tts-play]').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const text = this.getAttribute('data-tts-text') || this.closest('[data-tts-text]')?.getAttribute('data-tts-text') || '';
+                            speakText(text, this);
+                        });
+                    });
+
+                    document.querySelectorAll('[data-tts-stop]').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            stopTTS();
+                        });
+                    });
+
+                    // -----------------------
+                    // STT (Speech-to-text) pro speaking
+                    // -----------------------
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    let recognition = null;
+                    let isRecording = false;
+
+                    function stopSTT() {
+                        try {
+                            if (recognition) recognition.stop();
+                        } catch (e) {}
+                        isRecording = false;
+                    }
+
+                    function startSTT(questionId) {
+                        if (!SpeechRecognition) {
+                            alert('Rozpoznávání řeči není podporováno v tomto prohlížeči (zkuste Chrome).');
+                            return;
+                        }
+
+                        // pokud už něco běží, stopneme
+                        stopSTT();
+
+                        recognition = new SpeechRecognition();
+                        recognition.lang = 'en-US';
+                        recognition.interimResults = true;
+                        recognition.continuous = false;
+
+                        const resultEl = document.getElementById(`sttResult_${questionId}`);
+                        const statusEl = document.getElementById(`sttStatus_${questionId}`);
+                        const textInput = document.getElementById(`sttText_${questionId}`);
+
+                        recognition.onstart = () => {
+                            isRecording = true;
+                            if (statusEl) statusEl.style.display = 'flex';
+                            // Oprava je pouze přes další mluvení => při nové nahrávce vynulujeme
+                            if (resultEl) resultEl.textContent = '';
+                            if (textInput) textInput.value = '';
+                        };
+
+                        recognition.onresult = (event) => {
+                            let transcript = '';
+                            for (let i = event.resultIndex; i < event.results.length; i++) {
+                                transcript += event.results[i][0].transcript;
+                            }
+                            transcript = String(transcript || '').trim();
+                            if (resultEl) resultEl.textContent = transcript;
+                            if (textInput) textInput.value = transcript;
+                        };
+
+                        recognition.onerror = () => {
+                            isRecording = false;
+                            if (statusEl) statusEl.style.display = 'none';
+                        };
+
+                        recognition.onend = () => {
+                            isRecording = false;
+                            if (statusEl) statusEl.style.display = 'none';
+
+                            // po skončení aktualizujeme speaking počítadla (posílá se na backend)
+                            computeSpeakingCounts();
+
+                            // povolíme/zakážeme tlačítka
+                            document.querySelectorAll('[data-stt-stop]').forEach(b => b.disabled = true);
+                            document.querySelectorAll('[data-stt-record]').forEach(b => b.disabled = false);
+                        };
+
+                        // povolíme stop pro aktuální sekci a zakážeme record, aby se nespouštělo víckrát najednou
+                        document.querySelectorAll('[data-stt-stop]').forEach(b => b.disabled = false);
+                        document.querySelectorAll('[data-stt-record]').forEach(b => b.disabled = true);
+
+                        try {
+                            recognition.start();
+                        } catch (e) {
+                            // někdy prohlížeč vyhodí error, když startneš moc rychle po sobě
+                            isRecording = false;
+                            if (statusEl) statusEl.style.display = 'none';
+                        }
+                    }
+
+                    // Bind STT tlačítka
+                    document.querySelectorAll('[data-stt-record]').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const qEl = this.closest('.pm-q')?.querySelector('.pm-stt-result');
+                            const questionId = (qEl && qEl.id) ? qEl.id.replace('sttResult_', '') : null;
+                            if (!questionId) return;
+                            startSTT(questionId);
+                        });
+                    });
+
+                    document.querySelectorAll('[data-stt-stop]').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            stopSTT();
+                            this.disabled = true;
+                            document.querySelectorAll('[data-stt-record]').forEach(b => b.disabled = false);
+                        });
+                    });
+
+                    document.querySelectorAll('[data-stt-clear]').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const sectionEl = this.closest('.pm-stt-section');
+                            const resultEl = sectionEl?.querySelector('.pm-stt-result');
+                            if (!resultEl) return;
+                            const questionId = resultEl.id.replace('sttResult_', '');
+                            const textInput = document.getElementById(`sttText_${questionId}`);
+                            resultEl.textContent = '';
+                            if (textInput) textInput.value = '';
+                            computeSpeakingCounts();
+                        });
+                    });
+
+                    // Ruční editace přepisu je vypnutá (contenteditable=false) => žádné hand-edit listenery.
+
+                    window.addEventListener('beforeunload', () => {
+                        stopTTS();
+                        stopSTT();
+                    });
+
+                    // Průběžná aktualizace progressu
+                    form.addEventListener('input', () => {
+                        setProgress(computeAnswered());
+                        computeSpeakingCounts();
+                    });
+                    form.addEventListener('change', () => {
+                        setProgress(computeAnswered());
+                        computeSpeakingCounts();
+                    });
+
+                    // Po startu okamžitě nastavíme progress a speaking počty
+                    setProgress(computeAnswered());
+                    computeSpeakingCounts();
+                    tick();
+                })();
+            </script>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

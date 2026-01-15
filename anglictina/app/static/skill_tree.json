@@ -1,0 +1,946 @@
+{
+  "version": 1,
+  "phases": [
+    {
+      "id": "phase_1",
+      "title": "🟢 Fáze 1: Základy angličtiny",
+      "path": [
+        {
+          "id": "F1_M01_intro",
+          "title": "Vítej v Umíme anglicky",
+          "desc": "Prozkoumej hlavní stránku angličtiny a vyzkoušej si první aktivitu.",
+          "href": "/anglictina",
+          "lesson_area_key": "INTRO_ANG",
+          "requirements": []
+        },
+        {
+          "id": "F1_M02_first_listening",
+          "title": "Rozjeď poslech (3 správně)",
+          "desc": "Začni s poslechem a získej aspoň 3 správné odpovědi.",
+          "href": "/listening",
+          "lesson_area_key": "F1_M02_FIRST_LISTENING",
+          "requirements": [
+            {
+              "metric": "lis_cor",
+              "op": ">=",
+              "value": 3,
+              "label": "Získej alespoň 3 správné odpovědi v poslechu."
+            }
+          ]
+        },
+        {
+          "id": "F1_M03_first_hangman",
+          "title": "První výhra v hangmanu",
+          "desc": "Zahraj si hangmana a uhodni aspoň 1 slovo.",
+          "href": "/hangman",
+          "lesson_area_key": "F1_M03_FIRST_HANGMAN",
+          "requirements": [
+            {
+              "metric": "hangman_words_guessed",
+              "op": ">=",
+              "value": 1,
+              "label": "Uhodni alespoň 1 slovo v hangmanu."
+            }
+          ]
+        },
+        {
+          "id": "F1_M04_first_words_written",
+          "title": "Napiš prvních 20 slov",
+          "desc": "Vyzkoušej si psaní a napiš dohromady alespoň 20 slov.",
+          "href": "/psani",
+          "lesson_area_key": "F1_M04_FIRST_WORDS_WRITTEN",
+          "requirements": [
+            {
+              "metric": "total_psani_words",
+              "op": ">=",
+              "value": 20,
+              "label": "Napiš alespoň 20 slov v psaní."
+            }
+          ]
+        },
+        {
+          "id": "F1_M05_50_words_written",
+          "title": "Rozepiš se (50 slov)",
+          "desc": "Pokračuj v psaní a dosáhni celkem 50 napsaných slov.",
+          "href": "/psani",
+          "lesson_area_key": "F1_M05_50_WORDS_WRITTEN",
+          "requirements": [
+            {
+              "metric": "total_psani_words",
+              "op": ">=",
+              "value": 50,
+              "label": "Napiš alespoň 50 slov v psaní."
+            }
+          ]
+        },
+        {
+          "id": "F1_M06_first_listening",
+          "title": "První poslech",
+          "desc": "Zkus si poslechové cvičení a získej aspoň 5 správných odpovědí.",
+          "href": "/listening",
+          "lesson_area_key": "F1_M06_FIRST_LISTENING",
+          "requirements": [
+            {
+              "metric": "lis_cor",
+              "op": ">=",
+              "value": 5,
+              "label": "Získej alespoň 5 správných odpovědí v poslechu."
+            }
+          ]
+        },
+        {
+          "id": "F1_M07_10_listening",
+          "title": "10 správných v poslechu",
+          "desc": "Procvičuj poslech, dokud nezískáš 10 správných odpovědí.",
+          "href": "/listening",
+          "lesson_area_key": "F1_M07_10_LISTENING",
+          "requirements": [
+            {
+              "metric": "lis_cor",
+              "op": ">=",
+              "value": 10,
+              "label": "Získej alespoň 10 správných odpovědí v poslechu."
+            }
+          ]
+        },
+        {
+          "id": "F1_M08_first_hangman",
+          "title": "První uhodnutá slova",
+          "desc": "Zahraj si hangmana a uhodni alespoň 3 různá slova.",
+          "href": "/hangman",
+          "lesson_area_key": "F1_M08_FIRST_HANGMAN",
+          "requirements": [
+            {
+              "metric": "hangman_words_guessed",
+              "op": ">=",
+              "value": 3,
+              "label": "Uhodni alespoň 3 slova v hangmanu."
+            }
+          ]
+        },
+        {
+          "id": "F1_M09_5_hangman",
+          "title": "Rozjeď hangmana",
+          "desc": "Pokračuj v hangmanovi, dokud neuhodneš 5 slov.",
+          "href": "/hangman",
+          "lesson_area_key": "F1_M09_5_HANGMAN",
+          "requirements": [
+            {
+              "metric": "hangman_words_guessed",
+              "op": ">=",
+              "value": 5,
+              "label": "Uhodni alespoň 5 slov v hangmanu."
+            }
+          ]
+        },
+        {
+          "id": "F1_M10_phase1_complete",
+          "title": "Závěrečný test (Fáze 1)",
+          "desc": "Ověř si, co ses ve fázi 1 naučil/a. Po úspěšném testu se mise označí jako splněná.",
+          "href": "/skill-test/phase-1",
+          "lesson_area_key": "F1_M10_PHASE1_COMPLETE",
+          "requirements": [
+            {
+              "metric": "total_lessons_done",
+              "op": ">=",
+              "value": 10,
+              "label": "Dokonči alespoň 10 lekcí."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase_2",
+      "title": "🟡 Fáze 2: Porozumění angličtině",
+      "path": [
+        {
+          "id": "F2_M01_listening_intro",
+          "title": "Seznam se s poslechem",
+          "desc": "Pokračuj v poslechových cvičeních a získej alespoň 15 správných odpovědí.",
+          "href": "/listening",
+          "lesson_area_key": "F2_M01_LISTENING_INTRO",
+          "requirements": [
+            {
+              "metric": "lis_cor",
+              "op": ">=",
+              "value": 15,
+              "label": "Získej alespoň 15 správných odpovědí v poslechu."
+            }
+          ]
+        },
+        {
+          "id": "F2_M02_30_listening",
+          "title": "Poslechový základ",
+          "desc": "Nasbírej dohromady 30 správných odpovědí v poslechových cvičeních.",
+          "href": "/listening",
+          "lesson_area_key": "F2_M02_30_LISTENING",
+          "requirements": [
+            {
+              "metric": "lis_cor",
+              "op": ">=",
+              "value": 30,
+              "label": "Získej alespoň 30 správných odpovědí v poslechu."
+            }
+          ]
+        },
+        {
+          "id": "F2_M03_ai_listening_time",
+          "title": "AI poslech – 10 minut",
+          "desc": "Stráv alespoň 10 minut v AI poslechu.",
+          "href": "/AI_poslech",
+          "lesson_area_key": "F2_M03_AI_LISTENING_TIME",
+          "requirements": [
+            {
+              "metric": "AI_poslech_minut",
+              "op": ">=",
+              "value": 10,
+              "label": "Stráv alespoň 10 minut v AI poslechu."
+            }
+          ]
+        },
+        {
+          "id": "F2_M04_ai_listening_20min",
+          "title": "AI poslech – 20 minut",
+          "desc": "Pokračuj v AI poslechu a nasbírej 20 minut.",
+          "href": "/AI_poslech",
+          "lesson_area_key": "F2_M04_AI_LISTENING_20MIN",
+          "requirements": [
+            {
+              "metric": "AI_poslech_minut",
+              "op": ">=",
+              "value": 20,
+              "label": "Stráv alespoň 20 minut v AI poslechu."
+            }
+          ]
+        },
+        {
+          "id": "F2_M05_reading_lessons",
+          "title": "Lekce pro porozumění",
+          "desc": "Dokonči celkem 15 lekcí (čtení, cvičení, porozumění).",
+          "href": "/anglictina",
+          "lesson_area_key": "F2_M05_READING_LESSONS",
+          "requirements": [
+            {
+              "metric": "total_lessons_done",
+              "op": ">=",
+              "value": 15,
+              "label": "Dokonči alespoň 15 lekcí."
+            }
+          ]
+        },
+        {
+          "id": "F2_M06_write_100_words",
+          "title": "Napiš 100 slov",
+          "desc": "Procvičuj psaní a dosáhni 100 napsaných slov.",
+          "href": "/psani",
+          "lesson_area_key": "F2_M06_WRITE_100_WORDS",
+          "requirements": [
+            {
+              "metric": "total_psani_words",
+              "op": ">=",
+              "value": 100,
+              "label": "Napiš alespoň 100 slov v psaní."
+            }
+          ]
+        },
+        {
+          "id": "F2_M07_write_200_words",
+          "title": "Rozepiš se (200 slov)",
+          "desc": "Pokračuj v psaní a dosáhni 200 napsaných slov.",
+          "href": "/psani",
+          "lesson_area_key": "F2_M07_WRITE_200_WORDS",
+          "requirements": [
+            {
+              "metric": "total_psani_words",
+              "op": ">=",
+              "value": 200,
+              "label": "Napiš alespoň 200 slov v psaní."
+            }
+          ]
+        },
+        {
+          "id": "F2_M08_hangman_10_words",
+          "title": "Slovní zásoba – 10 slov",
+          "desc": "Uhodni v hangmanovi 10 různých slov.",
+          "href": "/hangman",
+          "lesson_area_key": "F2_M08_HANGMAN_10_WORDS",
+          "requirements": [
+            {
+              "metric": "hangman_words_guessed",
+              "op": ">=",
+              "value": 10,
+              "label": "Uhodni alespoň 10 slov v hangmanu."
+            }
+          ]
+        },
+        {
+          "id": "F2_M09_hangman_15_words",
+          "title": "Rozšířená slovní zásoba",
+          "desc": "Pokračuj v hangmanovi, dokud neuhodneš 15 slov.",
+          "href": "/hangman",
+          "lesson_area_key": "F2_M09_HANGMAN_15_WORDS",
+          "requirements": [
+            {
+              "metric": "hangman_words_guessed",
+              "op": ">=",
+              "value": 15,
+              "label": "Uhodni alespoň 15 slov v hangmanu."
+            }
+          ]
+        },
+        {
+          "id": "F2_M10_phase2_complete",
+          "title": "Závěrečný test (Fáze 2)",
+          "desc": "Ověř si, co ses ve fázi 2 naučil/a. Po úspěšném testu se mise označí jako splněná.",
+          "href": "/skill-test/phase-2",
+          "lesson_area_key": "F2_M10_PHASE2_COMPLETE",
+          "requirements": [
+            {
+              "metric": "total_lessons_done",
+              "op": ">=",
+              "value": 25,
+              "label": "Dokonči alespoň 25 lekcí."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase_3",
+      "title": "🟠 Fáze 3: Aktivní angličtina",
+      "path": [
+        {
+          "id": "F3_M01_speaking_roleplay_start",
+          "title": "Začni s konverzací",
+          "desc": "Vyzkoušej první rozhovory v roleplay modu.",
+          "href": "/roleplaying",
+          "lesson_area_key": "F3_M01_SPEAKING_ROLEPLAY_START",
+          "requirements": [
+            {
+              "metric": "roleplaying_cr",
+              "op": ">=",
+              "value": 3,
+              "label": "Dokonči alespoň 3 rozhovory."
+            }
+          ]
+        },
+        {
+          "id": "F3_M02_roleplay_10",
+          "title": "10 rozhovorů",
+          "desc": "Splň 10 různých konverzačních scénářů.",
+          "href": "/roleplaying",
+          "lesson_area_key": "F3_M02_ROLEPLAY_10",
+          "requirements": [
+            {
+              "metric": "roleplaying_cr",
+              "op": ">=",
+              "value": 10,
+              "label": "Dokonči alespoň 10 rozhovorů."
+            }
+          ]
+        },
+        {
+          "id": "F3_M03_listening_50",
+          "title": "Poslech – 50 správných",
+          "desc": "Nasbírej celkem 50 správných odpovědí v poslechu.",
+          "href": "/listening",
+          "lesson_area_key": "F3_M03_LISTENING_50",
+          "requirements": [
+            {
+              "metric": "lis_cor",
+              "op": ">=",
+              "value": 50,
+              "label": "Získej alespoň 50 správných odpovědí v poslechu."
+            }
+          ]
+        },
+        {
+          "id": "F3_M04_ai_listening_40min",
+          "title": "AI poslech – 40 minut",
+          "desc": "Stráv alespoň 40 minut s AI poslechem.",
+          "href": "/AI_poslech",
+          "lesson_area_key": "F3_M04_AI_LISTENING_40MIN",
+          "requirements": [
+            {
+              "metric": "AI_poslech_minut",
+              "op": ">=",
+              "value": 40,
+              "label": "Stráv alespoň 40 minut v AI poslechu."
+            }
+          ]
+        },
+        {
+          "id": "F3_M05_irregulars_20",
+          "title": "Nepravidelná slovesa – 20 správně",
+          "desc": "Uhodni správně alespoň 20 nepravidelných sloves.",
+          "href": "/nepravidelna_slovesa",
+          "lesson_area_key": "F3_M05_IRREGULARS_20",
+          "requirements": [
+            {
+              "metric": "irregular_verbs_guessed",
+              "op": ">=",
+              "value": 20,
+              "label": "Správně zodpověz 20 nepravidelných sloves."
+            }
+          ]
+        },
+        {
+          "id": "F3_M06_irregulars_40",
+          "title": "Nepravidelná slovesa – 40 správně",
+          "desc": "Rozšiř slovní zásobu a získej 40 správných nepravidelných sloves.",
+          "href": "/nepravidelna_slovesa",
+          "lesson_area_key": "F3_M06_IRREGULARS_40",
+          "requirements": [
+            {
+              "metric": "irregular_verbs_guessed",
+              "op": ">=",
+              "value": 40,
+              "label": "Správně zodpověz 40 nepravidelných sloves."
+            }
+          ]
+        },
+        {
+          "id": "F3_M07_write_400_words",
+          "title": "Aktivní psaní (400 slov)",
+          "desc": "Napiš dohromady alespoň 400 slov v psaní.",
+          "href": "/psani",
+          "lesson_area_key": "F3_M07_WRITE_400_WORDS",
+          "requirements": [
+            {
+              "metric": "total_psani_words",
+              "op": ">=",
+              "value": 400,
+              "label": "Napiš alespoň 400 slov v psaní."
+            }
+          ]
+        },
+        {
+          "id": "F3_M08_lessons_30",
+          "title": "30 lekcí",
+          "desc": "Dokonči alespoň 30 lekcí napříč aktivitami.",
+          "href": "/anglictina",
+          "lesson_area_key": "F3_M08_LESSONS_30",
+          "requirements": [
+            {
+              "metric": "total_lessons_done",
+              "op": ">=",
+              "value": 30,
+              "label": "Dokonči alespoň 30 lekcí."
+            }
+          ]
+        },
+        {
+          "id": "F3_M09_mix_listen_write",
+          "title": "Poslech + psaní",
+          "desc": "Spoj porozumění a psaní – poslouchej a zapisuj.",
+          "href": "/anglictina",
+          "lesson_area_key": "F3_M09_MIX_LISTEN_WRITE",
+          "requirements": [
+            {
+              "metric": "lis_cor",
+              "op": ">=",
+              "value": 70,
+              "label": "Získej alespoň 70 správných odpovědí v poslechu."
+            },
+            {
+              "metric": "total_psani_words",
+              "op": ">=",
+              "value": 700,
+              "label": "Napiš alespoň 700 slov v psaní."
+            }
+          ]
+        },
+        {
+          "id": "F3_M10_phase3_complete",
+          "title": "Závěrečný test (Fáze 3)",
+          "desc": "Ověř si, co ses ve fázi 3 naučil/a. Po úspěšném testu se mise označí jako splněná.",
+          "href": "/skill-test/phase-3",
+          "lesson_area_key": "F3_M10_PHASE3_COMPLETE",
+          "requirements": [
+            {
+              "metric": "total_lessons_done",
+              "op": ">=",
+              "value": 40,
+              "label": "Dokonči alespoň 40 lekcí."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase_4",
+      "title": "🔵 Fáze 4: Stavba jazyka (gramatika)",
+      "path": [
+        {
+          "id": "F4_M01_pp_intro",
+          "title": "Seznam se s present perfect",
+          "desc": "Vyzkoušej si první cvičení na present perfect.",
+          "href": "/present_perfect",
+          "lesson_area_key": "F4_M01_PP_INTRO",
+          "requirements": [
+            {
+              "metric": "pp_correct",
+              "op": ">=",
+              "value": 5,
+              "label": "Získej 5 správných odpovědí v present perfect."
+            }
+          ]
+        },
+        {
+          "id": "F4_M02_pp_20_correct",
+          "title": "Present perfect – 20 správně",
+          "desc": "Získej 20 správných odpovědí v cvičeních na present perfect.",
+          "href": "/present_perfect",
+          "lesson_area_key": "F4_M02_PP_20_CORRECT",
+          "requirements": [
+            {
+              "metric": "pp_correct",
+              "op": ">=",
+              "value": 20,
+              "label": "Získej 20 správných odpovědí v present perfect."
+            }
+          ]
+        },
+        {
+          "id": "F4_M03_pp_40_correct",
+          "title": "Present perfect – 40 správně",
+          "desc": "Upevni gramatiku present perfect 40 správnými odpověďmi.",
+          "href": "/present_perfect",
+          "lesson_area_key": "F4_M03_PP_40_CORRECT",
+          "requirements": [
+            {
+              "metric": "pp_correct",
+              "op": ">=",
+              "value": 40,
+              "label": "Získej 40 správných odpovědí v present perfect."
+            }
+          ]
+        },
+        {
+          "id": "F4_M04_at_on_intro",
+          "title": "Předložky at/on",
+          "desc": "Vyzkoušej si cvičení na předložky at/on a získej 10 správných odpovědí.",
+          "href": "/at_on",
+          "lesson_area_key": "F4_M04_AT_ON_INTRO",
+          "requirements": [
+            {
+              "metric": "at_cor",
+              "op": ">=",
+              "value": 10,
+              "label": "Získej alespoň 10 správných odpovědí v at/on."
+            }
+          ]
+        },
+        {
+          "id": "F4_M05_at_on_30",
+          "title": "Předložky at/on – 30 správně",
+          "desc": "Procvičuj předložky, dokud nezískáš 30 správných odpovědí.",
+          "href": "/at_on",
+          "lesson_area_key": "F4_M05_AT_ON_30",
+          "requirements": [
+            {
+              "metric": "at_cor",
+              "op": ">=",
+              "value": 30,
+              "label": "Získej alespoň 30 správných odpovědí v at/on."
+            }
+          ]
+        },
+        {
+          "id": "F4_M06_irregulars_70",
+          "title": "Nepravidelná slovesa – 70 správně",
+          "desc": "Rozšiř gramatiku i slovní zásobu 70 správnými nepravidelnými slovesy.",
+          "href": "/nepravidelna_slovesa",
+          "lesson_area_key": "F4_M06_IRREGULARS_70",
+          "requirements": [
+            {
+              "metric": "irregular_verbs_guessed",
+              "op": ">=",
+              "value": 70,
+              "label": "Správně zodpověz 70 nepravidelných sloves."
+            }
+          ]
+        },
+        {
+          "id": "F4_M07_pp_mix",
+          "title": "Present perfect v praxi",
+          "desc": "Používej present perfect v různých kontextech.",
+          "href": "/present_perfect",
+          "lesson_area_key": "F4_M07_PP_MIX",
+          "requirements": [
+            {
+              "metric": "pp_correct",
+              "op": ">=",
+              "value": 60,
+              "label": "Získej alespoň 60 správných odpovědí v present perfect."
+            }
+          ]
+        },
+        {
+          "id": "F4_M08_grammar_lessons",
+          "title": "Gramatické lekce",
+          "desc": "Dokonči alespoň 45 lekcí zaměřených na gramatiku.",
+          "href": "/anglictina",
+          "lesson_area_key": "F4_M08_GRAMMAR_LESSONS",
+          "requirements": [
+            {
+              "metric": "total_lessons_done",
+              "op": ">=",
+              "value": 45,
+              "label": "Dokonči alespoň 45 lekcí."
+            }
+          ]
+        },
+        {
+          "id": "F4_M09_write_800_words",
+          "title": "Zapisuj správnou gramatiku (800 slov)",
+          "desc": "Napiš alespoň 800 slov se zaměřením na správnou gramatiku.",
+          "href": "/psani",
+          "lesson_area_key": "F4_M09_WRITE_800_WORDS",
+          "requirements": [
+            {
+              "metric": "total_psani_words",
+              "op": ">=",
+              "value": 800,
+              "label": "Napiš alespoň 800 slov v psaní."
+            }
+          ]
+        },
+        {
+          "id": "F4_M10_phase4_complete",
+          "title": "Závěrečný test (Fáze 4)",
+          "desc": "Ověř si, co ses ve fázi 4 naučil/a. Po úspěšném testu se mise označí jako splněná.",
+          "href": "/skill-test/phase-4",
+          "lesson_area_key": "F4_M10_PHASE4_COMPLETE",
+          "requirements": [
+            {
+              "metric": "total_lessons_done",
+              "op": ">=",
+              "value": 55,
+              "label": "Dokonči alespoň 55 lekcí."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase_5",
+      "title": "🟣 Fáze 5: Zábavná angličtina",
+      "path": [
+        {
+          "id": "F5_M01_word_game_start",
+          "title": "Začni slovní fotbal",
+          "desc": "Vyzkoušej si slovní fotbal a získej první body.",
+          "href": "/slovni_fotbal",
+          "lesson_area_key": "F5_M01_WORD_GAME_START",
+          "requirements": [
+            {
+              "metric": "slovni_quick_points",
+              "op": ">=",
+              "value": 10,
+              "label": "Získej alespoň 10 bodů ve slovním fotbale."
+            }
+          ]
+        },
+        {
+          "id": "F5_M02_word_game_50",
+          "title": "Slovní fotbal – 50 bodů",
+          "desc": "Nasbírej dohromady 50 bodů ve slovním fotbale.",
+          "href": "/slovni_fotbal",
+          "lesson_area_key": "F5_M02_WORD_GAME_50",
+          "requirements": [
+            {
+              "metric": "slovni_quick_points",
+              "op": ">=",
+              "value": 50,
+              "label": "Získej alespoň 50 bodů ve slovním fotbale."
+            }
+          ]
+        },
+        {
+          "id": "F5_M03_hangman_50",
+          "title": "Hangman – 50 slov",
+          "desc": "Uhodni v hangmanovi alespoň 50 slov.",
+          "href": "/hangman",
+          "lesson_area_key": "F5_M03_HANGMAN_50",
+          "requirements": [
+            {
+              "metric": "hangman_words_guessed",
+              "op": ">=",
+              "value": 50,
+              "label": "Uhodni alespoň 50 slov v hangmanu."
+            }
+          ]
+        },
+        {
+          "id": "F5_M04_irregulars_100",
+          "title": "Nepravidelná slovesa – 100 správně",
+          "desc": "Získej 100 správných odpovědí v nepravidelných slovesech.",
+          "href": "/nepravidelna_slovesa",
+          "lesson_area_key": "F5_M04_IRREGULARS_100",
+          "requirements": [
+            {
+              "metric": "irregular_verbs_guessed",
+              "op": ">=",
+              "value": 100,
+              "label": "Správně zodpověz 100 nepravidelných sloves."
+            }
+          ]
+        },
+        {
+          "id": "F5_M05_ai_grammar_intro",
+          "title": "Seznam se s AI gramatikou",
+          "desc": "Vyzkoušej AI gramatiku a nasbírej první správné odpovědi.",
+          "href": "/AI_gramatika",
+          "lesson_area_key": "F5_M05_AI_GRAMMAR_INTRO",
+          "requirements": [
+            {
+              "metric": "ai_gram_cor",
+              "op": ">=",
+              "value": 10,
+              "label": "Získej 10 správných odpovědí v AI gramatice."
+            }
+          ]
+        },
+        {
+          "id": "F5_M06_ai_grammar_40",
+          "title": "AI gramatika – 40 správně",
+          "desc": "Pokračuj v AI gramatice a nasbírej 40 správných odpovědí.",
+          "href": "/AI_gramatika",
+          "lesson_area_key": "F5_M06_AI_GRAMMAR_40",
+          "requirements": [
+            {
+              "metric": "ai_gram_cor",
+              "op": ">=",
+              "value": 40,
+              "label": "Získej 40 správných odpovědí v AI gramatice."
+            }
+          ]
+        },
+        {
+          "id": "F5_M07_write_1500_words",
+          "title": "Psaní pro radost (1500 slov)",
+          "desc": "Napiš alespoň 1500 slov v psaní na různá témata.",
+          "href": "/psani",
+          "lesson_area_key": "F5_M07_WRITE_1500_WORDS",
+          "requirements": [
+            {
+              "metric": "total_psani_words",
+              "op": ">=",
+              "value": 1500,
+              "label": "Napiš alespoň 1500 slov v psaní."
+            }
+          ]
+        },
+        {
+          "id": "F5_M08_listen_fun_90",
+          "title": "Zábavný poslech – 90 správných",
+          "desc": "Poslouchej zábavné materiály a získej 90 správných odpovědí v poslechu.",
+          "href": "/listening",
+          "lesson_area_key": "F5_M08_LISTEN_FUN_90",
+          "requirements": [
+            {
+              "metric": "lis_cor",
+              "op": ">=",
+              "value": 90,
+              "label": "Získej alespoň 90 správných odpovědí v poslechu."
+            }
+          ]
+        },
+        {
+          "id": "F5_M09_lessons_70",
+          "title": "70 lekcí zábavnou formou",
+          "desc": "Dokonči alespoň 70 lekcí, které tě baví.",
+          "href": "/anglictina",
+          "lesson_area_key": "F5_M09_LESSONS_70",
+          "requirements": [
+            {
+              "metric": "total_lessons_done",
+              "op": ">=",
+              "value": 70,
+              "label": "Dokonči alespoň 70 lekcí."
+            }
+          ]
+        },
+        {
+          "id": "F5_M10_phase5_complete",
+          "title": "Závěrečný test (Fáze 5)",
+          "desc": "Ověř si, co ses ve fázi 5 naučil/a. Po úspěšném testu se mise označí jako splněná.",
+          "href": "/skill-test/phase-5",
+          "lesson_area_key": "F5_M10_PHASE5_COMPLETE",
+          "requirements": [
+            {
+              "metric": "total_lessons_done",
+              "op": ">=",
+              "value": 80,
+              "label": "Dokonči alespoň 80 lekcí."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase_6",
+      "title": "🔴 Fáze 6: Angličtina v praxi",
+      "path": [
+        {
+          "id": "F6_M01_practice_mix_start",
+          "title": "Začni s praxí",
+          "desc": "Začni kombinovat všechny dovednosti v praktických úkolech.",
+          "href": "/anglictina",
+          "lesson_area_key": "F6_M01_PRACTICE_MIX_START",
+          "requirements": [
+            {
+              "metric": "total_lessons_done",
+              "op": ">=",
+              "value": 90,
+              "label": "Dokonči alespoň 90 lekcí."
+            }
+          ]
+        },
+        {
+          "id": "F6_M02_listen_150",
+          "title": "Poslech – 150 správných",
+          "desc": "Nasbírej celkem 150 správných odpovědí v poslechu.",
+          "href": "/listening",
+          "lesson_area_key": "F6_M02_LISTEN_150",
+          "requirements": [
+            {
+              "metric": "lis_cor",
+              "op": ">=",
+              "value": 150,
+              "label": "Získej alespoň 150 správných odpovědí v poslechu."
+            }
+          ]
+        },
+        {
+          "id": "F6_M03_ai_listening_150min",
+          "title": "AI poslech – 150 minut",
+          "desc": "Stráv alespoň 150 minut s AI poslechem.",
+          "href": "/AI_poslech",
+          "lesson_area_key": "F6_M03_AI_LISTENING_150MIN",
+          "requirements": [
+            {
+              "metric": "AI_poslech_minut",
+              "op": ">=",
+              "value": 150,
+              "label": "Stráv alespoň 150 minut v AI poslechu."
+            }
+          ]
+        },
+        {
+          "id": "F6_M04_irregulars_150",
+          "title": "Nepravidelná slovesa – 150 správně",
+          "desc": "Zvládni správně alespoň 150 nepravidelných sloves.",
+          "href": "/nepravidelna_slovesa",
+          "lesson_area_key": "F6_M04_IRREGULARS_150",
+          "requirements": [
+            {
+              "metric": "irregular_verbs_guessed",
+              "op": ">=",
+              "value": 150,
+              "label": "Správně zodpověz 150 nepravidelných sloves."
+            }
+          ]
+        },
+        {
+          "id": "F6_M05_ai_grammar_80",
+          "title": "AI gramatika – 80 správně",
+          "desc": "Prokaž jistotu v gramatice pomocí 80 správných odpovědí v AI gramatice.",
+          "href": "/AI_gramatika",
+          "lesson_area_key": "F6_M05_AI_GRAMMAR_80",
+          "requirements": [
+            {
+              "metric": "ai_gram_cor",
+              "op": ">=",
+              "value": 80,
+              "label": "Získej alespoň 80 správných odpovědí v AI gramatice."
+            }
+          ]
+        },
+        {
+          "id": "F6_M06_pp_80",
+          "title": "Present perfect – 80 správně",
+          "desc": "Získej alespoň 80 správných odpovědí v present perfect.",
+          "href": "/present_perfect",
+          "lesson_area_key": "F6_M06_PP_80",
+          "requirements": [
+            {
+              "metric": "pp_correct",
+              "op": ">=",
+              "value": 80,
+              "label": "Získej alespoň 80 správných odpovědí v present perfect."
+            }
+          ]
+        },
+        {
+          "id": "F6_M07_write_2500_words",
+          "title": "Psaní v praxi (2500 slov)",
+          "desc": "Napiš alespoň 2500 slov v psaní o různých tématech.",
+          "href": "/psani",
+          "lesson_area_key": "F6_M07_WRITE_2500_WORDS",
+          "requirements": [
+            {
+              "metric": "total_psani_words",
+              "op": ">=",
+              "value": 2500,
+              "label": "Napiš alespoň 2500 slov v psaní."
+            }
+          ]
+        },
+        {
+          "id": "F6_M08_roleplay_30",
+          "title": "Konverzace v praxi (30 rozhovorů)",
+          "desc": "Dokonči alespoň 30 konverzačních scénářů v roleplay modu.",
+          "href": "/roleplaying",
+          "lesson_area_key": "F6_M08_ROLEPLAY_30",
+          "requirements": [
+            {
+              "metric": "roleplaying_cr",
+              "op": ">=",
+              "value": 30,
+              "label": "Dokonči alespoň 30 rozhovorů."
+            }
+          ]
+        },
+        {
+          "id": "F6_M09_mix_mastery",
+          "title": "Mix dovedností",
+          "desc": "Spoj poslech, psaní a gramatiku do jednoho stabilního návyku.",
+          "href": "/anglictina",
+          "lesson_area_key": "F6_M09_MIX_MASTERY",
+          "requirements": [
+            {
+              "metric": "total_lessons_done",
+              "op": ">=",
+              "value": 110,
+              "label": "Dokonči alespoň 110 lekcí."
+            },
+            {
+              "metric": "lis_cor",
+              "op": ">=",
+              "value": 180,
+              "label": "Získej alespoň 180 správných odpovědí v poslechu."
+            }
+          ]
+        },
+        {
+          "id": "F6_M10_phase6_complete",
+          "title": "Závěrečný test (Fáze 6)",
+          "desc": "Ověř si, co ses ve fázi 6 naučil/a. Po úspěšném testu se mise označí jako splněná.",
+          "href": "/skill-test/phase-6",
+          "lesson_area_key": "F6_M10_PHASE6_COMPLETE",
+          "requirements": [
+            {
+              "metric": "total_lessons_done",
+              "op": ">=",
+              "value": 120,
+              "label": "Dokonči alespoň 120 lekcí."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -56,7 +56,8 @@ def ai_check_english_text(text: str) -> dict | None:
             pass
         # Fallback: když to není JSON, tak hrubé heuristické vyhodnocení
         lower = content.lower()
-        is_ok = any(k in lower for k in ["ok", "looks good", "no issues", "fine"]) and not any(k in lower for k in ["error", "incorrect", "wrong", "issue"])
+        is_ok = any(k in lower for k in ["ok", "looks good", "no issues", "fine"]) and not any(
+            k in lower for k in ["error", "incorrect", "wrong", "issue"])
         return {"correct": is_ok, "feedback": content[:150]}
     except Exception:
         return None
@@ -69,9 +70,11 @@ def uloz_psani_do_db(user_id, obsah, public=False):
         "INSERT INTO psani (user_id, obsah, public) VALUES (%s, %s, %s)",
         (user_id, obsah, public)
     )
+    new_id = getattr(cur, 'lastrowid', None)
     conn.commit()
     cur.close()
     conn.close()
+    return new_id
 
 
 def nacti_psani_uzivatele(user_id):
@@ -152,12 +155,23 @@ def psani_page():
     # --- Měření času vstupu na stránku ---
     if request.method == 'GET':
         session['psani_training_start'] = time.time()
+        # Reset idempotence zámku při zobrazení formuláře
+        session.pop('psani_last_submit_token', None)
         # Nastavíme first_activity pokud ještě není
         update_user_stats(user_id, set_first_activity=True)
 
     if request.method == 'POST':
         obsah = request.form.get('obsah', '')
         public = bool(request.form.get('public'))
+
+        # Idempotence: pokud se form odešle 2× (double-click / refresh), neukládej podruhé
+        submit_token = request.form.get('submit_token') or request.headers.get('X-Submit-Token')
+        if submit_token:
+            if session.get('psani_last_submit_token') == submit_token:
+                vsechna_psani = nacti_psani_uzivatele(user_id)
+                flash("Formulář už byl odeslán. Příběh je uložený níže.", "info")
+                return render_template('psani/psani.html', obsah="", vsechna_psani=vsechna_psani, ai_feedback=None)
+
         if re.search(f"[{CESKE_ZNAKY}]", obsah, re.IGNORECASE):
             flash("Text nesmí obsahovat české znaky s diakritikou. Piš pouze anglicky.", "danger")
         else:
@@ -167,7 +181,47 @@ def psani_page():
                 if jazyk != 'en':
                     flash("Text musí být napsán v angličtině.", "danger")
                 else:
-                    # AI analýza po větách, zůstaneme na stránce a nic neukládáme
+                    # 1) ULOŽIT do DB ještě před AI kontrolou (aby se nic neztratilo)
+                    pribeh_id = None
+                    try:
+                        pribeh_id = uloz_psani_do_db(user_id, obsah, public)
+                        if submit_token:
+                            session['psani_last_submit_token'] = submit_token
+                    except Exception as e:
+                        print("DB save psani error:", e)
+                        flash("Nepodařilo se uložit příběh do databáze.", "danger")
+                        vsechna_psani = nacti_psani_uzivatele(user_id)
+                        return render_template('psani/psani.html', obsah=obsah, vsechna_psani=vsechna_psani,
+                                               ai_feedback=None)
+
+                    # 2) STATISTIKY, XP, STREAK (podobně jako u editace)
+                    word_count = len(plain_text.split())
+                    learning_time = None
+                    if session.get('psani_training_start'):
+                        try:
+                            start = float(session.pop('psani_training_start', None))
+                            duration = max(1, int(time.time() - start))
+                            learning_time = duration
+                        except Exception as e:
+                            print("Chyba při ukládání času tréninku:", e)
+                    try:
+                        update_user_stats(
+                            user_id,
+                            psani_words=word_count,
+                            lesson_done=True,
+                            learning_time=learning_time,
+                            set_first_activity=True
+                        )
+                    except Exception as e:
+                        print("Chyba při ukládání statistik psaní:", e)
+                    xp_awarded = 2
+                    try:
+                        add_xp_to_user(user_id, xp_awarded)
+                        update_user_streak(user_id)
+                    except Exception as e:
+                        print("XP/STREAK ERROR:", e)
+
+                    # 3) AI analýza po větách (zůstaneme na stránce a zobrazíme výsledek)
                     ai_feedback = None
                     if AI_API_KEY and plain_text.strip():
                         try:
@@ -212,11 +266,14 @@ def psani_page():
                                     pass
                         except Exception as e:
                             print("AI psani analysis error:", e)
+
                     if not ai_feedback:
                         flash("AI analýza dočasně nedostupná.", "warning")
-                    # Neukládáme, pouze zobrazíme výsledek a ponecháme obsah
+
+                    flash(f"Příběh uložen. (+{word_count} slov, +{xp_awarded} XP)", "success")
                     vsechna_psani = nacti_psani_uzivatele(user_id)
-                    return render_template('psani/psani.html', obsah=obsah, vsechna_psani=vsechna_psani, ai_feedback=ai_feedback)
+                    return render_template('psani/psani.html', obsah="", vsechna_psani=vsechna_psani,
+                                           ai_feedback=ai_feedback, pribeh_id=pribeh_id)
             except LangDetectException:
                 flash("Text je příliš krátký nebo nečitelný pro detekci jazyka.", "danger")
     vsechna_psani = nacti_psani_uzivatele(user_id)

@@ -1,333 +1,1169 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-    .alpha-badge {
-        font-size: 1.2em;
-        font-weight: bold;
-        color: red;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-top: 10px;
-        display: inline-block;
-        padding: 5px 15px;
-        border-radius: 20px;
-        background: rgba(255, 0, 0, 0.1);
-    }
+<link rel="stylesheet" href="/static/skill_tree.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    .footer-signature {
-        font-size: 1em;
-        font-weight: bold;
-        color: #666;
-        margin-top: 10px;
-    }
-
-    .logo-name {
-        font-size: 4rem;
-        color: #2c3e50;
-        text-transform: lowercase;
-        margin-bottom: 15px;
-        letter-spacing: -2px;
-    }
-
-    .profile-container {
-        position: relative;
-    }
-
-    .profile-pic {
-        border-radius: 50%;
-    }
-
-    .profile-menu {
-        position: absolute;
-        top: 70px;
-        right: 0;
-        background-color: white;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(10px);
-        transition: all 0.3s ease-in-out;
-    }
-
-    .profile-container:hover .profile-menu {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
-
-    /* XP Progress bar v headeru */
-    .xp-header-bar {
-        margin-top: 0.5em;
-        margin-bottom: 0.5em;
-        width: 220px;
-        max-width: 90vw;
-    }
-
-    .xp-header-bar-labels {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 1em;
-        margin-bottom: 0.2em;
-    }
-
-    .xp-level-badge {
-        background: #4CAF50;
-        color: #fff;
-        border-radius: 8px;
-        padding: 2px 10px;
-        font-weight: 600;
-        font-size: 0.95em;
-        margin-right: 0.5em;
-    }
-
-    .xp-value {
-        color: #333;
-        font-size: 0.95em;
-    }
-
-    body.dark-mode .xp-level-badge {
-        background: #2e7d32;
-    }
-
-    body.dark-mode .xp-value {
-        color: #eee;
-    }
-
-    .xp-header-bar-progress-bg {
-        background: #e0e0e0;
-        border-radius: 8px;
-        height: 12px;
-        width: 100%;
-        overflow: hidden;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-    }
-
-    .xp-header-bar-progress {
-        height: 100%;
-        background: linear-gradient(90deg, #4CAF50 60%, #43a047 100%);
-        border-radius: 8px 0 0 8px;
-        transition: width 0.4s;
-    }
-
-    body.dark-mode .xp-header-bar-progress-bg {
-        background: #333;
-    }
-
-    body.dark-mode .xp-header-bar-progress {
-        background: linear-gradient(90deg, #2e7d32 60%, #1b5e20 100%);
-    }
-
-    /* Fixní panel denních úkolů vpravo uprostřed (desktop) */
-    .daily-quests-fixed {
-        position: fixed;
-        right: 20px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: min(360px, 85vw);
-        z-index: 1000;
-    }
-
-    /* Na mobilu se má zobrazit dole (přirozený tok dokumentu) */
-    @media (max-width: 991.98px) {
-        .daily-quests-fixed {
-            position: static;
-            transform: none;
-            width: auto;
-            margin: 12px 16px 24px 16px; /* trocha vzduchu nahoře i dole */
-        }
-
-        /* Ujisti se, že blok je vizuálně oddělený a na konci */
-        .daily-quests-fixed {
-            order: 99;
-        }
-
-        main {
-            display: flex;
-            flex-direction: column;
-        }
-    }
-
-    /* Volitelný decentní styl pro text pod bublinou */
-    .plain-note {
-        color: #555;
-        margin: 6px 2px;
-    }
-
-    .pwa-popout {
-        position: fixed;
-        z-index: 10000;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        max-width: 560px;
-        width: calc(100% - 32px);
-        background: rgba(255, 255, 255, 0.98);
-        color: #111;
-        border-radius: 16px;
-        box-shadow: 0 12px 34px rgba(0, 0, 0, 0.35);
-        padding: 18px;
-        display: none;
-    }
-
-    .pwa-popout h3 {
-        margin: 0 0 6px;
-        font-size: 18px;
-        font-weight: 700;
-    }
-
-    .pwa-popout p {
-        margin: 8px 0;
-        line-height: 1.5;
-    }
-
-    .pwa-popout .steps {
-        background: #f3f4f6;
-        border-radius: 12px;
-        padding: 12px;
-    }
-
-    .pwa-popout .close-btn {
-        background: none;
-        border: none;
-        color: #555;
-        font-weight: 600;
-        padding: 8px 12px;
-        border-radius: 10px;
-        cursor: pointer;
-    }
-
-    .pwa-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(6px);
-        z-index: 9999;
-        display: none;
-    }
-</style>
-
-<main>
-    <section class="intro">
+<div class="home-wrap" id="skillTreeRoot">
+    <!-- Desktop header (velké logo a motto) -->
+    <section class="desktop-header">
         <h1 class="logo-name">knowix</h1>
-        <!--        <span class="alpha-badge">ALPHA VERZE</span>-->
         <h2 class="motto">Děláno pro lidi</h2>
+        {% if user_english_level %}
+        <div class="level-info">
+            <span class="level-badge">Úroveň: <strong>{{ user_english_level }}</strong></span>
+            {% if selected_phase_title %}
+            <span class="phase-info">| Fáze: <strong>{{ selected_phase_title }}</strong></span>
+            {% endif %}
+        </div>
+        {% endif %}
     </section>
 
-    <section class="info">
-
-        <div class="bubble support-bubble" onclick="location.href='/anglictina'">
-            <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="angličtina">
-            <div class="bubble-text">
-                <h3>Angličtina</h3>
-                <p>Zábavné cvičení na téma Angličtina</p>
+    <!-- Mobile compact header -->
+    <section class="mobile-compact-header">
+        <div class="header-top-row">
+            <h1 class="logo-name">knowix</h1>
+            <div class="header-meta">
+                <span class="level-badge">Úroveň: <strong>{{ user_english_level or 'A1' }}</strong></span>
             </div>
         </div>
-        <!-- „PWA aplikace“ -->
-        <div class="bubble support-bubble" onclick="openPwaHelp()">
-            <img src="{{ url_for('static', filename='pic/logo1.webp') }}" alt="Knowix Logo">
-            <div class="bubble-text">
-                <h3>PWA aplikace</h3>
-                <p>Knowix jde nainstalovat jako aplikace. Klikni a uvidíš jak.</p>
-            </div>
-        </div>
-        <div class="bubble support-bubble" onclick="location.href='/proc_jit_s_nama'">
-            <img src="{{ url_for('static', filename='pic/why.png') }}" alt="Podpora">
-            <div class="bubble-text">
-                <h3>Proč cvičit na Knowixu?</h3>
-                <p>Klikni na to, a dozvíte se proč bys měl nás doporučit ostatním.</p>
-            </div>
-        </div>
-        <!-- Kontakty bublina samostatně, text zvlášť pod ní -->
-        <div class="bubble support-bubble" onclick="location.href='/kontakty'">
-            <img src="{{ url_for('static', filename='pic/contac.png') }}" alt="Podpora">
-            <div class="bubble-text">
-                <h3>Kontakty</h3>
-                <p>Klikni jestliže chceš zjistit <strong>Discord, tiktok a atd...</strong></p>
-            </div>
-        </div>
-        <div class="bubble support-bubble" onclick="window.open('https://ko-fi.com/voku199', '_blank')">
-            <img src="{{ url_for('static', filename='pic/support.webp') }}" alt="Podpora">
-            <div class="bubble-text">
-                <h3>Podpora</h3>
-                <p>Chceš mě finančně podpořit? Klikni na to 😊</p>
-                <p>Dobrovolný příspěvek!</p>
-            </div>
+        <div class="header-bottom-row">
+            <h2 class="motto">Děláno pro lidi</h2>
+            {% if selected_phase_title %}
+            <div class="current-phase">Fáze: <strong>{{ selected_phase_title }}</strong></div>
+            {% endif %}
         </div>
     </section>
 
-    <div class="daily-quests-fixed">
-        {% include 'daily_quest.html' %}
+    <!-- Main action buttons - ALWAYS VISIBLE -->
+    <div class="main-actions-container">
+        <a href="/anglictina" class="main-action-btn btn-english">
+            <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="">
+            <span>Otevřít Angličtinu</span>
+        </a>
+        <a href="/prijmacky" class="main-action-btn btn-prijmacky">
+            <img src="{{ url_for('static', filename='pic/prijmacky.png') }}" alt="">
+            <span>Vyzkoušet Přijmačky</span>
+        </a>
     </div>
-</main>
 
-<div id="pwaOverlay" class="pwa-overlay" onclick="closePwaHelp()"></div>
-<div id="pwaPopout" class="pwa-popout" role="dialog" aria-modal="true" aria-labelledby="pwaHelpTitle">
-    <div style="display:flex; align-items:center; margin-bottom: 10px;">
-        <div style="width:44px; height:44px; border-radius:50%; background: linear-gradient(90deg, #2d7ff9, #6aa9ff); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:18px; margin-right:10px;">
-            ⬇️
+    <!-- Phase selector -->
+    <div class="phase-selector-container">
+        <div class="section-label">
+            <img src="{{ url_for('static', filename='icons/phase.png') }}" alt="" class="section-icon">
+            <span>VYBER FÁZI</span>
         </div>
-        <div>
-            <h3 id="pwaHelpTitle">Instalace PWA aplikace</h3>
-            <p style="margin:2px 0 0; font-size:13px; color:#555;">Knowix si můžeš nainstalovat jako aplikaci.</p>
+        <select class="phase-select" aria-label="Vyber fázi">
+            <option value="">-- Klikni a vyber fázi --</option>
+            {% for p in phases or [] %}
+                <option value="{{ p.id }}"
+                        {% if p.id == selected_phase_id %}selected{% endif %}
+                        {% if p.locked %}disabled{% endif %}>
+                    {{ p.title }}{% if p.locked %} (🔒 Zamčeno){% endif %}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    {#
+      Desktop skill tree je vypnuté.
+      Na desktopu teď používáme stejný UI jako na mobilu (mobile-roadmap).
+      Necháváme jen desktop-header.
+    #}
+    {#
+    <!-- DESKTOP SKILL TREE S VYLEPŠENOU CESTOU -->
+    <section class="desktop-skill-tree" aria-label="Strom dovedností">
+        {% if skills and skills|length > 0 %}
+        <div class="skill-tree-header">
+            <div class="section-label">
+                <img src="{{ url_for('static', filename='icons/roadmap.png') }}" alt="" class="section-icon">
+                <span>TVAJE CESTA - FÁZE: {{ selected_phase_title or 'Nevybráno' }}</span>
+            </div>
+            <div class="progress-info">
+                <span class="progress-text">{{ completed_count or 0 }}/{{ skills|length }} dokončeno</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ ((completed_count or 0) / skills|length * 100) if skills|length > 0 else 0 }}%"></div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="steps">
-        <p><strong>Chrome / Edge (Windows, Android):</strong></p>
-        <p>1) Klikni na ikonu „Instalovat“ vpravo nahoře nebo otevři menu ⋮ a zvol „Instalovat aplikaci“.</p>
-        <p>2) Potvrď instalaci. Aplikace se objeví v nabídce Start / na ploše.</p>
-        <hr style="border:none; border-top:1px solid #e5e7eb; margin:10px 0;">
-        <p><strong>Safari (iOS):</strong></p>
-        <p>1) Otevři menu „Sdílet“ (ikonka se šipkou nahoru).</p>
-        <p>2) Zvol „Přidat na plochu“.</p>
-        <p>3) Potvrď. Ikona se přidá na plochu jako aplikace.</p>
-    </div>
-    <div style="display:flex; justify-content:flex-end; margin-top:12px;">
-        <button class="close-btn" onclick="closePwaHelp()">Zavřít</button>
-        <button style="background: linear-gradient(90deg, #3b82f6, #8b5cf6); color:#fff; font-weight:600; padding:8px 14px; border:none; border-radius:10px; cursor:pointer; margin-left:8px;"
-                onclick="triggerPwaInstall()">Zkusit instalaci
-        </button>
+
+        <!-- Phase Navigation Tabs -->
+        <div class="phase-navigation">
+            <div class="phase-tabs">
+                {% for phase in phases %}
+                <a href="/?phase={{ phase.id }}"
+                   class="phase-tab {% if phase.id == selected_phase_id %}active{% endif %} {% if phase.locked %}locked{% endif %}"
+                   data-phase-id="{{ phase.id }}">
+                    <span class="phase-icon">
+                        {% if phase.id == 'phase_1' %}🟢
+                        {% elif phase.id == 'phase_2' %}🟡
+                        {% elif phase.id == 'phase_3' %}🟠
+                        {% elif phase.id == 'phase_4' %}🔵
+                        {% elif phase.id == 'phase_5' %}🟣
+                        {% elif phase.id == 'phase_6' %}🔴
+                        {% else %}●{% endif %}
+                    </span>
+                    <span class="phase-title">{{ phase.title|replace('Fáze ', '')|replace(': ', '') }}</span>
+                    {% if phase.locked %}<span class="lock-icon">🔒</span>{% endif %}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="skill-tree-container">
+            <!-- SVG pro klikatou cestu -->
+            <svg class="zigzag-path" width="100%" height="100%" preserveAspectRatio="none">
+                <!-- Cesta bude vykreslena JavaScriptem -->
+            </svg>
+
+            <!-- Uzly - rozšířený layout pro všechny questy -->
+            <div class="skill-pathway">
+                {% for s in skills %}
+                {% set position = loop.index %}
+                <div class="skill-node skill-node--{{ s.state or 'available' }} {{ 'locked' if s.locked else '' }}"
+                     data-title="{{ s.title | e }}"
+                     data-href="{{ s.href | e }}"
+                     data-locked="{{ '1' if s.locked else '0' }}"
+                     data-index="{{ position }}"
+                     data-state="{{ s.state or 'available' }}"
+                     data-row="{{ 'top' if position % 2 == 1 else 'bottom' }}"
+                     data-pos="{{ position }}">
+                    <div class="node-core">
+                        {% if s.state == 'completed' %}
+                            <div class="node-checkmark">
+                                <svg viewBox="0 0 24 24" width="24" height="24">
+                                    <path fill="white" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                </svg>
+                            </div>
+                        {% else %}
+                            <span class="node-number">{{ position }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="node-content">
+                        <h4 class="node-title">{{ s.title }}</h4>
+                        <div class="node-status">
+                            {% if s.state == 'completed' %}
+                            <span class="status-completed">✓ Dokončeno</span>
+                            {% elif s.locked %}
+                            <span class="status-locked">🔒 Zamčeno</span>
+                            {% else %}
+                            <span class="status-available">● Dostupné</span>
+                            {% endif %}
+                        </div>
+                        {% if not s.locked %}
+                        <a href="{{ s.href }}" class="node-action-btn">
+                            {% if s.state == 'completed' %}
+                            ↻ Zopakovat
+                            {% else %}
+                            ▶ Spustit
+                            {% endif %}
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-tree">
+            <img src="{{ url_for('static', filename='icons/empty.png') }}" alt="" class="empty-icon">
+            <p class="empty-title">Vyber fázi výše</p>
+            <p class="empty-desc">Zvol fázi, abys viděl/a cestu k dokončení</p>
+        </div>
+        {% endif %}
+    </section>
+    #}
+
+    <!-- MOBILE VERTICAL ROADMAP (používá se i pro desktop) -->
+    <section class="mobile-roadmap" aria-label="Cesta učení">
+        {% if skills and skills|length > 0 %}
+            <div class="roadmap-header">
+                <div class="section-label">
+                    <img src="{{ url_for('static', filename='icons/roadmap.png') }}" alt="" class="section-icon">
+                    <span>TVAJE CESTA</span>
+                </div>
+                <div class="progress-info">
+                    <span class="progress-text">{{ completed_count or 0 }}/{{ skills|length }} dokončeno</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ ((completed_count or 0) / skills|length * 100) if skills|length > 0 else 0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="roadmap-steps">
+                {% for s in skills or [] %}
+                <div class="roadmap-step {% if s.state == 'completed' %}completed{% elif s.state == 'available' %}available{% else %}locked{% endif %}"
+                     data-index="{{ loop.index }}"
+                     data-title="{{ s.title | e }}"
+                     data-href="{{ s.href | e }}"
+                     data-state="{{ s.state or 'available' }}"
+                     data-locked="{{ '1' if s.locked else '0' }}">
+                    <div class="step-indicator">
+                        <div class="step-number">{{ loop.index }}</div>
+                        <div class="step-connector {% if loop.last %}last{% endif %}"></div>
+                    </div>
+
+                    <div class="step-content">
+                        <div class="step-header">
+                            <h4 class="step-title">{{ s.title }}</h4>
+                            {% if s.state == 'completed' %}
+                            <span class="step-status completed">✓ Dokončeno</span>
+                            {% elif s.locked %}
+                            <span class="step-status locked">🔒 Zamčeno</span>
+                            {% else %}
+                            <span class="step-status available">● Dostupné</span>
+                            {% endif %}
+                        </div>
+
+                        <p class="step-desc">{{ s.desc or "Klikni pro spuštění úkolu" }}</p>
+
+                        <div class="step-actions">
+                            {% if s.locked %}
+                            <button class="step-btn locked" disabled>
+                                🔒 Čeká na předchozí úkoly
+                            </button>
+                            {% else %}
+                            <a href="{{ s.href }}" class="step-btn {% if s.state == 'completed' %}repeat{% else %}start{% endif %}">
+                                {% if s.state == 'completed' %}
+                                ↻ Zopakovat
+                                {% else %}
+                                ▶ Spustit
+                                {% endif %}
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-roadmap">
+                <img src="{{ url_for('static', filename='icons/empty.png') }}" alt="" class="empty-icon">
+                <p class="empty-title">Vyber fázi výše</p>
+                <p class="empty-desc">Zvol fázi, abys viděl/a kroky k dokončení</p>
+            </div>
+        {% endif %}
+    </section>
+</div>
+
+<!-- Modal overlay (tmavé pozadí) -->
+<div class="modal-overlay" id="modalOverlay" style="display: none;"></div>
+
+<!-- Popout bublina / modal pro detail dungeonu -->
+<div class="dungeon-modal" id="dungeonModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="dungeonModalTitle">
+    <button class="dungeon-modal__close" id="dungeonModalClose" type="button" aria-label="Zavřít">×</button>
+    <div class="dungeon-modal__body">
+        <div class="dungeon-modal__status" id="dungeonModalStatus"></div>
+        <h3 class="dungeon-modal__title" id="dungeonModalTitle"></h3>
+        <p class="dungeon-modal__desc" id="dungeonModalDesc"></p>
+        <div class="dungeon-modal__req" id="dungeonModalReq" style="display:none;"></div>
+        <div class="dungeon-modal__actions">
+            <a class="dungeon-modal__start" id="dungeonModalStart" href="#">▶ Spustit</a>
+        </div>
     </div>
 </div>
 
-<script>
-    function openPwaHelp() {
-        document.getElementById('pwaOverlay').style.display = 'block';
-        document.getElementById('pwaPopout').style.display = 'block';
+<style>
+    /* ===== MOBILE-FIRST REDESIGN ===== */
+    .home-wrap {
+        padding: 0;
+        min-height: 100vh;
+        background: #f8fafc;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    function closePwaHelp() {
-        document.getElementById('pwaOverlay').style.display = 'none';
-        document.getElementById('pwaPopout').style.display = 'none';
+    /* DESKTOP HEADER */
+    .desktop-header {
+        display: none;
+        text-align: center;
+        padding: 30px 20px 20px;
+        background: white;
+        border-bottom: 1px solid #eaeaea;
     }
 
-    function triggerPwaInstall() {
-        const btn = document.getElementById('install-app');
-        if (btn) {
-            btn.click();
-        } else {
-            alert('Instalace není dostupná v tomto prohlížeči. Postupuj dle návodu.');
+    .desktop-header .logo-name {
+        font-size: 4rem;
+        color: #2c3e50;
+        text-transform: lowercase;
+        margin-bottom: 10px;
+        letter-spacing: -2px;
+        font-weight: bold;
+    }
+
+    .desktop-header .motto {
+        font-size: 1.5rem;
+        color: #666;
+        margin-bottom: 20px;
+        font-weight: normal;
+    }
+
+    .level-info {
+        font-size: 1rem;
+        color: #555;
+        background: #f5f5f5;
+        padding: 10px 20px;
+        border-radius: 25px;
+        display: inline-block;
+    }
+
+    .level-badge {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .phase-info {
+        color: #666;
+        margin-left: 15px;
+    }
+
+    /* MOBILE HEADER */
+    .mobile-compact-header {
+        padding: 12px 16px;
+        background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+        color: white;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .header-top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .mobile-compact-header .logo-name {
+        font-size: 1.4rem;
+        font-weight: 800;
+        margin: 0;
+        color: white;
+        letter-spacing: -0.5px;
+    }
+
+    .mobile-compact-header .level-badge {
+        background: rgba(255,255,255,0.15);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .header-bottom-row {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .mobile-compact-header .motto {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: rgba(255,255,255,0.95);
+        margin: 0;
+    }
+
+    .current-phase {
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.8);
+    }
+
+    /* MAIN ACTION BUTTONS */
+    .main-actions-container {
+        display: flex;
+        gap: 10px;
+        padding: 16px;
+        background: white;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+    .main-action-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding: 14px 12px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+        border: 2px solid transparent;
+    }
+
+    .main-action-btn img {
+        width: 24px;
+        height: 24px;
+    }
+
+    .btn-english {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        color: #2e7d32;
+        border-color: #4caf50;
+    }
+
+    .btn-prijmacky {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        color: #1565c0;
+        border-color: #2196f3;
+    }
+
+    .main-action-btn:active {
+        transform: scale(0.98);
+    }
+
+    /* PHASE SELECTOR */
+    .phase-selector-container {
+        padding: 20px 16px 16px;
+        background: white;
+        margin-top: 2px;
+    }
+
+    .section-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #5f6368;
+        letter-spacing: 0.5px;
+    }
+
+    .section-icon {
+        width: 16px;
+        height: 16px;
+        opacity: 0.8;
+    }
+
+    .phase-select {
+        width: 100%;
+        padding: 14px 16px;
+        font-size: 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        background: white;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        background-size: 16px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .phase-select:focus {
+        outline: none;
+        border-color: #2196f3;
+        box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+    }
+
+    /* DESKTOP SKILL TREE */
+    .desktop-skill-tree {
+        display: none;
+        padding: 30px;
+        background: white;
+        margin: 20px auto;
+        max-width: 1600px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .skill-tree-header {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .skill-tree-container {
+        position: relative;
+        min-height: 600px;
+        padding: 80px 40px;
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        border-radius: 20px;
+        overflow: visible;
+    }
+
+    /* Phase Navigation */
+    .phase-navigation {
+        margin-bottom: 40px;
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid #e9ecef;
+    }
+
+    .phase-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .phase-tab {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        background: white;
+        border-radius: 10px;
+        text-decoration: none;
+        color: #495057;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        border: 2px solid transparent;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .phase-tab:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border-color: #e9ecef;
+    }
+
+    .phase-tab.active {
+        background: #007bff;
+        color: white;
+        border-color: #0056b3;
+        box-shadow: 0 4px 15px rgba(0,123,255,0.2);
+    }
+
+    .phase-tab.locked {
+        opacity: 0.6;
+        background: #e9ecef;
+        cursor: not-allowed;
+    }
+
+    .phase-tab.locked:hover {
+        transform: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .phase-icon {
+        font-size: 1.2rem;
+    }
+
+    .phase-title {
+        white-space: nowrap;
+    }
+
+    .lock-icon {
+        margin-left: 5px;
+        font-size: 0.8rem;
+    }
+
+    /* Empty tree */
+    .empty-tree {
+        text-align: center;
+        padding: 60px 20px;
+        color: #9e9e9e;
+    }
+
+    .empty-icon {
+        width: 80px;
+        height: 80px;
+        opacity: 0.4;
+        margin-bottom: 20px;
+    }
+
+    /* MOBILE ROADMAP */
+    .mobile-roadmap {
+        flex: 1;
+        padding: 16px;
+        background: white;
+        margin-top: 2px;
+    }
+
+    .roadmap-header {
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .progress-info {
+        margin-top: 12px;
+    }
+
+    .progress-text {
+        display: block;
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 6px;
+    }
+
+    .progress-bar {
+        height: 8px;
+        background: #e0e0e0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4caf50, #8bc34a);
+        border-radius: 4px;
+        transition: width 0.5s ease;
+    }
+
+    /* ROADMAP STEPS */
+    .roadmap-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .roadmap-step {
+        display: flex;
+        gap: 16px;
+        position: relative;
+    }
+
+    .step-indicator {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .step-number {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+        z-index: 2;
+        border: 3px solid white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .step-connector {
+        width: 2px;
+        flex: 1;
+        min-height: 40px;
+        background: #e0e0e0;
+        margin-top: 8px;
+    }
+
+    .step-connector.last {
+        display: none;
+    }
+
+    /* Step states */
+    .roadmap-step.completed .step-number {
+        background: #4caf50;
+        color: white;
+    }
+
+    .roadmap-step.available .step-number {
+        background: #2196f3;
+        color: white;
+        animation: pulse 2s infinite;
+    }
+
+    .roadmap-step.locked .step-number {
+        background: #bdbdbd;
+        color: #757575;
+    }
+
+    .roadmap-step.completed .step-connector {
+        background: #4caf50;
+    }
+
+    /* Step content */
+    .step-content {
+        flex: 1;
+        padding-bottom: 20px;
+    }
+
+    .step-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+    }
+
+    .step-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+        flex: 1;
+    }
+
+    .step-status {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-weight: 600;
+        margin-left: 8px;
+        white-space: nowrap;
+    }
+
+    .step-status.completed {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .step-status.available {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+
+    .step-status.locked {
+        background: #f5f5f5;
+        color: #757575;
+    }
+
+    .step-desc {
+        font-size: 0.9rem;
+        color: #666;
+        line-height: 1.5;
+        margin: 0 0 12px 0;
+    }
+
+    /* Step actions */
+    .step-actions {
+        margin-top: 12px;
+    }
+
+    .step-btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+        min-width: 120px;
+    }
+
+    .step-btn.start {
+        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+        color: white;
+        box-shadow: 0 2px 6px rgba(33, 150, 243, 0.3);
+    }
+
+    .step-btn.repeat {
+        background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+        color: white;
+        box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+    }
+
+    .step-btn.locked {
+        background: #f5f5f5;
+        color: #9e9e9e;
+        cursor: not-allowed;
+        width: 100%;
+        border: 1px solid #e0e0e0;
+    }
+
+    .step-btn:active:not(.locked) {
+        transform: translateY(2px);
+    }
+
+    /* Empty state */
+    .empty-roadmap {
+        text-align: center;
+        padding: 40px 20px;
+        color: #9e9e9e;
+    }
+
+    .empty-icon {
+        width: 64px;
+        height: 64px;
+        opacity: 0.5;
+        margin-bottom: 16px;
+    }
+
+    .empty-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin: 0 0 8px 0;
+        color: #757575;
+    }
+
+    .empty-desc {
+        font-size: 0.95rem;
+        margin: 0;
+        color: #9e9e9e;
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 999;
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .dungeon-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(520px, calc(100vw - 24px));
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 18px 60px rgba(0,0,0,0.25);
+        z-index: 1000;
+        border: 1px solid rgba(0,0,0,0.08);
+        animation: modalFadeIn 0.18s ease;
+        padding: 18px 18px 16px;
+    }
+
+    .dungeon-modal__close {
+        position: absolute;
+        top: 10px;
+        right: 12px;
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        border: 1px solid rgba(0,0,0,0.08);
+        background: #f8fafc;
+        cursor: pointer;
+        font-size: 20px;
+        line-height: 32px;
+        color: #333;
+    }
+
+    .dungeon-modal__status {
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        margin-bottom: 10px;
+        background: #f5f5f5;
+        color: #555;
+    }
+
+    .dungeon-modal__title {
+        margin: 0 0 8px 0;
+        font-size: 1.2rem;
+        color: #1f2937;
+    }
+
+    .dungeon-modal__desc {
+        margin: 0 0 12px 0;
+        color: #4b5563;
+        line-height: 1.5;
+    }
+
+    .dungeon-modal__req {
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: #f8fafc;
+        border: 1px solid rgba(0,0,0,0.06);
+        color: #374151;
+        font-size: 0.9rem;
+    }
+
+    .dungeon-modal__req ul {
+        margin: 8px 0 0 18px;
+        padding: 0;
+    }
+
+    .dungeon-modal__actions {
+        margin-top: 14px;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    .dungeon-modal__start {
+        display: inline-block;
+        padding: 10px 14px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+        color: #fff;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .dungeon-modal__start[aria-disabled="true"] {
+        pointer-events: none;
+        opacity: 0.55;
+        filter: grayscale(0.6);
+    }
+
+    /* ===== VYLEPŠENÉ DESKTOPOVÉ CESTIČKY ===== */
+    @media (min-width: 769px) {
+        .desktop-header {
+            display: block;
+        }
+
+        .mobile-compact-header {
+            display: none;
+        }
+
+        /* Na desktopu chceme používat mobile UI (roadmap + phase selector + main actions) */
+        .main-actions-container {
+            display: flex;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .phase-selector-container,
+        .mobile-roadmap {
+            display: block;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Desktop skill tree schovat úplně */
+        .desktop-skill-tree {
+            display: none !important;
         }
     }
-</script>
-<script>document.body.classList.add('onboarding-active');   </script>
-<script>const CSRF_TOKEN = "{{ csrf_token() }}";</script>
+
+    /* Animations - žádné pulzování */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+    }
+
+    .roadmap-step {
+        animation: fadeIn 0.3s ease forwards;
+        animation-delay: calc(var(--step-index, 0) * 0.1s);
+    }
+
+    /* Tablet adjustments */
+    @media (min-width: 481px) and (max-width: 768px) {
+        .main-actions-container {
+            padding: 20px;
+        }
+
+        .main-action-btn {
+            flex-direction: row;
+            justify-content: center;
+            font-size: 0.95rem;
+            padding: 16px;
+        }
+
+        .step-btn {
+            min-width: 140px;
+        }
+    }
+
+    /* Very small screens */
+    @media (max-width: 360px) {
+        .main-action-btn span {
+            font-size: 0.8rem;
+        }
+
+        .step-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+
+        .step-status {
+            align-self: flex-start;
+        }
+
+        .step-btn {
+            width: 100%;
+        }
+    }
+</style>
+
 <script>
-    document.addEventListener('click', (e) => {
-        const profileMenu = document.getElementById('profileMenu');
-        const trigger = document.getElementById('profileMenuTrigger');
-        if (profileMenu && trigger && !trigger.contains(e.target) && !profileMenu.contains(e.target)) {
-            profileMenu.style.opacity = '0';
-            profileMenu.style.visibility = 'hidden';
-            profileMenu.style.transform = 'translateY(10px)';
+    // Phase selector handler
+    document.querySelector('.phase-select')?.addEventListener('change', function(e) {
+        const phaseId = e.target.value;
+        if (phaseId) {
+            window.location.href = '/?phase=' + encodeURIComponent(phaseId);
         }
     });
+
+    // Add animation delays for steps
+    document.addEventListener('DOMContentLoaded', function() {
+        const steps = document.querySelectorAll('.roadmap-step');
+        steps.forEach((step, index) => {
+            step.style.setProperty('--step-index', index);
+        });
+    });
+
+    // ----- Popout bublina (modal) pro dungeon detail + data ze skill_tree.json -----
+    const SKILL_TREE_URL = '/static/skill_tree.json';
+
+    function getSelectedPhaseIdFromDOM() {
+        const select = document.querySelector('.phase-select');
+        if (select && select.value) return select.value;
+
+        const activeTab = document.querySelector('.phase-tab.active');
+        if (activeTab?.getAttribute('data-phase-id')) return activeTab.getAttribute('data-phase-id');
+
+        const url = new URL(window.location.href);
+        return url.searchParams.get('phase');
+    }
+
+    async function loadSkillTreeJson() {
+        try {
+            const res = await fetch(SKILL_TREE_URL, { cache: 'no-store' });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return await res.json();
+        } catch (err) {
+            console.warn('Nepodařilo se načíst skill_tree.json:', err);
+            return null;
+        }
+    }
+
+    function escHtml(s) {
+        return String(s ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#39;');
+    }
+
+    function openDungeonModal({ title, desc, href, state, locked, requirements }) {
+        const overlay = document.getElementById('modalOverlay');
+        const modal = document.getElementById('dungeonModal');
+        const closeBtn = document.getElementById('dungeonModalClose');
+
+        const elStatus = document.getElementById('dungeonModalStatus');
+        const elTitle = document.getElementById('dungeonModalTitle');
+        const elDesc = document.getElementById('dungeonModalDesc');
+        const elReq = document.getElementById('dungeonModalReq');
+        const elStart = document.getElementById('dungeonModalStart');
+
+        if (!overlay || !modal || !elTitle || !elDesc || !elStart || !closeBtn) return;
+
+        // Status label
+        let statusText = '● Dostupné';
+        if (locked) statusText = '🔒 Zamčeno';
+        else if (state === 'completed') statusText = '✓ Dokončeno';
+        else if (state === 'available') statusText = '● Dostupné';
+        elStatus.textContent = statusText;
+
+        elTitle.textContent = title || 'Detail úkolu';
+        elDesc.textContent = desc || '';
+
+        // Requirements list
+        const reqs = Array.isArray(requirements) ? requirements : [];
+        if (elReq) {
+            if (reqs.length === 0) {
+                elReq.style.display = 'none';
+                elReq.innerHTML = '';
+            } else {
+                elReq.style.display = '';
+                const items = reqs
+                    .map(r => {
+                        const label = r?.label || `${r?.metric ?? ''} ${r?.op ?? ''} ${r?.value ?? ''}`.trim();
+                        return `<li>${escHtml(label)}</li>`;
+                    })
+                    .join('');
+                elReq.innerHTML = `<div><strong>Podmínky:</strong></div><ul>${items}</ul>`;
+            }
+        }
+
+        // Start link
+        elStart.setAttribute('href', href || '#');
+        if (!href || locked) {
+            elStart.setAttribute('aria-disabled', 'true');
+        } else {
+            elStart.removeAttribute('aria-disabled');
+        }
+
+        // show
+        overlay.style.display = 'block';
+        modal.style.display = 'block';
+
+        // focus for accessibility
+        closeBtn.focus();
+    }
+
+    function closeDungeonModal() {
+        const overlay = document.getElementById('modalOverlay');
+        const modal = document.getElementById('dungeonModal');
+        if (overlay) overlay.style.display = 'none';
+        if (modal) modal.style.display = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        const overlay = document.getElementById('modalOverlay');
+        const closeBtn = document.getElementById('dungeonModalClose');
+
+        overlay?.addEventListener('click', closeDungeonModal);
+        closeBtn?.addEventListener('click', closeDungeonModal);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeDungeonModal();
+        });
+
+        const skillTree = await loadSkillTreeJson();
+        const selectedPhaseId = getSelectedPhaseIdFromDOM();
+
+        let phasePath = null;
+        if (skillTree?.phases && selectedPhaseId) {
+            const phase = skillTree.phases.find(p => p.id === selectedPhaseId);
+            phasePath = phase?.path || null;
+        }
+        if (!phasePath && skillTree?.phases?.length) {
+            phasePath = skillTree.phases[0]?.path || null;
+        }
+
+        const itemsByIndex = new Map();
+        if (Array.isArray(phasePath)) {
+            phasePath.forEach((item, idx) => {
+                itemsByIndex.set(String(idx + 1), item);
+            });
+        }
+
+        // Klik na roadmap step: otevři modal (nepřesměrovávej rovnou)
+        const steps = document.querySelectorAll('.roadmap-step');
+        steps.forEach(step => {
+            step.addEventListener('click', function(e) {
+                // Klik na tlačítko/link uvnitř necháme fungovat normálně
+                if (e.target.tagName === 'A' || e.target.closest('a') || e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                    return;
+                }
+
+                e.preventDefault();
+
+                const pos = this.getAttribute('data-index');
+                const state = this.getAttribute('data-state') || 'available';
+                const locked = this.classList.contains('locked') || this.getAttribute('data-locked') === '1';
+
+                const jsonItem = pos ? itemsByIndex.get(String(pos)) : null;
+
+                openDungeonModal({
+                    title: jsonItem?.title || this.getAttribute('data-title') || '',
+                    desc: jsonItem?.desc || '',
+                    href: jsonItem?.href || this.getAttribute('data-href') || '#',
+                    state,
+                    locked,
+                    requirements: jsonItem?.requirements || []
+                });
+            });
+        });
+    });
 </script>
-<script>document.body.classList.remove('onboarding-active');</script>
-<div class="plain-note">Děkujeme za <strong>th3cooki1 desing discordu! (ig : @th3cooki1 i discord)</strong></div>
 
 {% endblock %}

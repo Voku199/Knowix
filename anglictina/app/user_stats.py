@@ -94,11 +94,15 @@ def update_user_stats(user_id, correct=0, wrong=0, lesson_done=False, psani_word
                       roleplaying_cr=0, roleplaying_mb=0, roleplaying_wr=0, lis_cor=0, lis_wr=0, at_cor=0, at_wr=0,
                       learning_time=None, set_first_activity=False, ai_poslech_minut=0, ai_poslech_seconds=0,
                       shw_cor=0, shw_mb=0, shw_wr=0, pds_cor=0, pds_wr=0,
-                      ai_gram_cor=0, ai_gram_wr=0):
+                      ai_gram_cor=0, ai_gram_wr=0,
+                      lesson_area_key: str | None = None):
     """
     Aktualizuje statistiky uživatele v user_stats.
     Důležité inkrementy: total_learning_time (sekundy), AI_poslech_seconds (sekundy pro AI Poslech), AI_poslech_minut (zpětná kompatibilita).
     Nové sloupce: shw_cor/shw_mb/shw_wr pro Shadow, pds_cor/pds_wr pro Podcast, ai_gram_cor/ai_gram_wr pro AI‑gramatiku.
+
+    Navíc (skill-tree): pokud je předán `lesson_area_key`, zapíše se idempotentně do
+    tabulky `user_lessons_completed`.
     """
     _ensure_extended_columns()
     ensure_user_stats_exists(user_id)
@@ -207,6 +211,33 @@ def update_user_stats(user_id, correct=0, wrong=0, lesson_done=False, psani_word
     conn.commit()
     cur.close()
     conn.close()
+
+    # Skill-tree: jednorázové completion (idempotentně)
+    if lesson_area_key and isinstance(lesson_area_key, str) and lesson_area_key.strip():
+        conn2 = None
+        cur2 = None
+        try:
+            conn2 = get_db_connection()
+            cur2 = conn2.cursor()
+            cur2.execute(
+                "INSERT IGNORE INTO user_lessons_completed (user_id, area_key) VALUES (%s, %s)",
+                (user_id, lesson_area_key.strip()),
+            )
+            conn2.commit()
+        except Exception:
+            # nechceme pokazit request, když se nepovede zapsat completion
+            pass
+        finally:
+            try:
+                if cur2 is not None:
+                    cur2.close()
+            except Exception:
+                pass
+            try:
+                if conn2 is not None:
+                    conn2.close()
+            except Exception:
+                pass
 
     if set_first_activity:
         set_first_activity_if_needed(user_id)

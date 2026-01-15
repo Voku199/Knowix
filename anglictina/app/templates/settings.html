@@ -312,40 +312,46 @@
         background: linear-gradient(135deg, #78350f, #92400e);
     }
 
-    /* Responsivní úpravy pro menší obrazovky */
-    @media (max-width: 600px) {
-        .student-card { align-items: flex-start; }
-        .student-avatar { width: 48px; height: 48px; flex-basis: 48px; }
-        .student-actions { width: 100%; justify-content: flex-end; }
+    /* Profil – editace osobních údajů */
+    .profile-edit-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 12px;
     }
-
-    /* Oprava: zajistíme, aby veškerý text v dark módu byl viditelný */
-    body.dark-mode * {
-        color: inherit !important;
+    .profile-edit-grid .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
     }
-
-    /* Hlavní kontejner */
-    .settings-container {
+    .profile-edit-grid label {
+        font-weight: 700;
+        font-size: 0.95rem;
         color: #111827;
     }
-    body.dark-mode .settings-container {
-        color: #e5e7eb !important;
+    body.dark-mode .profile-edit-grid label {
+        color: #e5e7eb;
     }
-
-    /* Informace o skupinách studenta */
-    .student-group-info {
-        color: #111827;
+    .profile-edit-grid input {
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        outline: none;
+        font-size: 1rem;
     }
-    body.dark-mode .student-group-info {
-        color: #e5e7eb !important;
+    body.dark-mode .profile-edit-grid input {
+        background: #111827;
+        border-color: #374151;
+        color: #e5e7eb;
     }
-
-    /* Úkoly studenta */
-    .student-tasks-info {
-        color: #111827;
+    .profile-edit-grid .field.full {
+        grid-column: 1 / -1;
     }
-    body.dark-mode .student-tasks-info {
-        color: #e5e7eb !important;
+    @media (max-width: 640px) {
+        .profile-edit-grid {
+            grid-template-columns: 1fr;
+        }
     }
     </style>
 
@@ -367,6 +373,47 @@
                 <input type="file" name="file" id="file-upload" accept="image/*" required>
             </label>
             <button type="submit" class="btn-save">🚀 Nahrát novou fotku</button>
+        </form>
+    </div>
+
+    <div class="settings-section">
+        <h2>Osobní údaje</h2>
+        <p style="margin-top:-6px; color:#6b7280;">
+            Tady si můžeš upravit jméno, příjmení, e-mail a datum narození.
+        </p>
+
+        <form method="POST" action="/update_profile">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="profile-edit-grid">
+                <div class="field">
+                    <label for="first_name">Jméno</label>
+                    <input id="first_name" name="first_name" type="text" required
+                           value="{{ (profile.first_name if profile is defined else '') }}">
+                </div>
+
+                <div class="field">
+                    <label for="last_name">Příjmení</label>
+                    <input id="last_name" name="last_name" type="text" required
+                           value="{{ (profile.last_name if profile is defined else '') }}">
+                </div>
+
+                <div class="field full">
+                    <label for="email">E-mail</label>
+                    <input id="email" name="email" type="email" required
+                           value="{{ (profile.email if profile is defined else '') }}">
+                </div>
+
+                <div class="field full">
+                    <label for="date_of_birth">Datum narození</label>
+                    <input id="date_of_birth" name="date_of_birth" type="date"
+                           value="{% if profile is defined and profile.date_of_birth %}{{ profile.date_of_birth }}{% endif %}">
+                </div>
+            </div>
+
+            <div style="margin-top:14px;">
+                <button type="submit" class="btn-save">Uložit osobní údaje</button>
+            </div>
         </form>
     </div>
 

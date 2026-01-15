@@ -471,6 +471,10 @@ body.dark-mode .xp-header-bar-progress {
     background: linear-gradient(90deg, #2e7d32 60%, #1b5e20 100%);
 }
 
+
+/*---------------------------------------------------------------------------------------------*/
+
+
 .phone-wrapper {
     width: 430px;
     height: 65vh;

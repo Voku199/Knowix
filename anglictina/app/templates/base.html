@@ -3,19 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Knowix (často psané jako Novix, Nowix nebo Knovix) se učí anglicky zdarma a zábavně. Knowix (často psané jako Novix, Nowix nebo Knovix) nabízí písničky, chatové lekce, testy, příběhy a interaktivní cvičení pro děti i studenty. Moderní výuka angličtiny bez reklam. Angličitna Zdarma, Zábavná Angličtina">
-    <meta name="keywords" content="angličtina zdarma, výuka angličtiny, angličtina pro děti, procvičování angličtiny, angličtina online, angličtina zábavně, písničky angličtina, testy angličtina, chat angličtina, gramatika angličtina, knowix, knoviw, knovix, novix, nowix">
+    <meta name="description"
+          content="Knowix (často psané jako Novix, Nowix nebo Knovix) se učí anglicky zdarma a zábavně. Knowix (často psané jako Novix, Nowix nebo Knovix) nabízí písničky, chatové lekce, testy, příběhy a interaktivní cvičení pro děti i studenty. Moderní výuka angličtiny bez reklam. Angličitna Zdarma, Zábavná Angličtina">
+    <meta name="keywords"
+          content="angličtina zdarma, výuka angličtiny, angličtina pro děti, procvičování angličtiny, angličtina online, angličtina zábavně, písničky angličtina, testy angličtina, chat angličtina, gramatika angličtina, knowix, knoviw, knovix, novix, nowix">
     <meta name="robots" content="index, follow">
-<meta property="og:title" content="Knowix – Angličtina zdarma a zábavně">
-<meta property="og:description" content="Procvičuj angličtinu pomocí písniček, chatů, příběhů a testů. Kompletně zdarma, bez reklam.">
-<meta property="og:image" content="https://www.knowix.cz/static/og-banner.png">
-<meta property="og:url" content="https://www.knowix.cz">
-<meta property="og:type" content="website">
+    <meta property="og:title" content="Knowix – Angličtina zdarma a zábavně">
+    <meta property="og:description"
+          content="Procvičuj angličtinu pomocí písniček, chatů, příběhů a testů. Kompletně zdarma, bez reklam.">
+    <meta property="og:image" content="https://www.knowix.cz/static/og-banner.png">
+    <meta property="og:url" content="https://www.knowix.cz">
+    <meta property="og:type" content="website">
     <!-- PWA manifest & theme -->
     <link rel="manifest" href="/static/manifest.json">
     <meta name="theme-color" content="#0d1117">
     <!-- iOS PWA podpora -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Knowix">
     <link rel="apple-touch-icon" href="/static/pic/logo1.png">
@@ -27,9 +30,8 @@
     <link rel="canonical" href="https://www.knowix.cz">
 
     <title>{% block title %}knowix{% endblock %}</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="stylesheet" href="/static/mobile_header.css">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='mobile_header.css') }}">
 
     <!-- Preconnect zrychlí DNS a spojení -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -47,132 +49,369 @@
 
 
     <!-- Google tag (gtag.js) -->
-<!--<script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>-->
-<!--<script>-->
-<!--  window.dataLayer = window.dataLayer || [];-->
-<!--  function gtag(){dataLayer.push(arguments);}-->
-<!--  gtag('js', new Date());-->
+    <!--<script async src="https://www.googletagmanager.com/gtag/js?id=G-W1EN990JKP"></script>-->
+    <!--<script>-->
+    <!--  window.dataLayer = window.dataLayer || [];-->
+    <!--  function gtag(){dataLayer.push(arguments);}-->
+    <!--  gtag('js', new Date());-->
 
-<!--  gtag('config', 'G-W1EN990JKP');-->
-<!--</script>-->
+    <!--  gtag('config', 'G-W1EN990JKP');-->
+    <!--</script>-->
     <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Knowix",
-    "alternateName": ["Novix", "Nowix", "Knovix"],
-  "url": "https://www.knowix.cz",
-  "description": "Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam."
-}
-</script>
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Knowix",
+            "alternateName": [
+                "Novix",
+                "Nowix",
+                "Knovix"
+            ],
+            "url": "https://www.knowix.cz",
+            "description": "Zábavné procvičování angličtiny pomocí písniček, chatu a testů. Knowix je zdarma a bez reklam."
+        }
+    </script>
     <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Knowix",
-  "alternateName": ["Novix", "Nowix", "Knovix"],
-  "applicationCategory": "EducationalApplication",
-  "operatingSystem": "Web"
-}
-</script>
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Knowix",
+            "alternateName": [
+                "Novix",
+                "Nowix",
+                "Knovix"
+            ],
+            "applicationCategory": "EducationalApplication",
+            "operatingSystem": "Web"
+        }
+    </script>
 
     <style>
         /* Zvýrazněná tlačítka pro PWA a notifikace */
         .pwa-action-btn {
-            display:none; /* zůstává, JS přepne na inline-block */
-            background: linear-gradient(135deg,#2d7ff9,#6aa9ff);
-            color:#fff;
-            border:none;
-            cursor:pointer;
-            padding:6px 14px;
-            font-size:14px;
-            font-weight:600;
-            border-radius:999px;
-            font-family:inherit;
-            position:relative;
-            box-shadow:0 4px 12px rgba(0,0,0,.15);
-            transition:background .3s, transform .15s, box-shadow .3s;
+            display: none; /* zůstává, JS přepne na inline-block */
+            background: linear-gradient(135deg, #2d7ff9, #6aa9ff);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            padding: 6px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 999px;
+            font-family: inherit;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
+            transition: background .3s, transform .15s, box-shadow .3s;
         }
-        .pwa-action-btn[data-type="notif"] {background: linear-gradient(135deg,#ff9600,#ffbf4d);}
-        .dark-mode .pwa-action-btn {box-shadow:0 4px 14px rgba(0,0,0,.5);}
-        .pwa-action-btn:hover {transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.25);}
-        .pwa-action-btn:active {transform:translateY(0); box-shadow:0 3px 10px rgba(0,0,0,.2);}
-        .pwa-action-btn:focus-visible {outline:2px solid #fff; outline-offset:3px;}
-        .pwa-action-btn .icon {margin-right:6px; font-size:16px;}
-        .pwa-action-btn .label {vertical-align:middle;}
+
+        .pwa-action-btn[data-type="notif"] {
+            background: linear-gradient(135deg, #ff9600, #ffbf4d);
+        }
+
+        .dark-mode .pwa-action-btn {
+            box-shadow: 0 4px 14px rgba(0, 0, 0, .5);
+        }
+
+        .pwa-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, .25);
+        }
+
+        .pwa-action-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, .2);
+        }
+
+        .pwa-action-btn:focus-visible {
+            outline: 2px solid #fff;
+            outline-offset: 3px;
+        }
+
+        .pwa-action-btn .icon {
+            margin-right: 6px;
+            font-size: 16px;
+        }
+
+        .pwa-action-btn .label {
+            vertical-align: middle;
+        }
+
         /* Pulz při prvním zobrazení */
-        @keyframes pwaPulse {0%{box-shadow:0 0 0 0 rgba(45,127,249,.6);}70%{box-shadow:0 0 0 10px rgba(45,127,249,0);}100%{box-shadow:0 0 0 0 rgba(45,127,249,0);}}
-        @keyframes notifPulse {0%{box-shadow:0 0 0 0 rgba(255,150,0,.6);}70%{box-shadow:0 0 0 10px rgba(255,150,0,0);}100%{box-shadow:0 0 0 0 rgba(255,150,0,0);}}
-        .pwa-action-btn.pulse {animation:pwaPulse 2s ease-out 1;}
-        .pwa-action-btn[data-type="notif"].pulse {animation:notifPulse 2s ease-out 1;}
+        @keyframes pwaPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(45, 127, 249, .6);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(45, 127, 249, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(45, 127, 249, 0);
+            }
+        }
+
+        @keyframes notifPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 150, 0, .6);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 150, 0, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 150, 0, 0);
+            }
+        }
+
+        .pwa-action-btn.pulse {
+            animation: pwaPulse 2s ease-out 1;
+        }
+
+        .pwa-action-btn[data-type="notif"].pulse {
+            animation: notifPulse 2s ease-out 1;
+        }
     </style>
     <style>
-    /* Když je onboarding aktivní, rozostři obsah za ním */
-    body.onboarding-active #content-wrapper {
-        filter: blur(3px);
-        opacity: 0.7;
-        pointer-events: none;
-        user-select: none;
-        transition: filter 0.3s ease, opacity 0.3s ease;
-    }
+        /* Když je onboarding aktivní, rozostři obsah za ním */
+        body.onboarding-active #content-wrapper {
+            filter: blur(3px);
+            opacity: 0.7;
+            pointer-events: none;
+            user-select: none;
+            transition: filter 0.3s ease, opacity 0.3s ease;
+        }
 
-    /* Výjimka pro highlighted element */
-    .onboarding-highlight {
-        filter: none !important;
-        opacity: 1 !important;
-        pointer-events: auto !important;
-    }
-</style>
+        /* Výjimka pro highlighted element */
+        .onboarding-highlight {
+            filter: none !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+    </style>
     <style>
-    /* Vánoční doplňky: barvy, sníh a dekorace */
-    .christmas-accent { color: #b71c1c; } /* tmavá vánoční červená */
-    .christmas-accent-2 { color: #1b5e20; } /* tmavá vánoční zelená */
+        /* Vánoční doplňky: barvy, sníh a dekorace */
+        .christmas-accent {
+            color: #b71c1c;
+        }
 
-    /* Lehké přebarvení odkazů a tlačítek během Vánoc */
-    header .nav-right a, header .nav-right button { transition: transform .12s ease, color .12s ease; }
-    header .nav-right a:hover, header .nav-right button:hover { transform: translateY(-2px); color: #b71c1c; }
+        /* tmavá vánoční červená */
+        .christmas-accent-2 {
+            color: #1b5e20;
+        }
 
-    /* Logo s čepičkou a girlandou */
-    .logo { position: relative; display:inline-block; }
-    .logo .santa-hat { position: absolute; left: -8px; top: -12px; width: 48px; pointer-events:none; transform-origin:center; }
-    .logo .garland { position: absolute; right: -6px; top: 38px; width: 120px; pointer-events:none; opacity:0.9; }
+        /* tmavá vánoční zelená */
 
-    /* Sněhové vločky (CSS fallback - animovaný gradient a základní animace) */
-    /* Sníh musí být nad většinou UI, zvýšíme z-index pro spolehlivou viditelnost */
-    #snow-container { pointer-events:none; position:fixed; left:0; top:0; width:100%; height:100%; z-index:1000000; overflow:hidden; }
-    .snowflake { position:absolute; top:-10px; font-size:14px; opacity:0.9; will-change: transform; user-select:none; text-shadow:0 1px 2px rgba(0,0,0,.25); }
-    /* Plné kruhové vločky (lepší kontrast na světlém pozadí) */
-    .snowflake.dot { width:12px; height:12px; border-radius:50%; display:block; text-indent:-9999px; position:absolute; z-index:1000001; mix-blend-mode:normal; box-shadow: 0 6px 18px rgba(0,0,0,0.32); border:1px solid rgba(0,0,0,0.12); }
-    .snowflake.dot.large { width:18px; height:18px; }
-    /* Odstraněna CSS animace transform, protože JS používá transform pro pád a animace by s ní kolidovala. */
+        /* Lehké přebarvení odkazů a tlačítek během Vánoc */
+        header .nav-right a, header .nav-right button {
+            transition: transform .12s ease, color .12s ease;
+        }
 
-    /* Zvýrazněný drop-shadow pro výrazný kontrast na světlém pozadí */
-    /* SVG vločky: základní styly pro inline SVG elementy používané jako vločky */
-    .flake-svg { position:absolute; pointer-events:none; z-index:1000002; display:block; will-change: transform; }
-    .flake-svg line { stroke-linecap: round; }
-    .flake-svg.small line { stroke-width:1.2; }
-    .flake-svg.medium line { stroke-width:1.6; }
-    .flake-svg.large line { stroke-width:2.2; }
+        header .nav-right a:hover, header .nav-right button:hover {
+            transform: translateY(-2px);
+            color: #b71c1c;
+        }
 
-    /* jemné blikání světélek v hlavičce */
-    .header-lights { position:absolute; left:0; right:0; top:0; height:8px; pointer-events:none; }
-    .header-lights span { display:inline-block; width:10px; height:10px; border-radius:50%; margin:0 6px; opacity:0.95; animation:lightTwinkle 3s infinite; }
-    @keyframes lightTwinkle { 0%,100%{ opacity:0.6; transform: scale(1);} 50%{ opacity:1; transform: scale(1.25);} }
+        /* Logo s čepičkou a girlandou */
+        .logo {
+            position: relative;
+            display: inline-block;
+        }
 
-    /* lehký sníh efekt přes obsah (pro tmavé i světlé téma) */
-    .snow-overlay { position:fixed; inset:0; background-image: radial-gradient(rgba(134, 131, 131, 0.03) 1px, transparent 1px); background-size: 40px 40px; z-index:15; pointer-events:none; mix-blend-mode:screen; }
+        .logo .santa-hat {
+            position: absolute;
+            left: -8px;
+            top: -12px;
+            width: 48px;
+            pointer-events: none;
+            transform-origin: center;
+        }
 
-    /* Vánoční toast (popout bublina) */
-    .xmas-toast { position:fixed; right:20px; bottom:24px; background: linear-gradient(135deg,#fff8e1,#ffe0b2); color:#222; border-radius:12px; padding:12px 16px; box-shadow:0 8px 30px rgba(0,0,0,.2); z-index:10001; display:flex; gap:10px; align-items:center; max-width:320px; font-weight:600; }
-    .dark-mode .xmas-toast { background: linear-gradient(135deg,#2b2b2b,#1e1e1e); color:#fff; box-shadow:0 8px 30px rgba(0,0,0,.6); }
-    .xmas-toast .xmas-close { background:transparent; border:none; font-size:18px; cursor:pointer; color:inherit; margin-left:auto; }
-    .xmas-toast img { width:36px; height:36px; border-radius:6px; }
-    @keyframes xmasPop { 0%{ transform: translateY(20px) scale(.98); opacity:0} 60%{ transform: translateY(-6px) scale(1.02); opacity:1 } 100%{ transform: translateY(0) scale(1); } }
-    .xmas-toast.show { animation: xmasPop .6s cubic-bezier(.2,.9,.3,1) both; }
+        .logo .garland {
+            position: absolute;
+            right: -6px;
+            top: 38px;
+            width: 120px;
+            pointer-events: none;
+            opacity: 0.9;
+        }
 
-    /* Footer styl + malé vánoční přání */
-    footer { position:relative; }
-    footer .xmas-greeting { font-weight:600; color:#b71c1c; margin-top:6px; }
+        /* Sněhové vločky (CSS fallback - animovaný gradient a základní animace) */
+        /* Sníh musí být nad většinou UI, zvýšíme z-index pro spolehlivou viditelnost */
+        #snow-container {
+            pointer-events: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000000;
+            overflow: hidden;
+        }
+
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            font-size: 14px;
+            opacity: 0.9;
+            will-change: transform;
+            user-select: none;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+        }
+
+        /* Plné kruhové vločky (lepší kontrast na světlém pozadí) */
+        .snowflake.dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: block;
+            text-indent: -9999px;
+            position: absolute;
+            z-index: 1000001;
+            mix-blend-mode: normal;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32);
+            border: 1px solid rgba(0, 0, 0, 0.12);
+        }
+
+        .snowflake.dot.large {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Odstraněna CSS animace transform, protože JS používá transform pro pád a animace by s ní kolidovala. */
+
+        /* Zvýrazněný drop-shadow pro výrazný kontrast na světlém pozadí */
+        /* SVG vločky: základní styly pro inline SVG elementy používané jako vločky */
+        .flake-svg {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1000002;
+            display: block;
+            will-change: transform;
+        }
+
+        .flake-svg line {
+            stroke-linecap: round;
+        }
+
+        .flake-svg.small line {
+            stroke-width: 1.2;
+        }
+
+        .flake-svg.medium line {
+            stroke-width: 1.6;
+        }
+
+        .flake-svg.large line {
+            stroke-width: 2.2;
+        }
+
+        /* jemné blikání světélek v hlavičce */
+        .header-lights {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 8px;
+            pointer-events: none;
+        }
+
+        .header-lights span {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin: 0 6px;
+            opacity: 0.95;
+            animation: lightTwinkle 3s infinite;
+        }
+
+        @keyframes lightTwinkle {
+            0%, 100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.25);
+            }
+        }
+
+        /* lehký sníh efekt přes obsah (pro tmavé i světlé téma) */
+        .snow-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(rgba(134, 131, 131, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 15;
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
+
+        /* Vánoční toast (popout bublina) */
+        .xmas-toast {
+            position: fixed;
+            right: 20px;
+            bottom: 24px;
+            background: linear-gradient(135deg, #fff8e1, #ffe0b2);
+            color: #222;
+            border-radius: 12px;
+            padding: 12px 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .2);
+            z-index: 10001;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            max-width: 320px;
+            font-weight: 600;
+        }
+
+        .dark-mode .xmas-toast {
+            background: linear-gradient(135deg, #2b2b2b, #1e1e1e);
+            color: #fff;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .6);
+        }
+
+        .xmas-toast .xmas-close {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: inherit;
+            margin-left: auto;
+        }
+
+        .xmas-toast img {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+        }
+
+        @keyframes xmasPop {
+            0% {
+                transform: translateY(20px) scale(.98);
+                opacity: 0
+            }
+            60% {
+                transform: translateY(-6px) scale(1.02);
+                opacity: 1
+            }
+            100% {
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .xmas-toast.show {
+            animation: xmasPop .6s cubic-bezier(.2, .9, .3, 1) both;
+        }
+
+        /* Footer styl + malé vánoční přání */
+        footer {
+            position: relative;
+        }
+
+        footer .xmas-greeting {
+            font-weight: 600;
+            color: #b71c1c;
+            margin-top: 6px;
+        }
     </style>
 </head>
 <body class="{{ 'dark-mode' if session.get('theme') == 'dark' else '' }}">
@@ -181,6 +420,7 @@
 <div id="snow-container" aria-hidden="true"></div>
 <div class="snow-overlay" aria-hidden="true"></div>
 
+{% block header %}
 <header style="position:relative;">
     <div class="header-lights" aria-hidden="true" style="display:flex;justify-content:center;align-items:center;">
         <span style="background:#ff3d00; animation-delay:0s;"></span>
@@ -196,9 +436,11 @@
                 <img src="{{ url_for('static', filename='pic/logo.webp') }}" alt="Knowix Logo">
             </a>
             <!-- Santa čepička (přelepená přes logo) - používáme PNG umístěné ve static/pic -->
-            <img class="santa-hat" src="{{ url_for('static', filename='pic/santa_hat.png') }}" alt="Santa hat" onerror="this.style.display='none'">
+            <img class="santa-hat" src="{{ url_for('static', filename='pic/santa_hat.png') }}" alt="Santa hat"
+                 onerror="this.style.display='none'">
             <!-- Girlanda dekorace -->
-            <img class="garland" src="{{ url_for('static', filename='pic/garland.png') }}" alt="Garland" onerror="this.style.display='none'">
+            <img class="garland" src="{{ url_for('static', filename='pic/garland.png') }}" alt="Garland"
+                 onerror="this.style.display='none'">
         </div>
         <span class="streak-badge">
             <img src="/static/fire.svg" alt="Streak">
@@ -207,27 +449,27 @@
     </div>
     <div class="nav-profile-wrapper">
         <ul class="nav-right">
-<!--            <li>-->
-<!--                <a href="/set_lang/cs" title="Čeština">-->
-<!--                    <img src="{{ url_for('static', filename='icons/cz.png') }}" alt="Angličtina" class="nav-icon">-->
-<!--                </a>-->
-<!--            </li>-->
-<!--            <li>-->
-<!--                <a href="/set_lang/uk" title="Ukrajinština">-->
-<!--                    <img src="{{ url_for('static', filename='icons/uk.png') }}" alt="Angličtina" class="nav-icon">-->
-<!--                </a>-->
-<!--            </li>-->
+            <!--            <li>-->
+            <!--                <a href="/set_lang/cs" title="Čeština">-->
+            <!--                    <img src="{{ url_for('static', filename='icons/cz.png') }}" alt="Angličtina" class="nav-icon">-->
+            <!--                </a>-->
+            <!--            </li>-->
+            <!--            <li>-->
+            <!--                <a href="/set_lang/uk" title="Ukrajinština">-->
+            <!--                    <img src="{{ url_for('static', filename='icons/uk.png') }}" alt="Angličtina" class="nav-icon">-->
+            <!--                </a>-->
+            <!--            </li>-->
             <li>
                 <a href="/anglictina" title="Angličtina">
                     <img src="{{ url_for('static', filename='icons/eng.png') }}" alt="Angličtina" class="nav-icon">
                 </a>
             </li>
 
-<!--            <li>-->
-<!--                <a href="/math" title="Matematika">-->
-<!--                    <img src="{{ url_for('static', filename='icons/math.png') }}" alt="Angličtina" class="nav-icon">-->
-<!--                </a>-->
-<!--            </li>-->
+            <!--            <li>-->
+            <!--                <a href="/math" title="Matematika">-->
+            <!--                    <img src="{{ url_for('static', filename='icons/math.png') }}" alt="Angličtina" class="nav-icon">-->
+            <!--                </a>-->
+            <!--            </li>-->
             <li>
                 <a href="/feedback" title="Feedback">
                     <img src="{{ url_for('static', filename='icons/chat.png') }}" alt="Feedback" class="nav-icon">
@@ -249,36 +491,40 @@
                 </a>
             </li>
             <li>
-                <button id="theme-toggle" title="Přepnout téma" style="background:none;border:none;cursor:pointer;padding:0;">
+                <button id="theme-toggle" title="Přepnout téma"
+                        style="background:none;border:none;cursor:pointer;padding:0;">
                     🌙
                 </button>
             </li>
             <li>
-                <button id="enable-notifications" data-type="notif" aria-label="Povolit notifikace" title="Povolit notifikace" class="pwa-action-btn" style="display:none;">
+                <button id="enable-notifications" data-type="notif" aria-label="Povolit notifikace"
+                        title="Povolit notifikace" class="pwa-action-btn" style="display:none;">
                     <span class="icon">🔔</span><span class="label">Notifikace</span>
                 </button>
             </li>
             {% if session.user_id == 1 %}
             <li>
-    <button id="test-push" title="Test push notifikací" style="background:none;border:1px solid #444;border-radius:6px;cursor:pointer;padding:4px 8px;color:inherit;font-size:12px;">
-        Test Push
-    </button>
-</li>
+                <button id="test-push" title="Test push notifikací"
+                        style="background:none;border:1px solid #444;border-radius:6px;cursor:pointer;padding:4px 8px;color:inherit;font-size:12px;">
+                    Test Push
+                </button>
+            </li>
 
-<li>
-    <a href="/push/admin/subscriptions" title="Push Admin" style="color: #ff4444; font-weight: bold;">
-        🔧 Push Admin
-    </a>
-</li>
-{% endif %}
             <li>
-                <button id="install-app" data-type="pwa" aria-label="Instalovat aplikaci" title="Instalovat aplikaci" class="pwa-action-btn" style="display:none;">
+                <a href="/push/admin/subscriptions" title="Push Admin" style="color: #ff4444; font-weight: bold;">
+                    🔧 Push Admin
+                </a>
+            </li>
+            {% endif %}
+            <li>
+                <button id="install-app" data-type="pwa" aria-label="Instalovat aplikaci" title="Instalovat aplikaci"
+                        class="pwa-action-btn" style="display:none;">
                     <span class="icon">⬇️</span><span class="label">Instalovat</span>
                 </button>
             </li>
-<!--            <li>-->
-<!--                <button id="test-notif" title="Test notifikace" style="background:none;border:1px solid #444;border-radius:6px;cursor:pointer;padding:4px 8px;color:inherit;">Test notif</button>-->
-<!--            </li>-->
+            <!--            <li>-->
+            <!--                <button id="test-notif" title="Test notifikace" style="background:none;border:1px solid #444;border-radius:6px;cursor:pointer;padding:4px 8px;color:inherit;">Test notif</button>-->
+            <!--            </li>-->
         </ul>
         {% if session.get('user_name') %}
         <div class="user-profile">
@@ -286,7 +532,8 @@
                 {% if session.get('profile_pic') %}
                 <img src="{{ url_for('static', filename='profile_pics/' + session.get('profile_pic')) }}"
                      alt="Profilová fotka" width="64" class="profile-pic"
-                     onerror="this.onerror=null; this.src='{{ url_for('static', filename='pic/default.webp') }}';">
+                     onerror="this.onerror=null;this.src=this.dataset.fallback;"
+                     data-fallback="{{ url_for('static', filename='pic/default.webp') }}">
                 {% else %}
                 <img src="{{ url_for('static', filename='pic/default.webp') }}" alt="Defaultní profilovka"
                      class="profile-pic" id="profileMenuTrigger">
@@ -297,31 +544,42 @@
                 </div>
                 <span class="greeting" style="margin-left: 10px;">Ahoj {{ (session.get('user_name') or '').split()[0] }}!</span>
             </div>
-            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent is defined %}
+            {% if user_xp is defined and user_level is defined and user_level_name is defined and user_progress_percent
+            is defined %}
             <div class="xp-header-bar">
                 <div class="xp-header-bar-labels">
                     <span class="xp-level-badge">Level {{ user_level }} – {{ user_level_name }}</span>
                     <span class="xp-value">{{ user_xp_in_level }}/50 XP</span>
                 </div>
                 <div class="xp-header-bar-progress-bg">
-                    <div class="xp-header-bar-progress" style="width: {{ user_progress_percent }}%"></div>
+                    <div class="xp-header-bar-progress" data-progress="{{ user_progress_percent }}"></div>
                 </div>
             </div>
+            <script>
+                (function () {
+                    const el = document.querySelector('.xp-header-bar-progress');
+                    if (!el) return;
+                    const p = parseInt(el.getAttribute('data-progress') || '0', 10);
+                    el.style.width = Math.max(0, Math.min(100, p)) + '%';
+                })();
+            </script>
             {% endif %}
         </div>
         {% else %}
-<div class="auth-links">
-    <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
-    <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
-</div>
+        <div class="auth-links">
+            <a href="{{ url_for('auth.login') }}" class="auth-btn login-btn">🔑 Přihlásit se</a>
+            <a href="{{ url_for('auth.register') }}" class="auth-btn register-btn">📝 Registrovat se</a>
+        </div>
         {% endif %}
     </div>
 </header>
+{% endblock %}
+
 <main>
     {% block content %}{% endblock %}
 </main>
 <footer>
-    <p>&copy; 2025 Knowix. Všechna práva vyhrazena.</p>
+    <p>&copy; 2026 Knowix. Všechna práva vyhrazena.</p>
     <p class="footer-signature">
         Made with ❤️ by
         <a href="https://ko-fi.com/voku199" target="_blank" style="color: inherit; text-decoration: underline;">Voku</a>
@@ -330,220 +588,266 @@
 </footer>
 <script src="/static/js/pwa.js"></script>
 <script>
-(function(){
-  // Generátor jednoduchých sněhových vloček - vytváří elementy s náhodnou pozicí, rychlostí a velikostí
-  const container = document.getElementById('snow-container');
-  if (!container) return;
+    (function () {
+        // Generátor jednoduchých sněhových vloček - vytváří elementy s náhodnou pozicí, rychlostí a velikostí
+        const container = document.getElementById('snow-container');
+        if (!container) return;
 
-  // Vrací barvu vloček podle pozadí/témy (světlé pozadí -> tmavé vločky)
-  function computeSnowColor(){
-    // Pokud máme explictní třídu dark-mode, použij bílou
-    if (document.body.classList.contains('dark-mode')){ window.__snow_is_light = false; return '#ffffff'; }
+        // Vrací barvu vloček podle pozadí/témy (světlé pozadí -> tmavé vločky)
+        function computeSnowColor() {
+            // Pokud máme explictní třídu dark-mode, použij bílou
+            if (document.body.classList.contains('dark-mode')) {
+                window.__snow_is_light = false;
+                return '#ffffff';
+            }
 
-    // Zkontroluj několik elementů (body, main, #content-wrapper) a spočti průměrnou luminanci
-    try{
-      const candidates = [document.body, document.querySelector('#content-wrapper'), document.querySelector('main')].filter(Boolean);
-      let sumLum = 0, count = 0;
-      for (const el of candidates){
-        const bg = window.getComputedStyle(el).backgroundColor;
-        if (!bg) continue;
-        const m = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
-        if (!m) continue;
-        const r = parseInt(m[1],10), g = parseInt(m[2],10), b = parseInt(m[3],10);
-        const lum = 0.2126*r + 0.7152*g + 0.0722*b;
-        sumLum += lum; count++;
-      }
-      const avgLum = count ? (sumLum / count) : 255;
-      // pokud je průměrná luminance > 150 -> světlé pozadí => tmavé vločky
-      window.__snow_is_light = (avgLum > 150);
-      return window.__snow_is_light ? '#111111' : '#ffffff';
-    }catch(e){
-      window.__snow_is_light = true;
-      return '#111111';
-    }
-  }
+            // Zkontroluj několik elementů (body, main, #content-wrapper) a spočti průměrnou luminanci
+            try {
+                const candidates = [document.body, document.querySelector('#content-wrapper'), document.querySelector('main')].filter(Boolean);
+                let sumLum = 0, count = 0;
+                for (const el of candidates) {
+                    const bg = window.getComputedStyle(el).backgroundColor;
+                    if (!bg) continue;
+                    const m = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+                    if (!m) continue;
+                    const r = parseInt(m[1], 10), g = parseInt(m[2], 10), b = parseInt(m[3], 10);
+                    const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+                    sumLum += lum;
+                    count++;
+                }
+                const avgLum = count ? (sumLum / count) : 255;
+                // pokud je průměrná luminance > 150 -> světlé pozadí => tmavé vločky
+                window.__snow_is_light = (avgLum > 150);
+                return window.__snow_is_light ? '#111111' : '#ffffff';
+            } catch (e) {
+                window.__snow_is_light = true;
+                return '#111111';
+            }
+        }
 
-  // Použij barvu jednou; případně obnov při resize/tématu
-  let currentSnowColor = computeSnowColor();
-  // globální příznak pro jednoduché kontroly
-  window.__snow_is_light = !!window.__snow_is_light;
+        // Použij barvu jednou; případně obnov při resize/tématu
+        let currentSnowColor = computeSnowColor();
+        // globální příznak pro jednoduché kontroly
+        window.__snow_is_light = !!window.__snow_is_light;
 
-  const maxFlakes = Math.min(Math.max(Math.round(window.innerWidth / 30), 15), 120); // přizpůsobí se šířce
-  function createFlake(){
-    let f;
-    const size = Math.random() * 10 + 6; // 6-16px
-    // Pokud je stránka světlá, preferuj SVG šedé vločky; jinak použij bílé unicode vločky
-    const useSvgFlake = (window.__snow_is_light === true) ? (Math.random() < 0.95) : (Math.random() < 0.18);
-    if (useSvgFlake) {
-      // vytvoříme inline SVG místo kulaté tečky
-      const dim = Math.round(10 + Math.random() * 8); // 10-18
-      const svgNS = 'http://www.w3.org/2000/svg';
-      const svg = document.createElementNS(svgNS, 'svg');
-      svg.setAttribute('width', dim);
-      svg.setAttribute('height', dim);
-      svg.setAttribute('viewBox', `0 0 ${dim} ${dim}`);
-      svg.className.baseVal = 'flake-svg';
-      // určeme variantu stroke width podle velikosti
-      if (dim < 12) svg.classList.add('small'); else if (dim < 16) svg.classList.add('medium'); else svg.classList.add('large');
-      // pozice a styl
-      svg.style.left = Math.random() * 100 + '%';
-      svg.style.top = '-10px';
-      svg.style.opacity = (0.65 + Math.random() * 0.35).toFixed(2);
-      svg.style.transformOrigin = 'center';
+        const maxFlakes = Math.min(Math.max(Math.round(window.innerWidth / 30), 15), 120); // přizpůsobí se šířce
+        function createFlake() {
+            let f;
+            const size = Math.random() * 10 + 6; // 6-16px
+            // Pokud je stránka světlá, preferuj SVG šedé vločky; jinak použij bílé unicode vločky
+            const useSvgFlake = (window.__snow_is_light === true) ? (Math.random() < 0.95) : (Math.random() < 0.18);
+            if (useSvgFlake) {
+                // vytvoříme inline SVG místo kulaté tečky
+                const dim = Math.round(10 + Math.random() * 8); // 10-18
+                const svgNS = 'http://www.w3.org/2000/svg';
+                const svg = document.createElementNS(svgNS, 'svg');
+                svg.setAttribute('width', dim);
+                svg.setAttribute('height', dim);
+                svg.setAttribute('viewBox', `0 0 ${dim} ${dim}`);
+                svg.className.baseVal = 'flake-svg';
+                // určeme variantu stroke width podle velikosti
+                if (dim < 12) svg.classList.add('small'); else if (dim < 16) svg.classList.add('medium'); else svg.classList.add('large');
+                // pozice a styl
+                svg.style.left = Math.random() * 100 + '%';
+                svg.style.top = '-10px';
+                svg.style.opacity = (0.65 + Math.random() * 0.35).toFixed(2);
+                svg.style.transformOrigin = 'center';
 
-      // styl: šedá barva pro lepší kontrast na bílém pozadí
-      const strokeColor = '#8a8a8a';
+                // styl: šedá barva pro lepší kontrast na bílém pozadí
+                const strokeColor = '#8a8a8a';
 
-      // jednoduchá vločka: 6 paprsků
-      const cx = dim/2, cy = dim/2, len = dim*0.38;
-      for (let i=0;i<6;i++){
-        const ang = (i * Math.PI / 3);
-        const x1 = cx - Math.cos(ang)*len;
-        const y1 = cy - Math.sin(ang)*len;
-        const x2 = cx + Math.cos(ang)*len;
-        const y2 = cy + Math.sin(ang)*len;
-        const line = document.createElementNS(svgNS, 'line');
-        line.setAttribute('x1', x1); line.setAttribute('y1', y1); line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-        line.setAttribute('stroke', strokeColor);
-        line.setAttribute('stroke-opacity', 0.95);
-        line.setAttribute('stroke-width', Math.max(1, Math.round(dim*0.12)));
-        svg.appendChild(line);
-        // drobné větvičky u některých paprsků (dekor)
-        const bx = cx + Math.cos(ang)* (len*0.55);
-        const by = cy + Math.sin(ang)* (len*0.55);
-        const angL = ang + Math.PI/6; const angR = ang - Math.PI/6;
-        const l1 = document.createElementNS(svgNS, 'line');
-        l1.setAttribute('x1', bx); l1.setAttribute('y1', by);
-        l1.setAttribute('x2', bx + Math.cos(angL)* (len*0.18));
-        l1.setAttribute('y2', by + Math.sin(angL)* (len*0.18));
-        l1.setAttribute('stroke', strokeColor); l1.setAttribute('stroke-opacity',0.9); l1.setAttribute('stroke-width', Math.max(1, Math.round(dim*0.08)));
-        svg.appendChild(l1);
-        const l2 = document.createElementNS(svgNS, 'line');
-        l2.setAttribute('x1', bx); l2.setAttribute('y1', by);
-        l2.setAttribute('x2', bx + Math.cos(angR)* (len*0.18));
-        l2.setAttribute('y2', by + Math.sin(angR)* (len*0.18));
-        l2.setAttribute('stroke', strokeColor); l2.setAttribute('stroke-opacity',0.9); l2.setAttribute('stroke-width', Math.max(1, Math.round(dim*0.08)));
-        svg.appendChild(l2);
-      }
+                // jednoduchá vločka: 6 paprsků
+                const cx = dim / 2, cy = dim / 2, len = dim * 0.38;
+                for (let i = 0; i < 6; i++) {
+                    const ang = (i * Math.PI / 3);
+                    const x1 = cx - Math.cos(ang) * len;
+                    const y1 = cy - Math.sin(ang) * len;
+                    const x2 = cx + Math.cos(ang) * len;
+                    const y2 = cy + Math.sin(ang) * len;
+                    const line = document.createElementNS(svgNS, 'line');
+                    line.setAttribute('x1', x1);
+                    line.setAttribute('y1', y1);
+                    line.setAttribute('x2', x2);
+                    line.setAttribute('y2', y2);
+                    line.setAttribute('stroke', strokeColor);
+                    line.setAttribute('stroke-opacity', 0.95);
+                    line.setAttribute('stroke-width', Math.max(1, Math.round(dim * 0.12)));
+                    svg.appendChild(line);
+                    // drobné větvičky u některých paprsků (dekor)
+                    const bx = cx + Math.cos(ang) * (len * 0.55);
+                    const by = cy + Math.sin(ang) * (len * 0.55);
+                    const angL = ang + Math.PI / 6;
+                    const angR = ang - Math.PI / 6;
+                    const l1 = document.createElementNS(svgNS, 'line');
+                    l1.setAttribute('x1', bx);
+                    l1.setAttribute('y1', by);
+                    l1.setAttribute('x2', bx + Math.cos(angL) * (len * 0.18));
+                    l1.setAttribute('y2', by + Math.sin(angL) * (len * 0.18));
+                    l1.setAttribute('stroke', strokeColor);
+                    l1.setAttribute('stroke-opacity', 0.9);
+                    l1.setAttribute('stroke-width', Math.max(1, Math.round(dim * 0.08)));
+                    svg.appendChild(l1);
+                    const l2 = document.createElementNS(svgNS, 'line');
+                    l2.setAttribute('x1', bx);
+                    l2.setAttribute('y1', by);
+                    l2.setAttribute('x2', bx + Math.cos(angR) * (len * 0.18));
+                    l2.setAttribute('y2', by + Math.sin(angR) * (len * 0.18));
+                    l2.setAttribute('stroke', strokeColor);
+                    l2.setAttribute('stroke-opacity', 0.9);
+                    l2.setAttribute('stroke-width', Math.max(1, Math.round(dim * 0.08)));
+                    svg.appendChild(l2);
+                }
 
-      // lehké otáčení pro variaci
-      svg.style.transition = `transform ${8000 + Math.random()*8000}ms linear`;
-      f = svg;
-    } else {
-      const div = document.createElement('div');
-      div.className = 'snowflake';
-      div.style.fontSize = size + 'px';
-      div.style.left = Math.random() * 100 + '%';
-      div.style.opacity = (0.5 + Math.random() * 0.5).toFixed(2);
-      div.style.color = currentSnowColor;
-      if (currentSnowColor === '#111111' || currentSnowColor === '#000') {
-        div.style.textShadow = '0 1px 0 rgba(255,255,255,0.85)';
-      } else {
-        div.style.textShadow = '0 1px 2px rgba(0,0,0,0.35)';
-      }
-      div.textContent = '❄';
-      f = div;
-    }
+                // lehké otáčení pro variaci
+                svg.style.transition = `transform ${8000 + Math.random() * 8000}ms linear`;
+                f = svg;
+            } else {
+                const div = document.createElement('div');
+                div.className = 'snowflake';
+                div.style.fontSize = size + 'px';
+                div.style.left = Math.random() * 100 + '%';
+                div.style.opacity = (0.5 + Math.random() * 0.5).toFixed(2);
+                div.style.color = currentSnowColor;
+                if (currentSnowColor === '#111111' || currentSnowColor === '#000') {
+                    div.style.textShadow = '0 1px 0 rgba(255,255,255,0.85)';
+                } else {
+                    div.style.textShadow = '0 1px 2px rgba(0,0,0,0.35)';
+                }
+                div.textContent = '❄';
+                f = div;
+            }
 
-    // Animace přes transform pomocí transition + JS (kompatibilní fallback)
-    const duration = 8000 + Math.random() * 12000; // 8-20s
-    f.style.transition = `transform ${duration}ms linear, top ${duration}ms linear, left ${duration}ms linear`;
+            // Animace přes transform pomocí transition + JS (kompatibilní fallback)
+            const duration = 8000 + Math.random() * 12000; // 8-20s
+            f.style.transition = `transform ${duration}ms linear, top ${duration}ms linear, left ${duration}ms linear`;
 
-    container.appendChild(f);
+            container.appendChild(f);
 
-    // Vypočti koncovou pozici a přidej jemné otáčení
-    requestAnimationFrame(()=>{
-      const endX = (Math.random() * 20 - 10); // horizontální drift
-      const rot = (Math.random()*60 - 30); // otáčení během pádu
-      f.style.transform = `translate(${endX}vw, ${window.innerHeight + 40}px) rotate(${rot}deg)`;
-    });
+            // Vypočti koncovou pozici a přidej jemné otáčení
+            requestAnimationFrame(() => {
+                const endX = (Math.random() * 20 - 10); // horizontální drift
+                const rot = (Math.random() * 60 - 30); // otáčení během pádu
+                f.style.transform = `translate(${endX}vw, ${window.innerHeight + 40}px) rotate(${rot}deg)`;
+            });
 
-    // Odstranění po době trvání
-    setTimeout(()=>{ try{ f.remove(); }catch(e){} }, duration + 500);
-  }
+            // Odstranění po době trvání
+            setTimeout(() => {
+                try {
+                    f.remove();
+                } catch (e) {
+                }
+            }, duration + 500);
+        }
 
-  // Plynulé doplňování vloček
-  let running = true;
-  function loop(){
-    if (!running) return;
-    if (container.children.length < maxFlakes) createFlake();
-    setTimeout(loop, 200 + Math.random() * 300);
-  }
-  loop();
+        // Plynulé doplňování vloček
+        let running = true;
 
-  // Pokud se změní rozměr nebo téma, znovu vypočti barvu
-  window.addEventListener('resize', ()=>{ currentSnowColor = computeSnowColor(); });
-  // Poslouchej změnu třídy dark-mode (pokud někdo přepíná téma JSem)
-  const mo = new MutationObserver(()=>{ currentSnowColor = computeSnowColor(); });
-  mo.observe(document.body, { attributes: true, attributeFilter:['class'] });
+        function loop() {
+            if (!running) return;
+            if (container.children.length < maxFlakes) createFlake();
+            setTimeout(loop, 200 + Math.random() * 300);
+        }
 
-})();
+        loop();
+
+        // Pokud se změní rozměr nebo téma, znovu vypočti barvu
+        window.addEventListener('resize', () => {
+            currentSnowColor = computeSnowColor();
+        });
+        // Poslouchej změnu třídy dark-mode (pokud někdo přepíná téma JSem)
+        const mo = new MutationObserver(() => {
+            currentSnowColor = computeSnowColor();
+        });
+        mo.observe(document.body, {attributes: true, attributeFilter: ['class']});
+
+    })();
 </script>
 
 <!-- Přidáme jednorázovou vánoční bublinu (toast) -->
 <script>
-(function(){
-  const KEY = 'knowix_xmas_toast_shown_v1';
-  const PHRASE = 'Veselé Vánoce a šťastný nový rok od Knowix! 🎄';
-  // zobraz jen jednou za session/klienta
-  if (sessionStorage.getItem(KEY)) return;
+    (function () {
+        const KEY = 'knowix_xmas_toast_shown_v1';
+        const PHRASE = 'Veselé Vánoce a šťastný nový rok od Knowix! 🎄';
+        // zobraz jen jednou za session/klienta
+        if (sessionStorage.getItem(KEY)) return;
 
-  function pageHasPhrase(){
-    try{
-      if (document.body && document.body.innerText && document.body.innerText.indexOf(PHRASE) !== -1) return true;
-      const footer = document.querySelector('footer');
-      if (footer && footer.innerText && footer.innerText.indexOf(PHRASE) !== -1) return true;
-      if (document.querySelector('.xmas-greeting') && document.querySelector('.xmas-greeting').innerText.indexOf(PHRASE) !== -1) return true;
-    }catch(e){ /* ignore */ }
-    return false;
-  }
+        function pageHasPhrase() {
+            try {
+                if (document.body && document.body.innerText && document.body.innerText.indexOf(PHRASE) !== -1) return true;
+                const footer = document.querySelector('footer');
+                if (footer && footer.innerText && footer.innerText.indexOf(PHRASE) !== -1) return true;
+                if (document.querySelector('.xmas-greeting') && document.querySelector('.xmas-greeting').innerText.indexOf(PHRASE) !== -1) return true;
+            } catch (e) { /* ignore */
+            }
+            return false;
+        }
 
-  function showToastOnce(){
-    if (sessionStorage.getItem(KEY)) return;
-    try{
-      const toast = document.createElement('div');
-      toast.className = 'xmas-toast show';
+        function showToastOnce() {
+            if (sessionStorage.getItem(KEY)) return;
+            try {
+                const toast = document.createElement('div');
+                toast.className = 'xmas-toast show';
 
-      const img = document.createElement('img');
-      img.src = '/static/pic/christmas_icon.png';
-      img.alt = '🎄';
-      img.onerror = function(){ this.style.display='none'; };
+                const img = document.createElement('img');
+                img.src = '/static/pic/christmas_icon.png';
+                img.alt = '🎄';
+                img.onerror = function () {
+                    this.style.display = 'none';
+                };
 
-      const txt = document.createElement('div');
-      txt.textContent = PHRASE;
+                const txt = document.createElement('div');
+                txt.textContent = PHRASE;
 
-      const close = document.createElement('button');
-      close.className = 'xmas-close';
-      close.innerHTML = '✕';
-      close.addEventListener('click', ()=>{ toast.remove(); sessionStorage.setItem(KEY,'1'); });
+                const close = document.createElement('button');
+                close.className = 'xmas-close';
+                close.innerHTML = '✕';
+                close.addEventListener('click', () => {
+                    toast.remove();
+                    sessionStorage.setItem(KEY, '1');
+                });
 
-      toast.appendChild(img);
-      toast.appendChild(txt);
-      toast.appendChild(close);
+                toast.appendChild(img);
+                toast.appendChild(txt);
+                toast.appendChild(close);
 
-      document.body.appendChild(toast);
+                document.body.appendChild(toast);
 
-      // automaticky skryj po some sekundách
-      setTimeout(()=>{ try{ if(document.body.contains(toast)){ toast.remove(); sessionStorage.setItem(KEY,'1'); } }catch(e){} }, 9000);
-    }catch(e){ console.error('xmas toast error', e); }
-  }
+                // automaticky skryj po some sekundách
+                setTimeout(() => {
+                    try {
+                        if (document.body.contains(toast)) {
+                            toast.remove();
+                            sessionStorage.setItem(KEY, '1');
+                        }
+                    } catch (e) {
+                    }
+                }, 9000);
+            } catch (e) {
+                console.error('xmas toast error', e);
+            }
+        }
 
-  // Pokud už stránka obsahuje frázi, ukaž toast, jinak sleduj DOM krátce
-  if (pageHasPhrase()){
-    setTimeout(showToastOnce, 600); // malá prodleva, ať není v konfliktu s layoutem
-  } else {
-    const mo = new MutationObserver((muts, obs)=>{
-      if (pageHasPhrase()){
-        obs.disconnect();
-        showToastOnce();
-      }
-    });
-    mo.observe(document.body, { childList:true, subtree:true });
-    // timeout - pokud se fráze neobjeví do 5s, přestaň sledovat
-    setTimeout(()=>{ try{ mo.disconnect(); }catch(e){} }, 5000);
-  }
+        // Pokud už stránka obsahuje frázi, ukaž toast, jinak sleduj DOM krátce
+        if (pageHasPhrase()) {
+            setTimeout(showToastOnce, 600); // malá prodleva, ať není v konfliktu s layoutem
+        } else {
+            const mo = new MutationObserver((muts, obs) => {
+                if (pageHasPhrase()) {
+                    obs.disconnect();
+                    showToastOnce();
+                }
+            });
+            mo.observe(document.body, {childList: true, subtree: true});
+            // timeout - pokud se fráze neobjeví do 5s, přestaň sledovat
+            setTimeout(() => {
+                try {
+                    mo.disconnect();
+                } catch (e) {
+                }
+            }, 5000);
+        }
 
-})();
+    })();
 </script>
 
 <!-- zachovej další skripty a include onboarding -->
@@ -560,115 +864,31 @@
 <!--})();-->
 <!--</script>-->
 <script>
-// Diagnostika push notifikací
-document.getElementById('test-push')?.addEventListener('click', async function() {
-    try {
-        const response = await fetch('/push/test-send', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.content || ''
-            },
-            body: JSON.stringify({
-                title: 'Test Knowix',
-                body: 'Pokud vidíš tuto zprávu, push notifikace fungují! 🎉',
-                url: '/'
-            })
-        });
+    // Diagnostika push notifikací
+    document.getElementById('test-push')?.addEventListener('click', async function () {
+        try {
+            const response = await fetch('/push/test-send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                },
+                body: JSON.stringify({
+                    title: 'Test Knowix',
+                    body: 'Pokud vidíš tuto zprávu, push notifikace fungují! 🎉',
+                    url: '/'
+                })
+            });
 
-        const result = await response.json();
-        alert('Test výsledek:\n' + JSON.stringify(result, null, 2));
-    } catch (error) {
-        alert('Chyba testu: ' + error.message);
-    }
-});
-
-// Přepínač notifikací: povolit/vypnout (unsubscribe)
-(function(){
-  const btn = document.getElementById('enable-notifications');
-  if (!btn) return;
-
-  // Pomocná funkce pro nastavení vizuálu tlačítka
-  function setBtnState(enabled){
-    if (enabled){
-      btn.querySelector('.icon')?.replaceWith(Object.assign(document.createElement('span'), {className:'icon', textContent:'🔔'}));
-      btn.querySelector('.label')?.replaceWith(Object.assign(document.createElement('span'), {className:'label', textContent:'Vypnout notifikace'}));
-      btn.title = 'Vypnout notifikace';
-    } else {
-      btn.querySelector('.icon')?.replaceWith(Object.assign(document.createElement('span'), {className:'icon', textContent:'🔔'}));
-      btn.querySelector('.label')?.replaceWith(Object.assign(document.createElement('span'), {className:'label', textContent:'Povolit notifikace'}));
-      btn.title = 'Povolit notifikace';
-    }
-  }
-
-  // Inicializace stavu podle subscription
-  (async function init(){
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      const sub = await reg.pushManager.getSubscription();
-      setBtnState(!!sub && Notification.permission === 'granted');
-      btn.style.display = 'inline-block';
-    } catch(e){ /* ignore */ }
-  })();
-
-  btn.addEventListener('click', async function(){
-    try {
-      // Pokud prohlížeč nepodporuje notifikace
-      if (!('Notification' in window)){
-        alert('Notifikace nejsou podporované tímto prohlížečem.');
-        return;
-      }
-      const reg = await navigator.serviceWorker.ready;
-      let sub = await reg.pushManager.getSubscription();
-
-      // Pokud je subscription a povolení uděleno -> vypnout (unsubscribe)
-      if (sub && Notification.permission === 'granted'){
-        const ok = await sub.unsubscribe();
-        setBtnState(false);
-        if (!ok){
-          console.warn('Unsubscribe nevrátil OK, ale subscription by měla být zrušena.');
+            const result = await response.json();
+            alert('Test výsledek:\n' + JSON.stringify(result, null, 2));
+        } catch (error) {
+            alert('Chyba testu: ' + error.message);
         }
-        alert('Notifikace byly vypnuty.');
-        return;
-      }
+    });
 
-      // Pokud nemáme subscription, požádáme o oprávnění a pokusíme se přihlásit
-      if (Notification.permission === 'default'){
-        const perm = await Notification.requestPermission();
-        if (perm !== 'granted'){
-          alert('Notifikace nejsou povolené. Povol je v nastavení prohlížeče.');
-          setBtnState(false);
-          return;
-        }
-      } else if (Notification.permission === 'denied'){
-        alert('Notifikace jsou zakázané v prohlížeči. Povol je v nastavení.');
-        setBtnState(false);
-        return;
-      }
-
-      // Vytvoření nové subscription (vyžaduje VAPID public key na serveru – pokud pwa.js již řeší, jen triggeruj)
-      try {
-        // Pokud vaše pwa.js obsahuje logiku pro subscribe, lze ji vyvolat událostí/custom handlerem.
-        // Zde fallback: pokus o vytvoření subscription bez odeslání na server (nutné doplnit VAPID klíč v reálné implementaci).
-        const newSub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: undefined });
-        if (newSub){
-          setBtnState(true);
-          alert('Notifikace byly povoleny.');
-        } else {
-          alert('Nepodařilo se povolit notifikace.');
-          setBtnState(false);
-        }
-      } catch(err){
-        console.error('Subscribe error', err);
-        alert('Chyba při povolování notifikací.');
-        setBtnState(false);
-      }
-    } catch(e){
-      console.error('Toggle notif error', e);
-      alert('Chyba při změně stavu notifikací.');
-    }
-  });
-})();
+    // Přepínač notifikací řeší jednotně /static/js/pwa.js (subscribe/unsubscribe + uložení do DB).
+    // Dřívější fallback logika tady vytvářela subscription s applicationServerKey: undefined -> AbortError.
 
     document.getElementById('theme-toggle').addEventListener('click', () => {
         fetch('/set_theme', {
@@ -687,57 +907,68 @@ document.getElementById('test-push')?.addEventListener('click', async function()
     });
 </script>
 <script>
-(function(){
-  const btn = document.getElementById('test-notif');
-  if(!btn) return;
-  btn.addEventListener('click', async ()=>{
-    try {
-      if(Notification.permission === 'default') {
-        await Notification.requestPermission();
-      }
-      if(Notification.permission !== 'granted') {
-        alert('Notifikace nejsou povoleny v prohlížeči/OS.');
-        return;
-      }
-      const reg = await navigator.serviceWorker.ready;
-      // Preferuj PNG (Windows/Chrome často lépe zobrazí)
-      const iconPng = '/static/icons/bell.png';
-      await reg.showNotification('Test notifikace – Knowix', {
-        body: 'Pokud vidíš tento toast, notifikace fungují. (klikni pro otevření domů)',
-        icon: iconPng,
-        badge: iconPng,
-        requireInteraction: true,
-        renotify: true,
-        tag: 'knowix-test-1',
-        vibrate: [100, 50, 100],
-        data: { url: '/' }
-      });
-      // Fallback pro některá prostředí – vytvoří i ne-persistentní notifikaci
-      try { new Notification('Fallback notif', { body: 'Alternativní způsob zobrazení', icon: iconPng, tag: 'knowix-fallback-1', requireInteraction: true }); } catch(_){ }
-    } catch(e){ console.error('Test notifikace selhal', e); alert('Zobrazení notifikace selhalo – viz konzoli.'); }
-  });
-})();
+    (function () {
+        const btn = document.getElementById('test-notif');
+        if (!btn) return;
+        btn.addEventListener('click', async () => {
+            try {
+                if (Notification.permission === 'default') {
+                    await Notification.requestPermission();
+                }
+                if (Notification.permission !== 'granted') {
+                    alert('Notifikace nejsou povoleny v prohlížeči/OS.');
+                    return;
+                }
+                const reg = await navigator.serviceWorker.ready;
+                // Preferuj PNG (Windows/Chrome často lépe zobrazí)
+                const iconPng = '/static/icons/bell.png';
+                await reg.showNotification('Test notifikace – Knowix', {
+                    body: 'Pokud vidíš tento toast, notifikace fungují. (klikni pro otevření domů)',
+                    icon: iconPng,
+                    badge: iconPng,
+                    requireInteraction: true,
+                    renotify: true,
+                    tag: 'knowix-test-1',
+                    vibrate: [100, 50, 100],
+                    data: {url: '/'}
+                });
+                // Fallback pro některá prostředí – vytvoří i ne-persistentní notifikaci
+                try {
+                    new Notification('Fallback notif', {
+                        body: 'Alternativní způsob zobrazení',
+                        icon: iconPng,
+                        tag: 'knowix-fallback-1',
+                        requireInteraction: true
+                    });
+                } catch (_) {
+                }
+            } catch (e) {
+                console.error('Test notifikace selhal', e);
+                alert('Zobrazení notifikace selhalo – viz konzoli.');
+            }
+        });
+    })();
 </script>
 <script>
-// Přidání pulzu po zobrazení tlačítek (pozoruje změnu display)
-(function(){
-  const notifBtn = document.getElementById('enable-notifications');
-  const installBtn = document.getElementById('install-app');
-  const observer = new MutationObserver(muts => {
-    muts.forEach(m => {
-      if (m.attributeName === 'style') {
-        if (installBtn && installBtn.style.display !== 'none' && !installBtn.classList.contains('pulse')) {
-          installBtn.classList.add('pulse');
-        }
-        if (notifBtn && notifBtn.style.display !== 'none' && !notifBtn.classList.contains('pulse')) {
-          notifBtn.classList.add('pulse');
-        }
-      }
-    });
-  });
-  if (installBtn) observer.observe(installBtn, {attributes:true});
-  if (notifBtn) observer.observe(notifBtn, {attributes:true});
-})();
+    // Přidání pulzu po zobrazení tlačítek (pozoruje změnu display)
+    (function () {
+        const notifBtn = document.getElementById('enable-notifications');
+        const installBtn = document.getElementById('install-app');
+        const observer = new MutationObserver(muts => {
+            muts.forEach(m => {
+                if (m.attributeName === 'style') {
+                    if (installBtn && installBtn.style.display !== 'none' && !installBtn.classList.contains('pulse')) {
+                        installBtn.classList.add('pulse');
+                    }
+                    if (notifBtn && notifBtn.style.display !== 'none' && !notifBtn.classList.contains('pulse')) {
+                        notifBtn.classList.add('pulse');
+                    }
+                }
+            });
+        });
+        if (installBtn) observer.observe(installBtn, {attributes: true});
+        if (notifBtn) observer.observe(notifBtn, {attributes: true});
+    })();
 </script>
 
 {# Onboarding overlay – vloženo globálně #}

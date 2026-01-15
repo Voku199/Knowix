@@ -1,0 +1,564 @@
+{
+  "id": "prijmacky-c1c2-001",
+  "level": "C1-C2",
+  "time_limit": 60,
+  "sections": [
+    {
+      "type": "grammar",
+      "title": "Grammar & Use of English",
+      "questions": [
+        {
+          "id": "c1-g-1",
+          "format": "mcq",
+          "prompt": "Hardly ___ the meeting started when the fire alarm went off.",
+          "options": [
+            "had",
+            "has",
+            "did",
+            "was"
+          ],
+          "correct": [
+            "had"
+          ],
+          "explanation": "Hardly + past perfect ... when + past simple."
+        },
+        {
+          "id": "c1-g-2",
+          "format": "mcq",
+          "prompt": "No sooner ___ than she started complaining.",
+          "options": [
+            "had she arrived",
+            "she had arrived",
+            "did she arrive",
+            "has she arrived"
+          ],
+          "correct": [
+            "had she arrived"
+          ],
+          "explanation": "No sooner + inversion (past perfect)."
+        },
+        {
+          "id": "c1-g-3",
+          "format": "mcq",
+          "prompt": "Despite ___ the rain, the match continued.",
+          "options": [
+            "of",
+            "-",
+            "on",
+            "to"
+          ],
+          "correct": [
+            "-"
+          ],
+          "explanation": "Despite (bez of)."
+        },
+        {
+          "id": "c1-g-4",
+          "format": "mcq",
+          "prompt": "If he ___ earlier, he wouldn't have missed the train.",
+          "options": [
+            "left",
+            "had left",
+            "would leave",
+            "has left"
+          ],
+          "correct": [
+            "had left"
+          ],
+          "explanation": "Third conditional: If + past perfect."
+        },
+        {
+          "id": "c1-g-5",
+          "format": "mcq",
+          "prompt": "Not only ___ he apologise, but he also denied everything.",
+          "options": [
+            "did",
+            "does",
+            "has",
+            "was"
+          ],
+          "correct": [
+            "did"
+          ],
+          "explanation": "Inversion after Not only."
+        },
+        {
+          "id": "c1-g-6",
+          "format": "mcq",
+          "prompt": "It's about time you ___ to bed.",
+          "options": [
+            "go",
+            "went",
+            "gone",
+            "going"
+          ],
+          "correct": [
+            "went"
+          ],
+          "explanation": "It's about time + past simple."
+        },
+        {
+          "id": "c1-g-7",
+          "format": "mcq",
+          "prompt": "She acts as if she ___ the boss.",
+          "options": [
+            "is",
+            "were",
+            "has been",
+            "will be"
+          ],
+          "correct": [
+            "were"
+          ],
+          "explanation": "As if + unreal past (were)."
+        },
+        {
+          "id": "c1-g-8",
+          "format": "mcq",
+          "prompt": "The report, ___ was published yesterday, caused a stir.",
+          "options": [
+            "that",
+            "which",
+            "where",
+            "who"
+          ],
+          "correct": [
+            "which"
+          ],
+          "explanation": "Non-defining relative clause."
+        },
+        {
+          "id": "c1-g-9",
+          "format": "mcq",
+          "prompt": "Were I you, I ___ reconsider.",
+          "options": [
+            "will",
+            "would",
+            "can",
+            "must"
+          ],
+          "correct": [
+            "would"
+          ],
+          "explanation": "Inverted conditional: Were I you...}"
+        },
+        {
+          "id": "c1-g-10",
+          "format": "mcq",
+          "prompt": "He demanded that she ___ immediately.",
+          "options": [
+            "leaves",
+            "leave",
+            "left",
+            "leaving"
+          ],
+          "correct": [
+            "leave"
+          ],
+          "explanation": "Subjunctive: demand that + base form."
+        }
+      ]
+    },
+    {
+      "type": "vocabulary",
+      "title": "Vocabulary",
+      "questions": [
+        {
+          "id": "c1-v-1",
+          "format": "mcq",
+          "prompt": "The CEO's speech was widely criticised for its ___ tone.",
+          "options": [
+            "condescending",
+            "condensing",
+            "consecutive",
+            "conclusive"
+          ],
+          "correct": [
+            "condescending"
+          ],
+          "explanation": "Condescending = povýšený."
+        },
+        {
+          "id": "c1-v-2",
+          "format": "mcq",
+          "prompt": "The committee rejected the proposal, citing a lack of ___ evidence.",
+          "options": [
+            "compelling",
+            "random",
+            "minor",
+            "casual"
+          ],
+          "correct": [
+            "compelling"
+          ],
+          "explanation": "Compelling evidence."
+        },
+        {
+          "id": "c1-v-3",
+          "format": "mcq",
+          "prompt": "False friend: 'sensible' means:",
+          "options": [
+            "rozumný",
+            "citlivý",
+            "smyslový",
+            "senzační"
+          ],
+          "correct": [
+            "rozumný"
+          ],
+          "explanation": "Sensible = rozumný."
+        },
+        {
+          "id": "c1-v-4",
+          "format": "mcq",
+          "prompt": "The plan was abandoned due to ___ opposition.",
+          "options": [
+            "fierce",
+            "tiny",
+            "fragile",
+            "gentle"
+          ],
+          "correct": [
+            "fierce"
+          ],
+          "explanation": "Fierce opposition."
+        },
+        {
+          "id": "c1-v-5",
+          "format": "mcq",
+          "prompt": "Her explanation was so ___ that nobody understood it.",
+          "options": [
+            "convoluted",
+            "convenient",
+            "constant",
+            "conclusive"
+          ],
+          "correct": [
+            "convoluted"
+          ],
+          "explanation": "Convoluted = zamotaný."
+        },
+        {
+          "id": "c1-v-6",
+          "format": "mcq",
+          "prompt": "He gave a very ___ account of what happened.",
+          "options": [
+            "candid",
+            "candidate",
+            "candle",
+            "canal"
+          ],
+          "correct": [
+            "candid"
+          ],
+          "explanation": "Candid = upřímný."
+        },
+        {
+          "id": "c1-v-7",
+          "format": "mcq",
+          "prompt": "The company is trying to ___ its image.",
+          "options": [
+            "revamp",
+            "revolt",
+            "revise",
+            "reveal"
+          ],
+          "correct": [
+            "revamp"
+          ],
+          "explanation": "Revamp = výrazně přepracovat."
+        },
+        {
+          "id": "c1-v-8",
+          "format": "mcq",
+          "prompt": "The new policy will ___ small businesses.",
+          "options": [
+            "adversely affect",
+            "advantage",
+            "address",
+            "admire"
+          ],
+          "correct": [
+            "adversely affect"
+          ],
+          "explanation": "Negativně ovlivnit."
+        },
+        {
+          "id": "c1-v-9",
+          "format": "mcq",
+          "prompt": "The results were ___ with earlier studies.",
+          "options": [
+            "consistent",
+            "confident",
+            "convenient",
+            "constant"
+          ],
+          "correct": [
+            "consistent"
+          ],
+          "explanation": "Consistent with."
+        },
+        {
+          "id": "c1-v-10",
+          "format": "mcq",
+          "prompt": "He is known for his ___ sense of humour.",
+          "options": [
+            "dry",
+            "wet",
+            "watery",
+            "damp"
+          ],
+          "correct": [
+            "dry"
+          ],
+          "explanation": "Dry sense of humour."
+        }
+      ]
+    },
+    {
+      "type": "reading",
+      "title": "Reading comprehension",
+      "passage": "In an age of constant connectivity, the notion of 'digital minimalism' has gained traction among those who feel overwhelmed by endless notifications. Proponents argue that attention is a finite resource and that the default settings of many platforms are designed to maximise engagement rather than well-being. Yet critics contend that opting out can be a privilege: for some, social media is a vital tool for professional visibility, community building, or access to information that traditional institutions fail to provide. The debate, therefore, is less about technology itself than about agency—who controls it, who benefits from it, and how deliberately individuals choose to incorporate it into their lives.",
+      "questions": [
+        {
+          "id": "c1-r-1",
+          "format": "mcq",
+          "prompt": "What is the main point of the last sentence?",
+          "options": [
+            "Technology is always harmful",
+            "The debate focuses on personal control and intentional use",
+            "People should delete social media",
+            "Notifications are the main problem"
+          ],
+          "correct": [
+            "The debate focuses on personal control and intentional use"
+          ],
+          "explanation": "Agency and intentional use."
+        },
+        {
+          "id": "c1-r-2",
+          "format": "true_false",
+          "prompt": "The text suggests that leaving social media is equally easy for everyone.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correct": [
+            "False"
+          ],
+          "explanation": "Opting out can be a privilege."
+        },
+        {
+          "id": "c1-r-3",
+          "format": "mcq",
+          "prompt": "What do critics argue?",
+          "options": [
+            "Minimalism is useless",
+            "Opting out can be a privilege",
+            "Notifications are fine",
+            "Agency doesn't matter"
+          ],
+          "correct": [
+            "Opting out can be a privilege"
+          ],
+          "explanation": "Explicitly stated."
+        },
+        {
+          "id": "c1-r-4",
+          "format": "mcq",
+          "prompt": "What is the debate ultimately about?",
+          "options": [
+            "Phones",
+            "Agency and control",
+            "Advertising",
+            "Wi‑Fi"
+          ],
+          "correct": [
+            "Agency and control"
+          ],
+          "explanation": "Who controls it and benefits."
+        }
+      ]
+    },
+    {
+      "type": "transformation",
+      "title": "Sentence transformation",
+      "questions": [
+        {
+          "id": "c1-t-1",
+          "format": "transform",
+          "prompt": "Rewrite using the word 'little' (do not change it): I didn't expect the discussion to become so heated.",
+          "correct": [
+            "Little did I expect the discussion to become so heated."
+          ],
+          "alternatives": [
+            "Little did I expect the debate to become so heated."
+          ],
+          "explanation": "Inversion after Little."
+        },
+        {
+          "id": "c1-t-2",
+          "format": "transform",
+          "prompt": "Finish the sentence: It's possible that he misunderstood what you said. He may ___.",
+          "correct": [
+            "have misunderstood what you said"
+          ],
+          "alternatives": [
+            "have misunderstood"
+          ],
+          "explanation": "may have + past participle."
+        },
+        {
+          "id": "c1-t-3",
+          "format": "transform",
+          "prompt": "Rewrite using 'not': It's unlikely that she will agree.",
+          "correct": [
+            "She is not likely to agree."
+          ],
+          "alternatives": [
+            "It is not likely that she will agree."
+          ],
+          "explanation": "not likely."
+        }
+      ]
+    },
+    {
+      "type": "listening",
+      "title": "Listening (placeholder)",
+      "audio": null,
+      "passage": "(Listening text) Today I'm going to talk about why short-term measures are often more attractive to voters than long-term reforms. In the short run, politicians can offer quick benefits, such as temporary tax cuts or one-off subsidies, and people feel the impact immediately. Long-term reforms, however, usually involve trade-offs: they may require higher costs now in exchange for better outcomes later. That's why public support is essential, but it doesn't appear automatically. Leaders need to communicate clearly, not only about the expected benefits, but also about the costs and the timeline. Without transparency and trust, even well-designed reforms can fail because citizens assume that the burden will not be shared fairly. In other words, long-term change is as much a communication challenge as it is a policy challenge.",
+      "questions": [
+        {
+          "id": "c1-l-1",
+          "format": "mcq",
+          "prompt": "According to the speaker, why are short-term measures popular?",
+          "options": [
+            "They have immediate visible effects",
+            "They always cost less",
+            "They don't require voters",
+            "They are easier to explain than anything else"
+          ],
+          "correct": [
+            "They have immediate visible effects"
+          ],
+          "explanation": "The speaker says people feel the impact immediately."
+        },
+        {
+          "id": "c1-l-2",
+          "format": "mcq",
+          "prompt": "What do long-term reforms usually involve?",
+          "options": [
+            "Trade-offs and costs now for benefits later",
+            "No costs at all",
+            "Only short-term benefits",
+            "Less communication"
+          ],
+          "correct": [
+            "Trade-offs and costs now for benefits later"
+          ],
+          "explanation": "They involve trade-offs and higher costs now for outcomes later."
+        },
+        {
+          "id": "c1-l-3",
+          "format": "true_false",
+          "prompt": "The speaker suggests that transparency and trust can influence whether reforms succeed.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "correct": [
+            "True"
+          ],
+          "explanation": "Without transparency and trust, reforms can fail."
+        },
+        {
+          "id": "c1-l-4",
+          "format": "mcq",
+          "prompt": "What is the final point of the talk?",
+          "options": [
+            "Communication is irrelevant",
+            "Policy matters more than people",
+            "Long-term change is both a policy and communication challenge",
+            "Short-term measures should be banned"
+          ],
+          "correct": [
+            "Long-term change is both a policy and communication challenge"
+          ],
+          "explanation": "The last sentence makes this point directly."
+        }
+      ]
+    },
+    {
+      "type": "speaking",
+      "title": "Speaking (repeat / argument)",
+      "instructions": "Klikni na Přehrát a zkus větu zopakovat nahlas. Potom odpověz krátce vlastními slovy. Tahle část se nepočítá do skóre – je to trénink plynulosti, intonace a argumentace.",
+      "questions": [
+        {
+          "id": "c1-s-1",
+          "format": "repeat",
+          "prompt": "Repeat: 'In the long run, effective reforms require both public trust and clear communication.'",
+          "tts": "In the long run, effective reforms require both public trust and clear communication.",
+          "correct": [],
+          "alternatives": [],
+          "explanation": "Zkus udržet přirozenou intonaci a důraz na key words."
+        },
+        {
+          "id": "c1-s-2",
+          "format": "repeat",
+          "prompt": "Repeat: 'Although the costs are immediate, the benefits may only become visible years later.'",
+          "tts": "Although the costs are immediate, the benefits may only become visible years later.",
+          "correct": [],
+          "alternatives": [],
+          "explanation": "Procvič kontrast: although / may only."
+        },
+        {
+          "id": "c1-s-3",
+          "format": "repeat",
+          "prompt": "Repeat: 'Without transparency, citizens are likely to assume the burden is unfair.'",
+          "tts": "Without transparency, citizens are likely to assume the burden is unfair.",
+          "correct": [],
+          "alternatives": [],
+          "explanation": "Pozor na výslovnost transparency / citizens / burden."
+        },
+        {
+          "id": "c1-s-4",
+          "format": "speak_answer",
+          "prompt": "Speak 2–3 sentences: Do you agree that communication is as important as policy? Give one reason.",
+          "tts": "Speak two or three sentences. Do you agree that communication is as important as policy? Give one reason.",
+          "correct": [],
+          "alternatives": [],
+          "explanation": "Otevřená odpověď – zkus použít because / therefore / however."
+        }
+      ]
+    },
+    {
+      "type": "writing",
+      "title": "Writing (short)",
+      "questions": [
+        {
+          "id": "c1-w-1",
+          "format": "mcq",
+          "prompt": "Choose the most appropriate sentence for a formal email complaint:",
+          "options": [
+            "I'm really mad about this.",
+            "I am writing to express my dissatisfaction with the service provided.",
+            "This is a joke.",
+            "Fix it ASAP."
+          ],
+          "correct": [
+            "I am writing to express my dissatisfaction with the service provided."
+          ],
+          "explanation": "Formal register."
+        },
+        {
+          "id": "c1-w-2",
+          "format": "short_answer",
+          "prompt": "Write 1–2 sentences: Give an opinion on whether students should use AI to learn languages, and justify it.",
+          "correct": [],
+          "alternatives": [],
+          "explanation": "Otevřená odpověď (nepočítá se do skóre)."
+        }
+      ]
+    }
+  ]
+}

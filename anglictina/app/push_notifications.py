@@ -35,14 +35,23 @@ from security_ext import _ensure_csrf_token
 # Blueprint s prefixem /push
 push_bp = Blueprint('push_bp', __name__, url_prefix='/push')
 
-# VAPID klíče – načti z env, jinak použij zadané defaulty (pro dev)
-VAPID_PUBLIC_KEY = os.getenv(
-    'VAPID_PUBLIC_KEY'
-)
-VAPID_PRIVATE_KEY = os.getenv(
-    'VAPID_PRIVATE_KEY'
-)
+# VAPID klíče – načti z env
+VAPID_PUBLIC_KEY = os.getenv('VAPID_PUBLIC_KEY')
+VAPID_PRIVATE_KEY = os.getenv('VAPID_PRIVATE_KEY')
 VAPID_EMAIL = os.getenv('VAPID_EMAIL')
+
+
+def _has_vapid_config() -> bool:
+    return bool((VAPID_PUBLIC_KEY or '').strip()) and bool((VAPID_PRIVATE_KEY or '').strip()) and bool(
+        (VAPID_EMAIL or '').strip())
+
+
+def _vapid_status_payload() -> dict:
+    return {
+        'hasPublicKey': bool((VAPID_PUBLIC_KEY or '').strip()),
+        'hasPrivateKey': bool((VAPID_PRIVATE_KEY or '').strip()),
+        'hasEmail': bool((VAPID_EMAIL or '').strip()),
+    }
 
 
 # --- Pomocné funkce ---
@@ -153,6 +162,8 @@ def _list_subscriptions(user_id: Optional[int] = None) -> List[Dict[str, Any]]:
 
 def _send_webpush(subscription: Dict[str, Any], payload: Dict[str, Any]):
     """Odešle jednu notifikaci na daný subscription."""
+    if not _has_vapid_config():
+        raise RuntimeError('VAPID is not configured')
     return webpush(
         subscription_info=subscription,
         data=json.dumps(payload, ensure_ascii=False),
@@ -166,7 +177,16 @@ def _send_webpush(subscription: Dict[str, Any], payload: Dict[str, Any]):
 
 @push_bp.get('/vapid-public-key')
 def get_vapid_public_key():
-    return jsonify({'publicKey': VAPID_PUBLIC_KEY})
+    # Pokud klíč chybí, vrať jasnou chybu (FE pak nezkouší subscribe a zobrazí smysluplnou hlášku)
+    if not (VAPID_PUBLIC_KEY or '').strip():
+        return _json_err('VAPID public key missing (server config)', 500, **_vapid_status_payload())
+    return jsonify({'publicKey': VAPID_PUBLIC_KEY, **_vapid_status_payload()})
+
+
+@push_bp.get('/vapid-status')
+def vapid_status():
+    """Diagnostika konfigurace VAPID (bez leaknutí klíčů)."""
+    return _json_ok(**_vapid_status_payload())
 
 
 @push_bp.get('/csrf-token')

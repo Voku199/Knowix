@@ -1,0 +1,952 @@
+<!doctype html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Onboarding | Knowix</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Brand */
+            --bg0: #fefefe;
+            --bg1: #ffffff;
+            --card: rgba(245, 245, 245, .92);
+            --card2: rgba(254, 254, 254, .92);
+            --border: rgba(41, 41, 41, .14);
+            --text: #292929;
+            --muted: rgba(41, 41, 41, .70);
+
+            /* Accent (jen z brand barev – decentně) */
+            --accent: #292929;
+            --accent2: #c4c2c1;
+            --warn: #c4c2c1;
+            --shadow: 0 18px 60px rgba(41, 41, 41, .14);
+            --radius: 22px;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: 'League Spartan', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            color: var(--text);
+            background: radial-gradient(1100px 780px at 20% 10%, rgba(196, 194, 193, .35), transparent 58%),
+            radial-gradient(900px 700px at 90% 20%, rgba(245, 245, 245, .95), transparent 62%),
+            linear-gradient(180deg, var(--bg0), var(--bg1));
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .shell {
+            max-width: 1020px;
+            margin: 0 auto;
+            padding: 26px 16px 54px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logoDot {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 26px rgba(41, 41, 41, .10);
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+        }
+
+        .logoDot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .brand h1 {
+            font-size: 18px;
+            margin: 0;
+            letter-spacing: .3px;
+            font-weight: 800;
+        }
+
+        .brand .tag {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .progressWrap {
+            flex: 1 1 320px;
+            min-width: 240px;
+            max-width: 520px;
+        }
+
+        .progressMeta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .progressBar {
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(196, 194, 193, .35);
+            border: 1px solid rgba(41, 41, 41, .10);
+            overflow: hidden
+        }
+
+        .progressFill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #292929, rgba(41, 41, 41, .65));
+            width: 0;
+            transition: width .35s ease
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        @media (max-width: 980px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mascotCard {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            transform-origin: top center;
+            transition: transform .55s cubic-bezier(.2, .9, .2, 1), opacity .55s ease;
+        }
+
+        .mascotGlow {
+            position: absolute;
+            inset: -60px -60px auto auto;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle at 30% 30%, rgba(196, 194, 193, .55), transparent 70%);
+            filter: blur(2px)
+        }
+
+        .mascotImg {
+            width: 100%;
+            max-width: 280px;
+            display: block;
+            margin: 6px auto 10px;
+        }
+
+        .bubble {
+            background: rgba(254, 254, 254, .92);
+            border: 1px solid rgba(41, 41, 41, .10);
+            border-radius: 18px;
+            padding: 14px 14px;
+            color: var(--text);
+        }
+
+        .bubbleTitle {
+            font-weight: 900;
+            margin: 0 0 6px;
+        }
+
+        .bubbleText {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.38
+        }
+
+        .mainCard {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--shadow);
+            transition: opacity .45s ease, transform .45s ease;
+        }
+
+        /* Intro režim: nejdřív jen Alex, otázky schované */
+        body[data-intro="1"] .mainCard {
+            display: none;
+        }
+
+        body[data-intro="1"] .topbar .progressWrap {
+            opacity: .0;
+            pointer-events: none;
+            height: 0;
+            overflow: hidden;
+        }
+
+        body[data-intro="1"] form[action*="prev"] {
+            display: none !important;
+        }
+
+        /* Po intro: Alex se posune trochu nahoru a layout může dýchat */
+        body[data-intro="0"] .mascotCard {
+            transform: translateY(-10px);
+        }
+
+        /* Intro režim: Alex uprostřed stránky */
+        body[data-intro="1"] .layout {
+            grid-template-columns: 1fr;
+            min-height: calc(100vh - 120px);
+            place-items: center;
+            align-content: center;
+        }
+
+        body[data-intro="1"] .mascotCard {
+            width: min(560px, 100%);
+            transform: translateY(0);
+        }
+
+        /* Když už jsme v otázkách (data-intro=0), vycentruj obsah uprostřed */
+        body[data-intro="0"] .layout {
+            grid-template-columns: 1fr;
+            justify-items: center;
+            align-content: center;
+            min-height: calc(100vh - 120px);
+        }
+
+        body[data-intro="0"] .mascotCard {
+            width: min(560px, 100%);
+        }
+
+        body[data-intro="0"] .mainCard {
+            width: min(720px, 100%);
+        }
+
+        .stepTitle {
+            margin: 4px 0 10px;
+            font-size: 28px;
+            letter-spacing: .15px;
+            font-weight: 900;
+        }
+
+        .stepHint {
+            margin: 0 0 14px;
+            color: var(--muted);
+            line-height: 1.5;
+            font-weight: 600;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .grid2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        @media (max-width: 620px) {
+            .grid2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .opt {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            border: 1px solid rgba(41, 41, 41, .12);
+            background: rgba(254, 254, 254, .88);
+            cursor: pointer;
+            transition: transform .15s ease, border-color .2s ease, background .2s ease;
+            user-select: none;
+        }
+
+        .opt:hover {
+            transform: translateY(-2px);
+            border-color: rgba(41, 41, 41, .35);
+            background: rgba(245, 245, 245, 1)
+        }
+
+        .opt input {
+            accent-color: var(--accent);
+            width: 18px;
+            height: 18px
+        }
+
+        .opt strong {
+            font-weight: 900
+        }
+
+        .opt small {
+            display: block;
+            color: var(--muted);
+            margin-top: 2px;
+            font-size: 12px
+        }
+
+        .pillRow {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(41, 41, 41, .16);
+            background: rgba(254, 254, 254, .90);
+            color: var(--text);
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 900;
+            letter-spacing: .2px;
+            transition: transform .16s ease, background .2s ease, border-color .2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            border-color: rgba(41, 41, 41, .28)
+        }
+
+        .btnPrimary {
+            background: var(--text);
+            border: 1px solid rgba(41, 41, 41, .35);
+            color: #fefefe;
+        }
+
+        .btnPrimary:hover {
+            background: #1f1f1f
+        }
+
+        .btnGreen {
+            background: var(--text);
+            border: 1px solid rgba(41, 41, 41, .35);
+            color: #fefefe;
+        }
+
+        .btnWarn {
+            background: rgba(196, 194, 193, .62);
+            border: 1px solid rgba(41, 41, 41, .18);
+            color: var(--text);
+        }
+
+        .btnGhost {
+            background: rgba(245, 245, 245, .92);
+        }
+
+        .footerBar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .tiny {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        /* Intro text swap uvnitř bubble */
+        .introControls {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .introMsg {
+            display: none;
+        }
+
+        .introMsg.is-active {
+            display: block;
+        }
+
+        .fadeSwap {
+            animation: fadeSwap .28s ease;
+        }
+
+        @keyframes fadeSwap {
+            from {
+                opacity: .0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body data-onboarding="1" data-intro="1">
+<div class="shell">
+
+    <div class="topbar">
+        <div class="brand">
+            <div class="logoDot" aria-hidden="true">
+                <img src="/favicon.ico" alt="Knowix" width="34" height="34" loading="eager" decoding="async">
+            </div>
+            <div>
+                <h1>Knowix</h1>
+                <div class="tag">Onboarding</div>
+            </div>
+        </div>
+
+        <div class="progressWrap" aria-label="Průběh onboardingu"
+             data-progress="{{ (step_index * 100 / step_total) | round(0) }}">
+            <div class="progressMeta">
+                <span>{{ step_title }}</span>
+                <span>{{ step_index }}/{{ step_total }}</span>
+            </div>
+            <div class="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                 aria-valuenow="{{ (step_index * 100 / step_total)|round(0) }}">
+                <div class="progressFill" aria-hidden="true"></div>
+            </div>
+        </div>
+
+        {% if step_index > 1 %}
+        <form method="post" action="{{ url_for('onboarding_bp.prev_step') }}" style="margin:0;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btnGhost" type="submit">Zpět</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <div class="layout">
+        <div class="mascotCard" id="mascot">
+            <div class="mascotGlow"></div>
+
+            <!-- Obrázky Alexe: intro mává (happy) -> intro idle -> onboarding (pokud existuje) -->
+            <img class="mascotImg" id="alex-img" src="/static/Alex_Happy.png" alt="Alex">
+
+            <div class="bubble">
+                <p class="bubbleTitle" id="alex-title">Ahoj! Já jsem Alex.</p>
+
+                <!-- Intro zprávy (2 kroky) -->
+                <div id="intro-messages" data-step="1">
+                    <p class="bubbleText introMsg is-active" data-intro-step="1">Ahoj! Já jsem Alex.</p>
+                    <p class="bubbleText introMsg" data-intro-step="2">Pojďme to připravit pro tebe!</p>
+
+                    <div class="introControls">
+                        <button class="btn btnPrimary" type="button" id="intro-next">Další</button>
+                    </div>
+                </div>
+
+                <!-- Původní texty pro jednotlivé otázky (zůstanou zachované) -->
+                <p class="bubbleText" id="onboarding-bubble" style="display:none;">
+                    {% if step == 'welcome' %}
+                    Pojďme nastavit Knowix tak, aby ti to sedlo. Zabere to jen chvilku.
+                    {% elif step == 'source' %}
+                    Jen rychlá otázka – ať víme, odkud přicházíš.
+                    {% elif step == 'use_cases' %}
+                    Vyber, k čemu ti má Knowix pomoct. Můžeš klidně všechno.
+                    {% elif step == 'level' %}
+                    Společně nastavíme obtížnost.
+                    {% elif step == 'value' %}
+                    Tohle je to, v čem je Knowix silný.
+                    {% elif step == 'minutes' %}
+                    Kolik času si chceš dát denně? I 5 minut udělá rozdíl.
+                    {% elif step == 'notifications' %}
+                    Když chceš, připomenu ti učení notifikacemi.
+                    {% elif step == 'sample' %}
+                    Zkus si mini ukázku, ať víš, jak to vypadá.
+                    {% elif step == 'final' %}
+                    Hotovo! Pokud chceš, vytvoř si účet – budeš mít streak i uložený progres.
+                    {% else %}
+                    Pokračujeme dál.
+                    {% endif %}
+                </p>
+            </div>
+
+            <div style="margin-top:12px" class="tiny" id="alex-tip" hidden>
+                Tip: kdykoliv můžeš dát Zpět.
+            </div>
+        </div>
+
+        <div class="mainCard" id="mainCard">
+
+            {% if step == 'welcome' %}
+            <h2 class="stepTitle">Vítej v Knowixu</h2>
+            <p class="stepHint">Začni teď, nebo se přihlas, pokud už účet máš.</p>
+
+            <div class="pillRow">
+                <form method="post" action="{{ url_for('onboarding_bp.next_step') }}" style="margin:0;"
+                      data-autopick="1">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="step" value="welcome">
+                    <input type="hidden" name="choice" value="start">
+                    <button class="btn btnGreen" type="submit">Začít</button>
+                </form>
+
+                <a class="btn" href="{{ url_for('auth.login') }}">Už mám účet</a>
+            </div>
+
+            {% elif step == 'source' %}
+            <h2 class="stepTitle">Jak ses o nás dozvěděl?</h2>
+            <p class="stepHint">Pomůže nám to vylepšit Knowix.</p>
+
+            <form method="post" action="{{ url_for('onboarding_bp.next_step') }}" data-autopick="1">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="step" value="source">
+
+                <div class="options grid2">
+                    {% for opt in ['X (twitter)','Vyhledávání','TikTok','YouTube','Instagram','Přátele nebo
+                    rodina','Jiné'] %}
+                    <label class="opt">
+                        <input type="radio" name="source" value="{{ opt }}" required>
+                        <strong>{{ opt }}</strong>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <div class="footerBar">
+                    <span class="tiny">Vyber jednu možnost.</span>
+                    <button class="btn btnPrimary" type="submit">Pokračovat</button>
+                </div>
+            </form>
+
+            {% elif step == 'use_cases' %}
+            <h2 class="stepTitle">Jak chceš Knowix využít?</h2>
+            <p class="stepHint">Můžeš vybrat klidně více možností.</p>
+
+            <form method="post" action="{{ url_for('onboarding_bp.next_step') }}" data-autopick="1">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="step" value="use_cases">
+
+                <div class="options">
+                    {% for opt in ['Pomůže mi to v kariéře','Pomůže mi to ve škole','Chci se bavit s kamarádama z cizí
+                    země','Chci trávit čas smysluplně','Ostatní'] %}
+                    <label class="opt">
+                        <input type="checkbox" name="use_cases" value="{{ opt }}">
+                        <span>
+                            <strong>{{ opt }}</strong>
+                            <small>Vyber, co ti dává smysl.</small>
+                        </span>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <div class="footerBar">
+                    <span class="tiny">Tip: můžeš zaškrtnout i všechno.</span>
+                    <button class="btn btnPrimary" type="submit">Pokračovat</button>
+                </div>
+            </form>
+
+            {% elif step == 'level' %}
+            <h2 class="stepTitle">Jaká je tvoje úroveň?</h2>
+            <p class="stepHint">Podle toho nastavíme obtížnost.</p>
+
+            <form method="post" action="{{ url_for('onboarding_bp.next_step') }}" data-autopick="1">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="step" value="level">
+
+                <div class="options">
+                    {% for val,label in [
+                    ('A1','Jsem úplný začátečník'),
+                    ('A2','Znám pár běžných slov'),
+                    ('A2_plus','Zvládnu jednoduchou konverzaci'),
+                    ('B1','Dokážu mluvit o různých tématech'),
+                    ('B2','Umím hovořit o většině témat a podrobně')
+                    ] %}
+                    <label class="opt">
+                        <input type="radio" name="level" value="{{ val }}" required>
+                        <span>
+                            <strong>{{ label }}</strong>
+                            <small>{{ val }}</small>
+                        </span>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <div class="footerBar">
+                    <span class="tiny">Vyber jednu možnost.</span>
+                    <button class="btn btnPrimary" type="submit">Pokračovat</button>
+                </div>
+            </form>
+
+            {% elif step == 'value' %}
+            <h2 class="stepTitle">Co Knowix dokáže</h2>
+            <p class="stepHint">Tady je rychlý přehled, co v appce najdeš.</p>
+
+            <div class="options">
+                <div class="opt" style="cursor:default;">
+                  <span>
+                    <strong>Procvičujte zdarma a lépe!</strong>
+                    <small>Hudba, AI, mluvení a další typy procvičování.</small>
+                  </span>
+                </div>
+                <div class="opt" style="cursor:default;">
+                  <span>
+                    <strong>Pomůžeš mladému vývojáři</strong>
+                    <small>Když Knowix používáš, roste a zlepšuje se.</small>
+                  </span>
+                </div>
+                <div class="opt" style="cursor:default;">
+                  <span>
+                    <strong>Streak a denní připomínky</strong>
+                    <small>PWA notifikace tě udrží v rytmu.</small>
+                  </span>
+                </div>
+            </div>
+
+            <form method="post" action="{{ url_for('onboarding_bp.next_step') }}" style="margin-top:16px;"
+                  data-autopick="1">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="step" value="value">
+                <div class="footerBar">
+                    <span class="tiny">Jdeme na plán.</span>
+                    <button class="btn btnPrimary" type="submit">Pokračovat</button>
+                </div>
+            </form>
+
+            {% elif step == 'minutes' %}
+            <h2 class="stepTitle">Kolik minut chceš cvičit?</h2>
+            <p class="stepHint">Nastavíme ti denní cíl.</p>
+
+            <form method="post" action="{{ url_for('onboarding_bp.next_step') }}" data-autopick="1">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="step" value="minutes">
+
+                <div class="options grid2">
+                    {% for m in [5,10,15,20] %}
+                    <label class="opt">
+                        <input type="radio" name="minutes" value="{{ m }}" required>
+                        <span>
+                            <strong>{{ m }} minut denně</strong>
+                            <small>Lehký rytmus</small>
+                        </span>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <div class="footerBar">
+                    <span class="tiny">Cíl můžeš kdykoliv změnit v nastavení.</span>
+                    <button class="btn btnPrimary" type="submit">Pokračovat</button>
+                </div>
+            </form>
+
+            {% elif step == 'notifications' %}
+            <h2 class="stepTitle">Povolit notifikace?</h2>
+            <p class="stepHint">Doporučujeme – připomeneme ti učení.</p>
+
+            <div class="pillRow">
+                <button class="btn btnWarn" type="button" id="onb-notif">Povolit notifikace</button>
+
+                <form method="post" action="{{ url_for('onboarding_bp.next_step') }}" style="margin:0;"
+                      data-autopick="1" data-autopick-action="submitLast">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="step" value="notifications">
+                    <input type="hidden" name="notif_result" value="skipped">
+                    <button class="btn btnGhost" type="submit">Přeskočit</button>
+                </form>
+            </div>
+
+            <form id="onb-notif-form" method="post" action="{{ url_for('onboarding_bp.next_step') }}"
+                  style="display:none;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="step" value="notifications">
+                <input type="hidden" name="notif_result" id="onb-notif-result" value="">
+            </form>
+
+            <script>
+                (function () {
+                    const btn = document.getElementById('onb-notif');
+                    const form = document.getElementById('onb-notif-form');
+                    const out = document.getElementById('onb-notif-result');
+                    if (!btn || !form || !out) return;
+
+                    btn.addEventListener('click', async () => {
+                        try {
+                            btn.disabled = true;
+
+                            // Nativní prompt musí být vyvolán přímo z user gesture.
+                            const api = window.KnowixPWA;
+                            const fn = api && (api.requestPushPermissionFromUserGesture || api.requestPushPermission);
+                            if (!fn) {
+                                out.value = 'error';
+                                form.submit();
+                                return;
+                            }
+
+                            const res = await fn();
+                            const s = (res && res.status) ? String(res.status) : 'error';
+                            out.value = s;
+                            form.submit();
+                        } catch (e) {
+                            out.value = 'error';
+                            form.submit();
+                        } finally {
+                            btn.disabled = false;
+                        }
+                    });
+                })();
+            </script>
+
+            {% elif step == 'sample' %}
+            <h2 class="stepTitle">Mini ukázka</h2>
+            <p class="stepHint">Zkus si to nanečisto (nemusíš být perfektní).</p>
+
+            <div style="margin-top:10px;">
+                {{ embed_html|safe }}
+            </div>
+
+            <form method="post" action="{{ url_for('onboarding_bp.next_step') }}" style="margin-top:16px;"
+                  data-autopick="1">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="step" value="sample">
+                <input type="hidden" name="sample_done" value="1">
+                <div class="footerBar">
+                    <span class="tiny">Stačí jen zkusit.</span>
+                    <button class="btn btnPrimary" type="submit">Pokračovat</button>
+                </div>
+            </form>
+
+            {% elif step == 'final' %}
+            <h2 class="stepTitle">Hotovo</h2>
+            <p class="stepHint">Doporučujeme účet – uloží streak, progres a nastavení.</p>
+
+            <div class="pillRow" style="margin-top:10px;">
+                <a class="btn btnPrimary" href="{{ url_for('auth.register') }}">Vytvořit účet</a>
+                <button class="btn btnGhost" type="button" id="continue-guest">Pokračovat bez účtu</button>
+            </div>
+
+            <form id="finish-form" method="post" action="{{ url_for('onboarding_bp.finish') }}" style="display:none;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            </form>
+
+            <script>
+                (function () {
+                    const btn = document.getElementById('continue-guest');
+                    const form = document.getElementById('finish-form');
+                    if (!btn) return;
+                    btn.addEventListener('click', () => {
+                        const ok = confirm('Opravdu nechceš účet? Doporučujeme účet pro lepší funkce (streak, uložený progres, nastavení).');
+                        if (ok) form.submit();
+                    });
+                })();
+            </script>
+
+            <div style="margin-top:14px" class="tiny">Tip: účet můžeš vytvořit i později vpravo nahoře v aplikaci.</div>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- Intro state (persist) -------------------------------------------------
+    // Pokud už uživatel intro viděl, na dalších krocích ho nespouštěj.
+    (function () {
+        const KEY = 'knowix_onboarding_intro_done';
+        const body = document.body;
+        if (!body) return;
+
+        const introDone = (window.localStorage && localStorage.getItem(KEY) === '1');
+        if (introDone) {
+            body.setAttribute('data-intro', '0');
+            const introWrap = document.getElementById('intro-messages');
+            const bubbleOnb = document.getElementById('onboarding-bubble');
+            const tip = document.getElementById('alex-tip');
+            if (introWrap) introWrap.style.display = 'none';
+            if (bubbleOnb) bubbleOnb.style.display = '';
+            if (tip) tip.hidden = false;
+
+            // Na otázkách chceme "onboarding" obrázek, pokud existuje.
+            const alexImg = document.getElementById('alex-img');
+            if (alexImg) {
+                const candidate = '/static/Alex_Onboarding.png';
+                alexImg.src = candidate;
+                alexImg.onerror = () => {
+                    alexImg.src = '/static/Alex_Idle.png';
+                };
+            }
+        }
+    })();
+
+    // Nastavení progress baru bez inline Jinja ve style (lepší kompatibilita s editorem)
+    (function () {
+        try {
+            const wrap = document.querySelector('.progressWrap');
+            const fill = document.querySelector('.progressFill');
+            if (!wrap || !fill) return;
+            const p = parseFloat(wrap.getAttribute('data-progress') || '0');
+            fill.style.width = Math.max(0, Math.min(100, p)) + '%';
+        } catch (e) {
+        }
+    })();
+
+    // Intro UX: 2 kroky (happy -> idle) a pak plynulý start onboardingu
+    (function () {
+        const KEY = 'knowix_onboarding_intro_done';
+        const body = document.body;
+        const mascot = document.getElementById('mascot');
+        const nextBtn = document.getElementById('intro-next');
+        const introWrap = document.getElementById('intro-messages');
+        const bubbleOnb = document.getElementById('onboarding-bubble');
+        const alexImg = document.getElementById('alex-img');
+        const tip = document.getElementById('alex-tip');
+
+        // Když už intro bylo hotové, nespouštěj ho znovu
+        try {
+            if (window.localStorage && localStorage.getItem(KEY) === '1') return;
+        } catch (e) {
+        }
+
+        if (!body || !introWrap || !nextBtn || !alexImg) {
+            // fallback: pokud něco chybí, onboarding běží normálně
+            body.setAttribute('data-intro', '0');
+            if (bubbleOnb) bubbleOnb.style.display = '';
+            const intro = document.getElementById('intro-messages');
+            if (intro) intro.style.display = 'none';
+            if (tip) tip.hidden = false;
+            return;
+        }
+
+        function setIntroStep(n) {
+            introWrap.setAttribute('data-step', String(n));
+            const msgs = introWrap.querySelectorAll('.introMsg');
+            msgs.forEach(m => {
+                const isActive = m.getAttribute('data-intro-step') === String(n);
+                m.classList.toggle('is-active', isActive);
+                if (isActive) m.classList.add('fadeSwap');
+                setTimeout(() => m.classList.remove('fadeSwap'), 280);
+            });
+        }
+
+        let step = 1;
+        setIntroStep(step);
+
+        nextBtn.addEventListener('click', () => {
+            if (step === 1) {
+                step = 2;
+                // Happy -> Idle
+                alexImg.src = '/static/Alex_Idle.png';
+                setIntroStep(step);
+                return;
+            }
+
+            // Start onboarding (Alex -> onboarding pozice)
+            body.setAttribute('data-intro', '0');
+            introWrap.style.display = 'none';
+            if (bubbleOnb) bubbleOnb.style.display = '';
+            if (tip) tip.hidden = false;
+
+            // Persist: už nikdy znovu intro nespouštět
+            try {
+                if (window.localStorage) localStorage.setItem(KEY, '1');
+            } catch (e) {
+            }
+
+            // Alex onboarding obrázek (pokud existuje) – zobraz hned, fallback na idle
+            alexImg.src = '/static/Alex_Onboarding.png';
+            alexImg.onerror = () => {
+                alexImg.src = '/static/Alex_Idle.png';
+            };
+
+            // malý „lift“ animace
+            if (mascot) {
+                mascot.style.transform = 'translateY(-10px)';
+            }
+        });
+    })();
+
+    // Auto-výběr po 30s: vybere první dostupnou možnost a odešle AKTUÁLNÍ form
+    (function () {
+        const AUTO_MS = 30000;
+
+        function getActiveAutopickForm() {
+            const forms = Array.prototype.slice.call(document.querySelectorAll('form[data-autopick="1"]'));
+            for (const f of forms) {
+                const st = window.getComputedStyle(f);
+                if (st && (st.display === 'none' || st.visibility === 'hidden')) continue;
+                return f;
+            }
+            return null;
+        }
+
+        function pickForForm(form) {
+            if (!form) return false;
+
+            const anyChecked = form.querySelector('input[type="radio"]:checked, input[type="checkbox"]:checked');
+            if (anyChecked) return false;
+
+            const firstRadio = form.querySelector('input[type="radio"]');
+            if (firstRadio) {
+                firstRadio.checked = true;
+                firstRadio.dispatchEvent(new Event('change', {bubbles: true}));
+                return true;
+            }
+
+            const firstCb = form.querySelector('input[type="checkbox"]');
+            if (firstCb) {
+                firstCb.checked = true;
+                firstCb.dispatchEvent(new Event('change', {bubbles: true}));
+                return true;
+            }
+
+            return true;
+        }
+
+        function submitForm(form) {
+            if (!form) return;
+            try {
+                const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+                if (submitBtn) submitBtn.click();
+                else form.requestSubmit ? form.requestSubmit() : form.submit();
+            } catch (e) {
+                try {
+                    form.submit();
+                } catch (e2) {
+                }
+            }
+        }
+
+        window.setTimeout(() => {
+            if (document.body && document.body.getAttribute('data-intro') === '1') return;
+
+            const form = getActiveAutopickForm();
+            if (!form) return;
+
+            const shouldSubmit = pickForForm(form);
+            if (!shouldSubmit) return;
+
+            submitForm(form);
+        }, AUTO_MS);
+    })();
+</script>
+</body>
+</html>
+

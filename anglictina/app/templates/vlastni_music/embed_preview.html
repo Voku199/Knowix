@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+
+{% block title %}Ukázka: Vlastní hudba | Knowix{% endblock %}
+
+{% block header %}
+{# V onboarding embed režimu chceme header jen pokud se už ukazuje video + učení (nebo obecně nějaký výstup). #}
+{% if youtube_url or missing_exercises or translation_exercises or matching_pairs %}
+{{ super() }}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{# Minimal embedded preview pro onboarding (bez vlastní HTML stránky) #}
+
+<style>
+    /* Lokální (bezpečné) styly jen pro embed – drží se vzhledu style.css */
+    .vm-embed {
+        max-width: 980px;
+        margin: 0 auto;
+        color: inherit;
+    }
+
+    .vm-embed .vm-card {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    body.dark-mode .vm-embed .vm-card {
+        background: #1f2328;
+        border-color: #343a40;
+        box-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    .vm-embed .vm-title {
+        text-align: center;
+        margin-bottom: 14px;
+    }
+
+    .vm-embed .vm-title h2 {
+        margin: 0 0 8px;
+        font-size: 1.6rem;
+    }
+
+    .vm-embed .vm-title p {
+        margin: 0;
+        opacity: .85;
+    }
+
+    .vm-embed .vm-form {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: stretch;
+    }
+
+    .vm-embed .vm-input {
+        flex: 1 1 320px;
+        max-width: 520px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid #cfcfcf;
+        background: #fff;
+        color: inherit;
+        outline: none;
+    }
+
+    body.dark-mode .vm-embed .vm-input {
+        background: #0d1117;
+        border-color: #343a40;
+        color: #fff;
+    }
+
+    .vm-embed .vm-btn {
+        padding: 12px 18px;
+        border-radius: 12px;
+        border: none;
+        background: #2d7ff9;
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform .12s ease, filter .18s ease;
+    }
+
+    .vm-embed .vm-btn:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.04);
+    }
+
+    .vm-embed .vm-btn:active {
+        transform: translateY(0);
+    }
+
+    .vm-embed .vm-chipRow {
+        margin-top: 10px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .vm-embed .vm-chip {
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid #ddd;
+        background: #f8f8f8;
+        color: inherit;
+        cursor: pointer;
+    }
+
+    body.dark-mode .vm-embed .vm-chip {
+        background: rgba(255, 255, 255, .06);
+        border-color: rgba(255, 255, 255, .12);
+    }
+
+    .vm-embed .vm-error {
+        margin-top: 12px;
+        background: #ffe9e6;
+        border: 1px solid #ffb7ac;
+        color: #9d1f00;
+        padding: 10px 12px;
+        border-radius: 12px;
+        font-weight: 700;
+    }
+
+    .vm-embed .vm-yt {
+        margin-top: 14px;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #ddd;
+        background: #000;
+    }
+
+    body.dark-mode .vm-embed .vm-yt {
+        border-color: rgba(255, 255, 255, .12);
+    }
+
+    .vm-embed .vm-mini {
+        margin-top: 14px;
+        border-radius: 16px;
+        border: 1px solid #ddd;
+        background: #fff;
+        padding: 14px;
+    }
+
+    body.dark-mode .vm-embed .vm-mini {
+        background: #1f2328;
+        border-color: #343a40;
+    }
+
+    .vm-embed .vm-mini h3 {
+        margin: 0 0 10px;
+    }
+
+    .vm-embed .vm-mini p {
+        margin: 0 0 10px;
+        opacity: .85;
+    }
+
+    .vm-embed .vm-row {
+        display: grid;
+        gap: 10px;
+    }
+
+    .vm-embed .vm-label {
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .vm-embed .vm-checkRow {
+        margin-top: 12px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .vm-embed .vm-checkBtn {
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: none;
+        background: #18a957;
+        color: #fff;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .vm-embed .vm-result {
+        font-weight: 700;
+    }
+
+    /* Přístupnost: vizuálně skryté labely */
+    .vm-embed .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+</style>
+
+<div class="vm-embed">
+    <div class="vm-title">
+        <h2>Ukázka: Vlastní hudba</h2>
+        <p>Vyber si písničku a zkus si krátké cvičení.</p>
+    </div>
+
+    <div class="vm-card">
+        <form method="post" action="{{ url_for('vlastni_music_bp.embed_preview') }}" class="vm-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label class="sr-only" for="vm-song">Název písničky</label>
+            <input id="vm-song" type="text" name="song" placeholder="Napiš název písničky (např. 'Perfect Ed Sheeran')"
+                   required
+                   class="vm-input">
+            <button type="submit" class="vm-btn">Hledat</button>
+        </form>
+
+        <div class="vm-chipRow">
+            {% for s in ['Shape of You Ed Sheeran','Someone Like You Adele','Perfect Ed Sheeran','Counting Stars
+            OneRepublic'] %}
+            <form method="post" action="{{ url_for('vlastni_music_bp.embed_preview') }}" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="song" value="{{ s }}">
+                <button type="submit" class="vm-chip">{{ s.split(' ')[0:3]|join(' ') }}</button>
+            </form>
+            {% endfor %}
+        </div>
+
+        {% if error %}
+        <div class="vm-error">{{ error }}</div>
+        {% endif %}
+    </div>
+
+    {% if youtube_url %}
+    <div class="vm-yt">
+        <div style="position:relative;padding-top:56.25%;">
+            <iframe
+                    style="position:absolute;inset:0;width:100%;height:100%;border:0;"
+                    src="{{ youtube_url }}&origin={{ request.host_url.rstrip('/') }}"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    title="YouTube player"></iframe>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if missing_exercises or translation_exercises or matching_pairs %}
+    <div class="vm-mini">
+        <h3>Mini cvičení</h3>
+        <p>Doplň 1–2 věci jen na ukázku. (Plná verze je v sekci Hudba.)</p>
+
+        <div class="vm-row">
+            {% if missing_exercises %}
+            <div>
+                <div class="vm-label">Doplň chybějící slovo</div>
+                {% for ex in missing_exercises[:1] %}
+                <div style="margin-bottom:6px;">{{ ex.with_blank }}</div>
+                <label class="sr-only" for="vm-missing">Chybějící slovo</label>
+                <input id="vm-missing" type="text" placeholder="Napiš chybějící slovo" data-vm-missing class="vm-input"
+                       style="max-width:520px;">
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if translation_exercises %}
+            <div>
+                <div class="vm-label">Překlad</div>
+                {% set ex = translation_exercises[0] %}
+                <div style="margin-bottom:6px;">{{ ex.original }}</div>
+                <label class="sr-only" for="vm-translation">Překlad</label>
+                <input id="vm-translation" type="text" placeholder="Napiš překlad" data-vm-translation class="vm-input"
+                       style="max-width:520px;">
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="vm-checkRow">
+            <button type="button" id="vm-embed-check" class="vm-checkBtn">Zkontrolovat</button>
+            <div id="vm-embed-result" class="vm-result"></div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const btn = document.getElementById('vm-embed-check');
+            if (!btn) return;
+            const resultEl = document.getElementById('vm-embed-result');
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}';
+
+            btn.addEventListener('click', async () => {
+                try {
+                    btn.disabled = true;
+                    if (resultEl) resultEl.textContent = 'Kontroluji…';
+
+                    const missingInput = document.querySelector('[data-vm-missing]');
+                    const translationInput = document.querySelector('[data-vm-translation]');
+
+                    const payload = {
+                        csrf_token: csrf,
+                        missing: missingInput ? [{user: missingInput.value || ''}] : [],
+                        translations: translationInput ? [{user: translationInput.value || ''}] : [],
+                        pairs: []
+                    };
+
+                    const r = await fetch('/vlastni_music/check-answer', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrf},
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await r.json();
+
+                    const ok = !!data?.success;
+                    if (resultEl) resultEl.textContent = ok ? 'Super! To stačí na ukázku.' : 'Ještě ne, ale to nevadí – můžeš pokračovat.';
+
+                    // Notifikuj onboarding (pokud poslouchá)
+                    window.dispatchEvent(new CustomEvent('knowix:sample_exercise_done', {detail: {ok}}));
+                } catch (e) {
+                    if (resultEl) resultEl.textContent = 'Nepodařilo se ověřit odpověď. Můžeš pokračovat dál.';
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+        })();
+    </script>
+    {% endif %}
+</div>
+
+{% endblock %}

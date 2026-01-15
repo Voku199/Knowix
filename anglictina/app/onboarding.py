@@ -1,179 +1,186 @@
-from flask import Blueprint, session, request, jsonify, render_template_string
+from flask import Blueprint, render_template, request, redirect, url_for, session
 from db import get_db_connection
-import json
 
-onboarding_bp = Blueprint('onboarding', __name__)
+onboarding_bp = Blueprint('onboarding_bp', __name__)
 
-# Struktura kroků
-ONBOARDING_STEPS = [
-    {
-        'id': 1,
-        'title': 'Vítej v Knowix!',
-        'message': 'Ahoj! Já jsem Alex. Jsem tu, abych ti ukázal/a, jak se učit anglicky zábavně a efektivně. Společně projdeme základní funkce.',
-        'target_selector': None,
-        'action_required': 'click_next',
-        'position': 'center',
-        'show_skip': True
-    },
-    {
-        'id': 2,
-        'title': 'Angličtina – lekce a cvičení',
-        'message': 'Klikni na ikonu Angličtiny vpravo nahoře (vlajka). Tam najdeš lekce, cvičení a témata k procvičování.',
-        'target_selector': 'a[href="/anglictina"]',
-        'action_required': 'click',
-        'position': 'top-right',
-        'show_skip': True
-    },
-    {
-        'id': 3,
-        'title': 'Obchod s lekcemi',
-        'message': 'V obchodě najdeš nové lekce a bonusy. Získáváš je za XP body, které vyděláš učením. Klikni na "Obchod" v menu.',
-        'target_selector': 'a[href="/obchod"]',
-        'action_required': 'click',
-        'position': 'top-right',
-        'show_skip': True
-    },
-    {
-        'id': 4,
-        'title': 'Aplikace (PWA)',
-        'message': 'Knowix můžeš mít jako aplikaci. Na hlavní stránce klikni na "PWA aplikace" – uvidíš návod k instalaci.',
-        'target_selector': '[onclick="openPwaHelp()"]',
-        'action_required': 'click_next',
-        'position': 'bottom',
-        'show_skip': True
-    },
-    {
-        'id': 5,
-        'title': 'Domů a Denní úkoly',
-        'message': 'Kliknutím na logo vlevo nahoře se vždy vrátíš domů. Na hlavní stránce vlevo uvidíš Denní úkoly – plň je pro odměny.',
-        'target_selector': '.logo a',
-        'action_required': 'click',
-        'position': 'bottom',
-        'show_skip': True
-    },
-    {
-        'id': 6,
-        'title': 'Streak – denní série',
-        'message': 'Tady vidíš svoji denní sérii (streak). Procvičuj každý den a série poroste – odměny a motivace čekají!',
-        'target_selector': '.streak-badge',
-        'action_required': 'click_next',
-        'position': 'top-right',
-        'show_skip': True
-    },
-    {
-        'id': 7,
-        'title': 'Napiš nám Feedback',
-        'message': 'Máme rádi zpětnou vazbu. Klikni na ikonu chatu a napiš nám, co zlepšit nebo co se ti líbí.',
-        'target_selector': 'a[href="/feedback"]',
-        'action_required': 'click',
-        'position': 'top-right',
-        'show_skip': True
-    },
-    {
-        'id': 8,
-        'title': 'Hotovo!',
-        'message': 'Paráda! Teď už víš, kde jsou lekce, obchod, jak se vrátit domů, denní úkoly, streaky i instalace aplikace. Pokračuj v procvičování – krátce každý den = rychlý pokrok!',
-        'target_selector': None,
-        'action_required': 'complete',
-        'position': 'bottom',
-        'show_skip': False
-    }
+STEPS = [
+    ('welcome', 'Vítej v Knowixu'),
+    ('source', 'Jak ses o nás dozvěděl?'),
+    ('use_cases', 'Jak chceš Knowix využít?'),
+    ('level', 'Jaká je tvoje úroveň?'),
+    ('value', 'Co Knowix dokáže'),
+    ('minutes', 'Kolik minut chceš cvičit?'),
+    ('notifications', 'Notifikace'),
+    ('sample', 'Ukázkové cvičení'),
+    ('final', 'Hotovo'),
 ]
+STEP_INDEX = {k: i + 1 for i, (k, _) in enumerate(STEPS)}
+
+
+def _answers() -> dict:
+    a = session.get('onboarding_answers')
+    if not isinstance(a, dict):
+        a = {}
+        session['onboarding_answers'] = a
+    return a
+
+
+def _current_step_name() -> str:
+    # default step 1
+    idx = int(session.get('onboarding_step') or 1)
+    idx = max(1, min(idx, len(STEPS)))
+    return STEPS[idx - 1][0]
+
+
+def _set_step(name: str) -> None:
+    session['onboarding_step'] = STEP_INDEX.get(name, 1)
+
+
+def _persist_has_seen_onboarding(uid: int, value: int = 1) -> None:
+    conn = get_db_connection()
+    cur = None
+    try:
+        cur = conn.cursor()
+        cur.execute('UPDATE users SET has_seen_onboarding = %s WHERE id = %s', (int(value), int(uid)))
+        conn.commit()
+    finally:
+        try:
+            if cur:
+                cur.close()
+        except Exception:
+            pass
+        conn.close()
+
+
+@onboarding_bp.route('/onboarding', methods=['GET'])
+def onboarding_root():
+    # Onboarding je primárně pro guest flow.
+    # Přihlášený (ne-guest) uživatel se sem nemá vynuceně posílat a nemá být blokovaný onboarding guardem.
+    if session.get('user_id') and not session.get('is_guest'):
+        return redirect('/')
+
+    # pokud už onboarding viděl (typicky guest), pošli domů
+    if session.get('has_seen_onboarding'):
+        return redirect('/')
+    return redirect(url_for('onboarding_bp.step', step=_current_step_name()))
+
+
+@onboarding_bp.route('/onboarding/step/<step>', methods=['GET'])
+def step(step: str):
+    # Přihlášený (ne-guest) uživatel onboarding nepotřebuje.
+    if session.get('user_id') and not session.get('is_guest'):
+        return redirect('/')
+
+    if session.get('has_seen_onboarding'):
+        return redirect('/')
+
+    # vynucení pořadí
+    cur = _current_step_name()
+    if STEP_INDEX.get(step, 1) != STEP_INDEX.get(cur, 1):
+        return redirect(url_for('onboarding_bp.step', step=cur))
+
+    step_title = dict(STEPS).get(step, 'Onboarding')
+
+    embed_html = None
+    if step == 'sample':
+        # render embed preview z vlastni_music (standalone partial)
+        try:
+            from flask import render_template as _rt
+            embed_html = _rt('vlastni_music/embed_preview.html', video_id=None, youtube_url=None)
+        except Exception:
+            embed_html = '<div style="opacity:.8;">Ukázka cvičení se nepodařila načíst.</div>'
+
+    return render_template(
+        'onboarding_new.html',
+        step=step,
+        step_title=step_title,
+        step_index=STEP_INDEX.get(step, 1),
+        step_total=len(STEPS),
+        answers=_answers(),
+        embed_html=embed_html,
+    )
 
 
 @onboarding_bp.route('/onboarding/next', methods=['POST'])
 def next_step():
-    """Přejde na další krok onboadingu"""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'error': 'Not authenticated'}), 401
+    step = (request.form.get('step') or '').strip()
+    if not step or step not in STEP_INDEX:
+        step = _current_step_name()
 
-    data = request.get_json()
-    step_completed = data.get('step_completed', 1)
+    # guard: nesmí přeskočit
+    if step != _current_step_name():
+        return redirect(url_for('onboarding_bp.step', step=_current_step_name()))
 
-    try:
-        # Aktualizuj session
-        session['onboarding_step'] = step_completed + 1
+    a = _answers()
 
-        # Pokud je to poslední krok, označ onboarding jako dokončený
-        if step_completed >= len(ONBOARDING_STEPS):
-            session['has_seen_onboarding'] = 1
+    if step == 'welcome':
+        choice = request.form.get('choice')
+        a['welcome_choice'] = choice
 
-            # Aktualizuj databázi
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute(
-                "UPDATE users SET has_seen_onboarding = 1 WHERE id = %s",
-                (session['user_id'],)
-            )
-            conn.commit()
-            cur.close()
-            conn.close()
+    elif step == 'source':
+        a['source'] = request.form.get('source')
 
-            return jsonify({
-                'success': True,
-                'completed': True,
-                'redirect': '/'
-            })
+    elif step == 'use_cases':
+        # multi-select
+        a['use_cases'] = request.form.getlist('use_cases')
 
-        # Vrátí data pro další krok
-        next_step_data = next((s for s in ONBOARDING_STEPS if s['id'] == step_completed + 1), None)
+    elif step == 'level':
+        a['level'] = request.form.get('level')
 
-        return jsonify({
-            'success': True,
-            'next_step': next_step_data,
-            'progress': int((step_completed / len(ONBOARDING_STEPS)) * 100)
-        })
+    elif step == 'value':
+        a['value_seen'] = True
 
-    except Exception as e:
-        print(f"[onboarding] Error in next_step: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
+    elif step == 'minutes':
+        try:
+            a['target_minutes'] = int(request.form.get('minutes') or 0)
+        except Exception:
+            a['target_minutes'] = 0
 
+    elif step == 'notifications':
+        a['notif_result'] = request.form.get('notif_result') or 'skipped'
 
-@onboarding_bp.route('/onboarding/skip', methods=['POST'])
-def skip_onboarding():
-    """Přeskočí celý onboarding"""
-    if 'user_id' not in session:
-        return jsonify({'success': False}), 401
+    elif step == 'sample':
+        a['sample_done'] = bool(int(request.form.get('sample_done') or '0'))
 
-    try:
+        # Po ukázce chceme onboarding považovat za dokončený.
         session['has_seen_onboarding'] = 1
-        session.pop('onboarding_step', None)
+        session['onboarding_completed'] = True
+        uid = session.get('user_id')
+        if uid:
+            try:
+                _persist_has_seen_onboarding(int(uid), 1)
+            except Exception:
+                pass
 
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute(
-            "UPDATE users SET has_seen_onboarding = 1 WHERE id = %s",
-            (session['user_id'],)
-        )
-        conn.commit()
-        cur.close()
-        conn.close()
+        return redirect('/')
 
-        return jsonify({'success': True})
-    except Exception as e:
-        print(f"[onboarding] Error skipping: {e}")
-        return jsonify({'success': False}), 500
-
-
-@onboarding_bp.route('/onboarding/status', methods=['GET'])
-def onboarding_status():
-    """Vrátí stav onboadingu"""
-    return jsonify({
-        'has_seen_onboarding': session.get('has_seen_onboarding', 0),
-        'current_step': session.get('onboarding_step', 1),
-        'show_onboarding': session.get('user_id') and not session.get('has_seen_onboarding', 0)
-    })
+    # posun
+    idx = STEP_INDEX.get(step, 1)
+    next_idx = min(idx + 1, len(STEPS))
+    session['onboarding_step'] = next_idx
+    return redirect(url_for('onboarding_bp.step', step=STEPS[next_idx - 1][0]))
 
 
-@onboarding_bp.route('/onboarding/data', methods=['GET'])
-def onboarding_data():
-    """Vrátí data pro aktuální krok"""
-    current_step = session.get('onboarding_step', 1)
-    step_data = next((s for s in ONBOARDING_STEPS if s['id'] == current_step), ONBOARDING_STEPS[0])
+@onboarding_bp.route('/onboarding/prev', methods=['POST'])
+def prev_step():
+    idx = int(session.get('onboarding_step') or 1)
+    idx = max(1, idx - 1)
+    session['onboarding_step'] = idx
+    return redirect(url_for('onboarding_bp.step', step=STEPS[idx - 1][0]))
 
-    return jsonify({
-        'current_step': current_step,
-        'step_data': step_data,
-        'total_steps': len(ONBOARDING_STEPS),
-        'progress': int(((current_step - 1) / len(ONBOARDING_STEPS)) * 100)
-    })
+
+@onboarding_bp.route('/onboarding/finish', methods=['POST'])
+def finish():
+    # Ulož do session i DB, že onboarding byl dokončen
+    session['has_seen_onboarding'] = 1
+    uid = session.get('user_id')
+    if uid:
+        try:
+            _persist_has_seen_onboarding(int(uid), 1)
+        except Exception:
+            pass
+
+    # (volitelně) uložit answers do DB: zatím jen do session; rozšíření lze později
+    session['onboarding_completed'] = True
+
+    return redirect('/')

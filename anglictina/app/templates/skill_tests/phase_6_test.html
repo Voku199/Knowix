@@ -1,0 +1,841 @@
+{% extends "base.html" %}
+
+{% block title %}Test – Fáze 6 | Knowix{% endblock %}
+
+{% block content %}
+<style>
+    /* Lokální styly jen pro tuhle stránku (header/layout řeší base.html) */
+    .hero-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 0, 0, .10);
+        background: rgba(255, 255, 255, .55);
+        color: #4b5563;
+        font-weight: 700;
+        font-size: .92em;
+    }
+
+    body.dark-mode .badge {
+        border-color: rgba(255, 255, 255, .12);
+        background: rgba(255, 255, 255, .06);
+        color: #cbd5e1;
+    }
+
+    .title {
+        font-size: 1.65em;
+        margin: 10px 0 6px 0;
+    }
+
+    .subtitle {
+        margin: 0;
+        color: #6b7280;
+        line-height: 1.45;
+    }
+
+    body.dark-mode .subtitle {
+        color: #9ca3af;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns:1.25fr .75fr;
+        gap: 14px;
+        margin-top: 14px;
+    }
+
+    @media (max-width: 900px) {
+        .grid {
+            grid-template-columns:1fr;
+        }
+    }
+
+    .card {
+        border: 1px solid rgba(0, 0, 0, .08);
+        background: rgba(255, 255, 255, .65);
+        border-radius: 16px;
+        padding: 14px;
+    }
+
+    body.dark-mode .card {
+        border-color: rgba(255, 255, 255, .10);
+        background: rgba(255, 255, 255, .03);
+    }
+
+    .q {
+        border: 1px solid rgba(0, 0, 0, .10);
+        background: rgba(0, 0, 0, .03);
+        border-radius: 14px;
+        padding: 14px;
+        margin: 10px 0;
+    }
+
+    body.dark-mode .q {
+        border-color: rgba(255, 255, 255, .10);
+        background: rgba(0, 0, 0, .24);
+    }
+
+    .q h3 {
+        margin: 0 0 10px 0;
+        font-size: 1.05em;
+    }
+
+    .opt {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 10px;
+        border-radius: 12px;
+        border: 1px solid rgba(0, 0, 0, .08);
+        background: rgba(255, 255, 255, .55);
+        margin: 8px 0;
+        cursor: pointer;
+        transition: transform .08s ease, border-color .15s ease, background-color .15s ease;
+    }
+
+    .opt:hover {
+        transform: translateY(-1px);
+        border-color: rgba(59, 130, 246, .45);
+        background: rgba(59, 130, 246, .06);
+    }
+
+    body.dark-mode .opt {
+        border-color: rgba(255, 255, 255, .10);
+        background: rgba(255, 255, 255, .03);
+    }
+
+    body.dark-mode .opt:hover {
+        border-color: rgba(96, 165, 250, .55);
+        background: rgba(96, 165, 250, .10);
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(0, 0, 0, .12);
+        background: rgba(255, 255, 255, .85);
+        color: inherit;
+        text-decoration: none;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    body.dark-mode .btn {
+        border-color: rgba(255, 255, 255, .12);
+        background: rgba(255, 255, 255, .06);
+        color: #e5e7eb;
+    }
+
+    .btn-primary {
+        border-color: rgba(59, 130, 246, .40);
+        background: linear-gradient(135deg, rgba(59, 130, 246, .20), rgba(59, 130, 246, .06));
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, rgba(59, 130, 246, .30), rgba(59, 130, 246, .10));
+    }
+
+    .kv {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(0, 0, 0, .08);
+        color: #6b7280;
+    }
+
+    .kv strong {
+        color: inherit;
+        font-weight: 900;
+    }
+
+    body.dark-mode .kv {
+        border-bottom-color: rgba(255, 255, 255, .08);
+        color: #9ca3af;
+    }
+
+    .result {
+        margin-top: 12px;
+        padding: 14px;
+        border-radius: 16px;
+        border: 1px solid rgba(0, 0, 0, .10);
+        background: rgba(0, 0, 0, .03);
+    }
+
+    body.dark-mode .result {
+        border-color: rgba(255, 255, 255, .12);
+        background: rgba(0, 0, 0, .24);
+    }
+
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-weight: 900;
+        border: 1px solid rgba(0, 0, 0, .12);
+        background: rgba(255, 255, 255, .65);
+    }
+
+    body.dark-mode .pill {
+        border-color: rgba(255, 255, 255, .14);
+        background: rgba(255, 255, 255, .06);
+    }
+
+    .pill.ok {
+        border-color: rgba(34, 197, 94, .45);
+        background: rgba(34, 197, 94, .12);
+    }
+
+    .pill.warn {
+        border-color: rgba(245, 158, 11, .50);
+        background: rgba(245, 158, 11, .14);
+    }
+
+    .pill.bad {
+        border-color: rgba(239, 68, 68, .50);
+        background: rgba(239, 68, 68, .14);
+    }
+
+    .hint {
+        margin-top: 10px;
+        color: #6b7280;
+        font-size: .95em;
+    }
+
+    body.dark-mode .hint {
+        color: #9ca3af;
+    }
+
+    /* --- FULLSCREEN INTRO (jen Alex + dialog + 1 CTA) --- */
+    .intro-only .hero-top,
+    .intro-only #test {
+        display: none !important;
+    }
+
+    .intro-only .phase-test-wrap {
+        max-width: 1100px;
+        margin-top: 10px;
+    }
+
+    .intro-only .panel {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+    }
+
+    .intro-stage {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .intro-card {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 30px;
+        align-items: center;
+    }
+
+    @media (max-width: 650px) {
+        .intro-card {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+    }
+
+    .alex {
+        width: 240px;
+        max-width: 70vw;
+        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.1));
+    }
+
+    body.dark-mode .alex {
+        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
+    }
+
+    .speech {
+        padding: 24px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        position: relative;
+    }
+
+    body.dark-mode .speech {
+        background: rgba(15, 23, 42, 0.95);
+        border-color: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .speech:before {
+        content: '';
+        position: absolute;
+        left: -15px;
+        top: 50%;
+        transform: translateY(-50%);
+        border-width: 10px 15px 10px 0;
+        border-style: solid;
+        border-color: transparent rgba(255, 255, 255, 0.95) transparent transparent;
+    }
+
+    body.dark-mode .speech:before {
+        border-color: transparent rgba(15, 23, 42, 0.95) transparent transparent;
+    }
+
+    @media (max-width: 650px) {
+        .speech:before {
+            left: 50%;
+            top: -15px;
+            transform: translateX(-50%);
+            border-width: 0 10px 15px 10px;
+            border-color: transparent transparent rgba(255, 255, 255, 0.95) transparent;
+        }
+
+        body.dark-mode .speech:before {
+            border-color: transparent transparent rgba(15, 23, 42, 0.95) transparent;
+        }
+    }
+
+    .alex-line {
+        font-size: 1.3em;
+        line-height: 1.5;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+    .btn-xl {
+        padding: 14px 24px;
+        font-size: 1.1em;
+        border-radius: 14px;
+        font-weight: 700;
+    }
+
+    /* Intro: odstranit všechny pozadí */
+    body.intro-only main {
+        background: transparent !important;
+        padding-bottom: 0;
+    }
+
+    body.intro-only .card {
+        background: transparent;
+        border: none;
+        padding: 0;
+    }
+
+    body.intro-only .badge {
+        background: rgba(255, 255, 255, 0.9);
+        border-color: rgba(0, 0, 0, 0.1);
+        margin-bottom: 15px;
+    }
+
+    body.dark-mode.intro-only .badge {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    body.intro-only .hint {
+        color: rgba(0, 0, 0, 0.6);
+        margin-top: 15px;
+    }
+
+    body.dark-mode.intro-only .hint {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* Disabled button state */
+    .btn[disabled] {
+        opacity: .55;
+        cursor: not-allowed;
+        filter: grayscale(.15);
+        transform: none !important;
+    }
+
+    /* Intro progress (časové pásmo) */
+    .intro-progress {
+        margin-top: 12px;
+    }
+
+    .intro-progress-bar {
+        height: 10px;
+        border-radius: 999px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, .18);
+        background: rgba(255, 255, 255, .06);
+    }
+
+    .intro-progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, rgba(59, 130, 246, .85), rgba(34, 197, 94, .75));
+        transition: width .18s ease;
+    }
+
+    .intro-progress-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+        margin-top: 8px;
+        color: rgba(226, 232, 240, .78);
+        font-size: .95em;
+    }
+
+    .intro-progress-meta strong {
+        color: #e5e7eb;
+    }
+
+    /* Test timer */
+    .test-timer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        border: 1px solid rgba(0, 0, 0, .10);
+        background: rgba(255, 255, 255, .55);
+        margin: 0 0 12px 0;
+    }
+
+    body.dark-mode .test-timer {
+        border-color: rgba(255, 255, 255, .12);
+        background: rgba(255, 255, 255, .06);
+    }
+
+    .test-timer .label {
+        color: #6b7280;
+        font-weight: 700;
+    }
+
+    body.dark-mode .test-timer .label {
+        color: #9ca3af;
+    }
+
+    .test-timer .time {
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .test-timer-bar {
+        flex: 1;
+        height: 10px;
+        border-radius: 999px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, .12);
+        background: rgba(0, 0, 0, .04);
+        min-width: 120px;
+    }
+
+    body.dark-mode .test-timer-bar {
+        border-color: rgba(255, 255, 255, .14);
+        background: rgba(255, 255, 255, .06);
+    }
+
+    .test-timer-fill {
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(90deg, rgba(34, 197, 94, .75), rgba(59, 130, 246, .85));
+        transition: width .2s linear;
+    }
+</style>
+
+<div class="phase-test-wrap" data-has-result="{{ 1 if result is defined else 0 }}">
+    <div class="panel">
+        <div class="hero-top">
+            <div>
+                <div class="badge">🔴 Skill tree • Závěrečný test</div>
+                <h1 class="title">Test – Fáze 6 (angličtina v praxi)</h1>
+                <p class="subtitle">Fázi 6 splníš, když budeš mít maximálně <strong>2 chyby</strong>.</p>
+            </div>
+            <div class="badge">⏱️ 6 min • 🎯 max 2 chyby</div>
+        </div>
+
+        <!-- INTRO S ALEXEM -->
+        <section class="intro" id="intro">
+            <div class="intro-stage">
+                <div class="card" style="width:100%; max-width: 980px;">
+                    <div class="intro-card">
+                        <div class="alex-wrap">
+                            <img id="alexImg" class="alex" src="{{ url_for('static', filename='Alex_Idle.png') }}"
+                                 alt="Alex"/>
+                        </div>
+                        <div>
+                            <div class="speech">
+                                <div class="badge" style="margin-bottom:10px;">Alex</div>
+                                <div id="alexText" class="typing alex-line">Ahoj! Jsi připravený/á na závěrečný test?
+                                </div>
+
+                                <div class="intro-progress" aria-label="Čas na přečtení">
+                                    <div class="intro-progress-bar" role="progressbar" aria-valuemin="0"
+                                         aria-valuemax="100" aria-valuenow="0">
+                                        <div class="intro-progress-fill" id="introProgressFill"></div>
+                                    </div>
+                                    <div class="intro-progress-meta">
+                                        <span>Čas na přečtení</span>
+                                        <span><strong id="introSeconds">0</strong> s</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="actions" style="margin-top:14px;">
+                                <button type="button" class="btn btn-primary btn-xl" id="btnYes" disabled>Jdeme na to
+                                </button>
+                                <button type="button" class="btn btn-xl" id="btnNo">Teď ne</button>
+                            </div>
+
+                            <div class="hint">Dej si chvilku na přečtení. Tlačítko „Jdeme na to“ se odemkne za chvíli.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TEST -->
+        <section class="test" id="test">
+            <div class="grid">
+                <div class="card">
+                    <form method="POST" id="phaseTestForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="test-timer" id="testTimer" data-seconds="360" style="display:none;">
+                            <span class="label">Čas na test</span>
+                            <div class="test-timer-bar" aria-label="Čas testu" role="progressbar" aria-valuemin="0"
+                                 aria-valuemax="100" aria-valuenow="100">
+                                <div class="test-timer-fill" id="testTimerFill"></div>
+                            </div>
+                            <span class="time" id="testTimerText">06:00</span>
+                        </div>
+
+                        <div class="q">
+                            <h3>1) Past perfect: <em>When I arrived, they ___ already left.</em></h3>
+                            <label class="opt"><input type="radio" name="q1" value="a" required> have</label>
+                            <label class="opt"><input type="radio" name="q1" value="b"> had</label>
+                            <label class="opt"><input type="radio" name="q1" value="c"> has</label>
+                        </div>
+
+                        <div class="q">
+                            <h3>2) Vyber správně: <em>___ the rain, we went for a walk.</em></h3>
+                            <label class="opt"><input type="radio" name="q2" value="a" required> because</label>
+                            <label class="opt"><input type="radio" name="q2" value="b"> although</label>
+                            <label class="opt"><input type="radio" name="q2" value="c"> despite</label>
+                        </div>
+
+                        <div class="q">
+                            <h3>3) Third conditional: <em>I ___ have called you if I had known.</em></h3>
+                            <label class="opt"><input type="radio" name="q3" value="a" required> would</label>
+                            <label class="opt"><input type="radio" name="q3" value="b"> will</label>
+                            <label class="opt"><input type="radio" name="q3" value="c"> can</label>
+                        </div>
+
+                        <div class="q">
+                            <h3>4) Vyber správně: <em>I ___ living here for years.</em></h3>
+                            <label class="opt"><input type="radio" name="q4" value="a" required> am</label>
+                            <label class="opt"><input type="radio" name="q4" value="b"> have been</label>
+                            <label class="opt"><input type="radio" name="q4" value="c"> was</label>
+                        </div>
+
+                        <div class="q">
+                            <h3>5) Relative pronoun: <em>The person ___ called you is my boss.</em></h3>
+                            <label class="opt"><input type="radio" name="q5" value="a" required> which</label>
+                            <label class="opt"><input type="radio" name="q5" value="b"> where</label>
+                            <label class="opt"><input type="radio" name="q5" value="c"> who</label>
+                        </div>
+
+                        <div class="q">
+                            <h3>6) Doplň: <em>I'll go ___ you come with me.</em></h3>
+                            <label class="opt"><input type="radio" name="q6" value="a" required> unless</label>
+                            <label class="opt"><input type="radio" name="q6" value="b"> because</label>
+                            <label class="opt"><input type="radio" name="q6" value="c"> so</label>
+                        </div>
+
+                        <div class="q">
+                            <h3>7) Kolokace: <em>___ a break</em></h3>
+                            <label class="opt"><input type="radio" name="q7" value="a" required> do</label>
+                            <label class="opt"><input type="radio" name="q7" value="b"> take</label>
+                            <label class="opt"><input type="radio" name="q7" value="c"> make</label>
+                        </div>
+
+                        <div class="q">
+                            <h3>8) Doplň: <em>I ___ working all morning.</em></h3>
+                            <label class="opt"><input type="radio" name="q8" value="a" required> have been</label>
+                            <label class="opt"><input type="radio" name="q8" value="b"> am</label>
+                            <label class="opt"><input type="radio" name="q8" value="c"> have</label>
+                        </div>
+
+                        <div class="q">
+                            <h3>9) Vyber správně: <em>Take an umbrella ___ it rains.</em></h3>
+                            <label class="opt"><input type="radio" name="q9" value="a" required> because</label>
+                            <label class="opt"><input type="radio" name="q9" value="b"> unless</label>
+                            <label class="opt"><input type="radio" name="q9" value="c"> in case</label>
+                        </div>
+
+                        <div class="q">
+                            <h3>10) Question tag: <em>You haven't seen it, ___?</em></h3>
+                            <label class="opt"><input type="radio" name="q10" value="a" required> have you</label>
+                            <label class="opt"><input type="radio" name="q10" value="b"> haven't I</label>
+                            <label class="opt"><input type="radio" name="q10" value="c"> do you</label>
+                        </div>
+
+                        <div class="actions">
+                            <button type="submit" class="btn btn-primary">Vyhodnotit test</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2 style="margin:2px 0 8px 0;font-size:1.05em;">Co se počítá?</h2>
+                    <div class="kv"><span>Počet otázek</span><strong>10</strong></div>
+                    <div class="kv"><span>Max. chyb pro postup</span><strong>2</strong></div>
+                    <div class="kv"><span>Čas na test</span><strong>6:00</strong></div>
+                    <div class="kv"><span>Doporučení</span><strong>B1+</strong></div>
+                    <p class="hint">Tip: Pokud vyprší čas, test se automaticky odešle s tím, co máš vyplněné.</p>
+
+                    {% if result is defined %}
+                    <div class="result">
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <h3 style="margin:0;">Výsledek</h3>
+                            {% if result.status == 'great' %}
+                            <span class="pill ok">✅ Skvělá práce</span>
+                            {% elif result.status == 'ok' %}
+                            <span class="pill warn">🟠 Nevadí</span>
+                            {% else %}
+                            <span class="pill bad">❌ Zkus to později</span>
+                            {% endif %}
+                        </div>
+
+                        <p class="hint" style="margin:10px 0 0 0;">
+                            Skóre: <strong>{{ result.score }}/{{ result.total }}</strong>
+                            • Chyby: <strong>{{ result.wrong }}</strong>
+                        </p>
+
+                        {% if result.status in ['great','ok'] %}
+                        <p class="hint" style="margin-top:10px;">Skvělá práce! Nejdřív se koukni na statistiky a pak se
+                            vrať na skill tree.</p>
+                        <div class="actions">
+                            <a class="btn btn-primary" href="/my_stats">📊 Kouknout na statistiky</a>
+                            <a class="btn" href="/">🏁 Zpět na skill tree</a>
+                        </div>
+                        {% else %}
+                        <p class="hint" style="margin-top:10px;">Zkus to někdy jindy. Vrať se na skill tree a pokračuj v
+                            tréninku.</p>
+                        <div class="actions">
+                            <a class="btn btn-primary" href="/my_stats">📊 Kouknout na statistiky</a>
+                            <a class="btn" href="/">↩️ Zpět na skill tree</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<script>
+    (function () {
+        const wrap = document.querySelector('.phase-test-wrap');
+        const hasResult = wrap ? (wrap.getAttribute('data-has-result') === '1') : false;
+
+        const intro = document.getElementById('intro');
+        const test = document.getElementById('test');
+        const btnYes = document.getElementById('btnYes');
+        const btnNo = document.getElementById('btnNo');
+        const alexText = document.getElementById('alexText');
+        const alexImg = document.getElementById('alexImg');
+
+        const introProgressFill = document.getElementById('introProgressFill');
+        const introSeconds = document.getElementById('introSeconds');
+
+        // Pokud už je vyhodnocený test (POST), intro přeskočíme a rovnou ukážeme test se výsledkem.
+        if (hasResult) {
+            document.body.classList.remove('intro-only');
+            intro.style.display = 'none';
+            test.style.display = 'block';
+            return;
+        }
+
+        // Na začátku chceme jen intro "obrazovku"
+        document.body.classList.add('intro-only');
+
+        function say(text, mood) {
+            if (alexText) alexText.textContent = text;
+            if (alexImg) {
+                if (mood === 'happy') alexImg.src = "{{ url_for('static', filename='Alex_Happy.png') }}";
+                else alexImg.src = "{{ url_for('static', filename='Alex_Idle.png') }}";
+                alexImg.style.transform = 'translateY(-2px)';
+                setTimeout(() => {
+                    alexImg.style.transform = '';
+                }, 180);
+            }
+        }
+
+        // start: "mluví"
+        setTimeout(() => {
+            say('Ahoj! Než začneš, dej si chvilku a přečti si zadání. 🙂', 'idle');
+        }, 120);
+
+        // Čas na přečtení (delší) + časové pásmo
+        const totalSeconds = 6;
+        let remaining = totalSeconds;
+
+        function renderProgress() {
+            const done = Math.max(0, totalSeconds - remaining);
+            const pct = totalSeconds > 0 ? Math.min(100, Math.max(0, (done / totalSeconds) * 100)) : 100;
+            if (introProgressFill) introProgressFill.style.width = pct + '%';
+            if (introSeconds) introSeconds.textContent = String(remaining);
+            const pb = document.querySelector('.intro-progress-bar');
+            if (pb) pb.setAttribute('aria-valuenow', String(Math.round(pct)));
+        }
+
+        if (btnYes) {
+            btnYes.disabled = true;
+        }
+        renderProgress();
+
+        const t = setInterval(() => {
+            remaining -= 1;
+            if (remaining <= 0) {
+                remaining = 0;
+                renderProgress();
+                clearInterval(t);
+                if (btnYes) {
+                    btnYes.disabled = false;
+                }
+                say('Připraveno. Klikni na „Jdeme na to“ a spustíme test.', 'happy');
+            } else {
+                renderProgress();
+            }
+        }, 1000);
+
+        btnYes && btnYes.addEventListener('click', function () {
+            if (btnYes.disabled) return;
+            say('Tak to je skvělý, tak jdeme na to!', 'happy');
+            setTimeout(() => {
+                document.body.classList.remove('intro-only');
+                intro.style.display = 'none';
+                test.style.display = 'block';
+                try {
+                    window.scrollTo({top: test.getBoundingClientRect().top + window.scrollY - 90, behavior: 'smooth'});
+                } catch (e) {
+                }
+            }, 700);
+        });
+
+        btnNo && btnNo.addEventListener('click', function () {
+            say('V pohodě. Vrátím tě zpátky na skill tree.', 'idle');
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 900);
+        });
+
+        // Spuštění časovače testu až ve chvíli, kdy se test opravdu zobrazí.
+        function startTestTimerIfNeeded() {
+            const timerEl = document.getElementById('testTimer');
+            const fillEl = document.getElementById('testTimerFill');
+            const textEl = document.getElementById('testTimerText');
+            const formEl = document.getElementById('phaseTestForm');
+            if (!timerEl || !fillEl || !textEl || !formEl) return;
+
+            // nespouštět znovu
+            if (timerEl.getAttribute('data-started') === '1') return;
+            timerEl.setAttribute('data-started', '1');
+
+            // pokud už máme výsledek (POST), timer nedává smysl
+            if (hasResult) {
+                timerEl.style.display = 'none';
+                return;
+            }
+
+            timerEl.style.display = 'flex';
+            const total = parseInt(timerEl.getAttribute('data-seconds') || '180', 10) || 180;
+            let remaining = total;
+
+            function fmt(s) {
+                const mm = String(Math.floor(s / 60)).padStart(2, '0');
+                const ss = String(s % 60).padStart(2, '0');
+                return `${mm}:${ss}`;
+            }
+
+            function render() {
+                const pct = total > 0 ? Math.max(0, Math.min(100, (remaining / total) * 100)) : 0;
+                fillEl.style.width = pct + '%';
+                textEl.textContent = fmt(remaining);
+                timerEl.querySelector('.test-timer-bar')?.setAttribute('aria-valuenow', String(Math.round(pct)));
+
+                // zbarvení posledních 20s
+                if (remaining <= 20) {
+                    fillEl.style.background = 'linear-gradient(90deg, rgba(239,68,68,.82), rgba(245,158,11,.75))';
+                }
+            }
+
+            render();
+            const interval = setInterval(() => {
+                remaining -= 1;
+                if (remaining <= 0) {
+                    remaining = 0;
+                    render();
+                    clearInterval(interval);
+                    // auto-submit, aby se vyhodnotilo co je vyplněné
+                    try {
+                        formEl.requestSubmit ? formEl.requestSubmit() : formEl.submit();
+                    } catch (e) {
+                        formEl.submit();
+                    }
+                } else {
+                    render();
+                }
+            }, 1000);
+        }
+
+        // Hook do přechodu intro -> test
+        const prevShow = (window.__showTestSection || null);
+        window.__showTestSection = function () {
+            // pokud někdo přepíše, respektuj
+            if (typeof prevShow === 'function') prevShow();
+            startTestTimerIfNeeded();
+        };
+
+        // Pokud intro přeskočíme (POST výsledek), timer nespouštíme.
+        if (hasResult) {
+            // test se ukáže hned, ale timer při výsledku nemá smysl
+        } else {
+            // při kliknutí na Jdeme na to se test zobrazí -> spustíme timer tam (viz níže)
+        }
+
+        // napojení na existující click handler: po zobrazení testu spustit timer
+        btnYes && btnYes.addEventListener('click', function () {
+            // timer start až po tom, co se test zobrazí (cca 700ms v existující logice)
+            setTimeout(startTestTimerIfNeeded, 760);
+        });
+    })();
+</script>
+{% endblock %}
+

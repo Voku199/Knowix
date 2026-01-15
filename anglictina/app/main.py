@@ -56,6 +56,7 @@ from reminders import reminders_bp  # Přidán import připomínkového systému
 from push_notifications import push_bp, test_send_push  # PWA push notifikace blueprint + test sender
 from wordle import wordle_bp
 from onboarding import onboarding_bp  # nový onboarding blueprint
+from prijmacky import prijmacky_bp  # přijímačky z angličtiny
 
 # -------- Matematiky --------------------
 # from math_main import math_main_bp
@@ -175,6 +176,7 @@ app.register_blueprint(reminders_bp)  # Registrace blueprintu pro unsubscribe a 
 app.register_blueprint(push_bp)
 app.register_blueprint(wordle_bp)
 app.register_blueprint(onboarding_bp)
+app.register_blueprint(prijmacky_bp)
 
 # -------- Matematiky --------------------
 # app.register_blueprint(math_main_bp)
@@ -348,6 +350,16 @@ def handle_domain_and_session():
     # Aktualizace has_seen_onboarding ze session pokud chybí
     session.setdefault('has_seen_onboarding', 0)
     session.setdefault('onboarding_step', 1)
+
+    # Přesměrování nového uživatele na /welcome (jen root GET/HEAD)
+    if request.path == '/' and request.method in ('GET', 'HEAD'):
+        # /welcome je jen pro onboarding guest flow.
+        # Přihlášený (ne-guest) uživatel se sem nemá nikdy vynuceně posílat ani když has_seen_onboarding chybí/je 0.
+        is_guest = bool(session.get('is_guest'))
+        if is_guest and not session.get('has_seen_onboarding'):
+            # zabránění nechtěným loopům/upravám při explicitním skipu
+            if request.args.get('skip_welcome') != '1':
+                return redirect('/welcome')
 
     # NEpřesměrování na onboarding z / - místo toho budeme zobrazovat overlay
     # if request.path == '/' and session.get('user_id') and not session.get('has_seen_onboarding'):
@@ -546,7 +558,7 @@ def add_security_headers(response):
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.quilljs.com https://cdnjs.cloudflare.com; "
         "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
         "img-src 'self' data: https: blob: https://www.google-analytics.com https://ssl.google-analytics.com https://www.googletagmanager.com https://stats.g.doubleclick.net; "
-        "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
+        "connect-src 'self' https://cdn.quilljs.com https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
         "frame-src https://open.spotify.com https://*.spotify.com https://www.youtube-nocookie.com https://www.youtube.com https://*.youtube.com; "
         "media-src 'self' blob:; "
         "object-src 'none'; frame-ancestors 'none';"
