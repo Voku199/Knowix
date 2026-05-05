@@ -12,7 +12,7 @@ import mimetypes
 import json
 import logging  # přidán logging
 from worker_main import start_worker_thread  # přidán import vlákna workeru
-from db import get_db_connection, ensure_users_table_guest
+from db import get_db_connection, ensure_users_table_guest, initialize_database_backend
 from uuid import uuid4
 from auth import auth_bp, ensure_users_table
 
@@ -82,8 +82,10 @@ app = Flask(__name__)
 #     translations = {}
 
 # === ZÁKLADNÍ KONFIG A SESSION BACKEND ===
-ensure_users_table_guest()
 load_dotenv(dotenv_path=".env")
+initialize_database_backend(force=True)
+ensure_users_table()
+ensure_users_table_guest()
 app.secret_key = os.getenv("SECRET_KEY")
 if not app.secret_key:
     raise RuntimeError("SECRET_KEY is missing. Set SECRET_KEY in environment.")
@@ -274,8 +276,10 @@ def handle_domain_and_session():
         app.config['SESSION_COOKIE_DOMAIN'] = None
         app.config['SESSION_COOKIE_SECURE'] = False
     else:
-        # Default pro jiné hosty (např. preview)
+        # Pro ostatní hosty (např. veřejná IP v dev) respektuj schéma requestu.
+        # Na HTTP musí být Secure=False, jinak se session cookie do prohlížeče neuloží.
         app.config['SESSION_COOKIE_DOMAIN'] = None
+        app.config['SESSION_COOKIE_SECURE'] = bool(request.is_secure)
 
     # Přesměruj holou doménu na www pro konzistentní cookie doménu
     if host in ("knowix.cz", "knowix.up.railway.app"):
@@ -314,7 +318,8 @@ def handle_domain_and_session():
             #    Předpokládá se, že tabulka guest má sloupce kompatibilní s níže uvedenými
             cur.execute(
                 """
-                INSERT INTO guest (user_id, first_name, last_name, email, password, school, is_guest, has_seen_onboarding)
+                INSERT INTO guest (user_id, first_name, last_name, email, password, school, is_guest,
+                                   has_seen_onboarding)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
@@ -632,10 +637,13 @@ def send_notification_alias_root():
 
 
 # Po registraci blueprintů a inicializaci session zajistíme DB schéma users
-ensure_users_table()
+# (users a guest už bootstrappujeme hned po load_dotenv výše)
 
 
 def _ensure_user_columns():
+    from db import is_sqlite_mode
+    if is_sqlite_mode():
+        return  # SQLite schéma je kompletní z db._ensure_sqlite_schema()
     conn = None
     cur = None
     try:
@@ -679,6 +687,4 @@ _ensure_user_columns()
 # serve(app, host='0.0.0.0', port=8080, threads=32, backlog=1000)
 
 # === Spuštění aplikace ===
-from waitress import serve
-
-serve(app, host='0.0.0.0', port=8080, threads=32, backlog=1000)
+app.run(port=9999, debug=True, host='0.0.0.0')

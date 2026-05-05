@@ -253,9 +253,11 @@ def remove_student():
     try:
         # Odebrání studenta ze všech skupin učitele
         cur.execute("""
-            DELETE FROM teacher_groups 
-            WHERE teacher_id = %s AND student_id = %s
-        """, (session['user_id'], student_id))
+                    DELETE
+                    FROM teacher_groups
+                    WHERE teacher_id = %s
+                      AND student_id = %s
+                    """, (session['user_id'], student_id))
         db.commit()
         return jsonify({'success': True})
     except Exception as e:
@@ -282,18 +284,27 @@ def student_stats(student_id):
 
     # Ověření, že student patří k učiteli
     cur.execute("""
-        SELECT 1 FROM teacher_groups 
-        WHERE teacher_id = %s AND student_id = %s
-    """, (session['user_id'], student_id))
+                SELECT 1
+                FROM teacher_groups
+                WHERE teacher_id = %s
+                  AND student_id = %s
+                """, (session['user_id'], student_id))
     if not cur.fetchone():
         return "Tento student není ve vaší skupině", 403
 
     # Načtení základních údajů o studentovi
     cur.execute("""
-        SELECT first_name, last_name, email, profile_pic, xp, level, 
-               english_level, streak
-        FROM users WHERE id = %s
-    """, (student_id,))
+                SELECT first_name,
+                       last_name,
+                       email,
+                       profile_pic,
+                       xp,
+                       level,
+                       english_level,
+                       streak
+                FROM users
+                WHERE id = %s
+                """, (student_id,))
     student = cur.fetchone()
 
     # Načtení statistik z user_stats (jeden řádek jako slovník)
@@ -402,22 +413,23 @@ def settings():
         # Načti studenty pouze z aktivní skupiny
         if active_skupina_id:
             cur.execute("""
-                SELECT u.id, u.first_name, u.last_name, u.email, u.profile_pic, u.xp, u.level
-                FROM teacher_groups tg
-                JOIN users u ON tg.student_id = u.id
-                WHERE tg.teacher_id = %s AND tg.skupina_id = %s
-                ORDER BY u.xp DESC
-            """, (user, active_skupina_id))
+                        SELECT u.id, u.first_name, u.last_name, u.email, u.profile_pic, u.xp, u.level
+                        FROM teacher_groups tg
+                                 JOIN users u ON tg.student_id = u.id
+                        WHERE tg.teacher_id = %s
+                          AND tg.skupina_id = %s
+                        ORDER BY u.xp DESC
+                        """, (user, active_skupina_id))
             teacher_group_members = cur.fetchall()
         else:
             teacher_group_members = []
     else:
         cur.execute("""
-            SELECT ts.id, ts.nazev 
-            FROM teacher_groups tg
-            JOIN teacher_skupina ts ON tg.skupina_id = ts.id
-            WHERE tg.student_id = %s
-        """, (user,))
+                    SELECT ts.id, ts.nazev
+                    FROM teacher_groups tg
+                             JOIN teacher_skupina ts ON tg.skupina_id = ts.id
+                    WHERE tg.student_id = %s
+                    """, (user,))
         student_groups = cur.fetchall()
 
     theme = user_data['theme_mode'] if user_data and user_data['theme_mode'] in ['light', 'dark'] else 'light'
@@ -875,7 +887,7 @@ def register():
             try:
                 cursor.execute(
                     """
-                    INSERT INTO users 
+                    INSERT INTO users
                     (first_name, last_name, email, password, birthdate, english_level, school)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
                     """,
@@ -960,9 +972,10 @@ def forgot_password():
                 cursor = conn.cursor()
                 cursor.execute(
                     """
-                    SELECT id, first_name, email 
-                    FROM users 
-                    WHERE email = %s OR LOWER(first_name) = %s
+                    SELECT id, first_name, email
+                    FROM users
+                    WHERE email = %s
+                       OR LOWER(first_name) = %s
                     """, (input_data, input_data))
                 user = cursor.fetchone()
 
@@ -1149,10 +1162,10 @@ def group_assignments():
 
         # Získání všech skupin studenta
         cur.execute("""
-            SELECT DISTINCT tg.skupina_id
-            FROM teacher_groups tg
-            WHERE tg.student_id = %s
-        """, (user_id,))
+                    SELECT DISTINCT tg.skupina_id
+                    FROM teacher_groups tg
+                    WHERE tg.student_id = %s
+                    """, (user_id,))
         groups = cur.fetchall()
 
         if not groups:
@@ -1201,11 +1214,11 @@ def teacher_group_assignments():
 
         # Načtení úkolů z aktivní skupiny
         cur.execute('''
-            SELECT a.id, a.zadani, a.created_at
-            FROM assignments a
-            WHERE a.skupina_id = %s
-            ORDER BY a.created_at DESC
-        ''', (active_group_id,))
+                    SELECT a.id, a.zadani, a.created_at
+                    FROM assignments a
+                    WHERE a.skupina_id = %s
+                    ORDER BY a.created_at DESC
+                    ''', (active_group_id,))
         assignments = cur.fetchall()
 
         return jsonify({'success': True, 'assignments': assignments})
@@ -1234,9 +1247,11 @@ def delete_assignment(assignment_id):
         # Ověření, že úkol patří do aktivní skupiny učitele
         active_group_id = session.get('active_skupina_id')
         cur.execute('''
-            SELECT 1 FROM assignments
-            WHERE id = %s AND skupina_id = %s
-        ''', (assignment_id, active_group_id))
+                    SELECT 1
+                    FROM assignments
+                    WHERE id = %s
+                      AND skupina_id = %s
+                    ''', (assignment_id, active_group_id))
         if not cur.fetchone():
             return jsonify({'success': False, 'error': 'Úkol neexistuje nebo nepatří do vaší skupiny.'}), 403
 
@@ -1276,18 +1291,20 @@ def edit_assignment(assignment_id):
         # Ověření, že úkol patří do aktivní skupiny učitele
         active_group_id = session.get('active_skupina_id')
         cur.execute('''
-            SELECT 1 FROM assignments
-            WHERE id = %s AND skupina_id = %s
-        ''', (assignment_id, active_group_id))
+                    SELECT 1
+                    FROM assignments
+                    WHERE id = %s
+                      AND skupina_id = %s
+                    ''', (assignment_id, active_group_id))
         if not cur.fetchone():
             return jsonify({'success': False, 'error': 'Úkol neexistuje nebo nepatří do vaší skupiny.'}), 403
 
         # Aktualizace úkolu
         cur.execute('''
-            UPDATE assignments
-            SET zadani = %s
-            WHERE id = %s
-        ''', (new_zadani, assignment_id))
+                    UPDATE assignments
+                    SET zadani = %s
+                    WHERE id = %s
+                    ''', (new_zadani, assignment_id))
         db.commit()
 
         return jsonify({'success': True})
@@ -1481,7 +1498,8 @@ def create_user_from_google(profile):
         current_app.logger.debug(f"Vkládám uživatele do DB...")
         cur.execute(
             """
-            INSERT INTO users (provider, provider_id, email, first_name, last_name, avatar_url, password, created_at, last_login)
+            INSERT INTO users (provider, provider_id, email, first_name, last_name, avatar_url, password, created_at,
+                               last_login)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             """,
             ('google', google_id, email, first_name, last_name, avatar_url, password_hash, now, now)
@@ -1641,33 +1659,75 @@ def ensure_users_table():
     """Zajistí, že tabulka users existuje a má potřebné sloupce pro Google OAuth.
     Vytvoří tabulku, pokud chybí. Dále přidá chybějící sloupce.
     """
+    from db import is_sqlite_mode
+    if is_sqlite_mode():
+        return  # SQLite schéma je kompletní z db._ensure_sqlite_schema()
+
     conn = get_db_connection()
     cur = conn.cursor()
     try:
         cur.execute(
             """
-            CREATE TABLE IF NOT EXISTS users (
-              id INT AUTO_INCREMENT PRIMARY KEY,
-              provider VARCHAR(32) NULL,
-              provider_id VARCHAR(128) NULL,
-              email VARCHAR(255) NOT NULL,
-              first_name VARCHAR(100) NULL,
-              last_name VARCHAR(100) NULL,
-              avatar_url VARCHAR(512) NULL,
-              password VARCHAR(255) NOT NULL,
-              english_level ENUM('A1','A2','B1','B2','C1','C2') NULL,
-              school INT NULL,
-              created_at TIMESTAMP NULL,
-              last_login TIMESTAMP NULL,
-              UNIQUE KEY uniq_email (email)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            CREATE TABLE IF NOT EXISTS users
+            (
+                id
+                INT
+                AUTO_INCREMENT
+                PRIMARY
+                KEY,
+                provider
+                VARCHAR
+            (
+                32
+            ) NULL,
+                provider_id VARCHAR
+            (
+                128
+            ) NULL,
+                email VARCHAR
+            (
+                255
+            ) NOT NULL,
+                first_name VARCHAR
+            (
+                100
+            ) NULL,
+                last_name VARCHAR
+            (
+                100
+            ) NULL,
+                avatar_url VARCHAR
+            (
+                512
+            ) NULL,
+                password VARCHAR
+            (
+                255
+            ) NOT NULL,
+                english_level ENUM
+            (
+                'A1',
+                'A2',
+                'B1',
+                'B2',
+                'C1',
+                'C2'
+            ) NULL,
+                school INT NULL,
+                created_at TIMESTAMP NULL,
+                last_login TIMESTAMP NULL,
+                UNIQUE KEY uniq_email
+            (
+                email
+            )
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
             """
         )
         # Přidej unikátní kombinaci provider+provider_id
         cur.execute(
             """
             ALTER TABLE users
-            ADD UNIQUE KEY IF NOT EXISTS uniq_provider (provider, provider_id);
+                ADD UNIQUE KEY IF NOT EXISTS uniq_provider (provider, provider_id);
             """
         )
     except Exception:
@@ -1694,3 +1754,127 @@ def ensure_users_table():
     finally:
         cur.close()
         conn.close()
+
+
+def _is_dev_login_allowed() -> bool:
+    """Povolí /login/now jen v lokálním/dev režimu."""
+    try:
+        host = (request.host or '').split(':')[0]
+    except Exception:
+        host = ''
+
+    is_local = host in ('localhost', '127.0.0.1') or host.startswith('192.168.') or host.startswith('10.')
+    debug_env = str(os.getenv('FLASK_DEBUG', '0')).lower() in ('1', 'true', 'yes', 'on')
+    app_debug = bool(getattr(current_app, 'debug', False))
+    app_env = str(os.getenv('FLASK_ENV', '')).lower()
+    return bool(is_local or debug_env or app_debug or app_env == 'development')
+
+
+@auth_bp.route('/login/now', methods=['GET'])
+def login_now():
+    """Rychlé přihlášení na test účet (jen pro development)."""
+    if not _is_dev_login_allowed():
+        # Bezpečně se tváří jako neexistující endpoint mimo dev.
+        return render_template('error.html', error_code=404), 404
+
+    test_email = (os.getenv('TEST_LOGIN_EMAIL') or 'test@knowix.local').strip().lower()
+    test_first = os.getenv('TEST_LOGIN_FIRST_NAME') or 'test'
+    test_last = os.getenv('TEST_LOGIN_LAST_NAME') or 'user'
+    test_password = os.getenv('TEST_LOGIN_PASSWORD') or 'test'
+
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(dictionary=True)
+        try:
+            cur.execute(
+                """
+                SELECT id, first_name, last_name, profile_pic, has_seen_onboarding, is_guest
+                FROM users
+                WHERE email = %s LIMIT 1
+                """,
+                (test_email,)
+            )
+        except Exception:
+            # SQLite fallback schema pouziva profile_pk misto profile_pic.
+            cur.execute(
+                """
+                SELECT id, first_name, last_name, profile_pk AS profile_pic, has_seen_onboarding, is_guest
+                FROM users
+                WHERE email = %s LIMIT 1
+                """,
+                (test_email,)
+            )
+        user = cur.fetchone()
+
+        if not user:
+            cur.close()
+            cur = conn.cursor()
+            cur.execute(
+                """
+                INSERT INTO users (first_name, last_name, email, password, is_guest, has_seen_onboarding)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """,
+                (test_first, test_last, test_email, generate_password_hash(test_password), 0, 1)
+            )
+            conn.commit()
+
+            cur.close()
+            cur = conn.cursor(dictionary=True)
+            try:
+                cur.execute(
+                    """
+                    SELECT id, first_name, last_name, profile_pic, has_seen_onboarding, is_guest
+                    FROM users
+                    WHERE email = %s LIMIT 1
+                    """,
+                    (test_email,)
+                )
+            except Exception:
+                cur.execute(
+                    """
+                    SELECT id, first_name, last_name, profile_pk AS profile_pic, has_seen_onboarding, is_guest
+                    FROM users
+                    WHERE email = %s LIMIT 1
+                    """,
+                    (test_email,)
+                )
+            user = cur.fetchone()
+
+        if not user:
+            flash('Testovací účet se nepodařilo načíst ani vytvořit.', 'error')
+            return redirect(url_for('auth.login'))
+
+        # Nastavení session konzistentně s klasickým login flow.
+        session['user_id'] = user['id'] if isinstance(user, dict) else user[0]
+        first_name = user.get('first_name') if isinstance(user, dict) else user[1]
+        last_name = user.get('last_name') if isinstance(user, dict) else user[2]
+        profile_pic = user.get('profile_pic') if isinstance(user, dict) else user[3]
+        has_seen = user.get('has_seen_onboarding') if isinstance(user, dict) else user[4]
+
+        session['user_name'] = f"{first_name or ''} {last_name or ''}".strip() or 'Test User'
+        session['profile_pic'] = profile_pic or 'default.jpg'
+        try:
+            session['has_seen_onboarding'] = int(has_seen or 1)
+        except Exception:
+            session['has_seen_onboarding'] = 1
+        session['is_guest'] = False
+        session.pop('onboarding_answers', None)
+        session['onboarding_step'] = 1
+        session.modified = True
+
+        flash(f'Jsi přihlášen jako test user ({test_email}).', 'success')
+        return redirect(url_for('main.index'))
+    except Exception as e:
+        print(f"[auth.login_now] ERROR: {e}")
+        flash('Auto login selhal.', 'error')
+        return redirect(url_for('auth.login'))
+    finally:
+        try:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+        except Exception:
+            pass
