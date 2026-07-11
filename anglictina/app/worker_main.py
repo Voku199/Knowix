@@ -15,6 +15,7 @@ Integrace do main.py:
 """
 from __future__ import annotations
 
+import _paths  # noqa: F401 — přidá core/, services/, routes/* na sys.path; musí být před lokálními importy
 import os
 import time
 import traceback
@@ -47,7 +48,6 @@ def _loop(interval: int) -> None:
 
 def start_worker_thread(interval: int | None = None) -> threading.Thread:
     """Spustí worker ve vlákně (idempotentní)."""
-    global _worker_started
     if hasattr(start_worker_thread, 'thread') and start_worker_thread.thread.is_alive():
         return start_worker_thread.thread
     if interval is None:

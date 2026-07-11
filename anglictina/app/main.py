@@ -1,64 +1,91 @@
-# --- Flask and SocketIO imports ---
-from dotenv import load_dotenv
-from flask import Flask, render_template, session, send_from_directory, request, redirect, jsonify, g, make_response
-# from flask_session import Session
+"""Knowix — vstupní bod webové aplikace.
+
+Tady se skládá celá aplikace dohromady:
+
+1.  Konfigurace Flasku a výběr session backendu (Redis v produkci, filesystem lokálně).
+2.  Import a registrace všech feature blueprintů (každý žije v routes/<oblast>/).
+3.  Globální request hooky:
+      - before_request: cookie pravidla podle domény, redirect na www, guest účty
+      - after_request:  bezpečnostní hlavičky (CSP, HSTS, ...)
+4.  Context procesory pro šablony (streak, XP, denní úkoly).
+5.  Globální error handler (HTML nebo JSON podle Accept hlavičky).
+
+Spuštění: `python main.py` (dev server na portu 9999, viz konec souboru).
+"""
+
+import _paths  # noqa: F401 — přidá core/, services/, routes/* na sys.path; musí být před lokálními importy
+
+# --- Standardní knihovna ---
 import importlib
-from streak import get_user_streak
-import traceback
-import redis
-from werkzeug.middleware.proxy_fix import ProxyFix
-import os
+import logging
 import mimetypes
-import json
-import logging  # přidán logging
-from worker_main import start_worker_thread  # přidán import vlákna workeru
-from db import get_db_connection, ensure_users_table_guest, initialize_database_backend
+import os
+import traceback
 from uuid import uuid4
-from auth import auth_bp, ensure_users_table
 
-# Zajisti správný MIME typ pro WebP
-mimetypes.add_type('image/webp', '.webp')
+# --- Třetí strany ---
+import redis
+from dotenv import load_dotenv
+from flask import (
+    Flask, g, jsonify, make_response, redirect, render_template,
+    request, send_from_directory, session,
+)
+from werkzeug.middleware.proxy_fix import ProxyFix
 
-# Import všech blueprintů
-from A1_music import exercises_bp
-from ai import ai_bp
-from at_on import at_on_bp
-# from auth import auth_bp  # duplicitní import odstraněn
-from chat import zpravy_bp
-from feedback import feedback_bp
-from hangman import hangman_bp
-from listening import listening_bp
-from main_routes import main_bp
-from nepravidelna_slovesa import verbs_bp
-from news import news_bp
-from obchod import obchod_bp
-from present_perfect import chat_bp
-from review import review_bp
-from roleplaying import roleplaying_bp
-from theme import theme_bp
-from xp import get_user_xp_and_level
-from xp import xp_bp
-from drawing import drawing_bp
-from psani import psani_bp
-from stats import user_stats_bp
-from admin import admin_bp
-from vlastni_music import vlastni_music_bp
-from proc import proc_bp
+# --- Interní: core + services ---
+from db import ensure_users_table_guest, get_db_connection, initialize_database_backend
 from security_ext import init_security
-from AI_poslech import ai_poslech_bp
-from uvidet import uvidet  # QR landing page blueprint
-from shadow_ml import shadow_ml_bp
-from podcast import podcast_bp
-from slovni_fotbal import slovni_bp
-from daily_quest import daily_bp, get_daily_quests_for_user
-from AI_gramatika import ai_gramatika_bp
-from reminders import reminders_bp  # Přidán import připomínkového systému
-from push_notifications import push_bp, test_send_push  # PWA push notifikace blueprint + test sender
-from wordle import wordle_bp
-from onboarding import onboarding_bp  # nový onboarding blueprint
-from prijmacky import prijmacky_bp  # přijímačky z angličtiny
+from streak import get_user_streak
+from worker_main import start_worker_thread
 
-# -------- Matematiky --------------------
+# --- Blueprinty: user ---
+from auth import auth_bp, ensure_users_table
+from daily_quest import daily_bp, get_daily_quests_for_user
+from feedback import feedback_bp
+from obchod import obchod_bp
+from onboarding import onboarding_bp
+from push_notifications import push_bp, test_send_push
+from reminders import reminders_bp
+from stats import user_stats_bp
+from theme import theme_bp
+from xp import get_user_xp_and_level, xp_bp
+
+# --- Blueprinty: music ---
+from A1_music import exercises_bp
+from listening import listening_bp
+from podcast import podcast_bp
+from vlastni_music import vlastni_music_bp
+
+# --- Blueprinty: AI ---
+from ai import ai_bp
+from AI_gramatika import ai_gramatika_bp
+from AI_poslech import ai_poslech_bp
+from chat import zpravy_bp
+from roleplaying import roleplaying_bp
+
+# --- Blueprinty: grammar ---
+from at_on import at_on_bp
+from nepravidelna_slovesa import verbs_bp
+from present_perfect import chat_bp
+from psani import psani_bp
+
+# --- Blueprinty: games ---
+from drawing import drawing_bp
+from hangman import hangman_bp
+from shadow_ml import shadow_ml_bp
+from slovni_fotbal import slovni_bp
+from wordle import wordle_bp
+
+# --- Blueprinty: misc ---
+from admin import admin_bp
+from main_routes import main_bp
+from news import news_bp
+from prijmacky import prijmacky_bp
+from proc import proc_bp
+from review import review_bp
+from uvidet import uvidet
+
+# --- Blueprinty: math (hotové, ale zatím vypnuté) ---
 # from math_main import math_main_bp
 # from math_pocitejsam import math_pocitejsam_bp
 # from math_cas import cas_bp
@@ -66,40 +93,29 @@ from prijmacky import prijmacky_bp  # přijímačky z angličtiny
 # from math_porovnani import porovnani_bp
 # from math_prevodky import prevodky_bp
 
-# --------- Prezentace --------------
+# Zajisti správný MIME typ pro WebP
+mimetypes.add_type('image/webp', '.webp')
 
+
+# ===========================================================================
+# Základní konfigurace
+# ===========================================================================
 
 app = Flask(__name__)
 
-# # === Načtení překladů pro i18n ===
-# try:
-#     _translations_path = os.path.join(os.path.dirname(__file__), 'static', 'translations.json')
-#     with open(_translations_path, 'r', encoding='utf-8') as _f:
-#         translations = json.load(_f)
-#     print(f"[i18n] translations loaded: {_translations_path} ({len(translations)} keys)")
-# except Exception as _ex:
-#     print(f"[i18n] WARNING: failed to load translations.json: {_ex}")
-#     translations = {}
-
-# === ZÁKLADNÍ KONFIG A SESSION BACKEND ===
 load_dotenv(dotenv_path=".env")
 initialize_database_backend(force=True)
 ensure_users_table()
 ensure_users_table_guest()
+
 app.secret_key = os.getenv("SECRET_KEY")
 if not app.secret_key:
     raise RuntimeError("SECRET_KEY is missing. Set SECRET_KEY in environment.")
 
-# Pokus o dynamický import Flask-Session, který obejde případný konflikt s lokální složkou "flask_session"
-try:
-    FlaskSession = importlib.import_module('flask_session').Session
-except Exception:
-    FlaskSession = None
-
 app.config.update(
     SESSION_COOKIE_NAME=os.getenv('SESSION_COOKIE_NAME', 'knowix_session'),
     SESSION_COOKIE_SAMESITE='Lax',
-    SESSION_COOKIE_SECURE=True,  # Přepneme v before_request pro localhost
+    SESSION_COOKIE_SECURE=True,  # Přepíná se dynamicky v before_request podle hosta
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_USE_SIGNER=True,
     PERMANENT_SESSION_LIFETIME=60 * 60 * 24 * 30,  # 30 dní
@@ -108,12 +124,25 @@ app.config.update(
     ALLOWED_EXTENSIONS={'png', 'jpg', 'jpeg', 'gif'},
     GENIUS_ACCESS_TOKEN=os.getenv('GENIUS_ACCESS_TOKEN'),
     DEEPL_API_KEY=os.getenv('DEEPL_API_KEY'),
-    MAX_CONTENT_LENGTH=2 * 1024 * 1024
+    MAX_CONTENT_LENGTH=2 * 1024 * 1024,
 )
 
-# Determine session backend based on environment
+# Proxy fix kvůli správnému HTTPS z pohledu Flasku (Railway běží za proxy)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
+
+
+# ===========================================================================
+# Session backend: Redis v produkci, filesystem lokálně
+# ===========================================================================
+
+# Dynamický import Flask-Session — obchází konflikt s lokální složkou "flask_session"
+try:
+    FlaskSession = importlib.import_module('flask_session').Session
+except Exception:
+    FlaskSession = None
+
 redis_url = os.getenv('REDIS_URL')
-if redis_url and not os.getenv('FLASK_DEBUG'):  # Use Redis only in production
+if redis_url and not os.getenv('FLASK_DEBUG'):  # Redis jen v produkci
     try:
         app.config['SESSION_TYPE'] = 'redis'
         app.config['SESSION_REDIS'] = redis.from_url(redis_url)
@@ -123,70 +152,44 @@ if redis_url and not os.getenv('FLASK_DEBUG'):  # Use Redis only in production
         print(f"[main] WARNING: Redis ping failed ({ex}). Falling back to filesystem sessions.")
         app.config['SESSION_TYPE'] = 'filesystem'
 else:
-    # Use filesystem sessions for local development
     app.config['SESSION_TYPE'] = 'filesystem'
     print("[main] Session backend: filesystem (local development)")
 
-# Ensure session directory exists for filesystem sessions
 if app.config['SESSION_TYPE'] == 'filesystem':
-    # Use a directory outside of OneDrive to avoid sync issues
+    # Adresář mimo OneDrive, aby sync nerozbíjel session soubory
     session_dir = os.path.join(os.path.expanduser("~"), "knowix_sessions")
-    if not os.path.exists(session_dir):
-        os.makedirs(session_dir, exist_ok=True)
+    os.makedirs(session_dir, exist_ok=True)
     app.config['SESSION_FILE_DIR'] = session_dir
     print(f"[main] Using session directory: {session_dir}")
 
-# Proxy fix kvůli správnému HTTPS z pohledu Flasku
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
-
-# Initialize session after all config is set
 if FlaskSession:
     FlaskSession(app)
 
-# === Registrace blueprintů ===
-app.register_blueprint(main_bp)
-app.register_blueprint(auth_bp)
-app.register_blueprint(verbs_bp)
-app.register_blueprint(exercises_bp)
-app.register_blueprint(feedback_bp)
-app.register_blueprint(theme_bp)
-app.register_blueprint(hangman_bp)
-app.register_blueprint(news_bp)
-app.register_blueprint(chat_bp)
-app.register_blueprint(at_on_bp)
-app.register_blueprint(xp_bp)
-app.register_blueprint(listening_bp)
-app.register_blueprint(review_bp)
-app.register_blueprint(obchod_bp)
-app.register_blueprint(zpravy_bp)
-app.register_blueprint(roleplaying_bp)
-app.register_blueprint(ai_bp)
-app.register_blueprint(drawing_bp)
-app.register_blueprint(psani_bp)
-app.register_blueprint(user_stats_bp)
-app.register_blueprint(admin_bp)
-app.register_blueprint(vlastni_music_bp)
-app.register_blueprint(proc_bp)
-app.register_blueprint(ai_poslech_bp)
-app.register_blueprint(uvidet)  # /uvidet a /qr
-app.register_blueprint(shadow_ml_bp)
-app.register_blueprint(podcast_bp)
-app.register_blueprint(slovni_bp)
-app.register_blueprint(daily_bp)
-app.register_blueprint(ai_gramatika_bp)
-app.register_blueprint(reminders_bp)  # Registrace blueprintu pro unsubscribe a ruční scan
-app.register_blueprint(push_bp)
-app.register_blueprint(wordle_bp)
-app.register_blueprint(onboarding_bp)
-app.register_blueprint(prijmacky_bp)
 
-# -------- Matematiky --------------------
-# app.register_blueprint(math_main_bp)
-# app.register_blueprint(math_pocitejsam_bp)
-# app.register_blueprint(cas_bp)
-# app.register_blueprint(math_ulohy_bp)
-# app.register_blueprint(porovnani_bp)
-# app.register_blueprint(prevodky_bp)
+# ===========================================================================
+# Registrace blueprintů
+# ===========================================================================
+
+BLUEPRINTS = [
+    # misc / jádro webu
+    main_bp, admin_bp, news_bp, prijmacky_bp, proc_bp, review_bp, uvidet,
+    # user
+    auth_bp, daily_bp, feedback_bp, obchod_bp, onboarding_bp, push_bp,
+    reminders_bp, user_stats_bp, theme_bp, xp_bp,
+    # music
+    exercises_bp, listening_bp, podcast_bp, vlastni_music_bp,
+    # AI
+    ai_bp, ai_gramatika_bp, ai_poslech_bp, zpravy_bp, roleplaying_bp,
+    # grammar
+    at_on_bp, verbs_bp, chat_bp, psani_bp,
+    # games
+    drawing_bp, hangman_bp, shadow_ml_bp, slovni_bp, wordle_bp,
+    # math (vypnuté): math_main_bp, math_pocitejsam_bp, cas_bp,
+    #                  math_ulohy_bp, porovnani_bp, prevodky_bp
+]
+
+for bp in BLUEPRINTS:
+    app.register_blueprint(bp)
 
 init_security(app)
 
@@ -196,383 +199,206 @@ else:
     print('[main] Background worker ve web procesu je vypnutý (nastav START_WORKER_IN_WEB=1 pro zapnutí).', flush=True)
 
 
-@app.route('/sitemap.xml')
-def sitemap():
-    return send_from_directory('templates', 'sitemap.xml')
+# ===========================================================================
+# Pomocné funkce
+# ===========================================================================
+
+def _is_private_ip(host: str) -> bool:
+    """True pro privátní IP rozsahy (přístup z mobilu v lokální síti)."""
+    return any(host.startswith(prefix) for prefix in (
+        '192.168.', '10.', '172.16.', '172.17.', '172.18.', '172.19.',
+        '172.20.', '172.21.', '172.22.', '172.23.', '172.24.', '172.25.',
+        '172.26.', '172.27.', '172.28.', '172.29.', '172.30.', '172.31.',
+    ))
 
 
-@app.route('/privacy')
-def privacy():
-    return render_template('privacy.html')
+# Placeholder heslo pro guest účty (scrypt hash — guest se přes něj nikdy nepřihlašuje)
+_GUEST_PASSWORD_HASH = (
+    'scrypt:32768:8:1$SZwTcXBf633lMT5B$5314fff3be13114ecbf2bff33572a6e3771287491ad73f4dda4f2f13be'
+    '7493853f0badd609b3bf0a09f0c821bf55c30c9282ee46e88bcb1f38eccab9b56f5eef'
+)
 
 
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(
-        os.path.join(app.root_path, 'static'),
-        'favicon.ico',
-        mimetype='image/vnd.microsoft.icon'
-    )
+def _create_guest_account() -> None:
+    """Založí guest účet a uloží jeho users.id do session.
+
+    Vytvoří řádek v `users` (is_guest=1) + navázaný řádek v `guest`. Do session
+    se ukládá users.id (ne guest.id), aby XP, streak a statistiky pracovaly
+    s jedním konzistentním ID a nemusely řešit, že jde o hosta.
+    """
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        # Sloupec email je NOT NULL -> unikátní placeholder
+        guest_email = f"guest_{uuid4().hex[:12]}@example.com"
+
+        # 1) "Shadow" uživatel v users, aby FK (user_stats, ...) ukazovaly na users.id
+        cur.execute(
+            """
+            INSERT INTO users (first_name, last_name, email, password, school, is_guest, has_seen_onboarding)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            ('Guest', 'User', guest_email, _GUEST_PASSWORD_HASH, 'Knowix', 1, 0),
+        )
+        user_id = cur.lastrowid
+
+        # 2) Záznam v tabulce guest odkazující na users.id
+        cur.execute(
+            """
+            INSERT INTO guest (user_id, first_name, last_name, email, password, school, is_guest,
+                               has_seen_onboarding)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            (user_id, 'Guest', 'User', guest_email, _GUEST_PASSWORD_HASH, 'Knowix', 1, 0),
+        )
+        conn.commit()
+
+        # 3) Session drží users.id — zbytek aplikace nepozná rozdíl mezi guestem a userem
+        session['user_id'] = user_id
+        session['is_guest'] = True
+        session['has_seen_onboarding'] = 0
+        session['onboarding_step'] = 1
+    except Exception as ex:
+        print(f"[onboarding] WARNING: failed to create guest: {ex}")
+    finally:
+        try:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+        except Exception:
+            pass
 
 
-@app.route('/apple-touch-icon.png')
-def apple_touch_icon():
-    return send_from_directory(
-        os.path.join(app.root_path, 'static'),
-        'apple-touch-icon.png',
-        mimetype='image/png'
-    )
+# ===========================================================================
+# before_request: doména, cookie pravidla, guest bootstrap
+# ===========================================================================
 
-
-@app.route('/apple-touch-icon-precomposed.png')
-def apple_touch_icon_precomposed():
-    return send_from_directory(
-        os.path.join(app.root_path, 'static'),
-        'apple-touch-icon.png',
-        mimetype='image/png'
-    )
-
-
-@app.route('/kontakty')
-def kontakty():
-    return render_template('kontakty.html')
-
-
-@app.route('/robots.txt')
-def robots_txt():
-    return send_from_directory('templates', 'robots.txt')
-
-
-# === Offline fallback pro PWA ===
-@app.route('/offline')
-def offline_page():
-    return render_template('offline.html')
-
-
-# === BEFORE_REQUEST: doména, secure, redirect, refresh ===
-# === BEFORE_REQUEST: doména, secure, redirect, refresh ===
 @app.before_request
 def handle_domain_and_session():
     host = request.host.split(':')[0]
 
-    # Logy pro debug login/registrace/index
+    # Debug logy pro login/registraci/index
     if request.path in ('/login', '/register', '/'):
         cookie_name = app.config.get('SESSION_COOKIE_NAME', 'session')
         print(
-            f"[before_request] host={host} path={request.path} method={request.method} session_keys={list(session.keys())} sid={request.cookies.get(cookie_name)}")
+            f"[before_request] host={host} path={request.path} method={request.method} "
+            f"session_keys={list(session.keys())} sid={request.cookies.get(cookie_name)}")
 
-    # Privátní IP rozsahy pro lokální síť (mobil -> PC)
-    def _is_private_ip(h):
-        return any(h.startswith(prefix) for prefix in (
-            '192.168.', '10.', '172.16.', '172.17.', '172.18.', '172.19.', '172.20.', '172.21.', '172.22.', '172.23.',
-            '172.24.', '172.25.', '172.26.', '172.27.', '172.28.', '172.29.', '172.30.', '172.31.'))
-
-    # Dynamicky přenastav cookie parametry – musí být stabilní pro daný host (www i root přesměrujeme na www)
+    # Cookie parametry podle hosta — musí být stabilní pro daný host
     if host.endswith('knowix.cz'):
         app.config['SESSION_COOKIE_DOMAIN'] = '.knowix.cz'
         app.config['SESSION_COOKIE_SECURE'] = True
     elif host in ('localhost', '127.0.0.1') or _is_private_ip(host):
-        # Povolit nezabezpečené cookie pro lokální IP (HTTP přístup z mobilu)
+        # HTTP přístup z mobilu v lokální síti -> nezabezpečené cookie povoleny
         app.config['SESSION_COOKIE_DOMAIN'] = None
         app.config['SESSION_COOKIE_SECURE'] = False
     else:
-        # Pro ostatní hosty (např. veřejná IP v dev) respektuj schéma requestu.
-        # Na HTTP musí být Secure=False, jinak se session cookie do prohlížeče neuloží.
+        # Ostatní hosty (např. veřejná IP v dev): respektuj schéma requestu.
+        # Na HTTP musí být Secure=False, jinak prohlížeč cookie neuloží.
         app.config['SESSION_COOKIE_DOMAIN'] = None
         app.config['SESSION_COOKIE_SECURE'] = bool(request.is_secure)
 
-    # Přesměruj holou doménu na www pro konzistentní cookie doménu
+    # Holou doménu přesměruj na www kvůli konzistentní cookie doméně
     if host in ("knowix.cz", "knowix.up.railway.app"):
         target = "https://www.knowix.cz" + request.full_path
         code = 308 if request.method not in ("GET", "HEAD", "OPTIONS") else 301
         return redirect(target, code=code)
 
-    # Zajištění guest účtu pro nepřihlášené
+    # Nepřihlášený návštěvník dostane transparentně guest účet
     if 'user_id' not in session:
-        try:
-            conn = get_db_connection()
-            cur = conn.cursor()
-            # Vytvoř guest záznam s unikátním placeholder emailem (sloupec email je NOT NULL)
-            guest_email = f"guest_{uuid4().hex[:12]}@example.com"
-
-            # 1) Nejprve vytvořit záznam v users jako "shadow" uživatele pro guest
-            #    aby všechny FK (např. v user_stats) ukazovaly na users.id
-            cur.execute(
-                """
-                INSERT INTO users (first_name, last_name, email, password, school, is_guest, has_seen_onboarding)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """,
-                (
-                    'Guest',
-                    'User',
-                    guest_email,
-                    'scrypt:32768:8:1$SZwTcXBf633lMT5B$5314fff3be13114ecbf2bff33572a6e3771287491ad73f4dda4f2f13be7493853f0badd609b3bf0a09f0c821bf55c30c9282ee46e88bcb1f38eccab9b56f5eef',
-                    'Knowix',
-                    1,
-                    0
-                )
-            )
-            user_id = cur.lastrowid
-
-            # 2) Záznam v tabulce guest, který odkazuje na tohoto users.id
-            #    Předpokládá se, že tabulka guest má sloupce kompatibilní s níže uvedenými
-            cur.execute(
-                """
-                INSERT INTO guest (user_id, first_name, last_name, email, password, school, is_guest,
-                                   has_seen_onboarding)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                """,
-                (
-                    user_id,
-                    'Guest',
-                    'User',
-                    guest_email,
-                    'scrypt:32768:8:1$SZwTcXBf633lMT5B$5314fff3be13114ecbf2bff33572a6e3771287491ad73f4dda4f2f13be7493853f0badd609b3bf0a09f0c821bf55c30c9282ee46e88bcb1f38eccab9b56f5eef',
-                    'Knowix',
-                    1,
-                    0
-                )
-            )
-
-            conn.commit()
-
-            # 3) Do session ukládáme users.id (ne guest.id), aby všechny další části appky
-            #    pracovaly konzistentně s jedním ID pro user_stats, XP, streak atd.
-            session['user_id'] = user_id
-            session['is_guest'] = True
-            session['has_seen_onboarding'] = 0
-            session['onboarding_step'] = 1
-        except Exception as ex:
-            print(f"[onboarding] WARNING: failed to create guest: {ex}")
-        finally:
-            try:
-                if 'cur' in locals() and cur:
-                    cur.close()
-                if 'conn' in locals() and conn:
-                    conn.close()
-            except Exception:
-                pass
-    # Aktualizace has_seen_onboarding ze session pokud chybí
+        _create_guest_account()
     session.setdefault('has_seen_onboarding', 0)
     session.setdefault('onboarding_step', 1)
 
-    # Přesměrování nového uživatele na /welcome (jen root GET/HEAD)
+    # Nový guest bez onboardingu -> /welcome (jen root GET/HEAD).
+    # Přihlášený (ne-guest) uživatel se sem nikdy vynuceně neposílá.
     if request.path == '/' and request.method in ('GET', 'HEAD'):
-        # /welcome je jen pro onboarding guest flow.
-        # Přihlášený (ne-guest) uživatel se sem nemá nikdy vynuceně posílat ani když has_seen_onboarding chybí/je 0.
-        is_guest = bool(session.get('is_guest'))
-        if is_guest and not session.get('has_seen_onboarding'):
-            # zabránění nechtěným loopům/upravám při explicitním skipu
-            if request.args.get('skip_welcome') != '1':
+        if session.get('is_guest') and not session.get('has_seen_onboarding'):
+            if request.args.get('skip_welcome') != '1':  # explicitní skip bez loopů
                 return redirect('/welcome')
-
-    # NEpřesměrování na onboarding z / - místo toho budeme zobrazovat overlay
-    # if request.path == '/' and session.get('user_id') and not session.get('has_seen_onboarding'):
-    #     return redirect('/onboarding')
 
     # Permanentní session pro přihlášené
     if 'user_id' in session:
         session.permanent = True
         session.setdefault('_last_refresh', 0)
 
-    # Flag pro after_request zda byla session změněna explicitně (informativní)
+    # Informativní flag pro after_request
     g.session_keys_before = set(session.keys())
 
 
-# === Servírování profilovek s fallbackem ===
-@app.route('/static/profile_pics/<path:filename>')
-def serve_profile_pic(filename):
-    try:
-        return send_from_directory('static/profile_pics', filename)
-    except Exception:
-        # Bezpečný fallback
-        try:
-            return send_from_directory('static/profile_pics', 'default.webp')
-        except Exception:
-            return send_from_directory('static', 'favicon.ico')  # poslední fallback
+# ===========================================================================
+# after_request: bezpečnostní hlavičky (CSP, HSTS, ...)
+# ===========================================================================
+
+# Uvolněná CSP jen pro vlastni_music_bp (embeduje YouTube přehrávač)
+_CSP_VLASTNI_MUSIC = (
+    "default-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://s.ytimg.com https://i.ytimg.com; "
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com; "
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+    "font-src 'self' https://fonts.gstatic.com; "
+    "img-src 'self' data: https://i.ytimg.com https://s.ytimg.com; "
+    "frame-src https://www.youtube.com https://www.youtube-nocookie.com; "
+    "object-src 'none';"
+)
+
+# Výchozí CSP pro zbytek aplikace (vč. Google Analytics, Quill, Spotify/YouTube embedů)
+_CSP_DEFAULT = (
+    "default-src 'self'; "
+    "base-uri 'self'; "
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' "
+    "https://cdn.quilljs.com https://cdn.jsdelivr.net "
+    "https://www.youtube.com https://s.ytimg.com "
+    "https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com; "
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.quilljs.com https://cdnjs.cloudflare.com; "
+    "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
+    "img-src 'self' data: https: blob: https://www.google-analytics.com https://ssl.google-analytics.com https://www.googletagmanager.com https://stats.g.doubleclick.net; "
+    "connect-src 'self' https://cdn.quilljs.com https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
+    "frame-src https://open.spotify.com https://*.spotify.com https://www.youtube-nocookie.com https://www.youtube.com https://*.youtube.com; "
+    "media-src 'self' blob:; "
+    "object-src 'none'; frame-ancestors 'none';"
+)
 
 
-@app.route('/.well-known/appspecific/com.chrome.devtools.json')
-def chrome_devtools_assoc():
-    # vrátí prázdný 204 No Content místo 404
-    return make_response('', 204)
-
-
-# === Context procesory ===
-@app.context_processor
-def inject_streak():
-    user_id = session.get('user_id')
-    if user_id:
-        return dict(user_streak=get_user_streak(user_id))
-    return dict(user_streak=0)
-
-
-LEVEL_NAMES = [
-    "Začátečník", "Učeň", "Student", "Pokročilý", "Expert Knowixu", "Mistr", "Legenda", "Volax", "Král Knowixu"
-]
-
-
-def get_level_name(level):
-    if level <= 1:
-        return LEVEL_NAMES[0]
-    elif level <= 2:
-        return LEVEL_NAMES[1]
-    elif level <= 4:
-        return LEVEL_NAMES[2]
-    elif level <= 5:
-        return LEVEL_NAMES[3]
-    elif level <= 6:
-        return LEVEL_NAMES[4]
-    elif level <= 8:
-        return LEVEL_NAMES[5]
-    elif level <= 10:
-        return LEVEL_NAMES[6]
-    elif level <= 12:
-        return LEVEL_NAMES[7]
-    elif level <= 15:
-        return LEVEL_NAMES[8]
-    else:
-        return LEVEL_NAMES[-1]
-
-
-@app.context_processor
-def inject_xp_info():
-    user_id = session.get('user_id')
-    if user_id:
-        user_data = get_user_xp_and_level(user_id)
-        xp = user_data.get("xp", 0)
-        level = user_data.get("level", 1)
-        xp_in_level = xp % 50
-        percent = int((xp_in_level / 50) * 100)
-        return dict(
-            user_xp=xp,
-            user_level=level,
-            user_level_name=get_level_name(level),
-            user_progress_percent=percent,
-            user_xp_in_level=xp_in_level
-        )
-    return {}
-
-
-@app.context_processor
-def inject_daily_quests_cp():
-    user_id = session.get('user_id')
-    if user_id:
-        return dict(daily_quests=get_daily_quests_for_user(user_id))
-    return dict(daily_quests=None)
-
-
-# === Error handler (HTML nebo JSON) ===
-@app.errorhandler(502)
-@app.errorhandler(503)
-@app.errorhandler(504)
-@app.errorhandler(500)
-@app.errorhandler(404)
-@app.errorhandler(Exception)
-def server_error(e):
-    code = getattr(e, 'code', 500)
-    tb = traceback.format_exc()
-
-    logger = logging.getLogger("main")
-
-    # --- DETAILNÍ LOGOVÁNÍ CHYB ---
-    try:
-        user_id = session.get('user_id')
-    except Exception:
-        user_id = None
-    try:
-        path = request.path
-        method = request.method
-    except Exception:
-        path = '<no request>'
-        method = '<no method>'
-
-    logger.error(
-        "[main] server_error: type=%s code=%s msg=%s method=%s path=%s user_id=%s\n%s",
-        type(e).__name__,
-        code,
-        str(e),
-        method,
-        path,
-        user_id,
-        tb
-    )
-
-    wants_json = ('application/json' in request.headers.get('Accept', '')) or \
-                 ('application/json' in request.headers.get('Content-Type', '')) or \
-                 request.path.endswith('/check-answer')
-    if wants_json:
-        return jsonify({'error': str(e), 'code': code, 'traceback': tb}), code
-    return render_template('error.html', error_code=code, error_message=str(e), error_traceback=tb), code
-
-
-# === AFTER_REQUEST: bezpečnostní hlavičky + debug ===
 @app.after_request
 def add_security_headers(response):
-    # Speciální režim: u vlastni_music_bp endpointů výrazně povolíme zdroje (embedding YouTube)
+    # Speciální režim pro vlastni_music_bp: uvolněná CSP kvůli YouTube embedu
     endpoint = request.endpoint or ''
     if endpoint.startswith('vlastni_music_bp.'):
-        # Minimalistická, uvolněná CSP pro tento blueprint
-        response.headers['Content-Security-Policy'] = (
-            "default-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://s.ytimg.com https://i.ytimg.com; "
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com; "
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-            "font-src 'self' https://fonts.gstatic.com; "
-            "img-src 'self' data: https://i.ytimg.com https://s.ytimg.com; "
-            "frame-src https://www.youtube.com https://www.youtube-nocookie.com; "
-            "object-src 'none';"
-        )
-        # Odstraníme restriktivní hlavičky které mohou komplikovat přehrávání
-        for h in (
-                'Permissions-Policy', 'Cross-Origin-Opener-Policy', 'Cross-Origin-Resource-Policy',
-                'X-Frame-Options'
-        ):
+        response.headers['Content-Security-Policy'] = _CSP_VLASTNI_MUSIC
+        # Restriktivní hlavičky by komplikovaly přehrávání
+        for h in ('Permissions-Policy', 'Cross-Origin-Opener-Policy',
+                  'Cross-Origin-Resource-Policy', 'X-Frame-Options'):
             response.headers.pop(h, None)
-        # HSTS necháme jen pokud je produkce na doméně
+        # HSTS jen na produkční doméně
         if not request.host.endswith('knowix.cz'):
             response.headers.pop('Strict-Transport-Security', None)
         return response
 
+    # Debug logy pro login/registraci/index
     if request.path in ('/login', '/register', '/'):
-        cookie_name = app.config.get('SESSION_COOKIE_NAME', 'session')
         set_cookie_header = response.headers.get('Set-Cookie')
         print(
-            f"[after_request] host={request.host} path={request.path} status={response.status_code} set_cookie={'Set-Cookie' in response.headers} cookie_domain={app.config.get('SESSION_COOKIE_DOMAIN')} samesite={app.config.get('SESSION_COOKIE_SAMESITE')} secure={app.config.get('SESSION_COOKIE_SECURE')} set_cookie_header={set_cookie_header[:160] if set_cookie_header else None}")
+            f"[after_request] host={request.host} path={request.path} status={response.status_code} "
+            f"set_cookie={'Set-Cookie' in response.headers} "
+            f"cookie_domain={app.config.get('SESSION_COOKIE_DOMAIN')} "
+            f"samesite={app.config.get('SESSION_COOKIE_SAMESITE')} "
+            f"secure={app.config.get('SESSION_COOKIE_SECURE')} "
+            f"set_cookie_header={set_cookie_header[:160] if set_cookie_header else None}")
 
-    # Detekce prostředí/domény
+    # Detekce prostředí
     host = request.host.split(':')[0]
-
-    def _is_private_ip(h):
-        return any(h.startswith(prefix) for prefix in (
-            '192.168.', '10.', '172.16.', '172.17.', '172.18.', '172.19.', '172.20.', '172.21.', '172.22.', '172.23.',
-            '172.24.', '172.25.', '172.26.', '172.27.', '172.28.', '172.29.', '172.30.', '172.31.'))
-
     is_localhost = host in ('localhost', '127.0.0.1')
-    is_private = _is_private_ip(host)
     is_prod = host.endswith('knowix.cz')
     is_https = bool(request.is_secure)
 
-    # CSP (rozšířená o GA domény) – bez upgrade-insecure-requests pro lokální/privátní, jinak přidáme
-    csp = (
-        "default-src 'self'; "
-        "base-uri 'self'; "
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' "
-        "https://cdn.quilljs.com https://cdn.jsdelivr.net "
-        "https://www.youtube.com https://s.ytimg.com "
-        "https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com; "
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.quilljs.com https://cdnjs.cloudflare.com; "
-        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
-        "img-src 'self' data: https: blob: https://www.google-analytics.com https://ssl.google-analytics.com https://www.googletagmanager.com https://stats.g.doubleclick.net; "
-        "connect-src 'self' https://cdn.quilljs.com https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
-        "frame-src https://open.spotify.com https://*.spotify.com https://www.youtube-nocookie.com https://www.youtube.com https://*.youtube.com; "
-        "media-src 'self' blob:; "
-        "object-src 'none'; frame-ancestors 'none';"
-    )
+    csp = _CSP_DEFAULT
     if is_prod and is_https:
         csp += " upgrade-insecure-requests;"
     response.headers['Content-Security-Policy'] = csp
 
-    # Permissions-Policy držíme univerzálně
     response.headers['Permissions-Policy'] = (
         'geolocation=(), microphone=(self), camera=(), '
         'fullscreen=(self "https://www.youtube.com" "https://www.youtube-nocookie.com"), '
@@ -585,7 +411,7 @@ def add_security_headers(response):
     else:
         response.headers.pop('Strict-Transport-Security', None)
 
-    # COOP/CORP pouze na důvěryhodných origínech (produkční https nebo localhost); na privátní IP je vypneme
+    # COOP/CORP jen na důvěryhodných origínech; na privátní IP vypnout
     if is_prod and is_https or is_localhost:
         response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
         response.headers['Cross-Origin-Resource-Policy'] = 'same-origin'
@@ -599,48 +425,193 @@ def add_security_headers(response):
     return response
 
 
-# === Static SW na root cestě kvůli scope ===
+# ===========================================================================
+# Context procesory pro šablony (streak, XP, denní úkoly)
+# ===========================================================================
+
+# Názvy levelů: (max_level, název) — první vyhovující řádek vyhrává
+_LEVEL_NAMES = [
+    (1, "Začátečník"),
+    (2, "Učeň"),
+    (4, "Student"),
+    (5, "Pokročilý"),
+    (6, "Expert Knowixu"),
+    (8, "Mistr"),
+    (10, "Legenda"),
+    (12, "Volax"),
+    (15, "Král Knowixu"),
+]
+
+
+def get_level_name(level):
+    """Vrátí český název levelu podle tabulky _LEVEL_NAMES."""
+    for max_level, name in _LEVEL_NAMES:
+        if level <= max_level:
+            return name
+    return _LEVEL_NAMES[-1][1]
+
+
+@app.context_processor
+def inject_streak():
+    user_id = session.get('user_id')
+    if user_id:
+        return dict(user_streak=get_user_streak(user_id))
+    return dict(user_streak=0)
+
+
+@app.context_processor
+def inject_xp_info():
+    user_id = session.get('user_id')
+    if not user_id:
+        return {}
+    user_data = get_user_xp_and_level(user_id)
+    xp = user_data.get("xp", 0)
+    level = user_data.get("level", 1)
+    xp_in_level = xp % 50  # level = 50 XP
+    return dict(
+        user_xp=xp,
+        user_level=level,
+        user_level_name=get_level_name(level),
+        user_progress_percent=int((xp_in_level / 50) * 100),
+        user_xp_in_level=xp_in_level,
+    )
+
+
+@app.context_processor
+def inject_daily_quests_cp():
+    user_id = session.get('user_id')
+    if user_id:
+        return dict(daily_quests=get_daily_quests_for_user(user_id))
+    return dict(daily_quests=None)
+
+
+# ===========================================================================
+# Globální error handler (HTML nebo JSON podle Accept hlavičky)
+# ===========================================================================
+
+@app.errorhandler(502)
+@app.errorhandler(503)
+@app.errorhandler(504)
+@app.errorhandler(500)
+@app.errorhandler(404)
+@app.errorhandler(Exception)
+def server_error(e):
+    code = getattr(e, 'code', 500)
+    tb = traceback.format_exc()
+
+    # Kontext requestu pro log (mimo request context nemusí existovat)
+    try:
+        user_id = session.get('user_id')
+    except Exception:
+        user_id = None
+    try:
+        path, method = request.path, request.method
+    except Exception:
+        path, method = '<no request>', '<no method>'
+
+    logging.getLogger("main").error(
+        "[main] server_error: type=%s code=%s msg=%s method=%s path=%s user_id=%s\n%s",
+        type(e).__name__, code, str(e), method, path, user_id, tb,
+    )
+
+    wants_json = ('application/json' in request.headers.get('Accept', '')) or \
+                 ('application/json' in request.headers.get('Content-Type', '')) or \
+                 request.path.endswith('/check-answer')
+    if wants_json:
+        return jsonify({'error': str(e), 'code': code, 'traceback': tb}), code
+    return render_template('error.html', error_code=code, error_message=str(e), error_traceback=tb), code
+
+
+# ===========================================================================
+# Drobné routy vlastněné přímo aplikací (statické soubory, PWA, aliasy)
+# ===========================================================================
+
+@app.route('/sitemap.xml')
+def sitemap():
+    return send_from_directory('templates', 'sitemap.xml')
+
+
+@app.route('/robots.txt')
+def robots_txt():
+    return send_from_directory('templates', 'robots.txt')
+
+
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
+
+@app.route('/kontakty')
+def kontakty():
+    return render_template('kontakty.html')
+
+
+@app.route('/offline')
+def offline_page():
+    """Offline fallback stránka pro PWA."""
+    return render_template('offline.html')
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'), 'favicon.ico',
+        mimetype='image/vnd.microsoft.icon')
+
+
+@app.route('/apple-touch-icon.png')
+def apple_touch_icon():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'), 'apple-touch-icon.png',
+        mimetype='image/png')
+
+
+@app.route('/apple-touch-icon-precomposed.png')
+def apple_touch_icon_precomposed():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'), 'apple-touch-icon.png',
+        mimetype='image/png')
+
+
+@app.route('/static/profile_pics/<path:filename>')
+def serve_profile_pic(filename):
+    """Profilovky s fallbackem na default obrázek."""
+    try:
+        return send_from_directory('static/profile_pics', filename)
+    except Exception:
+        try:
+            return send_from_directory('static/profile_pics', 'default.webp')
+        except Exception:
+            return send_from_directory('static', 'favicon.ico')  # poslední záchrana
+
+
 @app.route('/service-worker.js')
 def service_worker_file():
+    """Service worker na root cestě kvůli PWA scope."""
     resp = send_from_directory('static', 'service-worker.js')
-    # Zajistí root scope bez chyb
     resp.headers['Service-Worker-Allowed'] = '/'
     resp.headers['Cache-Control'] = 'no-cache'
     return resp
 
 
-# @app.route("/set_lang/<lang>")
-# def set_lang(lang):
-#     session["lang"] = lang
-#     return redirect(request.referrer or url_for("main.index"))
-#
-#
-# def t(key):
-#     lang = session.get("lang", "cs")
-#     # Odolnější fallback při chybějícím klíči/jazyku
-#     entry = translations.get(key)
-#     if isinstance(entry, dict):
-#         return entry.get(lang) or entry.get("cs") or next(iter(entry.values()), key)
-#     return key
-#
-#
-# # Zpřístupnit překladovou funkci do Jinja šablon
-# @app.context_processor
-# def inject_t():
-#     return dict(t=t)
+@app.route('/.well-known/appspecific/com.chrome.devtools.json')
+def chrome_devtools_assoc():
+    # Prázdný 204 místo 404 (Chrome DevTools si o soubor říká automaticky)
+    return make_response('', 204)
 
 
-# === Alias: /send_notification -> použije test_send_push z push_notifications ===
 @app.route('/send_notification', methods=['POST'])
 def send_notification_alias_root():
+    """Alias na testovací push notifikaci z push_notifications."""
     return test_send_push()
 
 
-# Po registraci blueprintů a inicializaci session zajistíme DB schéma users
-# (users a guest už bootstrappujeme hned po load_dotenv výše)
-
+# ===========================================================================
+# Migrace schématu users (jen MySQL — SQLite schéma je kompletní z db.py)
+# ===========================================================================
 
 def _ensure_user_columns():
+    """Doplní chybějící sloupce do users; duplicitní sloupce (chyba 1060) ignoruje."""
     from db import is_sqlite_mode
     if is_sqlite_mode():
         return  # SQLite schéma je kompletní z db._ensure_sqlite_schema()
@@ -649,23 +620,20 @@ def _ensure_user_columns():
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-        # Každý sloupec přidáme zvlášť a ignorujeme chybu 1060 (Duplicate column)
         alters = [
             "ALTER TABLE users ADD COLUMN is_guest TINYINT(1) DEFAULT 0",
             "ALTER TABLE users ADD COLUMN has_seen_onboarding TINYINT(1) DEFAULT 0",
-            "ALTER TABLE users ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+            "ALTER TABLE users ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
         ]
         for sql in alters:
             try:
                 cur.execute(sql)
                 conn.commit()
             except Exception as e:
-                # Pokud DB vrátí, že sloupec existuje, pokračuj; jinak znovu vyhoď
                 msg = str(getattr(e, 'msg', e))
                 if 'Duplicate column' in msg or '1060' in msg:
-                    continue
-                else:
-                    raise
+                    continue  # sloupec už existuje
+                raise
         print("[main] users table columns ensured")
     except Exception as ex:
         print(f"[main] WARNING: unable to ensure users columns: {ex}")
@@ -680,11 +648,11 @@ def _ensure_user_columns():
 
 
 _ensure_user_columns()
-# app.run(port=5000, debug=True, host='0.0.0.0')
 
-# from waitress import serve
 
-# serve(app, host='0.0.0.0', port=8080, threads=32, backlog=1000)
+# ===========================================================================
+# Spuštění dev serveru
+# ===========================================================================
 
-# === Spuštění aplikace ===
-app.run(port=9999, debug=True, host='0.0.0.0')
+if __name__ == '__main__':
+    app.run(port=9999, debug=True, host='0.0.0.0')
